@@ -11,6 +11,7 @@ namespace FadingFlame.UserAccounts
     {
         UserAccount GetUser();
         void SetUser(UserAccount account);
+        void RemoveUser();
     }
 
     public class UserContext : IUserContext
@@ -52,6 +53,11 @@ namespace FadingFlame.UserAccounts
             {
                 _httpContext.HttpContext?.User.AddIdentity(identity);
             }
+        }
+
+        public void RemoveUser()
+        {
+            if (_httpContext.HttpContext != null) _httpContext.HttpContext.User = new ClaimsPrincipal();
         }
 
         private ClaimsIdentity FindUserClaim()

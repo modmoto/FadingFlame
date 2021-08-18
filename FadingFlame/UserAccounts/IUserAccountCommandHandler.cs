@@ -58,7 +58,7 @@ namespace FadingFlame.UserAccounts
 
         public async Task Logout()
         {
-            // TODO REMOVE USER FROM HTTPCONTEXT
+            _context.RemoveUser();
             await _localStorageService.RemoveItem(_userKey);
         }
 
