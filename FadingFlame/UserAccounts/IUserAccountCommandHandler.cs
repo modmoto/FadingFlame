@@ -56,10 +56,10 @@ namespace FadingFlame.UserAccounts
             }
         }
 
-        public Task Logout()
+        public async Task Logout()
         {
-            _context.SetUser(null);
-            return _localStorageService.RemoveItem(_userKey);
+            // TODO REMOVE USER FROM HTTPCONTEXT
+            await _localStorageService.RemoveItem(_userKey);
         }
 
         public async Task Register(RegisterModel registerModel)

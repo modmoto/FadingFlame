@@ -45,6 +45,8 @@
     private async Task LogOut()
     {
         await _commandHandler.Logout();
+        UserName = "";
+        StateHasChanged();
     }
 
     protected override async Task OnAfterRenderAsync(bool what)
