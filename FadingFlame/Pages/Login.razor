@@ -32,11 +32,7 @@
 </div>
 
 @code{
-    private LoginModel model = new()
-    {
-        Email = "test@lel.de",
-        Password = "123456"
-    };
+    private LoginModel model = new();
     private bool _loading;
 
     private async Task OnValidSubmit()
