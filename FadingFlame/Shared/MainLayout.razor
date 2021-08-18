@@ -45,7 +45,6 @@
     private async Task LogOut()
     {
         await _commandHandler.Logout();
-        UserName = "";
         StateHasChanged();
     }
 
