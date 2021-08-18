@@ -1,4 +1,9 @@
+@using FadingFlame.UserAccounts
+@using FadingFlame.Players
 @inherits LayoutComponentBase
+@inject IUserContext _userContext
+@inject IUserAccountCommandHandler _commandHandler
+@inject IPlayerRepository _playerRepository
 
 <div class="page">
     <div class="sidebar">
@@ -6,8 +11,12 @@
     </div>
 
     <div class="main">
-        <div class="top-row px-4">
+        <div class="top-row px-4" hidden="@IsLoggedIn">
             <a href="/login" >Login</a>
+        </div>
+        <div class="top-row px-4" hidden="@(!IsLoggedIn)">
+            <span>Hello @UserName</span>
+            <a href="/login" @onclick="LogOut">Logout</a>
         </div>
 
         <div class="content px-4">
@@ -15,3 +24,36 @@
         </div>
     </div>
 </div>
+
+@code
+{
+    public bool IsLoggedIn => _userContext.GetUser() != null;
+    public string UserName { get; set; }
+
+    public async Task<string> GetUserName()
+    {
+        var userAccount = _userContext.GetUser();
+        if (userAccount != null)
+        {
+            var player = await _playerRepository.Load(userAccount.PlayerId);
+            return player.DisplayName ?? userAccount.Email;
+        }
+
+        return "";
+    }
+
+    private async Task LogOut()
+    {
+        await _commandHandler.Logout();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool what)
+    {
+        if (!IsLoggedIn)
+        {
+            await _commandHandler.LoginFromCookie();
+            UserName = await GetUserName();
+            StateHasChanged();
+        }
+    }
+}

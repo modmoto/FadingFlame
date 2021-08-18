@@ -33,13 +33,13 @@ namespace FadingFlame
             services.AddTransient<ILeagueRepository, LeagueRepository>();
             services.AddTransient<IPlayerRepository, PlayerRepository>();
             services.AddTransient<ILeagueCommandHandler, LeagueCommandHandler>();
-            services.AddSingleton<IUserContext, UserContext>();
+            services.AddTransient<IUserContext, UserContext>();
             services.AddTransient<ILocalStorageService, LocalStorageService>();
             services.AddTransient<IUserAccountRepository, UserAccountRepository>();
             services.AddTransient<IUserAccountCommandHandler, UserAccountCommandHandler>();
+            services.AddHttpContextAccessor();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -52,7 +52,6 @@ namespace FadingFlame
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();

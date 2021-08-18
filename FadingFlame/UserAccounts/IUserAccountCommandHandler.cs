@@ -6,6 +6,7 @@ namespace FadingFlame.UserAccounts
     public interface IUserAccountCommandHandler
     {
         public Task Login(LoginModel loginModel);
+        public Task LoginFromCookie();
         public Task Logout();
         public Task Register(RegisterModel registerModel);
     }
@@ -36,13 +37,28 @@ namespace FadingFlame.UserAccounts
             if (user?.Password == loginModel.Password)
             {
                 await _localStorageService.SetItem(_userKey, user);
-                _context.LoggedInUser = user;
+                _context.SetUser(user);
+            }
+        }
+
+        public async Task LoginFromCookie()
+        {
+            var item = await _localStorageService.GetItem<UserAccount>(_userKey);
+            if (item != null)
+            {
+                var loginModel = new LoginModel
+                {
+                    Email = item.Email,
+                    Password = item.Password
+                };
+
+                await Login(loginModel);
             }
         }
 
         public Task Logout()
         {
-            _context.LoggedInUser = null;
+            _context.SetUser(null);
             return _localStorageService.RemoveItem(_userKey);
         }
 
@@ -56,7 +72,7 @@ namespace FadingFlame.UserAccounts
                 await _playerRepository.Insert(player);
                 var userAccount = UserAccount.Create(player.Id, registerModel.Email, registerModel.Password);
 
-                _context.LoggedInUser = userAccount;
+                _context.SetUser(userAccount);
                 await _localStorageService.SetItem(_userKey, userAccount);
                 await _accountRepository.Upsert(userAccount);
             }

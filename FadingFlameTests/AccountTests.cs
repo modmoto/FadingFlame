@@ -18,7 +18,7 @@ namespace FadingFlameTests
                 new Mock<ILocalStorageService>().Object,
                 userAccountRepository,
                 new PlayerRepository(MongoClient),
-                new UserContext());
+                new Mock<IUserContext>().Object);
 
             var email = "simon@123.de";
             var registerModel = new RegisterModel
