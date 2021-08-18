@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FadingFlame", "FadingFlame\FadingFlame.csproj", "{FE936BAC-EDCC-4EC3-8DB5-20C0FB4C5B56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FadingFlameTests", "FadingFlameTests\FadingFlameTests.csproj", "{7CDA5F78-087E-4A07-84E9-48758BE5C1DF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FE936BAC-EDCC-4EC3-8DB5-20C0FB4C5B56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE936BAC-EDCC-4EC3-8DB5-20C0FB4C5B56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE936BAC-EDCC-4EC3-8DB5-20C0FB4C5B56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE936BAC-EDCC-4EC3-8DB5-20C0FB4C5B56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CDA5F78-087E-4A07-84E9-48758BE5C1DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CDA5F78-087E-4A07-84E9-48758BE5C1DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CDA5F78-087E-4A07-84E9-48758BE5C1DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CDA5F78-087E-4A07-84E9-48758BE5C1DF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

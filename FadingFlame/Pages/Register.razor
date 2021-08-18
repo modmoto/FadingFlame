@@ -1,0 +1,65 @@
+﻿@page "/register"
+@using FadingFlame.UserAccounts
+
+@inject NavigationManager _navigation
+@inject IUserAccountCommandHandler _userAccountCommandHandler
+
+<div class="card">
+    <h4 class="card-header">Register</h4>
+    <div class="card-body">
+        <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+            <div class="form-group">
+                <label>Display Name</label>
+                <InputText @bind-Value="model.DisplayName" class="form-control" />
+                <ValidationMessage For="@(() => model.DisplayName)" />
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <InputText @bind-Value="model.Email" class="form-control" />
+                <ValidationMessage For="@(() => model.Email)" />
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <InputText @bind-Value="model.Password" type="password" class="form-control" />
+                <ValidationMessage For="@(() => model.Password)" />
+            </div>
+            <button disabled="@_loading" class="btn btn-primary">
+                @if (_loading)
+                {
+                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                }
+                Register
+            </button>
+            <NavLink href="login" class="btn btn-link">Cancel</NavLink>
+        </EditForm>
+    </div>
+</div>
+
+@code{
+    private RegisterModel model = new()
+    {
+        Email = "test@lel.de",
+        Password = "123456",
+        DisplayName = "modmoto"
+    };
+
+    private bool _loading;
+
+    private async Task OnValidSubmit()
+    {
+        _loading = true;
+        try
+        {
+            await _userAccountCommandHandler.Register(model);
+            _navigation.NavigateTo("");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            Console.WriteLine(e.StackTrace);
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+}

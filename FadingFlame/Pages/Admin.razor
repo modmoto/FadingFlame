@@ -1,0 +1,13 @@
+﻿@page "/admin"
+@using FadingFlame.Leagues
+
+<button class="button" @onclick="CreateLeagues">make leagues</button>
+
+@inject ILeagueCommandHandler _leagueCommandHandler
+
+@code {
+    private async Task CreateLeagues()
+    {
+        await _leagueCommandHandler.CreateLeagues();
+    }
+}

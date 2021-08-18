@@ -1,0 +1,49 @@
+﻿@page "/league/{leagueId?}"
+@using MongoDB.Bson
+@using FadingFlame.Leagues
+
+@if (_league == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Points</th>
+            <th>Matches</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var forecast in _league.Players)
+        {
+            <tr>
+                <td>@forecast.Name</td>
+                <td>@forecast.Points</td>
+                <td>@forecast.Games</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@inject ILeagueRepository _leagueRepository
+
+@code {
+    [Parameter]
+    public string LeagueId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ObjectId.TryParse(LeagueId, out var arsed))
+        {
+            _league = await _leagueRepository.Load(arsed);
+        }
+    }
+
+    private League _league;
+}
