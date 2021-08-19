@@ -10,6 +10,15 @@
 }
 
 @code {
+
+    protected override void OnInitialized()
+    {
+        _userState.UserLoggedIn += (_, _) =>
+        {
+            StateHasChanged();
+        };
+    }
+
     private async Task CreateLeagues()
     {
         await _leagueCommandHandler.CreateLeagues();

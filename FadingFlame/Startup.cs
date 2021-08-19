@@ -39,6 +39,17 @@ namespace FadingFlame
             services.AddTransient<IUserAccountCommandHandler, UserAccountCommandHandler>();
             services.AddScoped<UserState>();
             services.AddHttpContextAccessor();
+
+            // var buildServiceProvider = services.BuildServiceProvider();
+            // var userAccountCommandHandler = buildServiceProvider.GetService<IUserAccountCommandHandler>();
+            // for (int i = 0; i < 103; i++)
+            // {
+            //     var registerModel = new RegisterModel();
+            //     registerModel.Email = $"test{i}@lel.de";
+            //     registerModel.DisplayName = $"test{i}";
+            //     registerModel.Password = "secret";
+            //     userAccountCommandHandler.Register(registerModel).Wait();
+            // }
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

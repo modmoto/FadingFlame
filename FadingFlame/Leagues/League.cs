@@ -5,6 +5,7 @@ using System.Linq;
 using FadingFlame.Players;
 using FadingFlame.Repositories;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace FadingFlame.Leagues
 {
@@ -12,6 +13,7 @@ namespace FadingFlame.Leagues
     {
         public string Name { get; set; }
         public int Season { get; set; }
+        [BsonId]
         public ObjectId Id { get; set; }
         public List<PlayerInLeague> Players { get; set; } = new();
 

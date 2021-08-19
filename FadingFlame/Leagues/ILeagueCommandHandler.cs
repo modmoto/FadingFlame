@@ -23,9 +23,9 @@ namespace FadingFlame.Leagues
         public async Task CreateLeagues()
         {
             // Todo add season
-            var season = 0;
+            var season = 1;
 
-            var leagues = await _leagueRepository.LoadForSeason(season - 1);
+            // var leagues = await _leagueRepository.LoadForSeason(season - 1);
 
             var players = await _playerRepository.LoadAll();
             int counter = 0;
@@ -44,6 +44,10 @@ namespace FadingFlame.Leagues
                 }
             }
 
+            if (currentLeageu.Players.Count != 0)
+            {
+                newLeagues.Add(currentLeageu);
+            }
             await _leagueRepository.Insert(newLeagues);
             //
             // if (leagues.Count == 0)

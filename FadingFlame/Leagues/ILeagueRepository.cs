@@ -31,7 +31,7 @@ namespace FadingFlame.Leagues
 
         public Task Insert(List<League> newLeagues)
         {
-            return UpsertMany(newLeagues);
+            return base.Insert(newLeagues);
         }
     }
 }

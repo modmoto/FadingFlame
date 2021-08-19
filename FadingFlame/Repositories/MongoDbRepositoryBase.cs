@@ -41,6 +41,12 @@ namespace FadingFlame.Repositories
             return mongoCollection.InsertOneAsync(element);
         }
 
+        protected Task Insert<T>(List<T> element)
+        {
+            var mongoCollection = CreateCollection<T>();
+            return mongoCollection.InsertManyAsync(element);
+        }
+
         protected async Task<List<T>> LoadAll<T>(Expression<Func<T, bool>> expression = null, int? limit = null)
         {
             if (expression == null) expression = l => true;
