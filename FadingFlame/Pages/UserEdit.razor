@@ -1,28 +1,28 @@
 ﻿@page "/player/{Id}"
 @using Microsoft.AspNetCore.Components
 @using FadingFlame.Players
-@using FadingFlame.UserAccounts
 @using MongoDB.Bson
+@using FadingFlame.Events
 
 @inject IPlayerRepository _playerRepository
-@inject IUserContext _userContext
+@inject UserLoginState _loginState
 
 <div class="card">
     <h4 class="card-header">Profile</h4>
     <div class="card-body">
         @if (_isLoggedInUser)
         {
-            <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+            <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
                 <DataAnnotationsValidator/>
                 <div class="form-group">
                     <label>Name: </label>
-                    <InputText @bind-Value="model.DisplayName" class="form-control"/>
-                    <ValidationMessage For="@(() => model.DisplayName)"/>
+                    <InputText @bind-Value="_model.DisplayName" class="form-control"/>
+                    <ValidationMessage For="@(() => _model.DisplayName)"/>
                 </div>
                 <div class="form-group">
                     <label>Discord Tag: </label>
-                    <InputText @bind-Value="model.DiscordTag" class="form-control"/>
-                    <ValidationMessage For="@(() => model.DiscordTag)"/>
+                    <InputText @bind-Value="_model.DiscordTag" class="form-control"/>
+                    <ValidationMessage For="@(() => _model.DiscordTag)"/>
                 </div>
                 <button disabled="@_loading" class="btn btn-primary">
                     @if (_loading)
@@ -37,11 +37,11 @@
         {
             <div class="form-group">
                 <label>Name: </label>
-                <span>@model.DisplayName</span>
+                <span>@_model.DisplayName</span>
             </div>
             <div class="form-group">
                 <label>Discord Tag: </label>
-                <span>@model.DiscordTag</span>
+                <span>@_model.DiscordTag</span>
             </div>
         }
 
@@ -49,7 +49,7 @@
 </div>
 
 @code{
-    private EditUserModel model = new();
+    private EditUserModel _model = new();
     private bool _loading;
     private bool _isLoggedInUser;
     [ParameterAttribute]
@@ -66,13 +66,13 @@
             }
             else
             {
-                var userAccount = _userContext.GetUser();
-                if (userAccount?.PlayerId == layer.Id)
+                var layerId = _loginState.LoggedInPlayerId;
+                if (layerId == layer.Id)
                 {
                     _isLoggedInUser = true;
                 }
 
-                model = new EditUserModel
+                _model = new EditUserModel
                 {
                     DiscordTag = layer.DiscordTag,
                     DisplayName = layer.DisplayName
@@ -87,8 +87,8 @@
     {
         _loading = true;
         var layer = await _playerRepository.Load(new ObjectId(Id));
-        layer.DiscordTag = model.DiscordTag;
-        layer.DisplayName = model.DisplayName;
+        layer.DiscordTag = _model.DiscordTag;
+        layer.DisplayName = _model.DisplayName;
         await _playerRepository.Udate(layer);
         _loading = false;
     }
