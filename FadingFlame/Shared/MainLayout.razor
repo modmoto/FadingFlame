@@ -5,7 +5,7 @@
 @inject IUserContext _userContext
 @inject IUserAccountCommandHandler _commandHandler
 @inject IPlayerRepository _playerRepository
-@inject EventBus _eventBus
+@inject UserLoginState _userLoginState
 
 <div class="page">
     <div class="sidebar">
@@ -29,8 +29,8 @@
 
 @code
 {
-    public bool IsLoggedIn => _userContext.GetUser() != null;
-    public string UserName { get; set; }
+    public bool IsLoggedIn => _userLoginState.UserIsLoggedIn;
+    public string UserName => _userLoginState.UserName;
 
     public async Task<string> GetUserName()
     {
@@ -55,11 +55,8 @@
         if (!IsLoggedIn)
         {
             await _commandHandler.LoginFromCookie();
-            UserName = await GetUserName();
-            _eventBus.OnUserLoggedIn(new UserLoggedInEvent
-            {
-                PlayerId = _userContext.GetUser().PlayerId
-            });
+            var userName = await GetUserName();
+            _userLoginState.SetUserLoggedIn(_userContext.GetUser().PlayerId, userName);
             StateHasChanged();
         }
     }
