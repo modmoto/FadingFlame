@@ -3,7 +3,7 @@ using MongoDB.Bson;
 
 namespace FadingFlame.Events
 {
-    public class UserLoginState
+    public class UserState
     {
         public event EventHandler UserLoggedIn;
 

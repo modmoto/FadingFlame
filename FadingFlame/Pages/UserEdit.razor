@@ -5,7 +5,7 @@
 @using FadingFlame.Events
 
 @inject IPlayerRepository _playerRepository
-@inject UserLoginState _loginState
+@inject UserState _state
 
 <div class="card">
     <h4 class="card-header">Profile</h4>
@@ -66,7 +66,7 @@
             }
             else
             {
-                var layerId = _loginState.LoggedInPlayerId;
+                var layerId = _state.LoggedInPlayerId;
                 if (layerId == layer.Id)
                 {
                     _isLoggedInUser = true;

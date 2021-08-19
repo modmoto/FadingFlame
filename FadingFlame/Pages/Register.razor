@@ -49,10 +49,8 @@
             await _userAccountCommandHandler.Register(model);
             _navigation.NavigateTo("");
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            Console.WriteLine(e.Message);
-            Console.WriteLine(e.StackTrace);
             _loading = false;
             StateHasChanged();
         }

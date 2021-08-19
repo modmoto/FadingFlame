@@ -2,10 +2,9 @@
 @using FadingFlame.Players
 @using FadingFlame.Events
 @inherits LayoutComponentBase
-@inject IUserContext _userContext
 @inject IUserAccountCommandHandler _commandHandler
 @inject IPlayerRepository _playerRepository
-@inject UserLoginState _userLoginState
+@inject UserState _userState
 
 <div class="page">
     <div class="sidebar">
@@ -29,16 +28,15 @@
 
 @code
 {
-    public bool IsLoggedIn => _userLoginState.UserIsLoggedIn;
-    public string UserName => _userLoginState.UserName;
+    public bool IsLoggedIn => _userState.UserIsLoggedIn;
+    public string UserName => _userState.UserName;
 
     public async Task<string> GetUserName()
     {
-        var userAccount = _userContext.GetUser();
-        if (userAccount != null)
+        if (_userState.UserIsLoggedIn)
         {
-            var player = await _playerRepository.Load(userAccount.PlayerId);
-            return player.DisplayName ?? userAccount.Email;
+            var player = await _playerRepository.Load(_userState.LoggedInPlayerId);
+            return player.DisplayName;
         }
 
         return "";
@@ -56,10 +54,9 @@
         {
             await _commandHandler.LoginFromCookie();
             var userName = await GetUserName();
-            var playerId = _userContext.GetUser()?.PlayerId;
-            if (playerId != null)
+            if (_userState.UserIsLoggedIn)
             {
-                _userLoginState.SetUserLoggedIn(playerId.Value, userName);
+                _userState.SetUserLoggedIn(_userState.LoggedInPlayerId, userName);
                 StateHasChanged();
             }
         }

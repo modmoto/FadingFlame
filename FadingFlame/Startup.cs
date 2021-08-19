@@ -38,7 +38,7 @@ namespace FadingFlame
             services.AddTransient<ILocalStorageService, LocalStorageService>();
             services.AddTransient<IUserAccountRepository, UserAccountRepository>();
             services.AddTransient<IUserAccountCommandHandler, UserAccountCommandHandler>();
-            services.AddScoped<UserLoginState>();
+            services.AddScoped<UserState>();
             services.AddHttpContextAccessor();
         }
 
