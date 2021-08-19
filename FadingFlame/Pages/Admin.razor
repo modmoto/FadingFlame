@@ -1,9 +1,13 @@
 ﻿@page "/admin"
 @using FadingFlame.Leagues
-
-<button class="button" @onclick="CreateLeagues">make leagues</button>
-
+@using FadingFlame.UserAccounts
+@inject UserState _userState
 @inject ILeagueCommandHandler _leagueCommandHandler
+
+@if (_userState.UserIsAdmin)
+{
+    <button class="button" @onclick="CreateLeagues">make leagues</button>
+}
 
 @code {
     private async Task CreateLeagues()

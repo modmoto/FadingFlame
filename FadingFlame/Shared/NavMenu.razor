@@ -2,7 +2,7 @@
 @inject UserState _userState
 
 <div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">FadingFlame</a>
+    <a class="navbar-brand" href="">Fading Flame</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -11,21 +11,19 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/admin" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span>Admin
-            </NavLink>
-            <NavLink class="nav-link" href="@Link" Match="NavLinkMatch.All" hidden="@(!_userState.UserIsLoggedIn)">
-                <span class="oi oi-home" aria-hidden="true"></span>Profile
+            <NavLink class="nav-link" href="/admin" Match="NavLinkMatch.All" hidden="@(!_userState.UserIsAdmin)">
+                <span class="oi oi-account-login" aria-hidden="true"></span>Admin
             </NavLink>
         </li>
     </ul>
 </div>
 
 @code {
+    public string LoggedInPlayerId => _userState.LoggedInPlayerId.ToString();
+    public string Link => $"/player/{LoggedInPlayerId}";
+
     private bool collapseNavMenu = true;
-
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
@@ -38,7 +36,4 @@
             StateHasChanged();
         };
     }
-
-    public string LoggedInPlayerId => _userState.LoggedInPlayerId.ToString();
-    public string Link => $"/player/{LoggedInPlayerId}";
 }

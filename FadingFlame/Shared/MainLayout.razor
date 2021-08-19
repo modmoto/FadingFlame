@@ -12,11 +12,15 @@
 
     <div class="main">
         <div class="top-row px-4" hidden="@IsLoggedIn">
-            <a href="/login" >Login</a>
+            <a href="/login">
+                <span class="oi oi-account-login" aria-hidden="true"></span>
+            </a>
         </div>
         <div class="top-row px-4" hidden="@(!IsLoggedIn)">
-            <span>Hello @UserName</span>
-            <a href="/logout" @onclick="LogOut">Logout</a>
+            <span>Hello<a href="@Link">@UserName</a></span>
+            <a href="/" @onclick="LogOut">
+                <span class="oi oi-account-logout" aria-hidden="true"></span>
+            </a>
         </div>
 
         <div class="content px-4">
@@ -29,6 +33,7 @@
 {
     public bool IsLoggedIn => _userState.UserIsLoggedIn;
     public string UserName => _userState.UserName;
+    public string Link => $"/player/{_userState.LoggedInPlayerId}";
 
     public async Task<string> GetUserName()
     {

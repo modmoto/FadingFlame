@@ -19,12 +19,12 @@ else
         </tr>
         </thead>
         <tbody>
-        @foreach (var forecast in _league.Players)
+        @foreach (var playerInLeague in _league.Players)
         {
             <tr>
-                <td>@forecast.Name</td>
-                <td>@forecast.Points</td>
-                <td>@forecast.Games</td>
+                <td>@playerInLeague.Name</td>
+                <td>@playerInLeague.Points</td>
+                <td>@playerInLeague.Games</td>
             </tr>
         }
         </tbody>
