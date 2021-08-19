@@ -19,9 +19,6 @@
 </div>
 
 @code {
-    public string LoggedInPlayerId => _userState.LoggedInPlayerId.ToString();
-    public string Link => $"/player/{LoggedInPlayerId}";
-
     private bool collapseNavMenu = true;
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
     private void ToggleNavMenu()
