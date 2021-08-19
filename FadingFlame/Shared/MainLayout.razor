@@ -56,8 +56,12 @@
         {
             await _commandHandler.LoginFromCookie();
             var userName = await GetUserName();
-            _userLoginState.SetUserLoggedIn(_userContext.GetUser().PlayerId, userName);
-            StateHasChanged();
+            var playerId = _userContext.GetUser()?.PlayerId;
+            if (playerId != null)
+            {
+                _userLoginState.SetUserLoggedIn(playerId.Value, userName);
+                StateHasChanged();
+            }
         }
     }
 }
