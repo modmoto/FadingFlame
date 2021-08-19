@@ -1,5 +1,6 @@
 ﻿@using FadingFlame.UserAccounts
-@inject IUserContext _context
+@using FadingFlame.Events
+@inject EventBus _eventBus
 
 <div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand" href="">FadingFlame</a>
@@ -14,7 +15,7 @@
             <NavLink class="nav-link" href="/admin" Match="NavLinkMatch.All">
                 <span class="oi oi-home" aria-hidden="true"></span>Admin
             </NavLink>
-            <NavLink class="nav-link" href="/profile/@LoggedInPlayerId" Match="NavLinkMatch.All" hidden="@(_context.GetUser() == null)">
+            <NavLink class="nav-link" href="@Link" Match="NavLinkMatch.All" hidden="@(LoggedInPlayerId == null)">
                 <span class="oi oi-home" aria-hidden="true"></span>Profile
             </NavLink>
         </li>
@@ -22,7 +23,6 @@
 </div>
 
 @code {
-
     private bool collapseNavMenu = true;
 
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
@@ -32,6 +32,18 @@
         collapseNavMenu = !collapseNavMenu;
     }
 
-    public string LoggedInPlayerId { get; set; }
+    protected override void OnInitialized()
+    {
+        _eventBus.UserLoggedIn += (_, args) =>
+        {
+            if (args is UserLoggedInEvent userLoggedInEvent)
+            {
+                LoggedInPlayerId = userLoggedInEvent.PlayerId.ToString();
+                StateHasChanged();
+            }
+        };
+    }
 
+    public string LoggedInPlayerId { get; set; }
+    public string Link => $"/profile/{LoggedInPlayerId}";
 }

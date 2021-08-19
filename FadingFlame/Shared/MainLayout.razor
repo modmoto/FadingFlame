@@ -1,9 +1,11 @@
 @using FadingFlame.UserAccounts
 @using FadingFlame.Players
+@using FadingFlame.Events
 @inherits LayoutComponentBase
 @inject IUserContext _userContext
 @inject IUserAccountCommandHandler _commandHandler
 @inject IPlayerRepository _playerRepository
+@inject EventBus _eventBus
 
 <div class="page">
     <div class="sidebar">
@@ -16,7 +18,7 @@
         </div>
         <div class="top-row px-4" hidden="@(!IsLoggedIn)">
             <span>Hello @UserName</span>
-            <a href="/login" @onclick="LogOut">Logout</a>
+            <a href="/logout" @onclick="LogOut">Logout</a>
         </div>
 
         <div class="content px-4">
@@ -27,8 +29,6 @@
 
 @code
 {
-    public static event EventHandler UserLoggedIn;
-
     public bool IsLoggedIn => _userContext.GetUser() != null;
     public string UserName { get; set; }
 
@@ -56,7 +56,10 @@
         {
             await _commandHandler.LoginFromCookie();
             UserName = await GetUserName();
-            UserLoggedIn?.Invoke(this, EventArgs.Empty);
+            _eventBus.OnUserLoggedIn(new UserLoggedInEvent
+            {
+                PlayerId = _userContext.GetUser().PlayerId
+            });
             StateHasChanged();
         }
     }

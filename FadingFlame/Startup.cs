@@ -1,3 +1,4 @@
+using FadingFlame.Events;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
 using FadingFlame.UserAccounts;
@@ -37,6 +38,7 @@ namespace FadingFlame
             services.AddTransient<ILocalStorageService, LocalStorageService>();
             services.AddTransient<IUserAccountRepository, UserAccountRepository>();
             services.AddTransient<IUserAccountCommandHandler, UserAccountCommandHandler>();
+            services.AddScoped<EventBus>();
             services.AddHttpContextAccessor();
         }
 
