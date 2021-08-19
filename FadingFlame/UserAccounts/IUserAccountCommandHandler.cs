@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using FadingFlame.Events;
 using FadingFlame.Players;
 
 namespace FadingFlame.UserAccounts

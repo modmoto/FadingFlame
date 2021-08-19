@@ -1,7 +1,7 @@
 using System;
 using MongoDB.Bson;
 
-namespace FadingFlame.Events
+namespace FadingFlame.UserAccounts
 {
     public class UserState
     {

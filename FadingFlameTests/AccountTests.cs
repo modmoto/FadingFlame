@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using FadingFlame.Events;
 using FadingFlame.Players;
 using FadingFlame.UserAccounts;
 using MongoDB.Bson;

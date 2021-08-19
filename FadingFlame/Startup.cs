@@ -1,4 +1,3 @@
-using FadingFlame.Events;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
 using FadingFlame.UserAccounts;
