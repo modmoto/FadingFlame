@@ -78,7 +78,7 @@ namespace FadingFlame.UserAccounts
                 var userAccount = UserAccount.Create(player.Id, registerModel.Email, registerModel.Password);
 
                 _context.SetUser(userAccount);
-                // await _localStorageService.SetItem(_userKey, userAccount);
+                await _localStorageService.SetItem(_userKey, userAccount);
                 await _accountRepository.Upsert(userAccount);
             }
         }
