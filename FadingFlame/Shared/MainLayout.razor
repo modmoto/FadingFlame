@@ -48,6 +48,14 @@
         StateHasChanged();
     }
 
+    protected override void OnInitialized()
+    {
+        _userState.UserLoggedIn += (_, _) =>
+        {
+            StateHasChanged();
+        };
+    }
+
     protected override async Task OnAfterRenderAsync(bool what)
     {
         if (!IsLoggedIn)

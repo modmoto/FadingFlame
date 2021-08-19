@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using FadingFlame.Events;
 using FadingFlame.Players;
 using FadingFlame.UserAccounts;
 using MongoDB.Bson;
@@ -18,7 +19,7 @@ namespace FadingFlameTests
                 new Mock<ILocalStorageService>().Object,
                 userAccountRepository,
                 new PlayerRepository(MongoClient),
-                new Mock<IUserContext>().Object);
+                new Mock<IUserContext>().Object, new UserState());
 
             var email = "simon@123.de";
             var registerModel = new RegisterModel

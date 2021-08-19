@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using FadingFlame.Events;
 using FadingFlame.Players;
 
 namespace FadingFlame.UserAccounts
@@ -17,18 +18,21 @@ namespace FadingFlame.UserAccounts
         private readonly IUserAccountRepository _accountRepository;
         private readonly IPlayerRepository _playerRepository;
         private readonly IUserContext _context;
+        private readonly UserState _userState;
         private string _userKey = "user";
 
         public UserAccountCommandHandler(
             ILocalStorageService localStorageService,
             IUserAccountRepository accountRepository,
             IPlayerRepository playerRepository,
-            IUserContext context)
+            IUserContext context,
+            UserState userState)
         {
             _localStorageService = localStorageService;
             _accountRepository = accountRepository;
             _playerRepository = playerRepository;
             _context = context;
+            _userState = userState;
         }
 
         public async Task Login(LoginModel loginModel)
@@ -38,6 +42,8 @@ namespace FadingFlame.UserAccounts
             {
                 await _localStorageService.SetItem(_userKey, user);
                 _context.SetUser(user);
+                var player = await _playerRepository.Load(user.PlayerId);
+                _userState.SetUserLoggedIn(player.Id, player.DisplayName);
             }
         }
 
