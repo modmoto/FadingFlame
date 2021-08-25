@@ -1,30 +1,30 @@
 @page "/"
 @using FadingFlame.Leagues
+@using MongoDB.Bson
 @inject ILeagueRepository _leagueRepository
+@inject NavigationManager _navigation
 
-<h1>Welcome to the fading flame!</h1>
+<div>
+    <h1 class="display-4">Welcome to the Fading Flame League!</h1>
+    <hr class="my-4">
+    <p>This is a online league for the 9th-age wargame all over the world.</p>
+</div>
 
-<table class="table">
-    <thead>
-    <tr>
-        @_leagues.FirstOrDefault()?.Season
-    </tr>
-    <tr>
-        <th>Name</th>
-        <th>Points</th>
-        <th>Matches</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var playerInLeague in _leagues)
+<div class="row row-cols-4 row-cols-md-2 g-4">
+    @foreach (var league in _leagues)
     {
-        <tr>
-            <td>@playerInLeague.Name</td>
-            <td>@playerInLeague.Season</td>
-        </tr>
+        <div class="col pb-4 cursor" @onclick="() => GoToLeague(league.Id)">
+            <div class="card" style="width: 18rem;">
+                <div class="card-header">
+                    @league.DivisionId @league.Name
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">@league.Name</h5>
+                </div>
+            </div>
+        </div>  
     }
-    </tbody>
-</table>
+</div>
 
 @code
 {
@@ -34,5 +34,10 @@
     {
         _leagues = await _leagueRepository.LoadForSeason(1);
         StateHasChanged();
+    }
+
+    public void GoToLeague(ObjectId leagueId)
+    {
+        _navigation.NavigateTo($"league/{leagueId}");
     }
 }

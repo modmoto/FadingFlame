@@ -6,17 +6,15 @@
 
 @if (_userState.UserIsAdmin)
 {
-    <button class="button" @onclick="CreateLeagues">make leagues</button>
+    <button type="button" class="btn btn-primary" @onclick="CreateLeagues">Reset Season 1</button>
 }
 
 @code {
 
     protected override void OnInitialized()
     {
-        _userState.UserLoggedIn += (_, _) =>
-        {
-            StateHasChanged();
-        };
+        _userState.UserLoggedIn += (_, _) => StateHasChanged();
+        _userState.UserLoggedOut += (_, _) => StateHasChanged();
     }
 
     private async Task CreateLeagues()

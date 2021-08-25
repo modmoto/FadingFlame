@@ -2,6 +2,8 @@
 @using MongoDB.Bson
 @using FadingFlame.Leagues
 
+@inject NavigationManager _navigation
+
 @if (_league == null)
 {
     <p>
@@ -10,6 +12,10 @@
 }
 else
 {
+    <div>
+        <h1 class="display-4">@_league.DivisionId @_league.Name</h1>
+        <hr class="my-4">
+    </div>
     <table class="table">
         <thead>
         <tr>
@@ -22,13 +28,81 @@ else
         @foreach (var playerInLeague in _league.Players)
         {
             <tr>
-                <td>@playerInLeague.Name</td>
+                <td @onclick="() => GoToPlayer(playerInLeague.Id)" class="cursor" >@playerInLeague.Name</td>
                 <td>@playerInLeague.Points</td>
-                <td>@playerInLeague.Games</td>
+                <td>@playerInLeague.Games.Count</td>
             </tr>
         }
         </tbody>
     </table>
+    
+    <div>
+        <h1 class="display-4">Gamedays</h1>
+        <hr class="my-4">
+    </div>
+    
+    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+        @foreach (var gameDay in _league.GameDays.Select((value, index) => new { value, index }))
+        {
+            <li class="nav-item" role="presentation">
+                @if (ActiveDay == gameDay.index)
+                {
+                    <button
+                        class="nav-link active"
+                        id="pills-home-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#pills-home"
+                        type="button"
+                        role="tab"
+                        aria-controls="pills-home"
+                        aria-selected="true"
+                        @onclick="() => SelectGameDay(gameDay.index)"
+                    >
+                        @(gameDay.index + 1)
+                    </button>
+                }
+                else
+                {
+                    <button
+                        class="nav-link"
+                        id="pills-home-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#pills-home"
+                        type="button"
+                        role="tab"
+                        aria-controls="pills-home"
+                        aria-selected="true"
+                        @onclick="() => SelectGameDay(gameDay.index)"
+                    >
+                        @(gameDay.index + 1)
+                    </button>
+                }
+            </li>
+        }
+    </ul>
+    <div class="tab-content" id="pills-tabContent">
+        @foreach (var gameDay in _league.GameDays.Select((value, index) => new {value, index}))
+        {
+            @if (ActiveDay == gameDay.index)
+            {
+                <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                <div class="card" style="width: 18rem;">
+                    <ul class="list-group list-group-flush">
+                        @foreach (var day in gameDay.value.Matchups)
+                        {
+                            <li class="list-group-item">@(day.NameAtHome) vs @(day.NameAsGuest)</li>
+                        }
+                    </ul>
+                </div>
+                </div>
+            }
+            else
+            {
+                <div class="tab-pane fade" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                </div>
+            }
+        }
+    </div>
 }
 
 @inject ILeagueRepository _leagueRepository
@@ -46,4 +120,16 @@ else
     }
 
     private League _league;
+    public int ActiveDay { get; set; }
+
+    private void GoToPlayer(ObjectId playerId)
+    {
+        _navigation.NavigateTo($"player/{playerId}");
+    }
+
+    private void SelectGameDay(int id)
+    {
+        ActiveDay = id;
+        StateHasChanged();
+    }
 }

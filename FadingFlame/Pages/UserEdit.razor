@@ -5,12 +5,12 @@
 @using MongoDB.Bson
 
 @inject IPlayerRepository _playerRepository
-@inject UserState _state
+@inject UserState _userState
 
 <div class="card">
     <h4 class="card-header">Profile</h4>
     <div class="card-body">
-        @if (_isLoggedInUser)
+        @if (_userState.LoggedInPlayerId?.ToString() == Id)
         {
             <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
                 <DataAnnotationsValidator/>
@@ -31,6 +31,12 @@
                     }
                     Save Profile
                 </button>
+                @if (_savedSuccesfully)
+                {
+                    <div class="alert alert-success" role="alert">
+                        Saved Data
+                    </div>
+                }
             </EditForm>
         }
         else
@@ -51,31 +57,32 @@
 @code{
     private EditUserModel _model = new();
     private bool _loading;
-    private bool _isLoggedInUser;
+    private bool _savedSuccesfully;
+
     [ParameterAttribute]
     public string Id { get; set; }
 
+    protected override void OnInitialized()
+    {
+        _userState.UserLoggedIn += (_, _) => StateHasChanged();
+        _userState.UserLoggedOut += (_, _) => StateHasChanged();
+    }
+    
     protected override async Task OnInitializedAsync()
     {
         if (ObjectId.TryParse(Id, out var realId))
         {
-            var layer = await _playerRepository.Load(realId);
-            if (layer == null)
+            var player = await _playerRepository.Load(realId);
+            if (player == null)
             {
-                // goto to not found
+                // todo goto to not found
             }
             else
             {
-                var layerId = _state.LoggedInPlayerId;
-                if (layerId == layer.Id)
-                {
-                    _isLoggedInUser = true;
-                }
-
                 _model = new EditUserModel
                 {
-                    DiscordTag = layer.DiscordTag,
-                    DisplayName = layer.DisplayName
+                    DiscordTag = player.DiscordTag,
+                    DisplayName = player.DisplayName
                 };
 
                 StateHasChanged();
@@ -86,10 +93,12 @@
     private async Task OnValidSubmit()
     {
         _loading = true;
+        _savedSuccesfully = false;
         var layer = await _playerRepository.Load(new ObjectId(Id));
         layer.DiscordTag = _model.DiscordTag;
         layer.DisplayName = _model.DisplayName;
         await _playerRepository.Udate(layer);
         _loading = false;
+        _savedSuccesfully = true;
     }
 }

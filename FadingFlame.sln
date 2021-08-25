@@ -4,6 +4,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FadingFlame", "FadingFlame\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FadingFlameTests", "FadingFlameTests\FadingFlameTests.csproj", "{7CDA5F78-087E-4A07-84E9-48758BE5C1DF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{46CB3B24-8790-40BF-B456-BAD440B130D8}"
+ProjectSection(SolutionItems) = preProject
+	.gitignore = .gitignore
+	build-pipeline.yml = build-pipeline.yml
+	.dockerignore = .dockerignore
+	docker-compose.token.yml = docker-compose.token.yml
+	Dockerfile = Dockerfile
+	release-pipeline.yml = release-pipeline.yml
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

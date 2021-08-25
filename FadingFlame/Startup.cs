@@ -1,3 +1,4 @@
+using System;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
 using FadingFlame.UserAccounts;
@@ -26,7 +27,7 @@ namespace FadingFlame
 
             services.AddSingleton(_ =>
             {
-                var mongoConnectionString = "mongodb://157.90.1.251:3513";
+                var mongoConnectionString = Environment.GetEnvironmentVariable("MONGO_DB_CONNECTION_STRING");
                 return new MongoClient(mongoConnectionString);
             });
 

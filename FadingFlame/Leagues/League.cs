@@ -16,6 +16,9 @@ namespace FadingFlame.Leagues
         [BsonId]
         public ObjectId Id { get; set; }
         public List<PlayerInLeague> Players { get; set; } = new();
+        public string DivisionId { get; set; }
+        public List<GameDay> GameDays { get; set; }
+        public bool IsFull => Players.Count == 6;
 
         public void ReportGame(MatchResult matchResult)
         {
@@ -83,7 +86,6 @@ namespace FadingFlame.Leagues
             if (player1Result.SecondaryObjective == SecondaryObjectiveState.lost
                 && player2Result.SecondaryObjective == SecondaryObjectiveState.won)
             {
-
                 return new PointTuple(points1 - 3, points2 + 3);
             }
 
@@ -98,17 +100,66 @@ namespace FadingFlame.Leagues
 
         public void AddPlayer(Player player)
         {
+            if (IsFull) return;
+            
             Players = Players.Where(p => p.Id != player.Id).ToList();
             var playerInLeague = PlayerInLeague.Create(player.Id, player.DisplayName);
             Players.Add(playerInLeague);
+
+            if (IsFull)
+            {
+                CreateGameDays();
+            }
         }
 
-        public static League Create(int season)
+        public static League Create(int season, string divisionId, string name)
         {
             return new()
             {
-                Season = season
+                Season = season,
+                DivisionId = divisionId,
+                Name = name
             };
+        }
+
+        public void CreateGameDays()
+        {
+            var teams = Players.ToList();
+            var numberOfRounds = teams.Count - 1;
+            var numberOfMatchesInARound = teams.Count / 2;
+
+            var teamsTemp = new List<PlayerInLeague>();
+
+            teamsTemp.AddRange(teams.Skip(numberOfMatchesInARound).Take(numberOfMatchesInARound));
+            teamsTemp.AddRange(teams.Skip(1).Take(numberOfMatchesInARound - 1).Reverse());
+
+            var numberOfPlayers = teamsTemp.Count;
+
+            var gameDays = new List<GameDay>();
+
+            for (var roundNumber = 0; roundNumber < numberOfRounds; roundNumber++)
+            {
+                var matchups = new List<Matchup>();
+
+                var playerIndex = roundNumber % numberOfPlayers;
+
+                var matchup = Matchup.Create(teamsTemp[playerIndex], teams.First());
+                matchups.Add(matchup);
+
+                for (var index = 1; index < numberOfMatchesInARound; index++)
+                {
+                    var firstPlayerIndex = (roundNumber + index) % numberOfPlayers;
+                    var secondPlayerIndex = (roundNumber + numberOfPlayers - index) % numberOfPlayers;
+
+                    var matchupInner = Matchup.Create(teamsTemp[firstPlayerIndex], teamsTemp[secondPlayerIndex]);
+                    matchups.Add(matchupInner);
+                }
+
+                var round = GameDay.Create(matchups);
+                gameDays.Add(round);
+            }
+
+            GameDays = gameDays;
         }
     }
 }

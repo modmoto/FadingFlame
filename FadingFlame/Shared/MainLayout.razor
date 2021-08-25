@@ -39,7 +39,7 @@
     {
         if (_userState.UserIsLoggedIn)
         {
-            var player = await _playerRepository.Load(_userState.LoggedInPlayerId);
+            var player = await _playerRepository.Load(_userState.LoggedInPlayerId.Value);
             return player.DisplayName;
         }
 
@@ -54,10 +54,8 @@
 
     protected override void OnInitialized()
     {
-        _userState.UserLoggedIn += (_, _) =>
-        {
-            StateHasChanged();
-        };
+        _userState.UserLoggedIn += (_, _) => StateHasChanged();
+        _userState.UserLoggedOut += (_, _) => StateHasChanged();
     }
 
     protected override async Task OnAfterRenderAsync(bool what)
@@ -68,7 +66,7 @@
             var userName = await GetUserName();
             if (_userState.UserIsLoggedIn)
             {
-                _userState.SetUserLoggedIn(_userState.LoggedInPlayerId, userName);
+                _userState.SetUserLoggedIn(_userState.LoggedInPlayerId.Value, userName);
                 StateHasChanged();
             }
         }

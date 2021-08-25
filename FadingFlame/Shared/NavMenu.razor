@@ -32,5 +32,10 @@
         {
             StateHasChanged();
         };
+        
+        _userState.UserLoggedOut += (_, _) =>
+        {
+            StateHasChanged();
+        };
     }
 }

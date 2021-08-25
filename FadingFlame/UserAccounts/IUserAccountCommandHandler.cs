@@ -65,6 +65,7 @@ namespace FadingFlame.UserAccounts
         {
             _context.RemoveUser();
             await _localStorageService.RemoveItem(_userKey);
+            _userState.SetUserLoggedOut();
         }
 
         public async Task Register(RegisterModel registerModel)
@@ -80,6 +81,7 @@ namespace FadingFlame.UserAccounts
                 _context.SetUser(userAccount);
                 await _localStorageService.SetItem(_userKey, userAccount);
                 await _accountRepository.Upsert(userAccount);
+                _userState.SetUserLoggedIn(player.Id, player.DisplayName);
             }
         }
     }
