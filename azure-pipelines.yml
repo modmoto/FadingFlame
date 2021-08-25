@@ -3,9 +3,6 @@ name: $(Build.BuildID)
 pool:
   vmImage: "ubuntu-20.04"
 
-variables:
-  - group: Secrets
-
 steps:
   - task: qetza.replacetokens.replacetokens-task.replacetokens@3
     displayName: 'Replace tokens'
