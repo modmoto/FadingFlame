@@ -3,31 +3,26 @@
 @inject ILeagueRepository _leagueRepository
 
 <div>
-  <h1 class="display-4">Welcome to the Fading Flame League!</h1>
-  <hr class="my-4">
-  <p>This is a online league for the 9th-age wargame all over the world.</p>
+    <h1 class="display-4">Welcome to the Fading Flame League!</h1>
+    <hr class="my-4">
+    <p>This is a online league for the 9th-age wargame all over the world.</p>
 </div>
-<table class="table">
-    <thead>
-    <tr>
-        @_leagues.FirstOrDefault()?.Season
-    </tr>
-    <tr>
-        <th>Name</th>
-        <th>Points</th>
-        <th>Matches</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var playerInLeague in _leagues)
+
+<div class="row row-cols-4 row-cols-md-2 g-4">
+    @foreach (var league in _leagues)
     {
-        <tr>
-            <td>@playerInLeague.Name</td>
-            <td>@playerInLeague.Season</td>
-        </tr>
+        <div class="col pb-4">
+            <div class="card" style="width: 18rem;">
+                <div class="card-header bg-light">
+                    @league.DivisionId @league.Name
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">@league.Name</h5>
+                </div>
+            </div>
+        </div>  
     }
-    </tbody>
-</table>
+</div>
 
 @code
 {

@@ -16,6 +16,7 @@ namespace FadingFlame.Leagues
         [BsonId]
         public ObjectId Id { get; set; }
         public List<PlayerInLeague> Players { get; set; } = new();
+        public string DivisionId { get; set; }
 
         public void ReportGame(MatchResult matchResult)
         {
@@ -103,11 +104,13 @@ namespace FadingFlame.Leagues
             Players.Add(playerInLeague);
         }
 
-        public static League Create(int season)
+        public static League Create(int season, string divisionId, string name)
         {
             return new()
             {
-                Season = season
+                Season = season,
+                DivisionId = divisionId,
+                Name = name
             };
         }
     }
