@@ -35,7 +35,7 @@
                 @if (_savedSuccesfully)
                 {
                     <div class="alert alert-success" role="alert">
-                        Saved Data
+                        data saved
                     </div>
                 }
             </EditForm>
@@ -99,10 +99,10 @@
     {
         _loading = true;
         _savedSuccesfully = false;
-        var layer = await _playerRepository.Load(new ObjectId(Id));
-        layer.DiscordTag = _model.DiscordTag;
-        layer.DisplayName = _model.DisplayName;
-        await _playerRepository.Udate(layer);
+        var player = await _playerRepository.Load(new ObjectId(Id));
+        player.DiscordTag = _model.DiscordTag;
+        player.DisplayName = _model.DisplayName;
+        await _playerRepository.Udate(player);
         _loading = false;
         _savedSuccesfully = true;
     }

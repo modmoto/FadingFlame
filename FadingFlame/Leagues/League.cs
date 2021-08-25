@@ -17,7 +17,7 @@ namespace FadingFlame.Leagues
         public ObjectId Id { get; set; }
         public List<PlayerInLeague> Players { get; set; } = new();
         public string DivisionId { get; set; }
-        public List<GameDay> GameDays { get; set; }
+        public List<GameDay> GameDays { get; set; } = new();
         public bool IsFull => Players.Count == 6;
         public DateTimeOffset StartDate { get; set; }
         
@@ -40,16 +40,14 @@ namespace FadingFlame.Leagues
                 throw new ValidationException("Match not in this gameday");
             }
             
-            var result = MatchResult.Create(player1Result, player2Result);
+            var result = MatchResult.Create(matchResultDto.SecondaryObjective, player1Result, player2Result);
             match.RecordResult(result);
             
-            player1.RecordResult(result.Player1.WinPoints);
-            player2.RecordResult(result.Player2.WinPoints);
+            player1.RecordResult(result.Player1.BattlePoints);
+            player2.RecordResult(result.Player2.BattlePoints);
 
             Players = Players.OrderByDescending(p => p.Points).ToList();
         }
-
-        
 
         public void AddPlayer(Player player)
         {

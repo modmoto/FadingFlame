@@ -114,8 +114,7 @@ namespace FadingFlame.Leagues
             var dateTimeOffset = new DateTimeOffset();
             var startDate = dateTimeOffset.AddDays(14).AddMonths(9).AddYears(2020);
             var league = League.Create(season, startDate, ids.First(), names.First());
-            newLeagues.Add(league);
-            for (var index = 1; index < players.Count; index++)
+            for (var index = 0; index < players.Count; index++)
             {
                 var player = players[index];
                 league.AddPlayer(player);
@@ -124,8 +123,8 @@ namespace FadingFlame.Leagues
                 if (league.IsFull)
                 {
                     var newLeaguesCount = newLeagues.Count;
-                    league = League.Create(season, startDate, ids[newLeaguesCount], names[newLeaguesCount]);
                     newLeagues.Add(league);
+                    league = League.Create(season, startDate, ids[newLeaguesCount], names[newLeaguesCount]);
                     counter = 0;
                 }
             }

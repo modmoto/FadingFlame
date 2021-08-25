@@ -91,15 +91,15 @@ else
                     <ul class="list-group list-group-flush">
                         @foreach (var day in gameDay.value.Matchups)
                         {
-                            <li class="list-group-item">
+                            <li class="list-group-item cursor" @onclick="() => GoToMatch(day.MatchId)">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h5 class="mb-1">@(day.Name1) vs @(day.Name2)</h5>
                                     <small>@day.Result?.RecordedAt.ToString("dd.MM.")</small>
                                 </div>
                                 @if (day.Result != null)
                                 {
-                                    <p class="mb-1">@day.Result.Player1.WinPoints : @day.Result.Player2.WinPoints</p>
-                                    <small>@day.Result.Player1.BattlePoints : @day.Result.Player2.BattlePoints</small>
+                                    <p class="mb-1">@day.Result.Player1.BattlePoints : @day.Result.Player2.BattlePoints</p>
+                                    <small>@day.Result.Player1.VictoryPoints @GetSecondaryString1(day.Result.SecondaryObjective) : @day.Result.Player2.VictoryPoints @GetSecondaryString2(day.Result.SecondaryObjective)</small>
                                 }
                                 else
                                 {
@@ -147,4 +147,30 @@ else
         ActiveDay = id;
         StateHasChanged();
     }
+
+    private void GoToMatch(ObjectId matchId)
+    {
+        _navigation.NavigateTo($"league/{_league.Id}/match/{matchId}");
+    }
+
+    private string GetSecondaryString1(SecondaryObjectiveState resultSecondaryObjective)
+    {
+        if (resultSecondaryObjective == SecondaryObjectiveState.player1)
+        {
+            return "(+2nd obj.)";
+        }
+
+        return "";
+    }
+
+    private string GetSecondaryString2(SecondaryObjectiveState resultSecondaryObjective)
+    {
+        if (resultSecondaryObjective == SecondaryObjectiveState.player2)
+        {
+            return "(+2nd obj.)";
+        }
+
+        return "";
+    }
+
 }

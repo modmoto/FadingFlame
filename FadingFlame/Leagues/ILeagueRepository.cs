@@ -12,6 +12,7 @@ namespace FadingFlame.Leagues
         Task<League> Load(ObjectId id);
         Task Insert(List<League> newLeagues);
         Task DeleteForSeason(int season);
+        Task Udate(League league);
     }
 
     public class LeagueRepository : MongoDbRepositoryBase, ILeagueRepository
@@ -38,6 +39,11 @@ namespace FadingFlame.Leagues
         public Task DeleteForSeason(int season)
         {
             return DeleteMultiple<League>(l => l.Season == season);
+        }
+
+        public Task Udate(League league)
+        {
+            return Upsert(league);
         }
     }
 }

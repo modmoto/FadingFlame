@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using MongoDB.Bson;
 
 namespace FadingFlame.Leagues

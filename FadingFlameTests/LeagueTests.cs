@@ -55,17 +55,16 @@ namespace FadingFlameTests
 
             var result = new MatchResultDto
             {
+                SecondaryObjective = SecondaryObjectiveState.player1,
                 Player1 = new PlayerResultDto
                 {
                     Id = player1.Id,
-                    BattlePoints = player1Points,
-                    SecondaryObjective = SecondaryObjectiveState.won
+                    VictoryPoints = player1Points,
                 },
                 Player2 = new PlayerResultDto
                 {
                     Id = player2.Id,
-                    BattlePoints = player2Points,
-                    SecondaryObjective = SecondaryObjectiveState.lost
+                    VictoryPoints = player2Points,
                 }
             };
 
@@ -112,17 +111,16 @@ namespace FadingFlameTests
 
             var result = new MatchResultDto
             {
+                SecondaryObjective = SecondaryObjectiveState.player2,
                 Player1 = new PlayerResultDto
                 {
                     Id = player1.Id,
-                    BattlePoints = player1Points,
-                    SecondaryObjective = SecondaryObjectiveState.lost
+                    VictoryPoints = player1Points
                 },
                 Player2 = new PlayerResultDto
                 {
                     Id = player2.Id,
-                    BattlePoints = player2Points,
-                    SecondaryObjective = SecondaryObjectiveState.won
+                    VictoryPoints = player2Points
                 }
             };
 

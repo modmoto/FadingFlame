@@ -1,5 +1,4 @@
-using System;
-using FadingFlame.Repositories;
+using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
 
 namespace FadingFlame.Leagues
@@ -20,12 +19,18 @@ namespace FadingFlame.Leagues
                 Player1 = playerAtHome.Id,
                 Player2 = playerAsGuest.Id,
                 Name1 = playerAtHome.Name,
-                Name2 = playerAsGuest.Name
+                Name2 = playerAsGuest.Name,
+                MatchId = ObjectId.GenerateNewId()
             };
         }
 
         public void RecordResult(MatchResult result)
         {
+            if (Result != null)
+            {
+                throw new ValidationException("Match allready reported");
+            }
+
             Result = result;
         }
     }

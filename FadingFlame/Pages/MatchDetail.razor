@@ -1,0 +1,161 @@
+﻿@page "/league/{leagueId}/match/{matchId}"
+@using MongoDB.Bson
+@using FadingFlame.Leagues
+@using FadingFlame.Players
+@using FadingFlame.UserAccounts
+@using Microsoft.AspNetCore.Components
+
+@if (_league == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    if (CanEditMatch)
+    {
+        <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator/>
+            <div class="form-group">
+                <label>Victory Points @_name1 :</label>
+                <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control"/>
+                <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
+            </div>
+            <div class="form-group">
+                <label>Victory Points @_name2 :</label>
+                <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control"/>
+                <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
+            </div>
+            <div class="form-group">
+                <label>Secondary Objective:</label> <br/>
+                <div class="ml-4">
+                    <InputRadioGroup @bind-Value="_model.SecondaryObjective" class="form-check">
+                        @foreach (var option in Enum.GetValues(typeof(SecondaryObjectiveState)))
+                        {
+                            <InputRadio Value="option" class="form-check-input" id="@($"second-{option}")"/>
+                            <label class="form-check-label" for="@($"second-{option}")">
+                                @GetString(option is SecondaryObjectiveState ? (SecondaryObjectiveState)option : SecondaryObjectiveState.draw)
+                            </label>
+                            <br/>
+                        }
+                    </InputRadioGroup>
+                    <ValidationMessage For="@(() => _model.SecondaryObjective)"/>
+                </div>
+            </div>
+            <button disabled="@_loading" class="btn btn-primary">
+                @if (_loading)
+                {
+                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                }
+                Report Game
+            </button>
+            @if (_savedSuccesfully)
+            {
+                <div class="alert alert-success" role="alert">
+                    result saved
+                </div>
+            }
+        </EditForm>
+    }
+    else
+    {
+        <div class="form-group">
+            You are not allowed to edit the match
+        </div>
+    }
+}
+
+@inject NavigationManager _navigation
+@inject ILeagueRepository _leagueRepository
+@inject IPlayerRepository _playerRepository
+@inject UserState _userState
+
+@code {
+    [Parameter]
+    public string LeagueId { get; set; }
+    [Parameter]
+    public string MatchId { get; set; }
+    private MatchResultDto _model = new();
+    private League _league;
+    private bool _loading;
+    private bool _savedSuccesfully;
+    private string _name1;
+    private string _name2;
+
+    public bool CanEditMatch => _model.Player1.Id == _userState.LoggedInPlayerId
+                                || _model.Player2.Id == _userState.LoggedInPlayerId;
+
+    protected override void OnInitialized()
+    {
+        _userState.UserLoggedIn += (_, _) => StateHasChanged();
+        _userState.UserLoggedOut += (_, _) => StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ObjectId.TryParse(LeagueId, out var realLeagueId))
+        {
+            var league = await _leagueRepository.Load(realLeagueId);
+            if (league == null)
+            {
+                _navigation.NavigateTo("notfound");
+            }
+            else
+            {
+                var match = league.GameDays
+                    .SelectMany(g => g.Matchups)
+                    .SingleOrDefault(m => m.MatchId.ToString() ==  MatchId);
+                if (match == null)
+                {
+                    _navigation.NavigateTo("notfound");
+                }
+                else
+                {
+                    var player1 = await _playerRepository.Load(match.Player1);
+                    var player2 = await _playerRepository.Load(match.Player2);
+
+                    _model.Player1.Id = match.Player1;
+                    _model.Player1.Id = match.Player1;
+                    _model.Player2.Id = match.Player2;
+
+                    _name1 = player1.DisplayName;
+                    _name2 = player2.DisplayName;
+                    _model.MatchId = match.MatchId;
+                    _league = league;
+
+                    StateHasChanged();
+                }
+            }
+        }
+        else
+        {
+            _navigation.NavigateTo("notfound");
+        }
+    }
+
+    private async Task OnValidSubmit()
+    {
+        _loading = true;
+        _savedSuccesfully = false;
+        if (_league != null)
+        {
+            _league.ReportGame(_model);
+            await _leagueRepository.Udate(_league);
+        }
+
+        _loading = false;
+        _savedSuccesfully = true;
+    }
+
+    private string GetString(SecondaryObjectiveState state)
+    {
+        return state switch
+        {
+            SecondaryObjectiveState.player1 => _name1,
+            SecondaryObjectiveState.player2 => _name2,
+            _ => "draw"
+        };
+    }
+
+}
