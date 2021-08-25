@@ -10,6 +10,7 @@ ProjectSection(SolutionItems) = preProject
 	azure-pipelines.yml = azure-pipelines.yml
 	.dockerignore = .dockerignore
 	docker-compose.token.yml = docker-compose.token.yml
+	Dockerfile = Dockerfile
 EndProjectSection
 EndProject
 Global
