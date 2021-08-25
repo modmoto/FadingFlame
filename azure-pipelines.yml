@@ -1,0 +1,49 @@
+name: $(Build.BuildID)
+
+pool:
+  vmImage: "ubuntu-20.04"
+
+variables:
+  - group: Secrets
+
+steps:
+  - task: qetza.replacetokens.replacetokens-task.replacetokens@3
+    displayName: 'Replace tokens'
+    inputs:
+      targetFiles: |
+        **/*.token.yml => *.yml
+
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: '5.0.x'
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'restore'
+      feedsToUse: 'select'
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'build'
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'test'
+
+  - task: Docker@2
+    inputs:
+      containerRegistry: 'official-docker-modmoto'
+      repository: 'modmoto/fading-flame'
+      command: 'buildAndPush'
+      Dockerfile: '**/Dockerfile'
+      buildContext: '.'
+      tags: |
+        $(TAG)
+
+  - task: CopyFiles@2
+    displayName: publish docker-compose files
+    inputs:
+      contents: '**/*docker-compose.yml'
+      targetFolder: $(Build.ArtifactStagingDirectory)
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)
