@@ -1,8 +1,11 @@
 ﻿@page "/league/{leagueId?}"
 @using MongoDB.Bson
 @using FadingFlame.Leagues
+@using FadingFlame.UserAccounts
 
 @inject NavigationManager _navigation
+@inject UserState _userState
+
 
 @if (_league == null)
 {
@@ -89,17 +92,17 @@ else
                 <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
                 <div class="card" style="width: 18rem;">
                     <ul class="list-group list-group-flush">
-                        @foreach (var day in gameDay.value.Matchups)
+                        @foreach (var matchup in gameDay.value.Matchups)
                         {
-                            <li class="list-group-item cursor" @onclick="() => GoToMatch(day.MatchId)">
+                            <li class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)">
                                 <div class="d-flex w-100 justify-content-between">
-                                    <h5 class="mb-1">@(day.Name1) vs @(day.Name2)</h5>
-                                    <small>@day.Result?.RecordedAt.ToString("dd.MM.")</small>
+                                    <h5 class="mb-1">@(matchup.Name1) vs @(matchup.Name2)</h5>
+                                    <small>@matchup.Result?.RecordedAt.ToString("dd.MM.")</small>
                                 </div>
-                                @if (day.Result != null)
+                                @if (matchup.Result != null)
                                 {
-                                    <p class="mb-1">@day.Result.Player1.BattlePoints : @day.Result.Player2.BattlePoints</p>
-                                    <small>@day.Result.Player1.VictoryPoints @GetSecondaryString1(day.Result.SecondaryObjective) : @day.Result.Player2.VictoryPoints @GetSecondaryString2(day.Result.SecondaryObjective)</small>
+                                    <p class="mb-1">@matchup.Result.Player1.BattlePoints : @matchup.Result.Player2.BattlePoints</p>
+                                    <small>@matchup.Result.Player1.VictoryPoints @GetSecondaryString1(matchup.Result.SecondaryObjective) : @matchup.Result.Player2.VictoryPoints @GetSecondaryString2(matchup.Result.SecondaryObjective)</small>
                                 }
                                 else
                                 {
@@ -126,6 +129,12 @@ else
     [Parameter]
     public string LeagueId { get; set; }
 
+    protected override void OnInitialized()
+    {
+        _userState.UserLoggedIn += (_, _) => StateHasChanged();
+        _userState.UserLoggedOut += (_, _) => StateHasChanged();
+    }
+
     protected override async Task OnInitializedAsync()
     {
         if (ObjectId.TryParse(LeagueId, out var arsed))
@@ -148,9 +157,12 @@ else
         StateHasChanged();
     }
 
-    private void GoToMatch(ObjectId matchId)
+    private void GoToMatch(Matchup matchup)
     {
-        _navigation.NavigateTo($"league/{_league.Id}/match/{matchId}");
+        if (UserIsOneOfTheLayers(matchup))
+        {
+            _navigation.NavigateTo($"league/{_league.Id}/match/{matchup.MatchId}");
+        }
     }
 
     private string GetSecondaryString1(SecondaryObjectiveState resultSecondaryObjective)
@@ -171,6 +183,21 @@ else
         }
 
         return "";
+    }
+
+    private string GetClasses(Matchup matchup)
+    {
+        if (UserIsOneOfTheLayers(matchup))
+        {
+            return "list-group-item bg-light cursor";
+        }
+
+        return "list-group-item";
+    }
+
+    private bool UserIsOneOfTheLayers(Matchup matchup)
+    {
+        return _userState.LoggedInPlayerId == matchup.Player1 || _userState.LoggedInPlayerId == matchup.Player2;
     }
 
 }
