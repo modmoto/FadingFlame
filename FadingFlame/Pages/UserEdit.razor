@@ -6,6 +6,7 @@
 
 @inject IPlayerRepository _playerRepository
 @inject UserState _userState
+@inject NavigationManager _navigation
 
 <div class="card">
     <h4 class="card-header">Profile</h4>
@@ -75,7 +76,7 @@
             var player = await _playerRepository.Load(realId);
             if (player == null)
             {
-                // todo goto to not found
+                _navigation.NavigateTo("notfound");
             }
             else
             {
@@ -87,6 +88,10 @@
 
                 StateHasChanged();
             }
+        }
+        else
+        {
+            _navigation.NavigateTo("notfound");
         }
     }
 
