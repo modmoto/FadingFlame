@@ -57,15 +57,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _userState.UserLoggedIn += (_, _) =>
-        {
-            StateHasChanged();
-        };
-        
-        _userState.UserLoggedOut += (_, _) =>
-        {
-            StateHasChanged();
-        };
+        _userState.UserLoggedIn += (_, _) => StateHasChanged();
+        _userState.UserLoggedOut += (_, _) => StateHasChanged();
         
         if (ObjectId.TryParse(Id, out var realId))
         {
