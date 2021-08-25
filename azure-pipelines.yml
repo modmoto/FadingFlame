@@ -16,17 +16,28 @@ steps:
       version: '5.0.x'
       
   - task: DotNetCoreCLI@2
+    displayName: 'restore'
     inputs:
       command: 'restore'
       feedsToUse: 'select'
       
   - task: DotNetCoreCLI@2
+    displayName: 'build'
     inputs:
       command: 'build'
       
+  - task: CmdLine@2
+    displayName: 'start mongo daemon'
+    inputs:
+      script: 'sudo systemctl start mongod'
+
   - task: DotNetCoreCLI@2
+    displayName: 'unit tests'
+    env:
+      TESTING_MONGO_CONNECTION_STRING: 'mongodb://127.0.0.1:27017'
     inputs:
       command: 'test'
+      projects: '**/*Tests.csproj'
 
   - task: Docker@2
     inputs:
@@ -47,3 +58,21 @@ steps:
   - task: PublishBuildArtifacts@1
     inputs:
       pathToPublish: $(Build.ArtifactStagingDirectory)
+      
+jobs:
+  - deployment: Deploy
+    displayName: Deploy to test
+    environment: test
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: myappbuild
+              artifact: drop
+            - task: ExtractFiles@1
+              inputs:
+                archiveFilePatterns: '$(PIPELINE.WORKSPACE)/myappbuild/drop/$(resources.pipeline.myappbuild.runID).zip'
+                destinationFolder: '$(agent.builddirectory)'
+                cleanDestinationFolder: false
+            - script: |
+                cat $(agent.builddirectory)/greatcode.txt
