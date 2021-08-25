@@ -57,6 +57,16 @@
 
     protected override async Task OnInitializedAsync()
     {
+        _userState.UserLoggedIn += (_, _) =>
+        {
+            StateHasChanged();
+        };
+        
+        _userState.UserLoggedOut += (_, _) =>
+        {
+            StateHasChanged();
+        };
+        
         if (ObjectId.TryParse(Id, out var realId))
         {
             var layer = await _playerRepository.Load(realId);
@@ -81,19 +91,6 @@
                 StateHasChanged();
             }
         }
-    }
-    
-    protected override void OnInitialized()
-    {
-        _userState.UserLoggedIn += (_, _) =>
-        {
-            StateHasChanged();
-        };
-        
-        _userState.UserLoggedOut += (_, _) =>
-        {
-            StateHasChanged();
-        };
     }
 
     private async Task OnValidSubmit()
