@@ -1,6 +1,9 @@
 trigger:
   - none
 
+pool:
+  vmImage: "ubuntu-20.04"
+  
 resources:
   pipelines:
     - pipeline: fading-flame.build  # Name of the pipeline resource
@@ -9,13 +12,10 @@ resources:
         branches:
           - master
 
-variables:
-  vmImageName: 'ubuntu-20.04'
-
 jobs:
   - deployment: Deploy
-    displayName: Deploy
-    environment: dev
+    displayName: Test
+    environment: Test
     variables:
       CONTAINER_SUFFIX: 'dev'
       MONGO_CONNECTION_STRING: 'mongodb://157.90.1.251:3513'
@@ -24,7 +24,7 @@ jobs:
       runOnce:
         deploy:
           steps:
-            - download: fading-flame
+            - download: fading-flame.build
               artifact: drop
               
             - task: CopyFilesOverSSH@0
