@@ -5,7 +5,7 @@
 @using MongoDB.Bson
 
 @inject IPlayerRepository _playerRepository
-@inject UserState _state
+@inject UserState _userState
 
 <div class="card">
     <h4 class="card-header">Profile</h4>
@@ -66,7 +66,7 @@
             }
             else
             {
-                var layerId = _state.LoggedInPlayerId;
+                var layerId = _userState.LoggedInPlayerId;
                 if (layerId == layer.Id)
                 {
                     _isLoggedInUser = true;
@@ -81,6 +81,19 @@
                 StateHasChanged();
             }
         }
+    }
+    
+    protected override void OnInitialized()
+    {
+        _userState.UserLoggedIn += (_, _) =>
+        {
+            StateHasChanged();
+        };
+        
+        _userState.UserLoggedOut += (_, _) =>
+        {
+            StateHasChanged();
+        };
     }
 
     private async Task OnValidSubmit()
