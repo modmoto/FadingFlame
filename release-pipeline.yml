@@ -16,8 +16,6 @@ jobs:
   - deployment: Deploy
     displayName: Deploy
     environment: dev
-    pool:
-      vmImage: $(vmImageName)
     strategy:
       runOnce:
         deploy:
@@ -35,16 +33,16 @@ jobs:
               inputs:
                 sshEndpoint: HetziPrivate
                 sourceFolder: '$(System.DefaultWorkingDirectory)'
-                targetFolder: '/usr/local/deespul-compose/$(Release.DefinitionName)/$(Release.EnvironmentName)'
+                targetFolder: '/usr/local/release-compose-files/fading-flame/$(CONTAINER_SUFFIX)'
                 flattenFolders: true
                 
             - task: SSH@0
-                displayName: 'Run shell inline on remote machine'
-                inputs:
-                  sshEndpoint: HetziPrivate
-                  runOptions: inline
-                  inline: |
-                    cd /usr/local/deespul-compose/$(Release.DefinitionName)/$(Release.EnvironmentName)
-                    TAG_MATCH_BOX=$(Build.BuildId) TAG_ADMIN_UI=latest TAG_DEMO_UI=latest TAG_DEMO_BACKEND=latest CONTAINER_SUFFIX=$(CONTAINER_SUFFIX) MONGO_CONNECTION_STRING=$(MONGO_CONNECTION_STRING) DB_PORT=$(DB_PORT) DB_SECRET=$(DB_SECRET) API_KEY=$(API_KEY) HOST_URL=$(HOST_URL) docker-compose -p $(Release.DefinitionName)-$(CONTAINER_SUFFIX) pull 
-                    TAG_MATCH_BOX=$(Build.BuildId) TAG_ADMIN_UI=latest TAG_DEMO_UI=latest TAG_DEMO_BACKEND=latest CONTAINER_SUFFIX=$(CONTAINER_SUFFIX) MONGO_CONNECTION_STRING=$(MONGO_CONNECTION_STRING) DB_PORT=$(DB_PORT) DB_SECRET=$(DB_SECRET) API_KEY=$(API_KEY) HOST_URL=$(HOST_URL) docker-compose -p $(Release.DefinitionName)-$(CONTAINER_SUFFIX) up -d 
-                  failOnStdErr: false  
+              displayName: 'Run shell inline on remote machine'
+              inputs:
+                sshEndpoint: HetziPrivate
+                runOptions: inline
+                inline: |
+                  cd /usr/local/release-compose-files/fading-flame/$(CONTAINER_SUFFIX)
+                  TAG_MATCH_BOX=$(Build.BuildId) TAG_ADMIN_UI=latest TAG_DEMO_UI=latest TAG_DEMO_BACKEND=latest CONTAINER_SUFFIX=$(CONTAINER_SUFFIX) MONGO_CONNECTION_STRING=$(MONGO_CONNECTION_STRING) DB_PORT=$(DB_PORT) DB_SECRET=$(DB_SECRET) API_KEY=$(API_KEY) HOST_URL=$(HOST_URL) docker-compose -p $(Release.DefinitionName)-$(CONTAINER_SUFFIX) pull 
+                  TAG_MATCH_BOX=$(Build.BuildId) TAG_ADMIN_UI=latest TAG_DEMO_UI=latest TAG_DEMO_BACKEND=latest CONTAINER_SUFFIX=$(CONTAINER_SUFFIX) MONGO_CONNECTION_STRING=$(MONGO_CONNECTION_STRING) DB_PORT=$(DB_PORT) DB_SECRET=$(DB_SECRET) API_KEY=$(API_KEY) HOST_URL=$(HOST_URL) docker-compose -p $(Release.DefinitionName)-$(CONTAINER_SUFFIX) up -d 
+                failOnStdErr: false  
