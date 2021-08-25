@@ -1,7 +1,7 @@
 ﻿version: '3.9'
 services:
   fading-flame:
-    image: deespul/fading-flame:${TAG}
+    image: modmoto/fading-flame:${TAG}
     container_name: fading-flame-${CONTAINER_SUFFIX}
     restart: unless-stopped
     expose:
