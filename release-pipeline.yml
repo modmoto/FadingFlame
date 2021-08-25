@@ -20,11 +20,6 @@ jobs:
       runOnce:
         deploy:
           steps:
-            - variables:
-                CONTAINER_SUFFIX: 'dev'
-                MONGO_CONNECTION_STRING: 'mongodb://157.90.1.251:3513'
-                DB_PORT: '4011'
-                
             - download: fading-flame
               artifact: drop
               
@@ -33,7 +28,7 @@ jobs:
               inputs:
                 sshEndpoint: HetziPrivate
                 sourceFolder: '$(System.DefaultWorkingDirectory)'
-                targetFolder: '/usr/local/release-compose-files/fading-flame/$(CONTAINER_SUFFIX)'
+                targetFolder: '/usr/local/release-compose-files/fading-flame/test'
                 flattenFolders: true
                 
             - task: SSH@0
@@ -42,7 +37,7 @@ jobs:
                 sshEndpoint: HetziPrivate
                 runOptions: inline
                 inline: |
-                  cd /usr/local/release-compose-files/fading-flame/$(CONTAINER_SUFFIX)
-                  TAG_MATCH_BOX=$(Build.BuildId) TAG_ADMIN_UI=latest TAG_DEMO_UI=latest TAG_DEMO_BACKEND=latest CONTAINER_SUFFIX=$(CONTAINER_SUFFIX) MONGO_CONNECTION_STRING=$(MONGO_CONNECTION_STRING) DB_PORT=$(DB_PORT) DB_SECRET=$(DB_SECRET) API_KEY=$(API_KEY) HOST_URL=$(HOST_URL) docker-compose -p $(Release.DefinitionName)-$(CONTAINER_SUFFIX) pull 
-                  TAG_MATCH_BOX=$(Build.BuildId) TAG_ADMIN_UI=latest TAG_DEMO_UI=latest TAG_DEMO_BACKEND=latest CONTAINER_SUFFIX=$(CONTAINER_SUFFIX) MONGO_CONNECTION_STRING=$(MONGO_CONNECTION_STRING) DB_PORT=$(DB_PORT) DB_SECRET=$(DB_SECRET) API_KEY=$(API_KEY) HOST_URL=$(HOST_URL) docker-compose -p $(Release.DefinitionName)-$(CONTAINER_SUFFIX) up -d 
+                  cd /usr/local/release-compose-files/fading-flame/test
+                  MONGO_CONNECTION_STRING=mongodb://157.90.1.251:3513 docker-compose -p $(Release.DefinitionName)-$(CONTAINER_SUFFIX) pull 
+                  MONGO_CONNECTION_STRING=mongodb://157.90.1.251:3513 docker-compose -p $(Release.DefinitionName)-$(CONTAINER_SUFFIX) up -d 
                 failOnStdErr: false  
