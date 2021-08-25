@@ -15,7 +15,15 @@ else
 {
     if (CanEditMatch)
     {
-        <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
+        if (_matchWasFinished)
+        {
+            <div class="alert alert-danger" role="alert">
+                The match was allready reported, you can not alter it anymore
+            </div>
+        }
+        else
+        {
+            <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
             <DataAnnotationsValidator/>
             <div class="form-group">
                 <label>Victory Points @_name1 :</label>
@@ -56,11 +64,12 @@ else
                     result saved
                 </div>
             }
-        </EditForm>
+            </EditForm>
+        }
     }
     else
     {
-        <div class="form-group">
+        <div class="alert alert-danger" role="alert">
             You are not allowed to edit the match
         </div>
     }
@@ -82,8 +91,8 @@ else
     private bool _savedSuccesfully;
     private string _name1;
     private string _name2;
-
-    public bool CanEditMatch => _model.Player1.Id == _userState.LoggedInPlayerId
+    private bool _matchWasFinished;
+    private bool CanEditMatch => _model.Player1.Id == _userState.LoggedInPlayerId
                                 || _model.Player2.Id == _userState.LoggedInPlayerId;
 
     protected override void OnInitialized()
@@ -122,6 +131,7 @@ else
                     _name1 = player1.DisplayName;
                     _name2 = player2.DisplayName;
                     _model.MatchId = match.MatchId;
+                    _matchWasFinished = match.Result != null;
                     _league = league;
 
                     StateHasChanged();
