@@ -53,15 +53,15 @@ namespace FadingFlameTests
             league.AddPlayer(player1);
             league.AddPlayer(player2);
 
-            var result = new MatchResult
+            var result = new MatchResultDto
             {
-                Player1 = new PlayerResult
+                Player1 = new PlayerResultDto
                 {
                     Id = player1.Id,
                     BattlePoints = player1Points,
                     SecondaryObjective = SecondaryObjectiveState.won
                 },
-                Player2 = new PlayerResult
+                Player2 = new PlayerResultDto
                 {
                     Id = player2.Id,
                     BattlePoints = player2Points,
@@ -110,15 +110,15 @@ namespace FadingFlameTests
             league.AddPlayer(player2);
             league.AddPlayer(player1);
 
-            var result = new MatchResult
+            var result = new MatchResultDto
             {
-                Player1 = new PlayerResult
+                Player1 = new PlayerResultDto
                 {
                     Id = player1.Id,
                     BattlePoints = player1Points,
                     SecondaryObjective = SecondaryObjectiveState.lost
                 },
-                Player2 = new PlayerResult
+                Player2 = new PlayerResultDto
                 {
                     Id = player2.Id,
                     BattlePoints = player2Points,
@@ -188,7 +188,7 @@ namespace FadingFlameTests
                 match, matchSwitched
             };
 
-            var gameDay = GameDay.Create(matchups);
+            var gameDay = GameDay.Create(DateTimeOffset.Now, matchups);
             return gameDay;
         }
 
@@ -283,8 +283,8 @@ namespace FadingFlameTests
             var allMatches = gameDays.SelectMany(g => g.Matchups).ToList();
             foreach (var match in allMatches)
             {
-                var matchWith = allMatches.Where(m => m.PlayerAtHome == match.PlayerAtHome && m.PlayerAsGuest == match.PlayerAsGuest
-                                                      || m.PlayerAtHome == match.PlayerAsGuest && m.PlayerAsGuest == match.PlayerAtHome);
+                var matchWith = allMatches.Where(m => m.Player1 == match.Player1 && m.Player2 == match.Player2
+                                                      || m.Player1 == match.Player2 && m.Player2 == match.Player1);
                 if (matchWith.Count() != 1) return false;
             }
 
@@ -293,7 +293,7 @@ namespace FadingFlameTests
 
         private static League CreateLeagueWithPlayers(params ObjectId[] identities)
         {
-            var league = League.Create(1, "1A", "bogota");
+            var league = League.Create(1, DateTimeOffset.Now, "1A", "bogota");
             foreach (var guidIdentity in identities)
             {
                 league.AddPlayer(new Player()

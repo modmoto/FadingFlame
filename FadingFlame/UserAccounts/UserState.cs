@@ -11,8 +11,8 @@ namespace FadingFlame.UserAccounts
 
         private List<ObjectId> Admins = new()
         {
-            new("611ce5c80c434f08ea507fa6"),
-            new("612623695664dde81689acba"),
+            new ObjectId("611ce5c80c434f08ea507fa6"),
+            new ObjectId("612623695664dde81689acba"),
         };
 
         public virtual void SetUserLoggedIn(ObjectId playerId, string userName)

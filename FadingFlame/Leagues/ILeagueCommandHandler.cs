@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -109,8 +110,10 @@ namespace FadingFlame.Leagues
                 "18A",
                 "18B",
             };
-            
-            var league = League.Create(season, ids.First(), names.First());
+
+            var dateTimeOffset = new DateTimeOffset();
+            var startDate = dateTimeOffset.AddDays(14).AddMonths(9).AddYears(2020);
+            var league = League.Create(season, startDate, ids.First(), names.First());
             newLeagues.Add(league);
             for (var index = 1; index < players.Count; index++)
             {
@@ -121,7 +124,7 @@ namespace FadingFlame.Leagues
                 if (league.IsFull)
                 {
                     var newLeaguesCount = newLeagues.Count;
-                    league = League.Create(season, ids[newLeaguesCount], names[newLeaguesCount]);
+                    league = League.Create(season, startDate, ids[newLeaguesCount], names[newLeaguesCount]);
                     newLeagues.Add(league);
                     counter = 0;
                 }

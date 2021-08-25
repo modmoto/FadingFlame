@@ -19,11 +19,12 @@ namespace FadingFlame.Leagues
         public string DivisionId { get; set; }
         public List<GameDay> GameDays { get; set; }
         public bool IsFull => Players.Count == 6;
-
-        public void ReportGame(MatchResult matchResult)
+        public DateTimeOffset StartDate { get; set; }
+        
+        public void ReportGame(MatchResultDto matchResultDto)
         {
-            var player1Result = matchResult.Player1;
-            var player2Result = matchResult.Player2;
+            var player1Result = matchResultDto.Player1;
+            var player2Result = matchResultDto.Player2;
 
             var player1 = Players.FirstOrDefault(p => p.Id == player1Result.Id);
             var player2 = Players.FirstOrDefault(p => p.Id == player2Result.Id);
@@ -33,70 +34,22 @@ namespace FadingFlame.Leagues
                 throw new ValidationException("Players are not in this league");
             }
 
-            var points = CalculateWinPoints(player1Result.BattlePoints, player2Result.BattlePoints);
-
-            var pointsAfteObjective = CalculateSecondaryObjective(
-                player1Result,
-                player2Result,
-                points.Player1,
-                points.Player2);
-
-            player1.RecordResult(pointsAfteObjective.Player1);
-            player2.RecordResult(pointsAfteObjective.Player2);
-
-            player1.RecordResult(matchResult);
-            player2.RecordResult(matchResult);
+            var match = GameDays.SelectMany(g => g.Matchups).FirstOrDefault(m => m.MatchId == matchResultDto.MatchId);
+            if (match == null)
+            {
+                throw new ValidationException("Match not in this gameday");
+            }
+            
+            var result = MatchResult.Create(player1Result, player2Result);
+            match.RecordResult(result);
+            
+            player1.RecordResult(result.Player1.WinPoints);
+            player2.RecordResult(result.Player2.WinPoints);
 
             Players = Players.OrderByDescending(p => p.Points).ToList();
         }
 
-        private static PointTuple CalculateWinPoints(int player1, int player2)
-        {
-            var pointTuples = new Dictionary<int, PointTuple>
-            {
-                { 225, new PointTuple(10, 10)},
-                { 450, new PointTuple(11, 9)},
-                { 900, new PointTuple(12, 8)},
-                { 1350, new PointTuple(13, 7)},
-                { 1800, new PointTuple(14, 6)},
-                { 2250, new PointTuple(15, 5)},
-                { 3150, new PointTuple(16, 4)},
-                { 3151, new PointTuple(17, 3)}
-            };
-
-            var pair = pointTuples.First(p => Math.Abs(player1 - player2) <= p.Key);
-
-            return player1 > player2
-                ? new PointTuple(pair.Value.Player1, pair.Value.Player2)
-                : new PointTuple(pair.Value.Player2, pair.Value.Player1);
-        }
-
-        private static PointTuple CalculateSecondaryObjective(
-            PlayerResult player1Result,
-            PlayerResult player2Result,
-            int points1,
-            int points2)
-        {
-            if (player1Result.SecondaryObjective == SecondaryObjectiveState.won
-                && player2Result.SecondaryObjective == SecondaryObjectiveState.lost)
-            {
-                return new PointTuple(points1 + 3, points2 - 3);
-            }
-
-            if (player1Result.SecondaryObjective == SecondaryObjectiveState.lost
-                && player2Result.SecondaryObjective == SecondaryObjectiveState.won)
-            {
-                return new PointTuple(points1 - 3, points2 + 3);
-            }
-
-            if (player1Result.SecondaryObjective == SecondaryObjectiveState.draw
-                && player2Result.SecondaryObjective == SecondaryObjectiveState.draw)
-            {
-                return new PointTuple(points1, points2);
-            }
-
-            throw new ValidationException("Invalid secondary objective selection");
-        }
+        
 
         public void AddPlayer(Player player)
         {
@@ -112,13 +65,14 @@ namespace FadingFlame.Leagues
             }
         }
 
-        public static League Create(int season, string divisionId, string name)
+        public static League Create(int season, DateTimeOffset startDate, string divisionId, string name)
         {
             return new()
             {
                 Season = season,
                 DivisionId = divisionId,
-                Name = name
+                Name = name,
+                StartDate = startDate
             };
         }
 
@@ -137,25 +91,26 @@ namespace FadingFlame.Leagues
 
             var gameDays = new List<GameDay>();
 
-            for (var roundNumber = 0; roundNumber < numberOfRounds; roundNumber++)
+            for (var gameDayIndex = 0; gameDayIndex < numberOfRounds; gameDayIndex++)
             {
                 var matchups = new List<Matchup>();
 
-                var playerIndex = roundNumber % numberOfPlayers;
+                var playerIndex = gameDayIndex % numberOfPlayers;
 
+                var offset = StartDate.AddDays(14 * gameDayIndex);
                 var matchup = Matchup.Create(teamsTemp[playerIndex], teams.First());
                 matchups.Add(matchup);
 
                 for (var index = 1; index < numberOfMatchesInARound; index++)
                 {
-                    var firstPlayerIndex = (roundNumber + index) % numberOfPlayers;
-                    var secondPlayerIndex = (roundNumber + numberOfPlayers - index) % numberOfPlayers;
+                    var firstPlayerIndex = (gameDayIndex + index) % numberOfPlayers;
+                    var secondPlayerIndex = (gameDayIndex + numberOfPlayers - index) % numberOfPlayers;
 
                     var matchupInner = Matchup.Create(teamsTemp[firstPlayerIndex], teamsTemp[secondPlayerIndex]);
                     matchups.Add(matchupInner);
                 }
 
-                var round = GameDay.Create(matchups);
+                var round = GameDay.Create(offset, matchups);
                 gameDays.Add(round);
             }
 

@@ -1,23 +1,32 @@
+using System;
+using FadingFlame.Repositories;
 using MongoDB.Bson;
 
 namespace FadingFlame.Leagues
 {
     public class Matchup
     {
-        public ObjectId PlayerAtHome { get; set; }
-        public ObjectId PlayerAsGuest { get; set; }
-        public string NameAtHome { get; set; }
-        public string NameAsGuest { get; set; }
+        public ObjectId MatchId { get; set; }
+        public ObjectId Player1 { get; set; }
+        public ObjectId Player2 { get; set; }
+        public string Name1 { get; set; }
+        public string Name2 { get; set; }
+        public MatchResult Result { get; set; }
 
         public static Matchup Create(PlayerInLeague playerAtHome, PlayerInLeague playerAsGuest)
         {
             return new()
             {
-                PlayerAtHome = playerAtHome.Id,
-                PlayerAsGuest = playerAsGuest.Id,
-                NameAtHome = playerAtHome.Name,
-                NameAsGuest = playerAsGuest.Name
+                Player1 = playerAtHome.Id,
+                Player2 = playerAsGuest.Id,
+                Name1 = playerAtHome.Name,
+                Name2 = playerAsGuest.Name
             };
+        }
+
+        public void RecordResult(MatchResult result)
+        {
+            Result = result;
         }
     }
 }

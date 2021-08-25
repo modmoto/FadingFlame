@@ -30,7 +30,7 @@ else
             <tr>
                 <td @onclick="() => GoToPlayer(playerInLeague.Id)" class="cursor" >@playerInLeague.Name</td>
                 <td>@playerInLeague.Points</td>
-                <td>@playerInLeague.Games.Count</td>
+                <td>@playerInLeague.GamesCount</td>
             </tr>
         }
         </tbody>
@@ -85,12 +85,27 @@ else
         {
             @if (ActiveDay == gameDay.index)
             {
+                <p class="lead">@gameDay.value.StartDate.ToString("dd.MM.") - @gameDay.value.EndDate.ToString("dd.MM.")</p>
                 <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
                 <div class="card" style="width: 18rem;">
                     <ul class="list-group list-group-flush">
                         @foreach (var day in gameDay.value.Matchups)
                         {
-                            <li class="list-group-item">@(day.NameAtHome) vs @(day.NameAsGuest)</li>
+                            <li class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">@(day.Name1) vs @(day.Name2)</h5>
+                                    <small>@day.Result?.RecordedAt.ToString("dd.MM.")</small>
+                                </div>
+                                @if (day.Result != null)
+                                {
+                                    <p class="mb-1">@day.Result.Player1.WinPoints : @day.Result.Player2.WinPoints</p>
+                                    <small>@day.Result.Player1.BattlePoints : @day.Result.Player2.BattlePoints</small>
+                                }
+                                else
+                                {
+                                    <p class="mb-1">not reported yet</p>
+                                }
+                            </li>
                         }
                     </ul>
                 </div>
