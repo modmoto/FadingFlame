@@ -6,8 +6,8 @@ pool:
   
 resources:
   pipelines:
-    - pipeline: fading-flame.build  # Name of the pipeline resource
-      source: fading-flame.build # Name of the triggering pipeline
+    - pipeline: fading-flame.build
+      source: fading-flame
       trigger:
         branches:
           - master
@@ -15,7 +15,7 @@ resources:
 jobs:
   - deployment: Deploy
     displayName: Test
-    environment: Test
+    environment: dev
     variables:
       CONTAINER_SUFFIX: 'dev'
       MONGO_CONNECTION_STRING: 'mongodb://157.90.1.251:3513'
