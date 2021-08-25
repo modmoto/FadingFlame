@@ -7,7 +7,7 @@ services:
     expose:
       - 80
     environment:
-      - MONGO_DB_CONNECTION_SCTRING=mongodb://157.90.1.251:3513
+      - MONGO_DB_CONNECTION_SCTRING=$(MONGO_DB_CONNECTION_SCTRING)
   
   mongo-db:
     image: mongo
