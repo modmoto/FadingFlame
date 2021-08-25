@@ -52,9 +52,11 @@ namespace FadingFlameTests
 
             league.AddPlayer(player1);
             league.AddPlayer(player2);
+            league.CreateGameDays();
 
             var result = new MatchResultDto
             {
+                MatchId = league.GameDays.First().Matchups.First().MatchId,
                 SecondaryObjective = SecondaryObjectiveState.player1,
                 Player1 = new PlayerResultDto
                 {
@@ -108,9 +110,11 @@ namespace FadingFlameTests
 
             league.AddPlayer(player2);
             league.AddPlayer(player1);
+            league.CreateGameDays();
 
             var result = new MatchResultDto
             {
+                MatchId = league.GameDays.First().Matchups.First().MatchId,
                 SecondaryObjective = SecondaryObjectiveState.player2,
                 Player1 = new PlayerResultDto
                 {
