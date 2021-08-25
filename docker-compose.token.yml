@@ -1,0 +1,32 @@
+﻿version: '3.9'
+services:
+  fading-flame:
+    image: deespul/fading-flame:${TAG}
+    container_name: fading-flame-${CONTAINER_SUFFIX}
+    restart: unless-stopped
+    expose:
+      - 80
+    environment:
+      - MONGO_DB_CONNECTION_SCTRING=mongodb://157.90.1.251:3513
+  
+  mongo-db:
+    image: mongo
+    container_name: mongo-db-fading-flame-${CONTAINER_SUFFIX}
+    restart: unless-stopped
+    ports:
+      - ${DB_PORT}:27017
+    command: --wiredTigerCacheSizeGB=1
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_SECRET}
+    volumes:
+      - mongo-db-fading-flame:/data/db
+
+networks:
+  default:
+    external:
+      name: caddy
+
+volumes:
+  mongo-db-fading-flame:
+    name: mongo-db-fading-flame-${CONTAINER_SUFFIX}
