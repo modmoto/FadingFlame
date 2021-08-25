@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
 using FluentAssertions;
@@ -132,6 +135,174 @@ namespace FadingFlameTests
 
             league.Players[0].Points.Should().Be(expectedPoints2);
             league.Players[1].Points.Should().Be(exectedoints1);
+        }
+        
+        [Test]
+        public void AssertMethodTest_HappyPath()
+        {
+            var match = CreateDefaultMatchup();
+            var match2 = CreateDefaultMatchup();
+            var gameDays = new List<GameDay>
+            {
+                CreateGameDay(match, match2)
+            };
+
+            AssertMatchIsNeverPlayedTwice(gameDays);
+            Assert.IsTrue(AssertMatchIsNeverPlayedTwice(gameDays));
+        }
+
+        [Test]
+        public void AssertMethodTest_DoubleGame()
+        {
+            var match = CreateDefaultMatchup();
+            var gameDays = new List<GameDay>
+            {
+                CreateGameDay(match, match)
+            };
+
+            AssertMatchIsNeverPlayedTwice(gameDays);
+            Assert.IsFalse(AssertMatchIsNeverPlayedTwice(gameDays));
+        }
+
+        [Test]
+        public void AssertMethodTest_switched()
+        {
+            var player1 = ObjectId.GenerateNewId();
+            var player2 = ObjectId.GenerateNewId();
+            var match = CreateDefaultMatchup(player1, player2);
+            var matchSwitched = CreateDefaultMatchup(player1, player2);
+
+
+            var gameDays = new List<GameDay>
+            {
+                CreateGameDay(match, matchSwitched)
+            };
+
+            Assert.IsFalse(AssertMatchIsNeverPlayedTwice(gameDays));
+        }
+
+        private static GameDay CreateGameDay(Matchup match, Matchup matchSwitched)
+        {
+            var matchups = new List<Matchup>
+            {
+                match, matchSwitched
+            };
+
+            var gameDay = GameDay.Create(matchups);
+            return gameDay;
+        }
+
+        [Test]
+        public void MakePairings_GameDaysOk()
+        {
+            var league = CreateLeagueWithPlayers(ObjectId.GenerateNewId(), ObjectId.GenerateNewId(), ObjectId.GenerateNewId(), ObjectId.GenerateNewId());
+
+            league.CreateGameDays();
+
+            Assert.AreEqual(3, league.GameDays.Count);
+        }
+
+        [Test]
+        public void MakePairings_PairingsOk_TwoPlayers()
+        {
+            var player1 = ObjectId.GenerateNewId();
+            var player2 = ObjectId.GenerateNewId();
+            var league = CreateLeagueWithPlayers(player1, player2);
+
+            league.CreateGameDays();
+
+            Assert.AreEqual(1, league.GameDays.Count);
+            Assert.IsTrue(AssertMatchIsNeverPlayedTwice(league.GameDays));
+        }
+
+        [Test]
+        public void MakePairings_PairingsOk_fourPlayers()
+        {
+            var player1 = ObjectId.GenerateNewId();
+            var player2 = ObjectId.GenerateNewId();
+            var player3 = ObjectId.GenerateNewId();
+            var player4 = ObjectId.GenerateNewId();
+            var league = CreateLeagueWithPlayers(player1, player2, player3, player4);
+
+            league.CreateGameDays();
+
+            var domainEventGameDays = league.GameDays.ToList();
+            Assert.AreEqual(3, domainEventGameDays.Count);
+            Assert.IsTrue(AssertMatchIsNeverPlayedTwice(domainEventGameDays));
+        }
+
+        [Test]
+        public void MakePairings_PairingsOk_sixPlayers()
+        {
+            var player1 = ObjectId.GenerateNewId();
+            var player2 = ObjectId.GenerateNewId();
+            var player3 = ObjectId.GenerateNewId();
+            var player4 = ObjectId.GenerateNewId();
+            var player5 = ObjectId.GenerateNewId();
+            var player6 = ObjectId.GenerateNewId();
+            var league = CreateLeagueWithPlayers(player1, player2, player3, player4, player5, player6);
+
+            league.CreateGameDays();
+
+            var domainEventGameDays = league.GameDays.ToList();
+            Assert.AreEqual(5, domainEventGameDays.Count);
+            Assert.IsTrue(AssertMatchIsNeverPlayedTwice(domainEventGameDays));
+        }
+
+        [Test]
+        public void MakePairings_PairingsOk_eightPlayers()
+        {
+            var player1 = ObjectId.GenerateNewId();
+            var player2 = ObjectId.GenerateNewId();
+            var player3 = ObjectId.GenerateNewId();
+            var player4 = ObjectId.GenerateNewId();
+            var player5 = ObjectId.GenerateNewId();
+            var player6 = ObjectId.GenerateNewId();
+            var player7 = ObjectId.GenerateNewId();
+            var player8 = ObjectId.GenerateNewId();
+            var league = CreateLeagueWithPlayers(player1, player2, player3, player4, player5, player6, player7, player8);
+
+            league.CreateGameDays();
+
+            var domainEventGameDays = league.GameDays.ToList();
+            Assert.AreEqual(5, domainEventGameDays.Count);
+            Assert.IsTrue(AssertMatchIsNeverPlayedTwice(domainEventGameDays));
+        }
+
+
+        private static Matchup CreateDefaultMatchup(ObjectId? player1 = null, ObjectId? player2 = null)
+        {
+            var playerInLeague1 = PlayerInLeague.Create(player1 ?? ObjectId.GenerateNewId(), player1.ToString());
+            var playerInLeague2 = PlayerInLeague.Create(player2 ?? ObjectId.GenerateNewId(), player2.ToString());
+            var matchup = Matchup.Create(playerInLeague1, playerInLeague2);
+            return matchup;
+        }
+
+        private bool AssertMatchIsNeverPlayedTwice(IEnumerable<GameDay> gameDays)
+        {
+            var allMatches = gameDays.SelectMany(g => g.Matchups).ToList();
+            foreach (var match in allMatches)
+            {
+                var matchWith = allMatches.Where(m => m.PlayerAtHome == match.PlayerAtHome && m.PlayerAsGuest == match.PlayerAsGuest
+                                                      || m.PlayerAtHome == match.PlayerAsGuest && m.PlayerAsGuest == match.PlayerAtHome);
+                if (matchWith.Count() != 1) return false;
+            }
+
+            return true;
+        }
+
+        private static League CreateLeagueWithPlayers(params ObjectId[] identities)
+        {
+            var league = League.Create(1, "1A", "bogota");
+            foreach (var guidIdentity in identities)
+            {
+                league.AddPlayer(new Player()
+                {
+                    Id = guidIdentity
+                });
+            }
+
+            return league;
         }
     }
 }

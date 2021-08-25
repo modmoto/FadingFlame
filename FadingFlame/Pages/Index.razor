@@ -1,6 +1,8 @@
 @page "/"
 @using FadingFlame.Leagues
+@using MongoDB.Bson
 @inject ILeagueRepository _leagueRepository
+@inject NavigationManager _navigation
 
 <div>
     <h1 class="display-4">Welcome to the Fading Flame League!</h1>
@@ -11,9 +13,9 @@
 <div class="row row-cols-4 row-cols-md-2 g-4">
     @foreach (var league in _leagues)
     {
-        <div class="col pb-4">
+        <div class="col pb-4 cursor" @onclick="() => GoToLeague(league.Id)">
             <div class="card" style="width: 18rem;">
-                <div class="card-header bg-light">
+                <div class="card-header">
                     @league.DivisionId @league.Name
                 </div>
                 <div class="card-body">
@@ -32,5 +34,10 @@
     {
         _leagues = await _leagueRepository.LoadForSeason(1);
         StateHasChanged();
+    }
+
+    public void GoToLeague(ObjectId leagueId)
+    {
+        _navigation.NavigateTo($"league/{leagueId}");
     }
 }

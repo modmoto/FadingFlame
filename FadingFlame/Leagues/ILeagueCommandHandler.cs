@@ -110,19 +110,19 @@ namespace FadingFlame.Leagues
                 "18B",
             };
             
-            var currentLeageu = League.Create(season, ids.First(), names.First());
-            newLeagues.Add(currentLeageu);
+            var league = League.Create(season, ids.First(), names.First());
+            newLeagues.Add(league);
             for (var index = 1; index < players.Count; index++)
             {
                 var player = players[index];
-                currentLeageu.AddPlayer(player);
+                league.AddPlayer(player);
                 counter++;
 
-                if (counter == 6)
+                if (league.IsFull)
                 {
                     var newLeaguesCount = newLeagues.Count;
-                    currentLeageu = League.Create(season, ids[newLeaguesCount], names[newLeaguesCount]);
-                    newLeagues.Add(currentLeageu);
+                    league = League.Create(season, ids[newLeaguesCount], names[newLeaguesCount]);
+                    newLeagues.Add(league);
                     counter = 0;
                 }
             }
