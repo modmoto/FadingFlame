@@ -95,6 +95,13 @@ namespace FadingFlame.Repositories
             var mongoCollection = mongoDatabase.GetCollection<T>(typeof(T).Name);
             await mongoCollection.DeleteOneAsync<T>(deleteQuery);
         }
+        
+        protected async Task DeleteMultiple<T>(Expression<Func<T, bool>> deleteQuery)
+        {
+            var mongoDatabase = CreateClient();
+            var mongoCollection = mongoDatabase.GetCollection<T>(typeof(T).Name);
+            await mongoCollection.DeleteManyAsync<T>(deleteQuery);
+        }
 
         protected Task Delete<T>(ObjectId id) where T : IIdentifiable
         {

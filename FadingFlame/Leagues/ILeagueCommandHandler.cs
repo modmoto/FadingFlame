@@ -26,7 +26,7 @@ namespace FadingFlame.Leagues
             // Todo add season
             var season = 1;
 
-            // var leagues = await _leagueRepository.LoadForSeason(season - 1);
+            await _leagueRepository.DeleteForSeason(season);
 
             var players = await _playerRepository.LoadAll();
             int counter = 0;
