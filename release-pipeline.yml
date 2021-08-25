@@ -6,8 +6,8 @@ pool:
   
 resources:
   pipelines:
-    - pipeline: fading-flame.build
-      source: fading-flame
+    - pipeline: fading-flame
+      source: fading-flame.build
       trigger:
         branches:
           - master
