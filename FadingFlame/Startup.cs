@@ -1,4 +1,5 @@
 using System;
+using FadingFlame.Discord;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
 using FadingFlame.UserAccounts;
@@ -29,6 +30,13 @@ namespace FadingFlame
             {
                 var mongoConnectionString = Environment.GetEnvironmentVariable("MONGO_DB_CONNECTION_STRING");
                 return new MongoClient(mongoConnectionString);
+            });
+            
+            services.AddSingleton(_ =>
+            {
+                var token = Environment.GetEnvironmentVariable("DISCORD_TOKEN");
+                var discordBot = new DiscordBot(token);
+                return discordBot;
             });
 
             services.AddTransient<ILeagueRepository, LeagueRepository>();

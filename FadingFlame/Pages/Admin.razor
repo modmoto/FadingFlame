@@ -4,6 +4,7 @@
 @using FadingFlame.Discord
 @inject UserState _userState
 @inject ILeagueCommandHandler _leagueCommandHandler
+@inject IDiscordBot _discordBot
 
 @if (_userState.UserIsAdmin)
 {
@@ -23,8 +24,7 @@
         if (_userState.UserIsAdmin)
         {
             var leagues = await _leagueCommandHandler.CreateLeagues();
-            var discordBot = DiscordBot.Instance;
-            await discordBot.CreateLeagueChannels(leagues);
+            await _discordBot.CreateLeagueChannels(leagues);
         }
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -9,48 +8,32 @@ using Microsoft.Extensions.Logging;
 
 namespace FadingFlame.Discord
 {
-    public class DiscordBot
+    public interface IDiscordBot
     {
-        private readonly string _token = Environment.GetEnvironmentVariable("DISCORD_TOKEN");
-        private DiscordClient Client { get; }
-        private static DiscordBot _instance;
-        private static readonly object Padlock = new();
+        Task CreateLeagueChannels(List<League> leagues);
+    }
 
-        public static DiscordBot Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    lock (Padlock)
-                    {
-                        if (_instance == null)
-                        {
-                            _instance = new DiscordBot();
-                        }
-                    }
-                }
-                return _instance;
-            }
-        }
-        
-        private DiscordBot()
+    public class DiscordBot : IDiscordBot
+    {
+        private readonly DiscordClient _client;
+
+        public DiscordBot(string token)
         {
             var discordConfiguration = new DiscordConfiguration
             {
-                Token = _token,
+                Token = token,
                 TokenType = TokenType.Bot,
                 AutoReconnect = true,
                 MinimumLogLevel = LogLevel.Debug,
             };
-            Client = new DiscordClient(discordConfiguration);
-
-            Client.ConnectAsync().Wait();
+            
+            _client = new DiscordClient(discordConfiguration);
+            _client.ConnectAsync().Wait();
         }
         
         public async Task CreateLeagueChannels(List<League> leagues)
         {
-            var channels = Client.Guilds.SelectMany(g => g.Value.Channels).Where(c => c.Value.Type == ChannelType.Text);
+            var channels = _client.Guilds.SelectMany(g => g.Value.Channels).Where(c => c.Value.Type == ChannelType.Text);
             var regex = new Regex("league-([0-9]{1,2}[a-b])-\\w+");
             var channelsForLeagues = channels.Where(c => regex.IsMatch(c.Value.Name));
             var leagueNames = leagues.Select(l => ToLeagueName(l)).ToList();
@@ -62,7 +45,7 @@ namespace FadingFlame.Discord
                 }
             }
 
-            foreach (var clientGuild in Client.Guilds)
+            foreach (var clientGuild in _client.Guilds)
             {
                 var leaguesCategory = clientGuild.Value.Channels.FirstOrDefault(c => c.Value.IsCategory && c.Value.Name == "leagues").Value;
                 if (leaguesCategory == null)
