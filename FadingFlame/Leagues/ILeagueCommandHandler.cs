@@ -49,7 +49,7 @@ namespace FadingFlame.Leagues
                 "Hellebron",
                 "Settra",
                 "Karl",
-                "Gothrik",
+                "Gotrek",
                 "Felix",
                 "Dummy",
                 "Dummy",
