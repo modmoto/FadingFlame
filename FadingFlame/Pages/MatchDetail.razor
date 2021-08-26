@@ -146,16 +146,19 @@ else
 
     private async Task OnValidSubmit()
     {
-        _loading = true;
-        _savedSuccesfully = false;
-        if (_league != null)
+        if (CanEditMatch)
         {
-            _league.ReportGame(_model);
-            await _leagueRepository.Udate(_league);
-        }
+            _loading = true;
+            _savedSuccesfully = false;
+            if (_league != null)
+            {
+                _league.ReportGame(_model);
+                await _leagueRepository.Udate(_league);
+            }
 
-        _loading = false;
-        _savedSuccesfully = true;
+            _loading = false;
+            _savedSuccesfully = true;
+        }
     }
 
     private string GetString(SecondaryObjectiveState state)

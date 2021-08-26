@@ -11,7 +11,7 @@
 <div class="card">
     <h4 class="card-header">Profile</h4>
     <div class="card-body">
-        @if (_userState.LoggedInPlayerId?.ToString() == Id)
+        @if (IsTheRightUser())
         {
             <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
                 <DataAnnotationsValidator/>
@@ -97,13 +97,22 @@
 
     private async Task OnValidSubmit()
     {
-        _loading = true;
-        _savedSuccesfully = false;
-        var player = await _playerRepository.Load(new ObjectId(Id));
-        player.DiscordTag = _model.DiscordTag;
-        player.DisplayName = _model.DisplayName;
-        await _playerRepository.Udate(player);
-        _loading = false;
-        _savedSuccesfully = true;
+        if (IsTheRightUser())
+        {
+            _loading = true;
+            _savedSuccesfully = false;
+            var player = await _playerRepository.Load(new ObjectId(Id));
+            player.DiscordTag = _model.DiscordTag;
+            player.DisplayName = _model.DisplayName;
+            await _playerRepository.Udate(player);
+            _loading = false;
+            _savedSuccesfully = true;
+        }
     }
+
+    private bool IsTheRightUser()
+    {
+        return _userState.LoggedInPlayerId?.ToString() == Id;
+    }
+
 }

@@ -37,7 +37,8 @@ else
             </tr>
         }
         </tbody>
-    </table>
+    </table>    
+    
     
     <div>
         <h1 class="display-4">Gamedays</h1>
@@ -105,7 +106,7 @@ else
                                         @if (matchup.Result != null)
                                         {
                                             <p class="mb-1">@matchup.Result.Player1.BattlePoints : @matchup.Result.Player2.BattlePoints</p>
-                                            <small>@matchup.Result.Player1.VictoryPoints @GetSecondaryString1(matchup.Result.SecondaryObjective) : @matchup.Result.Player2.VictoryPoints @GetSecondaryString2(matchup.Result.SecondaryObjective)</small>
+                                            <small>@GetOriginalPointsString(matchup.Result)</small>
                                         }
                                         else
                                         {
@@ -141,9 +142,9 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        if (ObjectId.TryParse(LeagueId, out var arsed))
+        if (ObjectId.TryParse(LeagueId, out var parsed))
         {
-            _league = await _leagueRepository.Load(arsed);
+            _league = await _leagueRepository.Load(parsed);
         }
     }
 
@@ -163,45 +164,35 @@ else
 
     private void GoToMatch(Matchup matchup)
     {
-        if (UserIsOneOfTheLayers(matchup))
+        if (UserIsOneOfThePlayers(matchup))
         {
             _navigation.NavigateTo($"league/{_league.Id}/match/{matchup.MatchId}");
         }
     }
 
-    private string GetSecondaryString1(SecondaryObjectiveState resultSecondaryObjective)
+    private string GetSecondaryStringForPlayer1(SecondaryObjectiveState resultSecondaryObjective)
     {
-        if (resultSecondaryObjective == SecondaryObjectiveState.player1)
-        {
-            return "(+2nd obj.)";
-        }
-
-        return "";
+        return resultSecondaryObjective == SecondaryObjectiveState.player1 ? "(+2nd obj.)" : "";
     }
 
-    private string GetSecondaryString2(SecondaryObjectiveState resultSecondaryObjective)
+    private string GetSecondaryStringForPlayer2(SecondaryObjectiveState resultSecondaryObjective)
     {
-        if (resultSecondaryObjective == SecondaryObjectiveState.player2)
-        {
-            return "(+2nd obj.)";
-        }
-
-        return "";
+        return resultSecondaryObjective == SecondaryObjectiveState.player2 ? "(+2nd obj.)" : "";
     }
 
     private string GetClasses(Matchup matchup)
     {
-        if (UserIsOneOfTheLayers(matchup))
-        {
-            return "card bg-light cursor";
-        }
-
-        return "card";
+        return UserIsOneOfThePlayers(matchup) ? "card bg-light cursor" : "card";
     }
 
-    private bool UserIsOneOfTheLayers(Matchup matchup)
+    private bool UserIsOneOfThePlayers(Matchup matchup)
     {
         return _userState.LoggedInPlayerId == matchup.Player1 || _userState.LoggedInPlayerId == matchup.Player2;
+    }
+
+    private string GetOriginalPointsString(MatchResult result)
+    {
+        return $"{result.Player1.VictoryPoints} {GetSecondaryStringForPlayer1(result.SecondaryObjective)} : {result.Player2.VictoryPoints} {GetSecondaryStringForPlayer2(result.SecondaryObjective)}";
     }
 
 }
