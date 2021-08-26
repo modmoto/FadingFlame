@@ -102,8 +102,8 @@ namespace FadingFlame.Discord
 
                     foreach (var discordMember in clientGuild.Value.Members)
                     {
-                        var username = discordMember.Value.Username;
-                        var playerInLeagues = leagues.SelectMany(l => l.Players).FirstOrDefault(p => p.DiscordTag?.Split("#")[0] == username);
+                        var username = discordMember.Value.Username.ToLower();
+                        var playerInLeagues = leagues.SelectMany(l => l.Players).FirstOrDefault(p => p.DiscordTag?.Split("#")[0].ToLower() == username);
                         if (playerInLeagues != null)
                         {
                             await discordMember.Value.GrantRoleAsync(role);

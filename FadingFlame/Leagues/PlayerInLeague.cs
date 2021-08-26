@@ -9,10 +9,12 @@ namespace FadingFlame.Leagues
         public string DiscordTag { get; set; }
         public int Points { get; set; }
         public int GamesCount { get; set; }
+        public int VictoryPoints { get; set; }
 
-        public void RecordResult(int points)
+        public void RecordResult(int points, int victoryPoints)
         {
             Points += points;
+            VictoryPoints += victoryPoints;
             GamesCount++;
         }
 

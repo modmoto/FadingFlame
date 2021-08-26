@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using MongoDB.Bson;
 
@@ -46,7 +47,8 @@ namespace FadingFlame.Leagues
                 { 1800, new PointTuple(14, 6)},
                 { 2250, new PointTuple(15, 5)},
                 { 3150, new PointTuple(16, 4)},
-                { 3151, new PointTuple(17, 3)}
+                { 3151, new PointTuple(17, 3)},
+                { Int32.MaxValue, new PointTuple(17, 3)},
             };
 
             var pair = pointTuples.First(p => Math.Abs(player1 - player2) <= p.Key);
@@ -115,6 +117,7 @@ namespace FadingFlame.Leagues
     public class PlayerResultDto
     {
         public ObjectId Id { get; set; }
+        [Range(0, 4500)]
         public int VictoryPoints { get; set; }
     }
 

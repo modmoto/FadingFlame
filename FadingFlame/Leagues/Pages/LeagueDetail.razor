@@ -24,6 +24,7 @@ else
         <tr>
             <th>Name</th>
             <th>Battle Points</th>
+            <th>Victory Points</th>
             <th>Matches</th>
         </tr>
         </thead>
@@ -33,6 +34,7 @@ else
             <tr>
                 <td @onclick="() => GoToPlayer(playerInLeague.Id)" class="cursor" >@playerInLeague.Name</td>
                 <td>@playerInLeague.Points</td>
+                <td>@playerInLeague.VictoryPoints</td>
                 <td>@playerInLeague.GamesCount</td>
             </tr>
         }

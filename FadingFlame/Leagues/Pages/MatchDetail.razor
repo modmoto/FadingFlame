@@ -58,12 +58,6 @@ else
                 }
                 Report Game
             </button>
-            @if (_savedSuccesfully)
-            {
-                <div class="alert alert-success" role="alert">
-                    result saved
-                </div>
-            }
             </EditForm>
         }
     }
@@ -88,7 +82,6 @@ else
     private MatchResultDto _model = new();
     private League _league;
     private bool _loading;
-    private bool _savedSuccesfully;
     private string _name1;
     private string _name2;
     private bool _matchWasFinished;
@@ -149,7 +142,6 @@ else
         if (CanEditMatch)
         {
             _loading = true;
-            _savedSuccesfully = false;
             if (_league != null)
             {
                 _league.ReportGame(_model);
@@ -157,7 +149,7 @@ else
             }
 
             _loading = false;
-            _savedSuccesfully = true;
+            _navigation.NavigateTo($"league/{LeagueId}");
         }
     }
 
