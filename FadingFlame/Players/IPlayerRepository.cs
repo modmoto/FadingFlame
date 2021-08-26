@@ -10,7 +10,7 @@ namespace FadingFlame.Players
     {
         Task<List<Player>> LoadAll();
         Task<Player> Load(ObjectId id);
-        Task Udate(Player player);
+        Task Update(Player player);
         Task Insert(Player player);
     }
 
@@ -30,7 +30,7 @@ namespace FadingFlame.Players
             return LoadFirst<Player>(id);
         }
 
-        public Task Udate(Player player)
+        public Task Update(Player player)
         {
             return Upsert(player);
         }
