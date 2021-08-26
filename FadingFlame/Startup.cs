@@ -32,7 +32,7 @@ namespace FadingFlame
                 return new MongoClient(mongoConnectionString);
             });
             
-            services.AddSingleton(_ =>
+            services.AddSingleton<IDiscordBot>(_ =>
             {
                 var token = Environment.GetEnvironmentVariable("DISCORD_TOKEN");
                 var discordBot = new DiscordBot(token);
