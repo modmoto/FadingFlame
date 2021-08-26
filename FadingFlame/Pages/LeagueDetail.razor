@@ -90,28 +90,32 @@ else
             {
                 <p class="lead">@gameDay.value.StartDate.ToString("dd.MM.") - @gameDay.value.EndDate.ToString("dd.MM.")</p>
                 <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                <div class="card" style="width: 18rem;">
-                    <ul class="list-group list-group-flush">
+                    <div class="row row-cols-4 row-cols-md-2 g-4">
                         @foreach (var matchup in gameDay.value.Matchups)
                         {
-                            <li class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h5 class="mb-1">@(matchup.Name1) vs @(matchup.Name2)</h5>
-                                    <small>@matchup.Result?.RecordedAt.ToString("dd.MM.")</small>
+                            <div class="col pb-4 cursor" @onclick="() => GoToMatch(matchup)">
+                                <div class="@GetClasses(matchup)" style="width: 18rem;">
+                                    <div class="card-header">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h5 class="mb-1">@(matchup.Name1) vs @(matchup.Name2)</h5>
+                                            <small>@matchup.Result?.RecordedAt.ToString("dd.MM.")</small>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        @if (matchup.Result != null)
+                                        {
+                                            <p class="mb-1">@matchup.Result.Player1.BattlePoints : @matchup.Result.Player2.BattlePoints</p>
+                                            <small>@matchup.Result.Player1.VictoryPoints @GetSecondaryString1(matchup.Result.SecondaryObjective) : @matchup.Result.Player2.VictoryPoints @GetSecondaryString2(matchup.Result.SecondaryObjective)</small>
+                                        }
+                                        else
+                                        {
+                                            <p class="mb-1">not reported yet</p>
+                                        }
+                                    </div>
                                 </div>
-                                @if (matchup.Result != null)
-                                {
-                                    <p class="mb-1">@matchup.Result.Player1.BattlePoints : @matchup.Result.Player2.BattlePoints</p>
-                                    <small>@matchup.Result.Player1.VictoryPoints @GetSecondaryString1(matchup.Result.SecondaryObjective) : @matchup.Result.Player2.VictoryPoints @GetSecondaryString2(matchup.Result.SecondaryObjective)</small>
-                                }
-                                else
-                                {
-                                    <p class="mb-1">not reported yet</p>
-                                }
-                            </li>
+                            </div>
                         }
-                    </ul>
-                </div>
+                    </div>
                 </div>
             }
             else
@@ -189,10 +193,10 @@ else
     {
         if (UserIsOneOfTheLayers(matchup))
         {
-            return "list-group-item bg-light cursor";
+            return "card bg-light cursor";
         }
 
-        return "list-group-item";
+        return "card";
     }
 
     private bool UserIsOneOfTheLayers(Matchup matchup)
