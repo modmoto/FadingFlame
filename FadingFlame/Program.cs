@@ -1,3 +1,5 @@
+using System;
+using FadingFlame.Discord;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
@@ -7,6 +9,8 @@ namespace FadingFlame
     {
         public static void Main(string[] args)
         {
+            var discordBot = DiscordBot.Instance;
+            Console.WriteLine($"bot {discordBot}");
             CreateHostBuilder(args).Build().Run();
         }
 

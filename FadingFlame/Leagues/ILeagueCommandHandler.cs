@@ -8,7 +8,7 @@ namespace FadingFlame.Leagues
 {
     public interface ILeagueCommandHandler
     {
-        Task CreateLeagues();
+        Task<List<League>> CreateLeagues();
     }
 
     public class LeagueCommandHandler : ILeagueCommandHandler
@@ -22,7 +22,7 @@ namespace FadingFlame.Leagues
             _playerRepository = playerRepository;
         }
 
-        public async Task CreateLeagues()
+        public async Task<List<League>> CreateLeagues()
         {
             // Todo add season
             var season = 1;
@@ -129,6 +129,7 @@ namespace FadingFlame.Leagues
             }
 
             await _leagueRepository.Insert(newLeagues);
+            return newLeagues;
             //
             // if (leagues.Count == 0)
             // {

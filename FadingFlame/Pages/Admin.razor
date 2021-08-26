@@ -1,6 +1,7 @@
 ﻿@page "/admin"
 @using FadingFlame.Leagues
 @using FadingFlame.UserAccounts
+@using FadingFlame.Discord
 @inject UserState _userState
 @inject ILeagueCommandHandler _leagueCommandHandler
 
@@ -21,7 +22,9 @@
     {
         if (_userState.UserIsAdmin)
         {
-            await _leagueCommandHandler.CreateLeagues();    
+            var leagues = await _leagueCommandHandler.CreateLeagues();
+            var discordBot = DiscordBot.Instance;
+            await discordBot.CreateLeagueChannels(leagues);
         }
     }
 }
