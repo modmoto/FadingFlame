@@ -30,7 +30,6 @@ namespace FadingFlame.Leagues
             await _leagueRepository.DeleteForSeason(season);
 
             var players = await _playerRepository.LoadAll();
-            int counter = 0;
             var newLeagues = new List<League>();
 
             var names = new List<string>()

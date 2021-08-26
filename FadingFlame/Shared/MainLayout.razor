@@ -4,6 +4,7 @@
 @inject IUserAccountCommandHandler _commandHandler
 @inject IPlayerRepository _playerRepository
 @inject UserState _userState
+@inject NavigationManager _navigation
 
 <div class="page">
     <div class="sidebar">
@@ -26,6 +27,10 @@
         <div class="content px-4">
             @Body
         </div>
+        
+        <div class="text-center p-3 pt-5 cursor" @onclick="() => GoToImprint()">
+            Imprint
+        </div>    
     </div>
 </div>
 
@@ -70,5 +75,10 @@
                 StateHasChanged();
             }
         }
+    }
+
+    public void GoToImprint()
+    {
+        _navigation.NavigateTo("imprint");
     }
 }
