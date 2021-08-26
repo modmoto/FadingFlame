@@ -54,7 +54,7 @@ namespace FadingFlame.Leagues
             if (IsFull) return;
             
             Players = Players.Where(p => p.Id != player.Id).ToList();
-            var playerInLeague = PlayerInLeague.Create(player.Id, player.DisplayName);
+            var playerInLeague = PlayerInLeague.Create(player.Id, player.DisplayName, player.DiscordTag);
             Players.Add(playerInLeague);
 
             if (IsFull)

@@ -274,8 +274,8 @@ namespace FadingFlameTests
 
         private static Matchup CreateDefaultMatchup(ObjectId? player1 = null, ObjectId? player2 = null)
         {
-            var playerInLeague1 = PlayerInLeague.Create(player1 ?? ObjectId.GenerateNewId(), player1.ToString());
-            var playerInLeague2 = PlayerInLeague.Create(player2 ?? ObjectId.GenerateNewId(), player2.ToString());
+            var playerInLeague1 = PlayerInLeague.Create(player1 ?? ObjectId.GenerateNewId(), player1.ToString(), "123");
+            var playerInLeague2 = PlayerInLeague.Create(player2 ?? ObjectId.GenerateNewId(), player2.ToString(), "123");
             var matchup = Matchup.Create(playerInLeague1, playerInLeague2);
             return matchup;
         }
