@@ -118,14 +118,11 @@ namespace FadingFlame.Leagues
             {
                 var player = players[index];
                 league.AddPlayer(player);
-                counter++;
 
                 if (league.IsFull)
                 {
-                    var newLeaguesCount = newLeagues.Count;
                     newLeagues.Add(league);
-                    league = League.Create(season, startDate, ids[newLeaguesCount], names[newLeaguesCount]);
-                    counter = 0;
+                    league = League.Create(season, startDate, ids[newLeagues.Count], names[newLeagues.Count]);
                 }
             }
 
