@@ -8,6 +8,7 @@ services:
       - 80
     environment:
       - MONGO_DB_CONNECTION_STRING=${MONGO_DB_CONNECTION_STRING}
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
   
   mongo-db:
     image: mongo
