@@ -94,8 +94,8 @@ else
                     <div class="row row-cols-4 row-cols-md-2 g-4">
                         @foreach (var matchup in gameDay.value.Matchups)
                         {
-                            <div class="col pb-4 cursor" @onclick="() => GoToMatch(matchup)">
-                                <div class="@GetClasses(matchup)" style="width: 18rem;">
+                            <div class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)">
+                                <div class="card" style="width: 18rem;">
                                     <div class="card-header">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h5 class="mb-1">@(matchup.Name1) vs @(matchup.Name2)</h5>
@@ -182,7 +182,7 @@ else
 
     private string GetClasses(Matchup matchup)
     {
-        return UserIsOneOfThePlayers(matchup) ? "card bg-light cursor" : "card";
+        return UserIsOneOfThePlayers(matchup) ? "col pb-4 bg-light cursor" : "col pb-4";
     }
 
     private bool UserIsOneOfThePlayers(Matchup matchup)
