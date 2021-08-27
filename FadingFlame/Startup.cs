@@ -75,9 +75,6 @@ namespace FadingFlame
             services.AddTransient<ILeagueRepository, LeagueRepository>();
             services.AddTransient<IPlayerRepository, PlayerRepository>();
             services.AddTransient<ILeagueCommandHandler, LeagueCommandHandler>();
-            services.AddTransient<IUserContext, UserContext>();
-            services.AddTransient<ILocalStorageService, LocalStorageService>();
-            services.AddTransient<IUserAccountRepository, UserAccountRepository>();
             services.AddTransient<IUserAccountCommandHandler, UserAccountCommandHandler>();
             services.AddScoped<UserState>();
             services.AddHttpContextAccessor();

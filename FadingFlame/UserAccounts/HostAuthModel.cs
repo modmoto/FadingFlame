@@ -7,12 +7,6 @@ namespace FadingFlame.UserAccounts
 {
     public class HostAuthModel : PageModel
     {
-        private readonly UserState _userState;
-
-        public HostAuthModel(UserState userState)
-        {
-            _userState = userState;
-        }
         public IActionResult OnGetLogin()
         {
             return Challenge(AuthProps(), "oidc");
