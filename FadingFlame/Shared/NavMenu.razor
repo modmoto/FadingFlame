@@ -34,23 +34,15 @@
 </div>
 
 @code {
-    private bool collapseNavMenu = true;
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private bool _collapseNavMenu = true;
+    private string NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
     private void ToggleNavMenu()
     {
-        collapseNavMenu = !collapseNavMenu;
+        _collapseNavMenu = !_collapseNavMenu;
     }
 
     protected override void OnInitialized()
     {
-        _userState.UserLoggedIn += (_, _) =>
-        {
-            StateHasChanged();
-        };
-        
-        _userState.UserLoggedOut += (_, _) =>
-        {
-            StateHasChanged();
-        };
+        _userState.UserLoggedIn += (_, _) => StateHasChanged();
     }
 }

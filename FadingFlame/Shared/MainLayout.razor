@@ -1,10 +1,13 @@
 @using FadingFlame.UserAccounts
 @using FadingFlame.Players
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Http
+@using MongoDB.Bson
 @inherits LayoutComponentBase
-@inject IUserAccountCommandHandler _commandHandler
 @inject IPlayerRepository _playerRepository
 @inject UserState _userState
 @inject NavigationManager _navigation
+@inject IHttpContextAccessor _httpContextAccessor
 
 <div class="page">
     <div class="sidebar">
@@ -12,14 +15,14 @@
     </div>
 
     <div class="main">
-        <div class="top-row px-4" hidden="@IsLoggedIn">
-            <a href="/login">
+        <div class="top-row px-4" hidden="@_userState.UserIsLoggedIn">
+            <a href="/Login">
                 <span class="oi oi-account-login" aria-hidden="true"></span>
             </a>
         </div>
-        <div class="top-row px-4" hidden="@(!IsLoggedIn)">
-            <span>Hello<a href="@Link">@UserName</a></span>
-            <a href="/" @onclick="LogOut">
+        <div class="top-row px-4" hidden="@(!_userState.UserIsLoggedIn)">
+            <span>Hello<a href="@Link">@_userState.UserName</a></span>
+            <a href="/Logout">
                 <span class="oi oi-account-logout" aria-hidden="true"></span>
             </a>
         </div>
@@ -36,42 +39,32 @@
 
 @code
 {
-    public bool IsLoggedIn => _userState.UserIsLoggedIn;
-    public string UserName => _userState.UserName;
     public string Link => $"/player/{_userState.LoggedInPlayerId}";
-
-    public async Task<string> GetUserName()
-    {
-        if (_userState.UserIsLoggedIn)
-        {
-            var player = await _playerRepository.Load(_userState.LoggedInPlayerId.Value);
-            return player.DisplayName;
-        }
-
-        return "";
-    }
-
-    private async Task LogOut()
-    {
-        await _commandHandler.Logout();
-        StateHasChanged();
-    }
 
     protected override void OnInitialized()
     {
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
-        _userState.UserLoggedOut += (_, _) => StateHasChanged();
     }
 
-    protected override async Task OnAfterRenderAsync(bool what)
+    protected override async Task OnInitializedAsync()
     {
-        if (!IsLoggedIn)
+        var contextAccessorHttpContext = _httpContextAccessor.HttpContext;
+        if (contextAccessorHttpContext != null)
         {
-            await _commandHandler.LoginFromCookie();
-            var userName = await GetUserName();
-            if (_userState.UserIsLoggedIn)
+            await contextAccessorHttpContext.AuthenticateAsync("Cookies");
+            var claims = contextAccessorHttpContext.User.Claims.ToList();
+            
+            var email = claims.FirstOrDefault(c => c.Type == "email")?.Value;
+            if (email != null)
             {
-                _userState.SetUserLoggedIn(_userState.LoggedInPlayerId.Value, userName);
+                var player = await _playerRepository.LoadByEmail(email);
+                if (player == null)
+                {
+                    var name = claims.FirstOrDefault(c => c.Type == "name")?.Value;
+                    player = Player.Create(name, email);
+                    await _playerRepository.Insert(player);
+                }
+                _userState.SetUserLoggedIn(player.Id, player.DisplayName, player.AccountEmail);
                 StateHasChanged();
             }
         }

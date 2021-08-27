@@ -12,6 +12,7 @@ namespace FadingFlame.Players
         Task<Player> Load(ObjectId id);
         Task Update(Player player);
         Task Insert(Player player);
+        Task<Player> LoadByEmail(string email);
     }
 
     public class PlayerRepository : MongoDbRepositoryBase, IPlayerRepository
@@ -38,6 +39,11 @@ namespace FadingFlame.Players
         public Task Insert(Player player)
         {
             return base.Insert(player);
+        }
+
+        public Task<Player> LoadByEmail(string email)
+        {
+            return LoadFirst<Player>(p => p.AccountEmail == email);
         }
     }
 }

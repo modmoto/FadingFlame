@@ -15,12 +15,14 @@ namespace FadingFlame.Players
         public GameList List1 { get; set; }
         public GameList List2 { get; set; }
         public List<Faction> Armies { get; set; } = new();
+        public string AccountEmail { get; set; }
 
-        public static Player Create(string name)
+        public static Player Create(string name, string email)
         {
             return new()
             {
-                DisplayName = name
+                DisplayName = name,
+                AccountEmail = email
             };
         }
 

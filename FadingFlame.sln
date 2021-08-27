@@ -7,11 +7,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{46CB3B24-8790-40BF-B456-BAD440B130D8}"
 ProjectSection(SolutionItems) = preProject
 	.gitignore = .gitignore
-	build-pipeline.yml = build-pipeline.yml
+	azure-pipelines.yml = azure-pipelines.yml
 	.dockerignore = .dockerignore
 	docker-compose.token.yml = docker-compose.token.yml
 	Dockerfile = Dockerfile
-	release-pipeline.yml = release-pipeline.yml
 EndProjectSection
 EndProject
 Global

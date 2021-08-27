@@ -1,10 +1,13 @@
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using FadingFlame.Discord;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
 using FadingFlame.UserAccounts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -25,7 +28,38 @@ namespace FadingFlame
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            
+            JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultScheme = "Cookies";
+                    options.DefaultChallengeScheme = "oidc";
+                })
+                .AddCookie("Cookies")
+                .AddOpenIdConnect("oidc", options =>
+                {
+                    options.Authority = "https://localhost:5001";
+
+                    options.ClientId = "fading-flame";
+                    var secret = Environment.GetEnvironmentVariable("FADING_FLAME_SECRET");
+                    options.ClientSecret = secret;
+                    options.ResponseType = "code";
+                    
+                    options.Scope.Add("profile");
+                    options.Scope.Add("email");
+                    options.GetClaimsFromUserInfoEndpoint = true;
+
+                    options.SaveTokens = true;
+                });
+            // services.AddControllersWithViews(options =>
+            // {
+            //     var policy = new AuthorizationPolicyBuilder()
+            //         .RequireAuthenticatedUser()
+            //         .Build();
+            //     options.Filters.Add(new AuthorizeFilter(policy));
+            // });
+           
             services.AddSingleton(_ =>
             {
                 var mongoConnectionString = Environment.GetEnvironmentVariable("MONGO_DB_CONNECTION_STRING");
@@ -42,10 +76,6 @@ namespace FadingFlame
             services.AddTransient<ILeagueRepository, LeagueRepository>();
             services.AddTransient<IPlayerRepository, PlayerRepository>();
             services.AddTransient<ILeagueCommandHandler, LeagueCommandHandler>();
-            services.AddTransient<IUserContext, UserContext>();
-            services.AddTransient<ILocalStorageService, LocalStorageService>();
-            services.AddTransient<IUserAccountRepository, UserAccountRepository>();
-            services.AddTransient<IUserAccountCommandHandler, UserAccountCommandHandler>();
             services.AddScoped<UserState>();
             services.AddHttpContextAccessor();
 
@@ -76,6 +106,8 @@ namespace FadingFlame
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
