@@ -1,10 +1,15 @@
 @using FadingFlame.UserAccounts
 @using FadingFlame.Players
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Http
+@using MongoDB.Bson
+@using System.Security.Policy
 @inherits LayoutComponentBase
 @inject IUserAccountCommandHandler _commandHandler
 @inject IPlayerRepository _playerRepository
 @inject UserState _userState
 @inject NavigationManager _navigation
+@inject IHttpContextAccessor _httpContextAccessor
 
 <div class="page">
     <div class="sidebar">
@@ -36,24 +41,18 @@
 
 @code
 {
-    public bool IsLoggedIn => _userState.UserIsLoggedIn;
-    public string UserName => _userState.UserName;
+    private bool IsLoggedIn => _userState.UserIsLoggedIn;
+    private string UserName => _userState.UserName;
     public string Link => $"/player/{_userState.LoggedInPlayerId}";
-
-    public async Task<string> GetUserName()
-    {
-        if (_userState.UserIsLoggedIn)
-        {
-            var player = await _playerRepository.Load(_userState.LoggedInPlayerId.Value);
-            return player.DisplayName;
-        }
-
-        return "";
-    }
 
     private async Task LogOut()
     {
-        await _commandHandler.Logout();
+        await _httpContextAccessor.HttpContext.SignOutAsync("Cookies");
+        await _httpContextAccessor.HttpContext.SignOutAsync("oidc", new AuthenticationProperties
+        {
+            RedirectUri = "~/"
+        });
+        _userState.SetUserLoggedOut();
         StateHasChanged();
     }
 
@@ -63,17 +62,17 @@
         _userState.UserLoggedOut += (_, _) => StateHasChanged();
     }
 
-    protected override async Task OnAfterRenderAsync(bool what)
+    protected override async Task OnInitializedAsync()
     {
-        if (!IsLoggedIn)
+        var contextAccessorHttpContext = _httpContextAccessor.HttpContext;
+        if (contextAccessorHttpContext != null)
         {
-            await _commandHandler.LoginFromCookie();
-            var userName = await GetUserName();
-            if (_userState.UserIsLoggedIn)
-            {
-                _userState.SetUserLoggedIn(_userState.LoggedInPlayerId.Value, userName);
-                StateHasChanged();
-            }
+            await contextAccessorHttpContext.AuthenticateAsync();
+            var claims = contextAccessorHttpContext.User.Claims;
+            var name = claims.FirstOrDefault(c => c.Type == "name")?.Value;
+            _userState.SetUserLoggedIn(ObjectId.GenerateNewId(), name);
+            
+            StateHasChanged();
         }
     }
 
