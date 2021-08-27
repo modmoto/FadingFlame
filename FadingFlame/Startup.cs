@@ -42,7 +42,8 @@ namespace FadingFlame
                     options.Authority = "https://localhost:5001";
 
                     options.ClientId = "fading-flame";
-                    options.ClientSecret = "secret";
+                    var secret = Environment.GetEnvironmentVariable("FADING_FLAME_SECRET");
+                    options.ClientSecret = secret;
                     options.ResponseType = "code";
                     
                     options.Scope.Add("profile");
