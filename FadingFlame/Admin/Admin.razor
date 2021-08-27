@@ -23,7 +23,6 @@
     protected override void OnInitialized()
     {
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
-        _userState.UserLoggedOut += (_, _) => StateHasChanged();
     }
 
     private async Task CreateLeagues()

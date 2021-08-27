@@ -7,7 +7,6 @@ namespace FadingFlame.UserAccounts
     public class UserState
     {
         public event EventHandler UserLoggedIn;
-        public event EventHandler UserLoggedOut;
 
         private List<string> Admins = new()
         {
@@ -22,15 +21,6 @@ namespace FadingFlame.UserAccounts
             UserName = userName;
             UserIsAdmin = Admins.Contains(email);
             UserLoggedIn?.Invoke(this, EventArgs.Empty);
-        }
-        
-        public virtual void SetUserLoggedOut()
-        {
-            UserIsLoggedIn = false;
-            LoggedInPlayerId = null;
-            UserName = null;
-            UserIsAdmin = false;
-            UserLoggedOut?.Invoke(this, EventArgs.Empty);
         }
 
         public bool UserIsLoggedIn { get; private set; }

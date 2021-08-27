@@ -15,13 +15,13 @@
     </div>
 
     <div class="main">
-        <div class="top-row px-4" hidden="@IsLoggedIn">
+        <div class="top-row px-4" hidden="@_userState.UserIsLoggedIn">
             <a href="/Login">
                 <span class="oi oi-account-login" aria-hidden="true"></span>
             </a>
         </div>
-        <div class="top-row px-4" hidden="@(!IsLoggedIn)">
-            <span>Hello<a href="@Link">@UserName</a></span>
+        <div class="top-row px-4" hidden="@(!_userState.UserIsLoggedIn)">
+            <span>Hello<a href="@Link">@_userState.UserName</a></span>
             <a href="/Logout">
                 <span class="oi oi-account-logout" aria-hidden="true"></span>
             </a>
@@ -39,14 +39,11 @@
 
 @code
 {
-    private bool IsLoggedIn => _userState.UserIsLoggedIn;
-    private string UserName => _userState.UserName;
     public string Link => $"/player/{_userState.LoggedInPlayerId}";
 
     protected override void OnInitialized()
     {
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
-        _userState.UserLoggedOut += (_, _) => StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
