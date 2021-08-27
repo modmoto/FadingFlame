@@ -51,13 +51,13 @@ namespace FadingFlame
 
                     options.SaveTokens = true;
                 });
-            services.AddControllersWithViews(options =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                    .RequireAuthenticatedUser()
-                    .Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
-            });
+            // services.AddControllersWithViews(options =>
+            // {
+            //     var policy = new AuthorizationPolicyBuilder()
+            //         .RequireAuthenticatedUser()
+            //         .Build();
+            //     options.Filters.Add(new AuthorizeFilter(policy));
+            // });
            
             services.AddSingleton(_ =>
             {

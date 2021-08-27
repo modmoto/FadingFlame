@@ -3,7 +3,6 @@
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Http
 @using MongoDB.Bson
-@using System.Security.Policy
 @inherits LayoutComponentBase
 @inject IUserAccountCommandHandler _commandHandler
 @inject IPlayerRepository _playerRepository
@@ -18,13 +17,13 @@
 
     <div class="main">
         <div class="top-row px-4" hidden="@IsLoggedIn">
-            <a href="/login">
+            <a href="/Login">
                 <span class="oi oi-account-login" aria-hidden="true"></span>
             </a>
         </div>
         <div class="top-row px-4" hidden="@(!IsLoggedIn)">
             <span>Hello<a href="@Link">@UserName</a></span>
-            <a href="/" @onclick="LogOut">
+            <a href="/Logout">
                 <span class="oi oi-account-logout" aria-hidden="true"></span>
             </a>
         </div>
@@ -45,17 +44,6 @@
     private string UserName => _userState.UserName;
     public string Link => $"/player/{_userState.LoggedInPlayerId}";
 
-    private async Task LogOut()
-    {
-        await _httpContextAccessor.HttpContext.SignOutAsync("Cookies");
-        await _httpContextAccessor.HttpContext.SignOutAsync("oidc", new AuthenticationProperties
-        {
-            RedirectUri = "~/"
-        });
-        _userState.SetUserLoggedOut();
-        StateHasChanged();
-    }
-
     protected override void OnInitialized()
     {
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
@@ -67,12 +55,14 @@
         var contextAccessorHttpContext = _httpContextAccessor.HttpContext;
         if (contextAccessorHttpContext != null)
         {
-            await contextAccessorHttpContext.AuthenticateAsync();
+            await contextAccessorHttpContext.AuthenticateAsync("Cookies");
             var claims = contextAccessorHttpContext.User.Claims;
             var name = claims.FirstOrDefault(c => c.Type == "name")?.Value;
-            _userState.SetUserLoggedIn(ObjectId.GenerateNewId(), name);
-            
-            StateHasChanged();
+            if (name != null)
+            {
+                _userState.SetUserLoggedIn(ObjectId.GenerateNewId(), name);
+                StateHasChanged();
+            }
         }
     }
 
