@@ -9,19 +9,18 @@ namespace FadingFlame.UserAccounts
         public event EventHandler UserLoggedIn;
         public event EventHandler UserLoggedOut;
 
-        private List<ObjectId> Admins = new()
+        private List<string> Admins = new()
         {
-            // modmoto
-            new ObjectId("612623695664dde81689acba"),
-            new ObjectId("6127d7320244f6836fab402f"),
+            "AliceSmith@email.com",
+            "simonheiss87@gmail.com"
         };
 
-        public virtual void SetUserLoggedIn(ObjectId playerId, string userName)
+        public virtual void SetUserLoggedIn(ObjectId playerId, string userName, string email)
         {
             UserIsLoggedIn = true;
             LoggedInPlayerId = playerId;
             UserName = userName;
-            UserIsAdmin = Admins.Contains(playerId);
+            UserIsAdmin = Admins.Contains(email);
             UserLoggedIn?.Invoke(this, EventArgs.Empty);
         }
         
