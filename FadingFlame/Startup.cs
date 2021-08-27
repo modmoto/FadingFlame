@@ -41,12 +41,12 @@ namespace FadingFlame
                 {
                     options.Authority = "https://localhost:5001";
 
-                    options.ClientId = "mvc";
+                    options.ClientId = "fading-flame";
                     options.ClientSecret = "secret";
                     options.ResponseType = "code";
                     
                     options.Scope.Add("profile");
-                    // options.Scope.Add("email");
+                    options.Scope.Add("email");
                     options.GetClaimsFromUserInfoEndpoint = true;
 
                     options.SaveTokens = true;
@@ -75,7 +75,6 @@ namespace FadingFlame
             services.AddTransient<ILeagueRepository, LeagueRepository>();
             services.AddTransient<IPlayerRepository, PlayerRepository>();
             services.AddTransient<ILeagueCommandHandler, LeagueCommandHandler>();
-            services.AddTransient<IUserAccountCommandHandler, UserAccountCommandHandler>();
             services.AddScoped<UserState>();
             services.AddHttpContextAccessor();
 

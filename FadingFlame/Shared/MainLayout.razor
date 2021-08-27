@@ -4,7 +4,6 @@
 @using Microsoft.AspNetCore.Http
 @using MongoDB.Bson
 @inherits LayoutComponentBase
-@inject IUserAccountCommandHandler _commandHandler
 @inject IPlayerRepository _playerRepository
 @inject UserState _userState
 @inject NavigationManager _navigation
@@ -56,11 +55,19 @@
         if (contextAccessorHttpContext != null)
         {
             await contextAccessorHttpContext.AuthenticateAsync("Cookies");
-            var claims = contextAccessorHttpContext.User.Claims;
-            var name = claims.FirstOrDefault(c => c.Type == "name")?.Value;
-            if (name != null)
+            var claims = contextAccessorHttpContext.User.Claims.ToList();
+            
+            var email = claims.FirstOrDefault(c => c.Type == "email")?.Value;
+            if (email != null)
             {
-                _userState.SetUserLoggedIn(ObjectId.GenerateNewId(), name);
+                var player = await _playerRepository.LoadByEmail(email);
+                if (player == null)
+                {
+                    var name = claims.FirstOrDefault(c => c.Type == "name")?.Value;
+                    player = Player.Create(name, email);
+                    await _playerRepository.Insert(player);
+                }
+                _userState.SetUserLoggedIn(player.Id, player.DisplayName);
                 StateHasChanged();
             }
         }

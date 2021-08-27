@@ -10,4 +10,8 @@
       <PackageReference Include="MongoDB.Driver" Version="2.13.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="UserAccounts\Pages\Register.razor" />
+    </ItemGroup>
+
 </Project>
