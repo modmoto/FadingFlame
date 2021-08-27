@@ -39,7 +39,7 @@ namespace FadingFlame
                 .AddCookie("Cookies")
                 .AddOpenIdConnect("oidc", options =>
                 {
-                    options.Authority = "https://localhost:5001";
+                    options.Authority = $"https://{Environment.GetEnvironmentVariable("IDENTITY_BASE_URI")}";
 
                     options.ClientId = "fading-flame";
                     var secret = Environment.GetEnvironmentVariable("FADING_FLAME_SECRET");
