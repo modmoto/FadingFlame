@@ -11,7 +11,7 @@ services:
       - DISCORD_TOKEN=${DISCORD_TOKEN}
       - FADING_FLAME_SECRET=${FADING_FLAME_SECRET}
       - IDENTITY_BASE_URI=${IDENTITY_BASE_URI}
-  
+
   mongo-db:
     image: mongo
     container_name: mongo-db-fading-flame-${CONTAINER_SUFFIX}
