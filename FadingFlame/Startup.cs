@@ -4,10 +4,8 @@ using FadingFlame.Discord;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
 using FadingFlame.UserAccounts;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -52,13 +50,6 @@ namespace FadingFlame
 
                     options.SaveTokens = true;
                 });
-            // services.AddControllersWithViews(options =>
-            // {
-            //     var policy = new AuthorizationPolicyBuilder()
-            //         .RequireAuthenticatedUser()
-            //         .Build();
-            //     options.Filters.Add(new AuthorizeFilter(policy));
-            // });
            
             services.AddSingleton(_ =>
             {
@@ -106,6 +97,14 @@ namespace FadingFlame
             app.UseStaticFiles();
 
             app.UseRouting();
+            
+            // hack for identity server and caddy
+            app.Use((context, next) =>
+            {
+                context.Request.Scheme = "https";
+                return next();
+            });
+            
             app.UseAuthentication();
             app.UseAuthorization();
 
