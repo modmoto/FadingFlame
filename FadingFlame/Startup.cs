@@ -106,6 +106,14 @@ namespace FadingFlame
             app.UseStaticFiles();
 
             app.UseRouting();
+            
+            // hack for identity server and caddy
+            app.Use((context, next) =>
+            {
+                context.Request.Scheme = "https";
+                return next();
+            });
+            
             app.UseAuthentication();
             app.UseAuthorization();
 
