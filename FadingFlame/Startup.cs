@@ -1,4 +1,5 @@
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using FadingFlame.Discord;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
@@ -49,13 +50,6 @@ namespace FadingFlame
 
                     options.SaveTokens = true;
                 });
-            // services.AddControllersWithViews(options =>
-            // {
-            //     var policy = new AuthorizationPolicyBuilder()
-            //         .RequireAuthenticatedUser()
-            //         .Build();
-            //     options.Filters.Add(new AuthorizeFilter(policy));
-            // });
            
             services.AddSingleton(_ =>
             {
