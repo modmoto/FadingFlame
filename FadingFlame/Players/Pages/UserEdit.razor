@@ -44,6 +44,7 @@
             
             @if (!_listSubmitted)
             {
+                <h3 class="h3">Select your lists for this seasons, this can not be undone once you submitted the lists</h3>
                 <EditForm Model="@_listModel" OnValidSubmit="OnValidSubmitList">
                 <DataAnnotationsValidator/>
                 <div class="row align-items-start">
@@ -102,51 +103,6 @@
                 }
                 </EditForm>
             }
-            else
-            {
-                <div class="row align-items-start">
-                    <div class="col">
-                        <div class="form-group">
-                            <label>Faction: </label>
-                            <div><b>@_listModel.Faction.ToFactionString()</b></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row align-items-start">
-                    <div class="col">
-                        <div class="form-group">
-                            <label>First List: </label>
-                            <div><b>@_listModel.List1Name</b></div>
-                        </div>
-                        <hr class="my-3">
-                        <div class="form-group">
-                            <div style="white-space:pre-wrap;">@_listModel.List1</div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-group">
-                            <label>Second List: </label>
-                            <div><b>@_listModel.List2Name</b></div>
-                        </div>
-                        <hr class="my-3">
-                        <div class="form-group">
-                            <div style="white-space:pre-wrap;">@_listModel.List2</div>
-                        </div>
-                    </div>
-                </div>
-                if (_userState.UserIsAdmin)
-                {
-                    <button disabled="@_loadingLists" class="btn btn-danger" @onclick="() => DeleteLists()">
-                        @if (_loadingLists)
-                        {
-                            <span class="spinner-border spinner-border-sm mr-1"></span>
-                        }
-                        <span class="oi oi-shield" aria-hidden="true"></span> Delete lists for user
-                    </button>
-                }
-                
-            }
-            
         }
         else
         {
@@ -158,6 +114,49 @@
                 <label>Discord Tag: </label>
                 <span>@_model.DiscordTag</span>
             </div>
+        }
+        @if (_listSubmitted)
+        {
+            <div class="row align-items-start">
+                <div class="col">
+                    <div class="form-group">
+                        <label>Faction: </label>
+                        <div><b>@_listModel.Faction.ToFactionString()</b></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row align-items-start">
+                <div class="col">
+                    <div class="form-group">
+                        <label>First List: </label>
+                        <div><b>@_listModel.List1Name</b></div>
+                    </div>
+                    <hr class="my-3">
+                    <div class="form-group">
+                        <div style="white-space:pre-wrap;">@_listModel.List1</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>Second List: </label>
+                        <div><b>@_listModel.List2Name</b></div>
+                    </div>
+                    <hr class="my-3">
+                    <div class="form-group">
+                        <div style="white-space:pre-wrap;">@_listModel.List2</div>
+                    </div>
+                </div>
+            </div>
+            if (_userState.UserIsAdmin)
+            {
+                <button disabled="@_loadingLists" class="btn btn-danger" @onclick="() => DeleteLists()">
+                    @if (_loadingLists)
+                    {
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                    }
+                    <span class="oi oi-shield" aria-hidden="true"></span> Delete lists for user
+                </button>
+            }
         }
 
     </div>
