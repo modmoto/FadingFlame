@@ -111,6 +111,17 @@
                         </div>
                     </div>
                 </div>
+                if (_userState.UserIsAdmin)
+                {
+                    <button disabled="@_loadingLists" class="btn btn-danger" @onclick="() => DeleteLists()">
+                        @if (_loadingLists)
+                        {
+                            <span class="spinner-border spinner-border-sm mr-1"></span>
+                        }
+                        <span class="oi oi-shield" aria-hidden="true"></span> Delete lists for user
+                    </button>
+                }
+                
             }
             
         }
@@ -215,6 +226,7 @@
             player.DiscordTag = _model.DiscordTag;
             player.DisplayName = _model.DisplayName;
             await _playerRepository.Update(player);
+            _userState.SetUserData(player.Id, player.DisplayName, player.AccountEmail);
             _loading = false;
             _savedSuccesfully = true;
         }
@@ -223,6 +235,23 @@
     private bool IsTheRightUser()
     {
         return _userState.LoggedInPlayerId?.ToString() == Id;
+    }
+
+    private async Task DeleteLists()
+    {
+        if (_userState.UserIsAdmin)
+        {
+            _loadingLists = true;
+            var player = await _playerRepository.Load(new ObjectId(Id));
+            player.ResetLists();
+            _listModel.List1 = null;
+            _listModel.List2 = null;
+            _listModel.List1Name = null;
+            _listModel.List2Name = null;
+            _listSubmitted = false;
+            await _playerRepository.Update(player);
+            _loadingLists = false;
+        }
     }
 
 }

@@ -14,7 +14,7 @@ namespace FadingFlame.UserAccounts
             "simonheiss87@gmail.com"
         };
 
-        public virtual void SetUserLoggedIn(ObjectId playerId, string userName, string email)
+        public virtual void SetUserData(ObjectId playerId, string userName, string email)
         {
             UserIsLoggedIn = true;
             LoggedInPlayerId = playerId;

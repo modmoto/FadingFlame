@@ -64,7 +64,7 @@
                     player = Player.Create(name, email);
                     await _playerRepository.Insert(player);
                 }
-                _userState.SetUserLoggedIn(player.Id, player.DisplayName, player.AccountEmail);
+                _userState.SetUserData(player.Id, player.DisplayName, player.AccountEmail);
                 StateHasChanged();
             }
         }
