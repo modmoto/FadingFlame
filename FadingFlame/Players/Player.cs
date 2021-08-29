@@ -16,6 +16,7 @@ namespace FadingFlame.Players
         public GameList List2 { get; set; }
         public List<Faction> Armies { get; set; } = new();
         public string AccountEmail { get; set; }
+        public Faction Faction { get; set; }
 
         public static Player Create(string name, string email)
         {
@@ -26,11 +27,12 @@ namespace FadingFlame.Players
             };
         }
 
-        public void SubmitLists(GameList list1, GameList list2)
+        public void SubmitLists(Faction faction, GameList list1, GameList list2)
         {
             if (List1 != null || List2 != null) throw new ValidationException("Lists already set for this season");
             List1 = list1;
             List2 = list2;
+            Faction = faction;
         }
 
         public void ResetLists()

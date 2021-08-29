@@ -5,7 +5,7 @@ namespace FadingFlame.Players
 {
     public class EditUserModel
     {
-        [Required]
+        [Required(ErrorMessageResourceName = "FieldRequired", ErrorMessageResourceType = typeof(FadingFlameTranslations))]
         public string DisplayName { get; set; }
         public string DiscordTag { get; set; }
         public List<Faction> Armies { get; set; }
@@ -13,13 +13,16 @@ namespace FadingFlame.Players
     
     public class EditListsModel
     {
-        [Required]
+        [Required(ErrorMessageResourceName = "FieldRequired", ErrorMessageResourceType = typeof(FadingFlameTranslations))]
         public string List1Name { get; set; }
-        [Required]
+        [Required(ErrorMessageResourceName = "FieldRequired", ErrorMessageResourceType = typeof(FadingFlameTranslations))]
         public string List1 { get; set; }
-        [Required]
+        [Required(ErrorMessageResourceName = "FieldRequired", ErrorMessageResourceType = typeof(FadingFlameTranslations))]
         public string List2Name { get; set; }
-        [Required]
+        [Required(ErrorMessageResourceName = "FieldRequired", ErrorMessageResourceType = typeof(FadingFlameTranslations))]
         public string List2 { get; set; }
+        [Required]
+        [Range(1,16, ErrorMessageResourceName = "FactionRequired", ErrorMessageResourceType = typeof(FadingFlameTranslations))]
+        public Faction Faction { get; set; }
     }
 }

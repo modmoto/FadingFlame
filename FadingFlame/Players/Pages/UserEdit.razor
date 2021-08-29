@@ -3,6 +3,7 @@
 @using FadingFlame.Players
 @using FadingFlame.UserAccounts
 @using MongoDB.Bson
+@using System.Text.RegularExpressions
 
 @inject IPlayerRepository _playerRepository
 @inject UserState _userState
@@ -49,6 +50,21 @@
                 <div class="row align-items-start">
                     <div class="col">
                         <div class="form-group">
+                            <label>Faction: </label>
+                            <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_listModel.Faction">
+                                <option selected value="0">Open this select menu</option>
+                                @foreach (var faction in Enum.GetValues<Faction>())
+                                {
+                                    <option value="@faction">@ToFactionString(faction)</option>
+                                }
+                            </select>
+                            <ValidationMessage For="@(() => _listModel.Faction)"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row align-items-start">
+                    <div class="col">
+                        <div class="form-group">
                             <label>First List: </label>
                             <InputText @bind-Value="_listModel.List1Name" placeholder="Name" class="form-control"/>
                             <ValidationMessage For="@(() => _listModel.List1Name)"/>
@@ -89,6 +105,14 @@
             }
             else
             {
+                <div class="row align-items-start">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Faction: </label>
+                            <div><b>@ToFactionString(_listModel.Faction)</b></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="row align-items-start">
                     <div class="col">
                         <div class="form-group">
@@ -208,7 +232,7 @@
             var player = await _playerRepository.Load(new ObjectId(Id));
             var list1 = GameList.Create(_listModel.List1Name, _listModel.List1);
             var list2 = GameList.Create(_listModel.List1Name, _listModel.List1);
-            player.SubmitLists(list1, list2);
+            player.SubmitLists(_listModel.Faction, list1, list2);
             await _playerRepository.Update(player);
             _loadingLists = false;
             _savedListsSuccesfully = true;
@@ -252,6 +276,11 @@
             await _playerRepository.Update(player);
             _loadingLists = false;
         }
+    }
+
+    private string ToFactionString(Faction faction)
+    {
+        return Regex.Replace(faction.ToString(), "(\\B[A-Z])", " $1");
     }
 
 }
