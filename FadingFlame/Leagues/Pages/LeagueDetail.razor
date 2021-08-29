@@ -16,7 +16,7 @@
 else
 {
     <div>
-        <h1 class="display-4">@_league.DivisionId @_league.Name</h1>
+        <h1>@_league.DivisionId @_league.Name</h1>
         <hr class="my-4">
     </div>
     <table class="table">
@@ -31,8 +31,8 @@ else
         <tbody class="league">
         @foreach (var playerInLeague in _league.Players)
         {
-            <tr>
-                <td @onclick="() => GoToPlayer(playerInLeague.Id)" class="cursor" >@playerInLeague.Name</td>
+            <tr @onclick="() => GoToPlayer(playerInLeague.Id)" class="cursor" >
+                <td>@playerInLeague.Name</td>
                 <td>@playerInLeague.Points</td>
                 <td>@playerInLeague.VictoryPoints</td>
                 <td>@playerInLeague.GamesCount</td>
@@ -43,7 +43,7 @@ else
     
     
     <div>
-        <h1 class="display-4">Gamedays</h1>
+        <h2>Gamedays</h2>
         <hr class="my-4">
     </div>
     

@@ -9,7 +9,7 @@
 @inject NavigationManager _navigation
 
 <div class="card">
-    <h4 class="card-header">Profile</h4>
+    <h4 class="card-header">Profile @_model.DisplayName</h4>
     <div class="card-body">
         @if (IsTheRightUser())
         {
@@ -32,12 +32,6 @@
                     }
                     Save profile
                 </button>
-                @if (_savedSuccesfully)
-                {
-                    <div class="alert alert-success" role="alert">
-                        data saved
-                    </div>
-                }
             </EditForm>
             
             <hr class="my-3">
@@ -88,7 +82,6 @@
                     </div>
                 </div>
                 
-                
                 <button disabled="@_loadingLists" class="btn btn-primary">
                     @if (_loadingLists)
                     {
@@ -96,22 +89,12 @@
                     }
                     Submit final lists
                 </button>
-                @if (_savedListsSuccesfully)
-                {
-                    <div class="alert alert-success" role="alert">
-                        Lists submitted
-                    </div>
-                }
                 </EditForm>
             }
         }
         else
         {
-            <div class="form-group">
-                <label>Name: </label>
-                <span>@_model.DisplayName</span>
-            </div>
-            <div class="form-group">
+            <div class="form-group pb-3">
                 <label>Discord Tag: </label>
                 <span>@_model.DiscordTag</span>
             </div>
@@ -168,8 +151,6 @@
     private EditListsModel _listModel = new();
     private bool _loading;
     private bool _loadingLists;
-    private bool _savedSuccesfully;
-    private bool _savedListsSuccesfully;
     private bool _listSubmitted;
 
     [ParameterAttribute]
@@ -228,14 +209,12 @@
         if (IsTheRightUser())
         {
             _loadingLists = true;
-            _savedListsSuccesfully = false;
             var player = await _playerRepository.Load(new ObjectId(Id));
             var list1 = GameList.Create(_listModel.List1Name, _listModel.List1);
             var list2 = GameList.Create(_listModel.List2Name, _listModel.List2);
             player.SubmitLists(_listModel.Faction, list1, list2);
             await _playerRepository.Update(player);
             _loadingLists = false;
-            _savedListsSuccesfully = true;
             _listSubmitted = true;
         }
     }
@@ -245,14 +224,12 @@
         if (IsTheRightUser())
         {
             _loading = true;
-            _savedSuccesfully = false;
             var player = await _playerRepository.Load(new ObjectId(Id));
             player.DiscordTag = _model.DiscordTag;
             player.DisplayName = _model.DisplayName;
             await _playerRepository.Update(player);
             _userState.SetUserData(player.Id, player.DisplayName, player.AccountEmail);
             _loading = false;
-            _savedSuccesfully = true;
         }
     }
 

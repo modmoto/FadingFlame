@@ -2,7 +2,6 @@
 @using FadingFlame.Players
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Http
-@using MongoDB.Bson
 @inherits LayoutComponentBase
 @inject IPlayerRepository _playerRepository
 @inject UserState _userState
@@ -16,8 +15,8 @@
 
     <div class="main">
         <div class="top-row px-4" hidden="@_userState.UserIsLoggedIn">
-            <a href="/Login">
-                <span class="oi oi-account-login" aria-hidden="true"></span>
+            <a class="btn btn-primary" href="/Login">
+                <span class="oi oi-account-login" aria-hidden="true"></span><span class="m-2">Login</span>
             </a>
         </div>
         <div class="top-row px-4" hidden="@(!_userState.UserIsLoggedIn)">
