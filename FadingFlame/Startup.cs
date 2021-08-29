@@ -43,6 +43,7 @@ namespace FadingFlame
                     var secret = Environment.GetEnvironmentVariable("FADING_FLAME_SECRET");
                     options.ClientSecret = secret;
                     options.ResponseType = "code";
+                    options.SignedOutRedirectUri = $"https://{Environment.GetEnvironmentVariable("SIGNOUT_URI")}/signout-callback-oidc";
                     
                     options.Scope.Add("profile");
                     options.Scope.Add("email");
