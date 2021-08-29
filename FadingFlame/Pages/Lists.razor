@@ -1,6 +1,61 @@
 @page "/lists"
+@using FadingFlame.Players
+@using MongoDB.Bson
+@inject IPlayerRepository _playerRepository
+@inject NavigationManager _navigation
 
 <div>
     <h2 class="display-4">Lists played this season</h2>
     <hr class="my-4">
-</div>
+    @foreach (var player in _enlistedPlayers)
+    {
+        <div class="card">
+            <div class="card-header cursor" @onclick="() => GoToPlayer(player.Id)">
+                <div>@player.DisplayName: </div>
+                <div><b>@player.Army.Faction.ToFactionString()</b></div>
+                
+            </div>
+            <div class="card-body">
+                <div class="row align-items-start">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>First List: </label>
+                            <div><b>@player.Army.List1.Name</b></div>
+                        </div>
+                        <hr class="my-3">
+                        <div class="form-group">
+                            <div style="white-space:pre-wrap;">@player.Army.List1.List</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Second List: </label>
+                            <div><b>@player.Army.List2.Name</b></div>
+                        </div>
+                        <hr class="my-3">
+                        <div class="form-group">
+                            <div style="white-space:pre-wrap;">@player.Army.List2.List</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+            <hr class="my-3">
+            }
+        </div>
+
+@code
+{
+    private List<Player> _enlistedPlayers = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _enlistedPlayers = await _playerRepository.PlayersThatEnlisted();
+    }
+
+    private void GoToPlayer(ObjectId playerId)
+    {
+        _navigation.NavigateTo($"player/{playerId}");
+    }
+}

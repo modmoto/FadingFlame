@@ -8,7 +8,6 @@ namespace FadingFlame.Players
         [Required(ErrorMessageResourceName = "FieldRequired", ErrorMessageResourceType = typeof(FadingFlameTranslations))]
         public string DisplayName { get; set; }
         public string DiscordTag { get; set; }
-        public List<Faction> Armies { get; set; }
     }
     
     public class EditListsModel

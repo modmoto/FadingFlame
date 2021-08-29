@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace FadingFlame.Players
 {
     public enum Faction
@@ -18,5 +20,13 @@ namespace FadingFlame.Players
         VampireConvenant = 14,
         VerminSwarm = 15,
         WarriorsOfTheDarkGods = 16
+    }
+
+    public static class FactionExtensions
+    {
+        public static string ToFactionString(this Faction faction)
+        {
+            return Regex.Replace(faction.ToString(), "(\\B[A-Z])", " $1");
+        }
     }
 }

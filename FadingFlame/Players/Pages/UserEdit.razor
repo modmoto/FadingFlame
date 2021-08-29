@@ -3,7 +3,6 @@
 @using FadingFlame.Players
 @using FadingFlame.UserAccounts
 @using MongoDB.Bson
-@using System.Text.RegularExpressions
 
 @inject IPlayerRepository _playerRepository
 @inject UserState _userState
@@ -55,7 +54,7 @@
                                 <option selected value="0">Select faction</option>
                                 @foreach (var faction in Enum.GetValues<Faction>())
                                 {
-                                    <option value="@faction">@ToFactionString(faction)</option>
+                                    <option value="@faction">@faction.ToFactionString()</option>
                                 }
                             </select>
                             <ValidationMessage For="@(() => _listModel.Faction)"/>
@@ -109,7 +108,7 @@
                     <div class="col">
                         <div class="form-group">
                             <label>Faction: </label>
-                            <div><b>@ToFactionString(_listModel.Faction)</b></div>
+                            <div><b>@_listModel.Faction.ToFactionString()</b></div>
                         </div>
                     </div>
                 </div>
@@ -200,10 +199,11 @@
 
                 _listModel = new EditListsModel
                 {
-                    List1 = player.List1?.List,
-                    List2 = player.List2?.List,
-                    List1Name = player.List1?.Name,
-                    List2Name = player.List2?.Name,
+                    List1 = player.Army?.List1.List,
+                    List2 = player.Army?.List2.List,
+                    List1Name = player.Army?.List1.Name,
+                    List2Name = player.Army?.List2.Name,
+                    Faction = player.Army?.Faction ?? 0
                 };
 
                 if (_listModel.List1 != null
@@ -231,7 +231,7 @@
             _savedListsSuccesfully = false;
             var player = await _playerRepository.Load(new ObjectId(Id));
             var list1 = GameList.Create(_listModel.List1Name, _listModel.List1);
-            var list2 = GameList.Create(_listModel.List1Name, _listModel.List1);
+            var list2 = GameList.Create(_listModel.List2Name, _listModel.List2);
             player.SubmitLists(_listModel.Faction, list1, list2);
             await _playerRepository.Update(player);
             _loadingLists = false;
@@ -277,10 +277,4 @@
             _loadingLists = false;
         }
     }
-
-    private string ToFactionString(Faction faction)
-    {
-        return Regex.Replace(faction.ToString(), "(\\B[A-Z])", " $1");
-    }
-
 }

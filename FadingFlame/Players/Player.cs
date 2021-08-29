@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using FadingFlame.Repositories;
 using MongoDB.Bson;
@@ -12,12 +11,9 @@ namespace FadingFlame.Players
         public ObjectId Id { get; set; }
         public string DisplayName { get; set; }
         public string DiscordTag { get; set; }
-        public GameList List1 { get; set; }
-        public GameList List2 { get; set; }
-        public List<Faction> Armies { get; set; } = new();
+        public SeasonArmy Army  { get; set; }
+       
         public string AccountEmail { get; set; }
-        public Faction Faction { get; set; }
-
         public static Player Create(string name, string email)
         {
             return new()
@@ -29,16 +25,25 @@ namespace FadingFlame.Players
 
         public void SubmitLists(Faction faction, GameList list1, GameList list2)
         {
-            if (List1 != null || List2 != null) throw new ValidationException("Lists already set for this season");
-            List1 = list1;
-            List2 = list2;
-            Faction = faction;
+            if (Army != null) throw new ValidationException("Lists already set for this season");
+            Army = new SeasonArmy
+            {
+                List1 = list1,
+                List2 = list2,
+                Faction = faction
+            };
         }
 
         public void ResetLists()
         {
-            List1 = null;
-            List2 = null;
+            Army = null;
         }
+    }
+
+    public class SeasonArmy
+    {
+        public GameList List1 { get; set; }
+        public GameList List2 { get; set; }
+        public Faction Faction { get; set; }
     }
 }
