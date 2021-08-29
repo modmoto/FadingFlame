@@ -20,7 +20,33 @@ namespace FadingFlame.Leagues
         public List<GameDay> GameDays { get; set; } = new();
         public bool IsFull => Players.Count == 6;
         public DateTimeOffset StartDate { get; set; }
-        
+
+        public void SelectList(ObjectId playerId, ObjectId matchId, string listName)
+        {
+            var match = GetMatchup(matchId);
+
+            if (match.Player1 == playerId)
+            {
+                match.Player1List = listName;
+            }
+            
+            if (match.Player2 == playerId)
+            {
+                match.Player2List = listName;
+            }
+        }
+
+        public Matchup GetMatchup(ObjectId matchId)
+        {
+            var match = GameDays.SelectMany(g => g.Matchups).FirstOrDefault(m => m.MatchId == matchId);
+            if (match == null)
+            {
+                throw new ValidationException("Match not in this gameday");
+            }
+
+            return match;
+        }
+
         public void ReportGame(MatchResultDto matchResultDto)
         {
             var player1Result = matchResultDto.Player1;
@@ -34,11 +60,7 @@ namespace FadingFlame.Leagues
                 throw new ValidationException("Players are not in this league");
             }
 
-            var match = GameDays.SelectMany(g => g.Matchups).FirstOrDefault(m => m.MatchId == matchResultDto.MatchId);
-            if (match == null)
-            {
-                throw new ValidationException("Match not in this gameday");
-            }
+            var match = GetMatchup(matchResultDto.MatchId);
             
             var result = MatchResult.Create(matchResultDto.SecondaryObjective, player1Result, player2Result);
             match.RecordResult(result);

@@ -11,6 +11,9 @@ namespace FadingFlame.Leagues
         public string Name1 { get; set; }
         public string Name2 { get; set; }
         public MatchResult Result { get; set; }
+        public bool PlayersSelectedList => !string.IsNullOrEmpty(Player1List) && !string.IsNullOrEmpty(Player2List);
+        public string Player1List { get; set; }
+        public string Player2List { get; set; }
 
         public static Matchup Create(PlayerInLeague playerAtHome, PlayerInLeague playerAsGuest)
         {

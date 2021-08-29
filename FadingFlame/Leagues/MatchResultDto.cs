@@ -111,7 +111,6 @@ namespace FadingFlame.Leagues
         public PlayerResultDto Player2 { get; set; } = new();
 
         public SecondaryObjectiveState SecondaryObjective { get; set; }
-
     }
 
     public class PlayerResultDto
