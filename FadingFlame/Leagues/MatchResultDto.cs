@@ -109,7 +109,6 @@ namespace FadingFlame.Leagues
         public ObjectId MatchId  { get; set; }
         public PlayerResultDto Player1 { get; set; } = new();
         public PlayerResultDto Player2 { get; set; } = new();
-
         public SecondaryObjectiveState SecondaryObjective { get; set; }
     }
 

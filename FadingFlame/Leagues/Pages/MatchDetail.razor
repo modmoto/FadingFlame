@@ -47,27 +47,15 @@ else
                         <label>Victory Points @_name1 :</label>
                         <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control"/>
                         <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
+                        <label>Won secondary objective:</label>
+                        <InputCheckbox  @onclick="() => Select2ndObjective(1)" @bind-Value="_secondaryObjectivePlayer1" class="form-control"/>
                     </div>
                     <div class="col form-group">
                         <label>Victory Points @_name2 :</label>
                         <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control"/>
                         <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Secondary Objective:</label> <br/>
-                    <div class="ml-4">
-                        <InputRadioGroup @bind-Value="_model.SecondaryObjective" class="form-check">
-                            @foreach (var option in Enum.GetValues(typeof(SecondaryObjectiveState)))
-                            {
-                                <InputRadio Value="option" class="form-check-input" id="@($"second-{option}")"/>
-                                <label class="form-check-label" for="@($"second-{option}")">
-                                    @GetString(option is SecondaryObjectiveState ? (SecondaryObjectiveState)option : SecondaryObjectiveState.draw)
-                                </label>
-                                <br/>
-                            }
-                        </InputRadioGroup>
-                        <ValidationMessage For="@(() => _model.SecondaryObjective)"/>
+                        <label>Won secondary objective:</label>
+                        <InputCheckbox @onclick="() => Select2ndObjective(2)" @bind-Value="_secondaryObjectivePlayer2"  class="form-control"/>
                     </div>
                 </div>
                 <button disabled="@_loading" class="btn btn-primary">
@@ -152,6 +140,8 @@ else
     private string _name2;
     private string _selectedListPlayer1;
     private string _selectedListPlayer2;
+    private bool _secondaryObjectivePlayer1;
+    private bool _secondaryObjectivePlayer2;
     private string _selectedListAsString;
     private bool _matchWasFinished;
     private bool _allPlayersSelectedList;
@@ -230,6 +220,7 @@ else
             _loading = true;
             if (_league != null)
             {
+                _model.SecondaryObjective = ConvertToEnum();
                 _league.ReportGame(_model);
                 await _leagueRepository.Update(_league);
             }
@@ -239,14 +230,14 @@ else
         }
     }
 
-    private string GetString(SecondaryObjectiveState state)
+    private SecondaryObjectiveState ConvertToEnum()
     {
-        return state switch
+        if (!_secondaryObjectivePlayer1 && !_secondaryObjectivePlayer2)
         {
-            SecondaryObjectiveState.player1 => _name1,
-            SecondaryObjectiveState.player2 => _name2,
-            _ => "draw"
-        };
+            return SecondaryObjectiveState.draw;
+        }
+        
+        return _secondaryObjectivePlayer1 ? SecondaryObjectiveState.player1 : SecondaryObjectiveState.player2;
     }
 
     private async Task SelectListForMatch()
@@ -282,6 +273,19 @@ else
         {
             _league.SelectList(playerId, new ObjectId(MatchId), _listsOfLoggedInPlayer.List2.Name);
             _selectedListAsString = _listsOfLoggedInPlayer.List2.Name;
+        }
+    }
+
+    private void Select2ndObjective(int player)
+    {
+        if (player == 1)
+        {
+            _secondaryObjectivePlayer2 = false;
+        }
+        
+        if (player == 2)
+        {
+            _secondaryObjectivePlayer1 = false;
         }
     }
 
