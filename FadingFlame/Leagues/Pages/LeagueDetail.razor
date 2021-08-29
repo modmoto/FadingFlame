@@ -51,7 +51,7 @@ else
         @foreach (var gameDay in _league.GameDays.Select((value, index) => new { value, index }))
         {
             <li class="nav-item" role="presentation">
-                @if (ActiveDay == gameDay.index)
+                @if (_activeDay == gameDay.index)
                 {
                     <button
                         class="nav-link active"
@@ -89,7 +89,7 @@ else
     <div class="tab-content" id="pills-tabContent">
         @foreach (var gameDay in _league.GameDays.Select((value, index) => new {value, index}))
         {
-            @if (ActiveDay == gameDay.index)
+            @if (_activeDay == gameDay.index)
             {
                 <p class="lead">@gameDay.value.StartDate.ToString("dd.MM.") - @gameDay.value.EndDate.ToString("dd.MM.")</p>
                 <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
@@ -135,7 +135,10 @@ else
 @code {
     [Parameter]
     public string LeagueId { get; set; }
-
+    
+    private League _league;
+    private int _activeDay;
+    
     protected override void OnInitialized()
     {
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
@@ -146,11 +149,17 @@ else
         if (ObjectId.TryParse(LeagueId, out var parsed))
         {
             _league = await _leagueRepository.Load(parsed);
+            var now = DateTimeOffset.UtcNow;
+            for (int i = 0; i < _league.GameDays.Count; i++)
+            {
+                if (now < _league.GameDays[i].EndDate)
+                {
+                    _activeDay = i;
+                    break;
+                }
+            }
         }
     }
-
-    private League _league;
-    public int ActiveDay { get; set; }
 
     private void GoToPlayer(ObjectId playerId)
     {
@@ -159,7 +168,7 @@ else
 
     private void SelectGameDay(int id)
     {
-        ActiveDay = id;
+        _activeDay = id;
         StateHasChanged();
     }
 
@@ -195,5 +204,4 @@ else
     {
         return $"{result.Player1.VictoryPoints} {GetSecondaryStringForPlayer1(result.SecondaryObjective)} : {result.Player2.VictoryPoints} {GetSecondaryStringForPlayer2(result.SecondaryObjective)}";
     }
-
 }
