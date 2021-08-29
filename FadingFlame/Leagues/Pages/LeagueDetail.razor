@@ -93,11 +93,11 @@ else
             {
                 <p class="lead">@gameDay.value.StartDate.ToString("dd.MM.") - @gameDay.value.EndDate.ToString("dd.MM.")</p>
                 <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                    <div class="row row-cols-4 row-cols-md-2 g-4">
+                    <div class="row row-cols-3">
                         @foreach (var matchup in gameDay.value.Matchups)
                         {
                             <div class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)">
-                                <div class="card" style="width: 18rem;">
+                                <div class="card" style="width: 24rem;">
                                     <div class="card-header">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h5 class="mb-1">@(matchup.Name1) vs @(matchup.Name2)</h5>

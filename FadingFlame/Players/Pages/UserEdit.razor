@@ -16,13 +16,13 @@
             <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
                 <DataAnnotationsValidator/>
                 <div class="form-group">
-                    <label>Name: </label>
-                    <InputText @bind-Value="_model.DisplayName" class="form-control"/>
+                    <div class="pb-2">Name: </div>
+                    <InputText @bind-Value="_model.DisplayName" class="form-control mb-3"/>
                     <ValidationMessage For="@(() => _model.DisplayName)"/>
                 </div>
                 <div class="form-group">
-                    <label>Discord Tag: </label>
-                    <InputText @bind-Value="_model.DiscordTag" class="form-control"/>
+                    <div class="pb-2">Discord Tag: </div>
+                    <InputText @bind-Value="_model.DiscordTag" class="form-control mb-3"/>
                     <ValidationMessage For="@(() => _model.DiscordTag)"/>
                 </div>
                 <button disabled="@_loading" class="btn btn-primary">
@@ -52,7 +52,6 @@
                 <div class="row align-items-start">
                     <div class="col">
                         <div class="form-group">
-                            <label>Faction: </label>
                             <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_listModel.Faction">
                                 <option selected value="0">Select faction</option>
                                 @foreach (var faction in Enum.GetValues<Faction>())
@@ -67,23 +66,23 @@
                 <div class="row align-items-start">
                     <div class="col">
                         <div class="form-group">
-                            <label>First List: </label>
-                            <InputText @bind-Value="_listModel.List1Name" placeholder="Name" class="form-control"/>
+                            <div class="pb-3">First List: </div>
+                            <InputText @bind-Value="_listModel.List1Name" placeholder="Name" class="form-control mb-3"/>
                             <ValidationMessage For="@(() => _listModel.List1Name)"/>
                         </div>
                         <div class="form-group">
-                            <InputTextArea @bind-Value="_listModel.List1" placeholder="List" class="form-control" style="min-height: 350px"/>
+                            <InputTextArea @bind-Value="_listModel.List1" placeholder="List" class="form-control mb-3" style="min-height: 300px"/>
                             <ValidationMessage For="@(() => _listModel.List1)"/>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-group">
-                            <label>Second List: </label>
-                            <InputText @bind-Value="_listModel.List2Name" placeholder="Name" class="form-control"/>
+                            <div class="pb-3">Second List: </div>
+                            <InputText @bind-Value="_listModel.List2Name" placeholder="Name" class="form-control mb-3"/>
                             <ValidationMessage For="@(() => _listModel.List2Name)"/>
                         </div>
                         <div class="form-group">
-                            <InputTextArea @bind-Value="_listModel.List2" placeholder="List" class="form-control" style="min-height: 350px"/>
+                            <InputTextArea @bind-Value="_listModel.List2" placeholder="List" class="form-control mb-3" style="min-height: 300px"/>
                             <ValidationMessage For="@(() => _listModel.List2)"/>
                         </div>
                     </div>
@@ -122,8 +121,8 @@
             <div class="row align-items-start">
                 <div class="col">
                     <div class="form-group">
-                        <label>Faction: </label>
-                        <div><b>@_listModel.Faction.ToFactionString()</b></div>
+                        <div>Faction: </div>
+                        <div class="pb-3"><b>@_listModel.Faction.ToFactionString()</b></div>
                     </div>
                 </div>
             </div>

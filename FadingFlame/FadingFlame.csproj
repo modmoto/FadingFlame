@@ -11,10 +11,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <_ContentIncludedByDefault Remove="UserAccounts\Pages\Register.razor" />
-    </ItemGroup>
-
-    <ItemGroup>
       <EmbeddedResource Update="FadingFlameTranslations.resx">
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>FadingFlameTranslations.Designer.cs</LastGenOutput>
