@@ -100,15 +100,15 @@ namespace FadingFlame.Discord
                         role = await clientGuild.Value.CreateRoleAsync(league.DivisionId.ToLower(), color: discordColors[position - 1]);
                     }
 
-                    foreach (var discordMember in clientGuild.Value.Members)
-                    {
-                        var username = discordMember.Value.Username.ToLower();
-                        var playerInLeagues = leagues.SelectMany(l => l.Players).FirstOrDefault(p => p.DiscordTag?.Split("#")[0].ToLower() == username);
-                        if (playerInLeagues != null)
-                        {
-                            await discordMember.Value.GrantRoleAsync(role);
-                        }
-                    }
+                    // foreach (var discordMember in clientGuild.Value.Members)
+                    // {
+                    //     var username = discordMember.Value.Username.ToLower();
+                    //     var playerInLeagues = leagues.SelectMany(l => l.Players).FirstOrDefault(p => p.DiscordTag?.Split("#")[0].ToLower() == username);
+                    //     if (playerInLeagues != null)
+                    //     {
+                    //         await discordMember.Value.GrantRoleAsync(role);
+                    //     }
+                    // }
                     
                     position++;
                 }
