@@ -47,17 +47,28 @@ else
                         <label>Victory Points @_name1 :</label>
                         <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control"/>
                         <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
-                        <label>Won secondary objective:</label>
-                        <InputCheckbox  @onclick="() => Select2ndObjective(1)" @bind-Value="_secondaryObjectivePlayer1" class="form-control"/>
+                        <hr class="my-2">
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" @onclick="() => Select2ndObjective(1)" @bind-Value="_secondaryObjectivePlayer1"/>
+                            <label class="form-check-label">
+                                Won secondary objective
+                            </label>
+                        </div>
                     </div>
                     <div class="col form-group">
                         <label>Victory Points @_name2 :</label>
                         <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control"/>
                         <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
-                        <label>Won secondary objective:</label>
-                        <InputCheckbox @onclick="() => Select2ndObjective(2)" @bind-Value="_secondaryObjectivePlayer2"  class="form-control"/>
+                        <hr class="my-2">
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" @onclick="() => Select2ndObjective(2)" @bind-Value="_secondaryObjectivePlayer2"/>
+                            <label class="form-check-label">
+                                Won secondary objective
+                            </label>
+                        </div>
                     </div>
                 </div>
+                <hr class="my-3">
                 <button disabled="@_loading" class="btn btn-primary">
                     @if (_loading)
                     {
