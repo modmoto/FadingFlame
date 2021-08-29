@@ -46,7 +46,7 @@ namespace FadingFlame.Leagues
             player1.RecordResult(result.Player1.BattlePoints, result.Player1.VictoryPoints);
             player2.RecordResult(result.Player2.BattlePoints, result.Player2.VictoryPoints);
 
-            Players = Players.OrderByDescending(p => p.Points).ThenBy(p => p.VictoryPoints).ToList();
+            Players = Players.OrderByDescending(p => p.Points).ThenByDescending(p => p.VictoryPoints).ToList();
         }
 
         public void AddPlayer(Player player)
