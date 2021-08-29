@@ -60,7 +60,7 @@
                 var player = await _playerRepository.LoadByEmail(email);
                 if (player == null)
                 {
-                    var name = claims.FirstOrDefault(c => c.Type == "name")?.Value;
+                    var name = claims.FirstOrDefault(c => c.Type == "given_name")?.Value;
                     player = Player.Create(name, email);
                     await _playerRepository.Insert(player);
                 }
