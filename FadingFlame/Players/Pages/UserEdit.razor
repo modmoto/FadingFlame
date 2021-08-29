@@ -44,7 +44,9 @@
             
             @if (!_listSubmitted)
             {
-                <h3 class="h3">Select your lists for this seasons, this can not be undone once you submitted the lists</h3>
+                <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
+                    To participate in the next season, submit your lists here. This can not be undone once you submitted the lists.
+                </div>
                 <EditForm Model="@_listModel" OnValidSubmit="OnValidSubmitList">
                 <DataAnnotationsValidator/>
                 <div class="row align-items-start">
