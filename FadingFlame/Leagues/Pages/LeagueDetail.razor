@@ -1,6 +1,7 @@
 ﻿@page "/league/{leagueId?}"
 @using MongoDB.Bson
 @using FadingFlame.Leagues
+@using FadingFlame.Players
 @using FadingFlame.UserAccounts
 
 @inject NavigationManager _navigation
@@ -23,6 +24,7 @@ else
         <thead>
         <tr>
             <th>Name</th>
+            <th>Faction</th>
             <th>Battle Points</th>
             <th>Victory Points</th>
             <th>Matches</th>
@@ -32,7 +34,8 @@ else
         @foreach (var playerInLeague in _league.Players)
         {
             <tr @onclick="() => GoToPlayer(playerInLeague.Id)" class="cursor" >
-                <td>@playerInLeague.Name</td>
+                <td>@GetName(playerInLeague.Id)</td>
+                <td>@GetRace(playerInLeague.Id)</td>
                 <td>@playerInLeague.Points</td>
                 <td>@playerInLeague.VictoryPoints</td>
                 <td>@playerInLeague.GamesCount</td>
@@ -100,7 +103,7 @@ else
                                 <div class="card" style="width: 24rem;">
                                     <div class="card-header">
                                         <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1">@(matchup.Name1) vs @(matchup.Name2)</h5>
+                                            <h5 class="mb-1">@(GetName(matchup.Player1)) vs @(GetName(matchup.Player2))</h5>
                                             <small>@matchup.Result?.RecordedAt.ToString("dd.MM.")</small>
                                         </div>
                                     </div>
@@ -131,6 +134,7 @@ else
 }
 
 @inject ILeagueRepository _leagueRepository
+@inject IPlayerRepository _playerRepository
 
 @code {
     [Parameter]
@@ -138,7 +142,8 @@ else
     
     private League _league;
     private int _activeDay;
-    
+    private List<Player> _playersInLeague = new();
+
     protected override void OnInitialized()
     {
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
@@ -149,6 +154,7 @@ else
         if (ObjectId.TryParse(LeagueId, out var parsed))
         {
             _league = await _leagueRepository.Load(parsed);
+            _playersInLeague = await _playerRepository.LoadForLeague(_league.Players.Select(p => p.Id).ToList());
             var now = DateTimeOffset.UtcNow;
             for (int i = 0; i < _league.GameDays.Count; i++)
             {
@@ -203,5 +209,15 @@ else
     private string GetOriginalPointsString(MatchResult result)
     {
         return $"{result.Player1.VictoryPoints} {GetSecondaryStringForPlayer1(result.SecondaryObjective)} : {result.Player2.VictoryPoints} {GetSecondaryStringForPlayer2(result.SecondaryObjective)}";
+    }
+
+    private string GetName(ObjectId playerId)
+    {
+        return _playersInLeague.FirstOrDefault(p => p.Id == playerId)?.DisplayName;
+    }
+    
+    private string GetRace(ObjectId playerId)
+    {
+        return _playersInLeague.FirstOrDefault(p => p.Id == playerId)?.Army?.Faction.ToFactionString() ?? "";
     }
 }

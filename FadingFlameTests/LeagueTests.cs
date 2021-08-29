@@ -72,9 +72,7 @@ namespace FadingFlameTests
 
             league.ReportGame(result);
 
-            league.Players[0].Name.Should().Be(player1.DisplayName);
             league.Players[0].Id.Should().Be(player1.Id);
-            league.Players[1].Name.Should().Be(player2.DisplayName);
             league.Players[1].Id.Should().Be(player2.Id);
 
             league.Players[0].Points.Should().Be(exectedoints1);
@@ -130,9 +128,7 @@ namespace FadingFlameTests
 
             league.ReportGame(result);
 
-            league.Players[0].Name.Should().Be(player2.DisplayName);
             league.Players[0].Id.Should().Be(player2.Id);
-            league.Players[1].Name.Should().Be(player1.DisplayName);
             league.Players[1].Id.Should().Be(player1.Id);
 
             league.Players[0].Points.Should().Be(expectedPoints2);
@@ -274,8 +270,8 @@ namespace FadingFlameTests
 
         private static Matchup CreateDefaultMatchup(ObjectId? player1 = null, ObjectId? player2 = null)
         {
-            var playerInLeague1 = PlayerInLeague.Create(player1 ?? ObjectId.GenerateNewId(), player1.ToString());
-            var playerInLeague2 = PlayerInLeague.Create(player2 ?? ObjectId.GenerateNewId(), player2.ToString());
+            var playerInLeague1 = PlayerInLeague.Create(player1 ?? ObjectId.GenerateNewId());
+            var playerInLeague2 = PlayerInLeague.Create(player2 ?? ObjectId.GenerateNewId());
             var matchup = Matchup.Create(playerInLeague1, playerInLeague2);
             return matchup;
         }

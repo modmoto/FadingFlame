@@ -8,8 +8,6 @@ namespace FadingFlame.Leagues
         public ObjectId MatchId { get; set; }
         public ObjectId Player1 { get; set; }
         public ObjectId Player2 { get; set; }
-        public string Name1 { get; set; }
-        public string Name2 { get; set; }
         public MatchResult Result { get; set; }
         public bool PlayersSelectedList => !string.IsNullOrEmpty(Player1List) && !string.IsNullOrEmpty(Player2List);
         public string Player1List { get; set; }
@@ -21,8 +19,6 @@ namespace FadingFlame.Leagues
             {
                 Player1 = playerAtHome.Id,
                 Player2 = playerAsGuest.Id,
-                Name1 = playerAtHome.Name,
-                Name2 = playerAsGuest.Name,
                 MatchId = ObjectId.GenerateNewId()
             };
         }
