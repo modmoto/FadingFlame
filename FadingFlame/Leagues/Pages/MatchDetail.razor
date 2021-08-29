@@ -15,7 +15,66 @@ else
 {
     if (CanEditMatch)
     {
-        
+        if (_allPlayersSelectedList)
+        {
+            <div class="row align-items-start">
+                <div class="col">
+                    <div class="form-group">
+                        <label>List of @_name1: </label>
+                        <div><b>@_selectedListPlayer1</b></div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>List of @_name2: </label>
+                        <div><b>@_selectedListPlayer2</b></div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            if (_listsOfLoggedInPlayer == null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    You did not submit a list, submit a list on your profile!
+                </div>
+            }
+            else if (!string.IsNullOrEmpty(_selectedListAsString))
+            {
+                <div class="row align-items-start">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Your list for the match: </label>
+                            <div><b>@_selectedListAsString</b></div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="row align-items-start">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>List: </label>
+                            <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_selectedList">
+                                <option selected value="0">Select your list</option>
+                                <option value="1">@_listsOfLoggedInPlayer.List1.Name</option>
+                                <option value="2">@_listsOfLoggedInPlayer.List2.Name</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button disabled="@_selectingList" class="btn btn-primary" @onclick="() => SelectListForMatch()">
+                    @if (_selectingList)
+                    {
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                    }
+                    Select list for match
+                </button>
+                <hr class="my-5">
+            }
+        }
         if (_matchWasFinished)
         {
             <div class="alert alert-danger" role="alert">
