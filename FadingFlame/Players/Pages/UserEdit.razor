@@ -52,7 +52,7 @@
                         <div class="form-group">
                             <label>Faction: </label>
                             <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_listModel.Faction">
-                                <option selected value="0">Open this select menu</option>
+                                <option selected value="0">Select faction</option>
                                 @foreach (var faction in Enum.GetValues<Faction>())
                                 {
                                     <option value="@faction">@ToFactionString(faction)</option>
