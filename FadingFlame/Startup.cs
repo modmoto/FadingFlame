@@ -45,6 +45,8 @@ namespace FadingFlame
                     options.Authority = $"https://{Environment.GetEnvironmentVariable("IDENTITY_BASE_URI")}";
 
                     options.ClientId = "fading-flame";
+                    var secret = Environment.GetEnvironmentVariable("FADING_FLAME_SECRET");
+                    options.ClientSecret = secret;
                     options.ResponseType = "code";
                     options.SignedOutRedirectUri = $"https://{Environment.GetEnvironmentVariable("SIGNOUT_URI")}/signout-callback-oidc";
                     
