@@ -10,19 +10,4 @@
       <PackageReference Include="MongoDB.Driver" Version="2.13.1" />
     </ItemGroup>
 
-    <ItemGroup>
-      <EmbeddedResource Update="FadingFlameTranslations.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>FadingFlameTranslations.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="FadingFlameTranslations.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Ressources.resx</DependentUpon>
-      </Compile>
-    </ItemGroup>
-
 </Project>

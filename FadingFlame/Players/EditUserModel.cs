@@ -1,27 +1,32 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace FadingFlame.Players
 {
     public class EditUserModel
     {
-        [Required(ErrorMessageResourceName = "FieldRequired", ErrorMessageResourceType = typeof(FadingFlameTranslations))]
+        [Required(ErrorMessage = Errors.FieldRequired)]
         public string DisplayName { get; set; }
         public string DiscordTag { get; set; }
     }
     
     public class EditListsModel
     {
-        [Required(ErrorMessageResourceName = "FieldRequired", ErrorMessageResourceType = typeof(FadingFlameTranslations))]
+        [Required(ErrorMessage = Errors.FieldRequired)]
         public string List1Name { get; set; }
-        [Required(ErrorMessageResourceName = "FieldRequired", ErrorMessageResourceType = typeof(FadingFlameTranslations))]
+        [Required(ErrorMessage = Errors.FieldRequired)]
         public string List1 { get; set; }
-        [Required(ErrorMessageResourceName = "FieldRequired", ErrorMessageResourceType = typeof(FadingFlameTranslations))]
+        [Required(ErrorMessage = Errors.FieldRequired)]
         public string List2Name { get; set; }
-        [Required(ErrorMessageResourceName = "FieldRequired", ErrorMessageResourceType = typeof(FadingFlameTranslations))]
+        [Required(ErrorMessage = Errors.FieldRequired)]
         public string List2 { get; set; }
         [Required]
-        [Range(1,16, ErrorMessageResourceName = "FactionRequired", ErrorMessageResourceType = typeof(FadingFlameTranslations))]
+        [Range(1,16, ErrorMessage = Errors.FactionRequired)]
         public Faction Faction { get; set; }
+    }
+
+    public class Errors
+    {
+        public const string FactionRequired = "You have to select a faction";
+        public const string FieldRequired = "This field is required";
     }
 }
