@@ -4,6 +4,7 @@ using FadingFlame.Discord;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
 using FadingFlame.UserAccounts;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -39,7 +40,13 @@ namespace FadingFlame
                     options.DefaultScheme = "Cookies";
                     options.DefaultChallengeScheme = "oidc";
                 })
-                .AddCookie("Cookies")
+                .AddCookie("Cookies", options =>
+                {
+                    options.Events.OnSigningOut = async e =>
+                    {
+                        await e.HttpContext.RevokeUserRefreshTokenAsync();
+                    };
+                })
                 .AddOpenIdConnect("oidc", options =>
                 {
                     options.Authority = $"https://{Environment.GetEnvironmentVariable("IDENTITY_BASE_URI")}";
@@ -58,7 +65,8 @@ namespace FadingFlame
                     options.SaveTokens = true;
                 });
 
-            services.AddAccessTokenManagement();
+            services.AddAccessTokenManagement()
+                .ConfigureBackchannelHttpClient();
            
             services.AddSingleton(_ =>
             {
