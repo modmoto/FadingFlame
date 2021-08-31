@@ -11,7 +11,7 @@
     <hr class="my-4">
 </div>
 
-<div class="row row-cols-lg-6 row-cols-md-4 row-cols-sm-2">
+<div class="row row-cols-auto justify-content-around">
     @foreach (var league in _leagues)
     {
         <div class="col mb-4 cursor" @onclick="() => GoToLeague(league.Id)">

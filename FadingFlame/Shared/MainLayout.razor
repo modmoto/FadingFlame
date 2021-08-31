@@ -14,16 +14,20 @@
     </div>
 
     <div class="main">
-        <div class="top-row px-4" hidden="@_userState.UserIsLoggedIn">
-            <a class="btn btn-primary" href="/Login">
-                <span class="oi oi-account-login" aria-hidden="true"></span><span class="m-2">Login</span>
-            </a>
-        </div>
-        <div class="top-row px-4" hidden="@(!_userState.UserIsLoggedIn)">
-            <span>Hello<a href="@Link">@_userState.UserName</a></span>
-            <a href="/Logout">
-                <span class="oi oi-account-logout" aria-hidden="true"></span>
-            </a>
+        <div class="top-row px-4">
+            @if (!_userState.UserIsLoggedIn)
+            {
+                <a class="btn btn-primary" href="/Login">
+                    <span class="oi oi-account-login" aria-hidden="true"></span><span class="m-2">Login</span>
+                </a>
+            }
+            else
+            {
+                <span>Hello<a href="@Link">@_userState.UserName</a></span>
+                <a href="/Logout">
+                    <span class="oi oi-account-logout" aria-hidden="true"></span>
+                </a>
+            }
         </div>
 
         <div class="content px-4">
