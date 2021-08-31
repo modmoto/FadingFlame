@@ -33,7 +33,7 @@ namespace FadingFlame
             {
                 options.ResourcesPath = "FadingFlameTranslations";
             });
-            
+
             services.AddAuthentication(options =>
                 {
                     options.DefaultScheme = "Cookies";
@@ -49,13 +49,16 @@ namespace FadingFlame
                     options.ClientSecret = secret;
                     options.ResponseType = "code";
                     options.SignedOutRedirectUri = $"https://{Environment.GetEnvironmentVariable("SIGNOUT_URI")}/signout-callback-oidc";
-                    
+
                     options.Scope.Add("profile");
                     options.Scope.Add("email");
+                    options.Scope.Add("offline_access");
                     options.GetClaimsFromUserInfoEndpoint = true;
 
                     options.SaveTokens = true;
                 });
+
+            services.AddAccessTokenManagement();
            
             services.AddSingleton(_ =>
             {
