@@ -51,23 +51,20 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var contextAccessorHttpContext = _httpContextAccessor.HttpContext;
-        if (contextAccessorHttpContext != null)
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext != null)
         {
-            await contextAccessorHttpContext.AuthenticateAsync("Cookies");
-            var claims = contextAccessorHttpContext.User.Claims.ToList();
+            await httpContext.AuthenticateAsync("Cookies");
             
-            var email = claims.FirstOrDefault(c => c.Type == "email")?.Value;
-            if (email != null)
+            if (_userState.UserIsLoggedIn)
             {
-                var player = await _playerRepository.LoadByEmail(email);
+                var player = await _playerRepository.LoadByEmail(_userState.Email);
                 if (player == null)
                 {
-                    var name = claims.FirstOrDefault(c => c.Type == "given_name")?.Value;
-                    player = Player.Create(name, email);
+                    player = Player.Create(_userState.OriginalUserName, _userState.Email);
                     await _playerRepository.Insert(player);
                 }
-                _userState.SetUserData(player.Id, player.DisplayName, player.AccountEmail);
+                _userState.SetUserData(player.Id, player.DisplayName);
                 StateHasChanged();
             }
         }

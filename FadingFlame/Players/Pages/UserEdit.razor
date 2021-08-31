@@ -228,7 +228,7 @@
             player.DiscordTag = _model.DiscordTag;
             player.DisplayName = _model.DisplayName;
             await _playerRepository.Update(player);
-            _userState.SetUserData(player.Id, player.DisplayName, player.AccountEmail);
+            _userState.SetUserData(player.Id, player.DisplayName);
             _loading = false;
         }
     }
