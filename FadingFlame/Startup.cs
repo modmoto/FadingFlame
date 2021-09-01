@@ -86,7 +86,7 @@ namespace FadingFlame
             // var playerRepository = buildServiceProvider.GetService<IPlayerRepository>();
             // for (int i = 0; i < 107; i++)
             // {
-            //     var player = Player.Create($"test{i}@test.de", $"test{i}@test.de");
+            //     var player = Player.Create($"testuser{i}");
             //     playerRepository.Insert(player).Wait();
             // }
         }
