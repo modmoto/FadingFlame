@@ -4,7 +4,6 @@ namespace FadingFlame.Players
 {
     public class EditUserModel
     {
-        [Required(ErrorMessage = Errors.FieldRequired)]
         public string DisplayName { get; set; }
         public string DiscordTag { get; set; }
     }

@@ -16,11 +16,6 @@
             <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
                 <DataAnnotationsValidator/>
                 <div class="form-group">
-                    <div class="pb-2">Name: </div>
-                    <InputText @bind-Value="_model.DisplayName" class="form-control mb-3"/>
-                    <ValidationMessage For="@(() => _model.DisplayName)"/>
-                </div>
-                <div class="form-group">
                     <div class="pb-2">Discord Tag: </div>
                     <InputText @bind-Value="_model.DiscordTag" class="form-control mb-3"/>
                     <ValidationMessage For="@(() => _model.DiscordTag)"/>
@@ -175,7 +170,7 @@
                 _model = new EditUserModel
                 {
                     DiscordTag = player.DiscordTag,
-                    DisplayName = player.DisplayName
+                    DisplayName = player.AccountName
                 };
 
                 _listModel = new EditListsModel
@@ -226,9 +221,8 @@
             _loading = true;
             var player = await _playerRepository.Load(new ObjectId(Id));
             player.DiscordTag = _model.DiscordTag;
-            player.DisplayName = _model.DisplayName;
             await _playerRepository.Update(player);
-            _userState.SetUserData(player.Id, player.DisplayName);
+            _userState.SetUserData(player.Id);
             _loading = false;
         }
     }

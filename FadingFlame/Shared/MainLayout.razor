@@ -1,5 +1,6 @@
 @using FadingFlame.UserAccounts
 @using FadingFlame.Players
+@using IdentityModel.Client
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Http
 @inherits LayoutComponentBase
@@ -58,13 +59,13 @@
             
             if (_userState.UserIsLoggedIn)
             {
-                var player = await _playerRepository.LoadByEmail(_userState.Email);
+                var player = await _playerRepository.LoadByAccountName(_userState.UserName);
                 if (player == null)
                 {
-                    player = Player.Create(_userState.OriginalUserName, _userState.Email);
+                    player = Player.Create(_userState.UserName);
                     await _playerRepository.Insert(player);
                 }
-                _userState.SetUserData(player.Id, player.DisplayName);
+                _userState.SetUserData(player.Id);
                 StateHasChanged();
             }
         }

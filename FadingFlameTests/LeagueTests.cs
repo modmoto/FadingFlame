@@ -17,7 +17,7 @@ namespace FadingFlameTests
         {
             var league = new League();
 
-            var player = Player.Create("peter", "123");
+            var player = Player.Create("peter");
             league.AddPlayer(player);
 
             league.Players.Should().Contain(p => p.Id == player.Id);
@@ -45,9 +45,9 @@ namespace FadingFlameTests
         {
             var league = new League();
 
-            var player1 = Player.Create("peter", "123");
+            var player1 = Player.Create("peter");
             player1.Id = ObjectId.GenerateNewId();
-            var player2 = Player.Create("wolf", "123");
+            var player2 = Player.Create("wolf");
             player2.Id = ObjectId.GenerateNewId();
 
             league.AddPlayer(player1);
@@ -101,9 +101,9 @@ namespace FadingFlameTests
         {
             var league = new League();
 
-            var player1 = Player.Create("peter", "123");
+            var player1 = Player.Create("peter");
             player1.Id = ObjectId.GenerateNewId();
-            var player2 = Player.Create("wolf", "123");
+            var player2 = Player.Create("wolf");
             player2.Id = ObjectId.GenerateNewId();
 
             league.AddPlayer(player2);

@@ -12,7 +12,7 @@ namespace FadingFlame.Players
         Task<Player> Load(ObjectId id);
         Task Update(Player player);
         Task Insert(Player player);
-        Task<Player> LoadByEmail(string email);
+        Task<Player> LoadByAccountName(string email);
         Task<List<Player>> PlayersThatEnlisted();
         Task<List<Player>> LoadForLeague(List<ObjectId> playerIds);
     }
@@ -43,9 +43,9 @@ namespace FadingFlame.Players
             return base.Insert(player);
         }
 
-        public Task<Player> LoadByEmail(string email)
+        public Task<Player> LoadByAccountName(string email)
         {
-            return LoadFirst<Player>(p => p.AccountEmail == email);
+            return LoadFirst<Player>(p => p.AccountName == email);
         }
 
         public Task<List<Player>> PlayersThatEnlisted()

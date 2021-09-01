@@ -9,17 +9,15 @@ namespace FadingFlame.Players
     {
         [BsonId]
         public ObjectId Id { get; set; }
-        public string DisplayName { get; set; }
+        public string AccountName { get; private set; }
         public string DiscordTag { get; set; }
         public SeasonArmy Army  { get; set; }
        
-        public string AccountEmail { get; set; }
-        public static Player Create(string name, string email)
+        public static Player Create(string name)
         {
             return new()
             {
-                DisplayName = name,
-                AccountEmail = email
+                AccountName = name
             };
         }
 
