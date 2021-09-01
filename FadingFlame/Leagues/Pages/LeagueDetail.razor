@@ -213,7 +213,7 @@ else
 
     private string GetName(ObjectId playerId)
     {
-        return _playersInLeague.FirstOrDefault(p => p.Id == playerId)?.AccountName;
+        return _playersInLeague.FirstOrDefault(p => p.Id == playerId)?.IdentityAccountName;
     }
     
     private string GetRace(ObjectId playerId)

@@ -9,7 +9,7 @@ namespace FadingFlame.Players
     {
         [BsonId]
         public ObjectId Id { get; set; }
-        public string AccountName { get; private set; }
+        public string IdentityAccountName { get; private set; }
         public string DiscordTag { get; set; }
         public SeasonArmy Army  { get; set; }
        
@@ -17,7 +17,7 @@ namespace FadingFlame.Players
         {
             return new()
             {
-                AccountName = name
+                IdentityAccountName = name
             };
         }
 
