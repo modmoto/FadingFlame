@@ -30,11 +30,6 @@ namespace FadingFlame
             
             JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 
-            services.AddLocalization(options =>
-            {
-                options.ResourcesPath = "FadingFlameTranslations";
-            });
-
             services.AddAuthentication(options =>
                 {
                     options.DefaultScheme = "Cookies";
