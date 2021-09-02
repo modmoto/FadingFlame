@@ -63,10 +63,20 @@
             var refresh = await httpContext.GetTokenAsync("refresh_token");
             var token = await httpContext.GetUserAccessTokenAsync();
             var accessToken2 = await httpContext.GetTokenAsync("access_token");
-            _logger.LogInformation($"ac: {accessToken}");
-            _logger.LogInformation($"rt: {refresh}");
-            _logger.LogInformation($"new1: {token}");
-            _logger.LogInformation($"new2: {accessToken2}");
+            var refresh2 = await httpContext.GetTokenAsync("refresh_token");
+            if (accessToken != accessToken2)
+            {
+                _logger.LogInformation($"new1: {token}");
+                _logger.LogInformation($"new2: {accessToken2}");
+                _logger.LogInformation($"rt: {refresh}");
+                _logger.LogInformation($"rt2: {refresh2}");
+                _logger.LogInformation($"------------------------------------------------------------------------------------------------");
+            }
+            else
+            {
+                _logger.LogInformation($"{DateTimeOffset.Now:h:mm:ss}not refreshed yet");
+            }
+            
             
             if (_userState.UserIsLoggedIn)
             {
