@@ -65,7 +65,6 @@
                     await _playerRepository.Insert(player);
                 }
                 _userState.SetUserData(player.Id);
-                StateHasChanged();
             }
         }
     }
