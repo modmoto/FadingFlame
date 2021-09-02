@@ -59,8 +59,14 @@
             await httpContext.AuthenticateAsync("Cookies");
             // refresh token if needed
             
+            var accessToken = await httpContext.GetTokenAsync("access_token");
+            var refresh = await httpContext.GetTokenAsync("refresh_token");
             var token = await httpContext.GetUserAccessTokenAsync();
-            _logger.LogInformation(token);
+            var accessToken2 = await httpContext.GetTokenAsync("access_token");
+            _logger.LogInformation($"ac: {accessToken}");
+            _logger.LogInformation($"rt: {refresh}");
+            _logger.LogInformation($"new1: {token}");
+            _logger.LogInformation($"new2: {accessToken2}");
             
             if (_userState.UserIsLoggedIn)
             {
