@@ -2,11 +2,13 @@
 @using FadingFlame.Players
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Logging
 @inherits LayoutComponentBase
 @inject IPlayerRepository _playerRepository
 @inject UserState _userState
 @inject NavigationManager _navigation
 @inject IHttpContextAccessor _httpContextAccessor
+@inject ILogger<MainLayout> _logger
 
 <div class="page">
     <div class="sidebar">
@@ -55,6 +57,10 @@
         if (httpContext != null)
         {
             await httpContext.AuthenticateAsync("Cookies");
+            // refresh token if needed
+            
+            var token = await httpContext.GetUserAccessTokenAsync();
+            _logger.LogInformation(token);
             
             if (_userState.UserIsLoggedIn)
             {
