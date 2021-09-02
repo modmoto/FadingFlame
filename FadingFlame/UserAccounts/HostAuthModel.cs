@@ -21,7 +21,8 @@ namespace FadingFlame.UserAccounts
         private AuthenticationProperties AuthProps()
             => new AuthenticationProperties
             {
-                RedirectUri = Url.Content("/")
+                RedirectUri = Url.Content("/"),
+                AllowRefresh = true
             };
     }
 }

@@ -8,7 +8,6 @@
 @inject UserState _userState
 @inject NavigationManager _navigation
 @inject IHttpContextAccessor _httpContextAccessor
-@inject ILogger<MainLayout> _logger
 
 <div class="page">
     <div class="sidebar">
@@ -57,26 +56,8 @@
         if (httpContext != null)
         {
             await httpContext.AuthenticateAsync("Cookies");
-            // refresh token if needed
-            
-            var accessToken = await httpContext.GetTokenAsync("access_token");
-            var refresh = await httpContext.GetTokenAsync("refresh_token");
-            var token = await httpContext.GetUserAccessTokenAsync();
-            var accessToken2 = await httpContext.GetTokenAsync("access_token");
-            var refresh2 = await httpContext.GetTokenAsync("refresh_token");
-            if (accessToken != accessToken2)
-            {
-                _logger.LogInformation($"new1: {token}");
-                _logger.LogInformation($"new2: {accessToken2}");
-                _logger.LogInformation($"rt: {refresh}");
-                _logger.LogInformation($"rt2: {refresh2}");
-                _logger.LogInformation("REPLACED!!!---------------------------------------------------------------------------------------------");
-            }
-            else
-            {
-                _logger.LogInformation($"{DateTimeOffset.Now:h:mm:ss}not refreshed yet");
-            }
-            
+            // refresh token if needed, dont know if this works, though
+            await httpContext.GetUserAccessTokenAsync();
             
             if (_userState.UserIsLoggedIn)
             {
