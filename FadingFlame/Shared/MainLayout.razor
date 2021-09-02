@@ -56,8 +56,6 @@
         if (httpContext != null)
         {
             await httpContext.AuthenticateAsync("Cookies");
-            // refresh token if needed, dont know if this works, though
-            await httpContext.GetUserAccessTokenAsync();
             
             if (_userState.UserIsLoggedIn)
             {
