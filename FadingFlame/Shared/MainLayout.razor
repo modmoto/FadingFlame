@@ -59,10 +59,10 @@
             
             if (_userState.UserIsLoggedIn)
             {
-                var player = await _playerRepository.LoadByAccountName(_userState.UserName);
+                var player = await _playerRepository.LoadByEmail(_userState.AccountEmail);
                 if (player == null)
                 {
-                    player = Player.Create(_userState.UserName);
+                    player = Player.Create(_userState.UserName, _userState.AccountEmail);
                     await _playerRepository.Insert(player);
                 }
                 _userState.SetUserData(player.Id);

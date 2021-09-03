@@ -193,8 +193,8 @@ else
                     _model.Player1.Id = match.Player1;
                     _model.Player2.Id = match.Player2;
 
-                    _name1 = player1.IdentityAccountName;
-                    _name2 = player2.IdentityAccountName;
+                    _name1 = player1.DisplayName;
+                    _name2 = player2.DisplayName;
                     _model.MatchId = match.MatchId;
                     _matchWasFinished = match.Result != null;
                     _allPlayersSelectedList = match.PlayersSelectedList;

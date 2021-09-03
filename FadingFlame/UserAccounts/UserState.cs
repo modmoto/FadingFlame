@@ -29,9 +29,9 @@ namespace FadingFlame.UserAccounts
         }
 
         public bool UserIsLoggedIn => _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;
-        public bool UserIsAdmin => Admins.Contains(Email);
+        public bool UserIsAdmin => Admins.Contains(AccountEmail);
         public ObjectId? LoggedInPlayerId { get; private set; }
         public string UserName => _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value;
-        public string Email => _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
+        public string AccountEmail => _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
     }
 }
