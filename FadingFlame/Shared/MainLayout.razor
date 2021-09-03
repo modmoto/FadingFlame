@@ -2,6 +2,7 @@
 @using FadingFlame.Players
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Logging
 @inherits LayoutComponentBase
 @inject IPlayerRepository _playerRepository
 @inject UserState _userState
@@ -65,7 +66,6 @@
                     await _playerRepository.Insert(player);
                 }
                 _userState.SetUserData(player.Id);
-                StateHasChanged();
             }
         }
     }
