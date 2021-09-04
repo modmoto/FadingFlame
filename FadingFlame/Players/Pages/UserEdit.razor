@@ -126,8 +126,7 @@
                     </div>
                 </div>
             </div>
-            if (_userState.UserIsAdmin)
-            {
+            <AuthorizeView Roles="admin">
                 <button disabled="@_loadingLists" class="btn btn-danger" @onclick="() => DeleteLists()">
                     @if (_loadingLists)
                     {
@@ -135,7 +134,7 @@
                     }
                     <span class="oi oi-shield" aria-hidden="true"></span> Delete lists for user
                 </button>
-            }
+            </AuthorizeView>
         }
 
     </div>
@@ -234,18 +233,15 @@
 
     private async Task DeleteLists()
     {
-        if (_userState.UserIsAdmin)
-        {
-            _loadingLists = true;
-            var player = await _playerRepository.Load(new ObjectId(Id));
-            player.ResetLists();
-            _listModel.List1 = null;
-            _listModel.List2 = null;
-            _listModel.List1Name = null;
-            _listModel.List2Name = null;
-            _listSubmitted = false;
-            await _playerRepository.Update(player);
-            _loadingLists = false;
-        }
+        _loadingLists = true;
+        var player = await _playerRepository.Load(new ObjectId(Id));
+        player.ResetLists();
+        _listModel.List1 = null;
+        _listModel.List2 = null;
+        _listModel.List1Name = null;
+        _listModel.List2Name = null;
+        _listSubmitted = false;
+        await _playerRepository.Update(player);
+        _loadingLists = false;
     }
 }
