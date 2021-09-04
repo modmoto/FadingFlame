@@ -1,5 +1,4 @@
 ﻿@page "/admin"
-@attribute [Authorize(Roles = "admin")]
 @using FadingFlame.Leagues
 @using FadingFlame.UserAccounts
 @using FadingFlame.Discord
@@ -7,13 +6,16 @@
 @inject ILeagueCommandHandler _leagueCommandHandler
 @inject IDiscordBot _discordBot
 
-<button disabled="@_loading" type="button" class="btn btn-primary" @onclick="CreateLeagues">
-    @if (_loading)
-    {
-        <span class="spinner-border spinner-border-sm mr-1"></span>
-    }
-    Reset Season 1
-</button>
+@if (_userState.UserIsAdmin)
+{
+    <button disabled="@_loading" type="button" class="btn btn-primary" @onclick="CreateLeagues">
+        @if (_loading)
+        {
+            <span class="spinner-border spinner-border-sm mr-1"></span>
+        }
+        Reset Season 1
+    </button>
+}
 
 @code {
     private bool _loading;
@@ -25,10 +27,13 @@
 
     private async Task CreateLeagues()
     {
-        _loading = true;
-        var leagues = await _leagueCommandHandler.CreateLeagues();
-        await _discordBot.CreateLeagueChannels(leagues);
-        _loading = false;
+        if (_userState.UserIsAdmin)
+        {
+            _loading = true;
+            var leagues = await _leagueCommandHandler.CreateLeagues();
+            await _discordBot.CreateLeagueChannels(leagues);
+            _loading = false;
+        }
     }
 
 }
