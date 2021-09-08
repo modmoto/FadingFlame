@@ -28,13 +28,13 @@ else
                 <div class="row align-items-start">
                     <div class="col">
                         <div class="form-group">
-                            <label>List of @_name1: </label>
+                            <label>List of @_name1 : </label>
                             <div><b>@_selectedListPlayer1</b></div>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-group">
-                            <label>List of @_name2: </label>
+                            <label>List of @_name2 : </label>
                             <div><b>@_selectedListPlayer2</b></div>
                         </div>
                     </div>
@@ -205,13 +205,13 @@ else
                     if (Player1LoggedIn)
                     {
                         _listsOfLoggedInPlayer = player1.Army;
-                        _selectedListAsString = match.Player1List;
+                        _selectedListAsString = $"{match.Player1List}";
                     }
 
                     if (Player2LoggedIn)
                     {
                         _listsOfLoggedInPlayer = player2.Army;
-                        _selectedListAsString = match.Player2List;
+                        _selectedListAsString = $"{match.Player2List}";
                     }
 
                     StateHasChanged();

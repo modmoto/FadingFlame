@@ -2,14 +2,18 @@ namespace FadingFlame.Players
 {
     public class GameList
     {
-        public static GameList Create(string name, string list)
+        public static GameList Create(string name, string list, Faction faction)
         {
             return new()
             {
                 Name = name,
-                List = list
+                List = list,
+                Faction = faction
             };
         }
+
+
+        public Faction Faction { get; set; }
 
         public string List { get; set; }
 

@@ -41,23 +41,19 @@
                 <div class="row align-items-start">
                     <div class="col">
                         <div class="form-group">
-                            <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_listModel.Faction">
+                            <div class="pb-3">First List: </div>
+                            <InputText @bind-Value="_listModel.List1Name" placeholder="Name" class="form-control mb-3"/>
+                            <ValidationMessage For="@(() => _listModel.List1Name)"/>
+                        </div>
+                        <div class="form-group">
+                            <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_listModel.Faction1">
                                 <option selected value="0">Select faction</option>
                                 @foreach (var faction in Enum.GetValues<Faction>())
                                 {
                                     <option value="@faction">@faction.ToFactionString()</option>
                                 }
                             </select>
-                            <ValidationMessage For="@(() => _listModel.Faction)"/>
-                        </div>
-                    </div>
-                </div>
-                <div class="row align-items-start">
-                    <div class="col">
-                        <div class="form-group">
-                            <div class="pb-3">First List: </div>
-                            <InputText @bind-Value="_listModel.List1Name" placeholder="Name" class="form-control mb-3"/>
-                            <ValidationMessage For="@(() => _listModel.List1Name)"/>
+                            <ValidationMessage For="@(() => _listModel.Faction1)"/>
                         </div>
                         <div class="form-group">
                             <InputTextArea @bind-Value="_listModel.List1" placeholder="List" class="form-control mb-3" style="min-height: 300px"/>
@@ -69,6 +65,16 @@
                             <div class="pb-3">Second List: </div>
                             <InputText @bind-Value="_listModel.List2Name" placeholder="Name" class="form-control mb-3"/>
                             <ValidationMessage For="@(() => _listModel.List2Name)"/>
+                        </div>
+                        <div class="form-group">
+                            <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_listModel.Faction2">
+                                <option selected value="0">Select faction</option>
+                                @foreach (var faction in Enum.GetValues<Faction>())
+                                {
+                                    <option value="@faction">@faction.ToFactionString()</option>
+                                }
+                            </select>
+                            <ValidationMessage For="@(() => _listModel.Faction2)"/>
                         </div>
                         <div class="form-group">
                             <InputTextArea @bind-Value="_listModel.List2" placeholder="List" class="form-control mb-3" style="min-height: 300px"/>
@@ -100,7 +106,11 @@
                 <div class="col">
                     <div class="form-group">
                         <div>Faction: </div>
-                        <div class="pb-3"><b>@_listModel.Faction.ToFactionString()</b></div>
+                        <div class="pb-3"><b>@_listModel.Faction1.ToFactionString()</b></div>
+                    </div>
+                    <div class="form-group">
+                        <div>Faction: </div>
+                        <div class="pb-3"><b>@_listModel.Faction2.ToFactionString()</b></div>
                     </div>
                 </div>
             </div>
@@ -179,7 +189,8 @@
                     List2 = player.Army?.List2.List,
                     List1Name = player.Army?.List1.Name,
                     List2Name = player.Army?.List2.Name,
-                    Faction = player.Army?.Faction ?? 0
+                    Faction1 = player.Army?.List1.Faction ?? 0,
+                    Faction2 = player.Army?.List2.Faction ?? 0
                 };
 
                 if (_listModel.List1 != null
@@ -205,9 +216,9 @@
         {
             _loadingLists = true;
             var player = await _playerRepository.Load(new ObjectId(Id));
-            var list1 = GameList.Create(_listModel.List1Name, _listModel.List1);
-            var list2 = GameList.Create(_listModel.List2Name, _listModel.List2);
-            player.SubmitLists(_listModel.Faction, list1, list2);
+            var list1 = GameList.Create(_listModel.List1Name, _listModel.List1, _listModel.Faction1);
+            var list2 = GameList.Create(_listModel.List2Name, _listModel.List2, _listModel.Faction2);
+            player.SubmitLists(list1, list2);
             await _playerRepository.Update(player);
             _loadingLists = false;
             _listSubmitted = true;

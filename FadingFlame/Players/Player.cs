@@ -23,14 +23,13 @@ namespace FadingFlame.Players
             };
         }
 
-        public void SubmitLists(Faction faction, GameList list1, GameList list2)
+        public void SubmitLists(GameList list1, GameList list2)
         {
             if (Army != null) throw new ValidationException("Lists already set for this season");
             Army = new SeasonArmy
             {
                 List1 = list1,
                 List2 = list2,
-                Faction = faction
             };
         }
 
@@ -44,6 +43,5 @@ namespace FadingFlame.Players
     {
         public GameList List1 { get; set; }
         public GameList List2 { get; set; }
-        public Faction Faction { get; set; }
     }
 }
