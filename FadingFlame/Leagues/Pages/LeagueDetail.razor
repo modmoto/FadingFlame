@@ -218,8 +218,9 @@ else
     
     private string GetRace(ObjectId playerId)
     {
-        var player = _playersInLeague.First(p => p.Id == playerId);
-        var factions = new List<Faction> { player.Army.List1.Faction, player.Army.List2.Faction  }.Distinct();
-        return string.Join("/", factions.Select(f => f.ToFactionString()));
+        var player = _playersInLeague.FirstOrDefault(p => p.Id == playerId);
+        if (player == null) return "";
+        var factions = new List<Faction?> { player.Army?.List1?.Faction, player?.Army?.List2?.Faction }.Where(l => l != null).Distinct();
+        return string.Join("/", factions.Select(f => f.Value.ToFactionString()));
     }
 }
