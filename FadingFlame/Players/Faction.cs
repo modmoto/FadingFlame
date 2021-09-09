@@ -9,9 +9,9 @@ namespace FadingFlame.Players
         DreadElves = 3,
         DwarvenHolds = 4,
         EmpireOfSonnstahl = 5,
-        HighBornElves = 6,
+        HighbornElves = 6,
         InfernalDwarfs = 7,
-        KingdomOfEquitane = 8,
+        KingdomOfEquitaine = 8,
         OgreKhans = 9,
         OrcsAndGoblins = 10,
         SaurianAncients = 11,
@@ -26,7 +26,10 @@ namespace FadingFlame.Players
     {
         public static string ToFactionString(this Faction faction)
         {
-            return Regex.Replace(faction.ToString(), "(\\B[A-Z])", " $1");
+            return Regex.Replace(faction.ToString(), "(\\B[A-Z])", " $1")
+                .Replace("And", "and")
+                .Replace("The", "the")
+                .Replace("Of", "of");
         }
     }
 }
