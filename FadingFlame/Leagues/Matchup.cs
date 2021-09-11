@@ -12,6 +12,7 @@ namespace FadingFlame.Leagues
         public bool PlayersSelectedList => !string.IsNullOrEmpty(Player1List) && !string.IsNullOrEmpty(Player2List);
         public string Player1List { get; set; }
         public string Player2List { get; set; }
+        public bool IsFinished => Result != null;
 
         public static Matchup Create(PlayerInLeague playerAtHome, PlayerInLeague playerAsGuest)
         {
@@ -25,7 +26,7 @@ namespace FadingFlame.Leagues
 
         public void RecordResult(MatchResult result)
         {
-            if (Result != null)
+            if (IsFinished)
             {
                 throw new ValidationException("Match allready reported");
             }
