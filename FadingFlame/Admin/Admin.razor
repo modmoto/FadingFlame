@@ -2,23 +2,39 @@
 @using FadingFlame.Leagues
 @using FadingFlame.UserAccounts
 @using FadingFlame.Discord
+@using FadingFlame.Playoffs
 @inject UserState _userState
 @inject ILeagueCommandHandler _leagueCommandHandler
+@inject IPlayoffCommandHandler _playoffCommandHandler
 @inject IDiscordBot _discordBot
 
 @if (_userState.UserIsAdmin)
 {
-    <button disabled="@_loading" type="button" class="btn btn-primary" @onclick="CreateLeagues">
-        @if (_loading)
-        {
-            <span class="spinner-border spinner-border-sm mr-1"></span>
-        }
-        Reset Season 1
-    </button>
+    <div class="m-2">
+        <button disabled="@_loadingLeagues" type="button" class="btn btn-primary" @onclick="CreateLeagues">
+            @if (_loadingLeagues)
+            {
+                <span class="spinner-border spinner-border-sm mr-1"></span>
+            }
+            Reset Season 1
+        </button>
+    </div>
+    
+    <div class="m-2">
+        <button disabled="@_loadingPlayoffs" type="button" class="btn btn-primary" @onclick="CreatePlayoffs">
+            @if (_loadingLeagues)
+            {
+                <span class="spinner-border spinner-border-sm mr-1"></span>
+            }
+            Create Playoffs Season 1
+        </button>
+    </div>
+    
 }
 
 @code {
-    private bool _loading;
+    private bool _loadingLeagues;
+    private bool _loadingPlayoffs;
     
     protected override void OnInitialized()
     {
@@ -27,13 +43,16 @@
 
     private async Task CreateLeagues()
     {
-        if (_userState.UserIsAdmin)
-        {
-            _loading = true;
-            var leagues = await _leagueCommandHandler.CreateLeagues();
-            await _discordBot.CreateLeagueChannels(leagues);
-            _loading = false;
-        }
+        _loadingLeagues = true;
+        var leagues = await _leagueCommandHandler.CreateLeagues();
+        await _discordBot.CreateLeagueChannels(leagues);
+        _loadingLeagues = false;
     }
-
+    
+    private async Task CreatePlayoffs()
+    {
+        _loadingPlayoffs = true;
+        await _playoffCommandHandler.CreatePlayoffs();
+        _loadingPlayoffs = false;
+    }
 }

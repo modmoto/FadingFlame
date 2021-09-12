@@ -14,6 +14,8 @@ namespace FadingFlame.Leagues
         public SecondaryObjectiveState SecondaryObjective { get; set; }
         public DateTimeOffset RecordedAt { get; set; }
 
+        public ObjectId Winner { get; set; }
+
         public static MatchResult Create(
             SecondaryObjectiveState secondaryObjective,
             PlayerResultDto player1Result,
@@ -31,11 +33,25 @@ namespace FadingFlame.Leagues
                 MatchId = ObjectId.GenerateNewId(),
                 RecordedAt = DateTimeOffset.UtcNow,
                 SecondaryObjective = secondaryObjective,
+                Winner = GetWinnerId(player1Result, player2Result, pointsAfteObjective),
                 Player1 = PlayerResult.Create(player1Result.Id, player1Result.VictoryPoints, pointsAfteObjective.Player1),
-                Player2 = PlayerResult.Create(player2Result.Id, player2Result.VictoryPoints, pointsAfteObjective.Player2),
+                Player2 = PlayerResult.Create(player2Result.Id, player2Result.VictoryPoints, pointsAfteObjective.Player2)
             };
         }
-        
+
+        private static ObjectId GetWinnerId(
+            PlayerResultDto player1Result,
+            PlayerResultDto player2Result,
+            PointTuple pointsAfteObjective)
+        {
+            if (pointsAfteObjective.Player1 == pointsAfteObjective.Player2)
+            {
+                return player1Result.VictoryPoints > player2Result.VictoryPoints ? player1Result.Id : player2Result.Id;
+            }
+
+            return pointsAfteObjective.Player1 > pointsAfteObjective.Player2 ? player1Result.Id : player2Result.Id;
+        }
+
         private static PointTuple CalculateWinPoints(int player1, int player2)
         {
             var pointTuples = new Dictionary<int, PointTuple>
@@ -48,7 +64,7 @@ namespace FadingFlame.Leagues
                 { 2250, new PointTuple(15, 5)},
                 { 3150, new PointTuple(16, 4)},
                 { 3151, new PointTuple(17, 3)},
-                { Int32.MaxValue, new PointTuple(17, 3)},
+                { Int32.MaxValue, new PointTuple(17, 3)}
             };
 
             var pair = pointTuples.First(p => Math.Abs(player1 - player2) <= p.Key);

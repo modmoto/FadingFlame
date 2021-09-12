@@ -1,0 +1,97 @@
+@page "/playoffs"
+@using MongoDB.Bson
+@using FadingFlame.Leagues
+@using FadingFlame.Players
+@using FadingFlame.UserAccounts
+@inject IPlayoffRepository _playoffRepository
+@inject IPlayerRepository _playerRepository
+@inject NavigationManager _navigation
+@inject UserState _userState
+
+
+<div>
+    <h1>Playoffs Season @Season.Current</h1>
+    <hr class="my-4">
+</div>
+@if (_loading)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <div>
+        <div style="display: flex;">
+            @for (int i = 0; i < _playoffs.Rounds.Count; i++)
+            {
+                <div style="display: flex; flex-direction: column; justify-content: space-around; justify-items: center; ">
+                    @foreach (var matchup in _playoffs.Rounds[i].Matchups)
+                    {
+                        <div class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)" style="width: 12rem">
+                            <div class="card-body" style="padding: 0 !important;">
+                                <div class="playoff-border playoff-block">
+                                    <div class="playoff-name">@GetName(matchup.Player1)</div>
+                                    <div class="bg-opacity-25 bg-dark playoff-number">@matchup.Result?.Player1?.BattlePoints</div>
+                                </div>
+                                <div class="playoff-block">
+                                    <div class="playoff-name">@GetName(matchup.Player2)</div>
+                                    <div class="bg-opacity-25 bg-dark playoff-number">@matchup.Result?.Player2?.BattlePoints</div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code
+{
+    private bool _loading = true;
+    private Playoff _playoffs;
+    private List<Player> _playersInPlayoffs = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _playoffs = await _playoffRepository.LoadForSeason(Season.Current);
+        if (_playoffs == null)
+        {
+            var playerInLeagues = new List<PlayerInLeague>();
+            for (int i = 0; i < 32; i++)
+            {
+                playerInLeagues.Add(PlayerInLeague.Create(ObjectId.GenerateNewId()));
+            }
+            _playoffs = Playoff.Create(0, playerInLeagues);
+        }
+        var listOfPlayerInPlayoffs = _playoffs.Rounds.First().Matchups.SelectMany(m => new List<ObjectId> { m.Player1, m.Player2 }).ToList();
+        _playersInPlayoffs = await _playerRepository.LoadForLeague(listOfPlayerInPlayoffs);
+        _loading = false;
+    }
+
+    public void GoToMatch(Matchup matchup)
+    {
+        if (UserIsOneOfThePlayers(matchup))
+        {
+            _navigation.NavigateTo($"match/{matchup.MatchId}?playoffSeason={_playoffs.Season}");    
+        }
+    }
+    
+    private string GetClasses(Matchup matchup)
+    {
+        return UserIsOneOfThePlayers(matchup) ? "card bg-light cursor mx-4 my-2" : "card mx-4 my-2";
+    }
+
+    private bool UserIsOneOfThePlayers(Matchup matchup)
+    {
+        return _userState.LoggedInPlayerId == matchup.Player1 || _userState.LoggedInPlayerId == matchup.Player2;
+    }
+    
+    private string GetName(ObjectId playerId)
+    {
+        if (playerId == ObjectId.Empty) return "Freewin";
+
+        return _playersInPlayoffs.FirstOrDefault(p => p.Id == playerId)?.DisplayName ?? "tbd";
+    }
+}

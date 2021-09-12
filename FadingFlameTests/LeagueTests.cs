@@ -61,12 +61,12 @@ namespace FadingFlameTests
                 Player1 = new PlayerResultDto
                 {
                     Id = player1.Id,
-                    VictoryPoints = player1Points,
+                    VictoryPoints = player1Points
                 },
                 Player2 = new PlayerResultDto
                 {
                     Id = player2.Id,
-                    VictoryPoints = player2Points,
+                    VictoryPoints = player2Points
                 }
             };
 
@@ -193,7 +193,7 @@ namespace FadingFlameTests
         [Test]
         public void MakePairings_GameDaysOk()
         {
-            var league = CreateLeagueWithPlayers(ObjectId.GenerateNewId(), ObjectId.GenerateNewId(), ObjectId.GenerateNewId(), ObjectId.GenerateNewId());
+            var league = TestUtils.CreateLeagueWithPlayers(ObjectId.GenerateNewId(), ObjectId.GenerateNewId(), ObjectId.GenerateNewId(), ObjectId.GenerateNewId());
 
             league.CreateGameDays();
 
@@ -205,7 +205,7 @@ namespace FadingFlameTests
         {
             var player1 = ObjectId.GenerateNewId();
             var player2 = ObjectId.GenerateNewId();
-            var league = CreateLeagueWithPlayers(player1, player2);
+            var league = TestUtils.CreateLeagueWithPlayers(player1, player2);
 
             league.CreateGameDays();
 
@@ -220,7 +220,7 @@ namespace FadingFlameTests
             var player2 = ObjectId.GenerateNewId();
             var player3 = ObjectId.GenerateNewId();
             var player4 = ObjectId.GenerateNewId();
-            var league = CreateLeagueWithPlayers(player1, player2, player3, player4);
+            var league = TestUtils.CreateLeagueWithPlayers(player1, player2, player3, player4);
 
             league.CreateGameDays();
 
@@ -238,7 +238,7 @@ namespace FadingFlameTests
             var player4 = ObjectId.GenerateNewId();
             var player5 = ObjectId.GenerateNewId();
             var player6 = ObjectId.GenerateNewId();
-            var league = CreateLeagueWithPlayers(player1, player2, player3, player4, player5, player6);
+            var league = TestUtils.CreateLeagueWithPlayers(player1, player2, player3, player4, player5, player6);
 
             league.CreateGameDays();
 
@@ -258,7 +258,8 @@ namespace FadingFlameTests
             var player6 = ObjectId.GenerateNewId();
             var player7 = ObjectId.GenerateNewId();
             var player8 = ObjectId.GenerateNewId();
-            var league = CreateLeagueWithPlayers(player1, player2, player3, player4, player5, player6, player7, player8);
+            var league = TestUtils.CreateLeagueWithPlayers(player1, player2, player3, player4, player5, player6, player7,
+            player8);
 
             league.CreateGameDays();
 
@@ -287,20 +288,6 @@ namespace FadingFlameTests
             }
 
             return true;
-        }
-
-        private static League CreateLeagueWithPlayers(params ObjectId[] identities)
-        {
-            var league = League.Create(1, DateTimeOffset.Now, "1A", "bogota");
-            foreach (var guidIdentity in identities)
-            {
-                league.AddPlayer(new Player()
-                {
-                    Id = guidIdentity
-                });
-            }
-
-            return league;
         }
     }
 }

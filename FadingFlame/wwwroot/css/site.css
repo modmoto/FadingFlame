@@ -24,6 +24,27 @@ a, .btn-link {
     background-color: rgba(255, 188, 194, 0.7);
 }
 
+.playoff-border {
+    border-bottom: 1px solid rgba(0,0,0,.125);
+}
+
+.playoff-block {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: start
+}
+
+.playoff-name {
+    padding: 5px !important;
+    padding-left: 1rem !important;
+}
+.playoff-number {
+    width: 28px;
+    line-height: 34px;
+    text-align: center
+}
+
 .cursor {
     cursor: pointer;
 }

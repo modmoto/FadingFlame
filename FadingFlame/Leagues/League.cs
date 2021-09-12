@@ -21,22 +21,7 @@ namespace FadingFlame.Leagues
         public bool IsFull => Players.Count == 6;
         public DateTimeOffset StartDate { get; set; }
 
-        public void SelectList(ObjectId playerId, ObjectId matchId, string listName)
-        {
-            var match = GetMatchup(matchId);
-
-            if (match.Player1 == playerId)
-            {
-                match.Player1List = listName;
-            }
-            
-            if (match.Player2 == playerId)
-            {
-                match.Player2List = listName;
-            }
-        }
-
-        public Matchup GetMatchup(ObjectId matchId)
+        private Matchup GetMatchup(ObjectId matchId)
         {
             var match = GameDays.SelectMany(g => g.Matchups).FirstOrDefault(m => m.MatchId == matchId);
             if (match == null)
