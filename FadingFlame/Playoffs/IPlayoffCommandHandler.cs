@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FadingFlame.Leagues;
@@ -29,7 +30,17 @@ namespace FadingFlame.Playoffs
 
             var firstPlaces = leagues.Select(l => l.Players.First()).ToList();
 
-            var playoffs = Playoff.Create(season, firstPlaces);
+            var sortedFirstPlaces = new List<PlayerInLeague>();
+            for (int index = 0; index < firstPlaces.Count / 2; index++)
+            {
+                var player1 = firstPlaces[index];
+                var player2 = firstPlaces[index + firstPlaces.Count / 2];
+
+                sortedFirstPlaces.Add(player1);
+                sortedFirstPlaces.Add(player2);
+            }
+
+            var playoffs = Playoff.Create(season, sortedFirstPlaces);
 
             await _playoffRepository.Insert(playoffs);
 
