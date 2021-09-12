@@ -66,7 +66,7 @@ namespace FadingFlame.Leagues
                 "The Red Duke",
                 "Abhorash",
                 "Greasus Goldtooth",
-                "Mazdamundi",
+                "Mazdamundi"
             };
             
             var ids = new List<string>()
@@ -106,7 +106,7 @@ namespace FadingFlame.Leagues
                 "17A",
                 "17B",
                 "18A",
-                "18B",
+                "18B"
             };
 
             var dateTimeOffset = new DateTimeOffset();

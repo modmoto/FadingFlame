@@ -57,7 +57,7 @@ namespace FadingFlame.Playoffs
             var playoff = new Playoff
             {
                 Season = season,
-                Rounds = rounds,
+                Rounds = rounds
             };
             
             var freeWins = round.Matchups.Where(m => m.Player2 == ObjectId.Empty);

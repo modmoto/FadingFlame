@@ -29,7 +29,7 @@ namespace FadingFlame.Players
             Army = new SeasonArmy
             {
                 List1 = list1,
-                List2 = list2,
+                List2 = list2
             };
         }
 

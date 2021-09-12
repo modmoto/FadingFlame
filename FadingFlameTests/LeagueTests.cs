@@ -61,12 +61,12 @@ namespace FadingFlameTests
                 Player1 = new PlayerResultDto
                 {
                     Id = player1.Id,
-                    VictoryPoints = player1Points,
+                    VictoryPoints = player1Points
                 },
                 Player2 = new PlayerResultDto
                 {
                     Id = player2.Id,
-                    VictoryPoints = player2Points,
+                    VictoryPoints = player2Points
                 }
             };
 

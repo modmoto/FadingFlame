@@ -35,7 +35,7 @@ namespace FadingFlame.Leagues
                 SecondaryObjective = secondaryObjective,
                 Winner = GetWinnerId(player1Result, player2Result, pointsAfteObjective),
                 Player1 = PlayerResult.Create(player1Result.Id, player1Result.VictoryPoints, pointsAfteObjective.Player1),
-                Player2 = PlayerResult.Create(player2Result.Id, player2Result.VictoryPoints, pointsAfteObjective.Player2),
+                Player2 = PlayerResult.Create(player2Result.Id, player2Result.VictoryPoints, pointsAfteObjective.Player2)
             };
         }
 
@@ -64,7 +64,7 @@ namespace FadingFlame.Leagues
                 { 2250, new PointTuple(15, 5)},
                 { 3150, new PointTuple(16, 4)},
                 { 3151, new PointTuple(17, 3)},
-                { Int32.MaxValue, new PointTuple(17, 3)},
+                { Int32.MaxValue, new PointTuple(17, 3)}
             };
 
             var pair = pointTuples.First(p => Math.Abs(player1 - player2) <= p.Key);
