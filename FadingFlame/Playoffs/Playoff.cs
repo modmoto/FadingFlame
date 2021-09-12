@@ -18,7 +18,6 @@ namespace FadingFlame.Playoffs
         public int Season { get; set; }
 
         public List<Round> Rounds { get; set; }
-        public List<Matchup> Matchups => Rounds.SelectMany(r => r.Matchups).ToList();
 
         public static Playoff Create(int season, List<PlayerInLeague> firstPlaces)
         {
@@ -70,7 +69,7 @@ namespace FadingFlame.Playoffs
 
         public void ReportGame(MatchResultDto matchResultDto)
         {
-            var match = Matchups.SingleOrDefault(m => m.MatchId == matchResultDto.MatchId);
+            var match = Rounds.SelectMany(r => r.Matchups).ToList().SingleOrDefault(m => m.MatchId == matchResultDto.MatchId);
             if (match == null
                 || match.Player1 != matchResultDto.Player1.Id
                 || match.Player2 != matchResultDto.Player2.Id)
