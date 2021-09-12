@@ -31,7 +31,7 @@
 {
     private List<League> _leagues = new();
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
         _leagues = await _leagueRepository.LoadForSeason(1);
         StateHasChanged();
