@@ -10,7 +10,7 @@ namespace FadingFlame.Playoffs
 {
     public class Playoff : IIdentifiable
     {
-        private static readonly List<int> NormalRounds = new() { 256, 128, 64, 32, 16, 8, 4, 2 };
+        private static readonly List<int> NormalRounds = new() { 256, 128, 64, 32, 16, 8, 4, 2, 1 };
         
         [BsonId]
         public ObjectId Id { get; set; }
@@ -18,11 +18,14 @@ namespace FadingFlame.Playoffs
         public int Season { get; set; }
 
         public List<Round> Rounds { get; set; }
+        public int RoundCount { get; set; }
 
         public static Playoff Create(int season, List<PlayerInLeague> firstPlaces)
         {
+
             var playersWithFreeWins = new List<PlayerInLeague>();
-            var roundIndex = NormalRounds.First(r => r < firstPlaces.Count);
+            var rounds = NormalRounds.Where(r => r < firstPlaces.Count).ToList();
+            var roundIndex = rounds.First();
             var gamesTooMuch = firstPlaces.Count - roundIndex;
             var remainingGames = gamesTooMuch * 2;
             var freeWinCounter = firstPlaces.Count - remainingGames;
@@ -41,7 +44,8 @@ namespace FadingFlame.Playoffs
             var playoff = new Playoff
             {
                 Season = season,
-                Rounds = new List<Round> { round }
+                Rounds = new List<Round> { round },
+                RoundCount = rounds.Count
             };
             
             var freeWins = round.Matchups.Where(m => m.Player2 == ObjectId.Empty);

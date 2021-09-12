@@ -28,6 +28,7 @@ namespace FadingFlameTests
 
             Assert.AreEqual(1, playoffs.Rounds.Count);
             Assert.AreEqual(4, playoffs.Rounds.First().Matchups.Count);
+            Assert.AreEqual(3, playoffs.RoundCount);
         }
 
         [Test]
@@ -121,6 +122,7 @@ namespace FadingFlameTests
             Assert.IsTrue(playoffsRound.Matchups[1].IsFinished);
             Assert.IsFalse(playoffsRound.Matchups[2].IsFinished);
             Assert.IsFalse(playoffsRound.Matchups[3].IsFinished);
+            Assert.AreEqual(3, playoffs.RoundCount);
         }
         
         [Test]
