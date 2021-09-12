@@ -22,7 +22,7 @@ else
             <div class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)">
                 <div class="card" style="width: 18rem;">
                     <div class="card-body">
-                        <h5 class="card-title">@GetName(matchup.Player1) VS @GetName(matchup.Player2)</h5>
+                        <h5 class="card-title">@GetVersusString(matchup)</h5>
                     </div>
                 </div>
             </div>
@@ -63,7 +63,13 @@ else
     
     private string GetName(ObjectId playerId)
     {
-        if (playerId == ObjectId.Empty) return "Freewin";
         return _playersInPlayoffs.FirstOrDefault(p => p.Id == playerId)?.DisplayName;
+    }
+
+    private string GetVersusString(Matchup matchup)
+    {
+        if (matchup.Player2 == ObjectId.Empty) return $"Freewin for {GetName(matchup.Player1)}";
+
+        return $"{GetName(matchup.Player1)} VS {GetName(matchup.Player2)}";
     }
 }
