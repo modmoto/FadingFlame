@@ -16,14 +16,14 @@
 }
 else
 {
-    <div class="container">
-        <div class="row">
+    <div>
+        <div style="display: flex; justify-content: space-between">
             @for (int i = 0; i < _playoffs.RoundCount; i++)
             {
-                <div class="col">
+                <div style="display: flex; flex-direction: column; justify-content: space-around; justify-items: center; ">
                     @foreach (var matchup in _roundsWithEmptyRounds[i].Matchups)
                     {
-                        <div class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)">
+                        <div class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)" style="min-width: 12rem">
                             <div class="card-body" style="padding: 0 !important;">
                                 <div style="border-bottom: 1px solid rgba(0,0,0,.125); padding: 5px !important; padding-left: 1rem !important;">@GetName(matchup.Player1)</div>
                                 <div style="padding: 5px !important; padding-left: 1rem !important;">@GetName(matchup.Player2)</div>
