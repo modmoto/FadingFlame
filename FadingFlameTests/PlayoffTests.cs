@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using FadingFlame.Leagues;
@@ -26,25 +25,8 @@ namespace FadingFlameTests
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
 
-            Assert.AreEqual(1, playoffs.Rounds.Count);
+            Assert.AreEqual(3, playoffs.Rounds.Count);
             Assert.AreEqual(4, playoffs.Rounds.First().Matchups.Count);
-            Assert.AreEqual(3, playoffs.RoundCount);
-        }
-
-        [Test]
-        public async Task AdvanceRounds_NotFinished()
-        {
-            var leagueRepository = new Mock<ILeagueRepository>();
-            leagueRepository.Setup(l => l.LoadForSeason(It.IsAny<int>())).
-                ReturnsAsync(TestLeagues(8).ToList());
-
-            var playoffCommandHandler = new PlayoffCommandHandler(
-                leagueRepository.Object,
-                new PlayoffRepository(MongoClient));
-
-            var playoffs = await playoffCommandHandler.CreatePlayoffs();
-
-            Assert.Throws<ValidationException>(() => playoffs.AdvanceToNextStage());
         }
 
         [Test]
@@ -60,8 +42,8 @@ namespace FadingFlameTests
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
 
-            var matchup1 = playoffs.Rounds.Last().Matchups[0];
-            var matchup2 = playoffs.Rounds.Last().Matchups[1];
+            var matchup1 = playoffs.Rounds[0].Matchups[0];
+            var matchup2 = playoffs.Rounds[0].Matchups[1];
             playoffs.ReportGame(new MatchResultDto
             {
                 Player1 = new PlayerResultDto
@@ -112,8 +94,8 @@ namespace FadingFlameTests
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
             
-            Assert.AreEqual(1, playoffs.Rounds.Count);
-            Assert.AreEqual(4, playoffs.Rounds.Single().Matchups.Count);
+            Assert.AreEqual(3, playoffs.Rounds.Count);
+            Assert.AreEqual(4, playoffs.Rounds[0].Matchups.Count);
             var playoffsRound = playoffs.Rounds[0];
             Assert.IsTrue(playoffsRound.Matchups[0].IsFinished);
             Assert.AreEqual(ObjectId.Empty, playoffsRound.Matchups[0].Player2);
@@ -122,7 +104,6 @@ namespace FadingFlameTests
             Assert.IsTrue(playoffsRound.Matchups[1].IsFinished);
             Assert.IsFalse(playoffsRound.Matchups[2].IsFinished);
             Assert.IsFalse(playoffsRound.Matchups[3].IsFinished);
-            Assert.AreEqual(3, playoffs.RoundCount);
         }
         
         [Test]
@@ -138,8 +119,8 @@ namespace FadingFlameTests
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
             
-            Assert.AreEqual(1, playoffs.Rounds.Count);
-            Assert.AreEqual(16, playoffs.Rounds.Single().Matchups.Count);
+            Assert.AreEqual(5, playoffs.Rounds.Count);
+            Assert.AreEqual(16, playoffs.Rounds[0].Matchups.Count);
             var playoffsRound = playoffs.Rounds[0];
             Assert.IsTrue(playoffsRound.Matchups[0].IsFinished);
             Assert.AreEqual(ObjectId.Empty, playoffsRound.Matchups[0].Player2);

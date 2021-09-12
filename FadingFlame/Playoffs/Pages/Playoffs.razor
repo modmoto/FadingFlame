@@ -18,10 +18,10 @@ else
 {
     <div>
         <div style="display: flex;">
-            @for (int i = 0; i < _playoffs.RoundCount; i++)
+            @for (int i = 0; i < _playoffs.Rounds.Count; i++)
             {
                 <div style="display: flex; flex-direction: column; justify-content: space-around; justify-items: center; ">
-                    @foreach (var matchup in _roundsWithEmptyRounds[i].Matchups)
+                    @foreach (var matchup in _playoffs.Rounds[i].Matchups)
                     {
                         <div class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)" style="width: 12rem">
                             <div class="card-body" style="padding: 0 !important;">
@@ -39,7 +39,6 @@ else
 @code
 {
     private Playoff _playoffs;
-    private List<Round> _roundsWithEmptyRounds;
     private List<Player> _playersInPlayoffs = new();
 
     protected override async Task OnInitializedAsync()
@@ -47,34 +46,6 @@ else
         _playoffs = await _playoffRepository.LoadForSeason(Season.Current);
         var listOfPlayerInPlayoffs = _playoffs.Rounds.First().Matchups.SelectMany(m => new List<ObjectId> { m.Player1, m.Player2 }).ToList();
         _playersInPlayoffs = await _playerRepository.LoadForLeague(listOfPlayerInPlayoffs);
-        _roundsWithEmptyRounds = GetRounds();
-    }
-
-    private List<Round> GetRounds()
-    {
-        var rounds = new List<Round>();
-        for (var index = 0; index <  _playoffs.RoundCount; index++)
-        {
-            if (_playoffs.Rounds.Count > index)
-            {
-                rounds.Add(_playoffs.Rounds[index]);
-            }
-            else
-            {
-                var playoffsRoundCount = _playoffs.RoundCount - 1 - index;
-                var matchCounter = Math.Pow(2, playoffsRoundCount);
-                var fakeplayers = new List<PlayerInLeague>();
-                for (int i = 0; i < matchCounter; i++)
-                {
-                    fakeplayers.Add(PlayerInLeague.Create(ObjectId.GenerateNewId()));
-                    fakeplayers.Add(PlayerInLeague.Create(ObjectId.GenerateNewId()));
-                }
-
-                rounds.Add(Round.Create(fakeplayers));
-            }
-        }
-
-        return rounds;
     }
 
     public void GoToMatch(Matchup matchup)

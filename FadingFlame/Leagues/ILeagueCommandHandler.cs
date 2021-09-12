@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FadingFlame.Players;
-using FadingFlame.Playoffs;
 
 namespace FadingFlame.Leagues
 {

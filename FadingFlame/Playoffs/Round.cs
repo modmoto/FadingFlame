@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using FadingFlame.Leagues;
 
 namespace FadingFlame.Playoffs
@@ -23,17 +21,6 @@ namespace FadingFlame.Playoffs
             {
                 Matchups = matchups
             };
-        }
-
-        public Round AdvanceToNextStage()
-        {
-            if (Matchups.Any(m => !m.IsFinished))
-            {
-                throw new ValidationException("Can not advance to next round as games are still missing");
-            }
-
-            var winners = Matchups.Select(m => PlayerInLeague.Create(m.Result.Winner)).ToList();
-            return Create(winners);
         }
     }
 }

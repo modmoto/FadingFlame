@@ -10,7 +10,7 @@ namespace FadingFlame.Playoffs
 {
     public class Playoff : IIdentifiable
     {
-        private static readonly List<int> NormalRounds = new() { 256, 128, 64, 32, 16, 8, 4, 2, 1 };
+        private static readonly List<int> NormalRounds = new() { 256, 128, 64, 32, 16, 8, 4, 2 };
         
         [BsonId]
         public ObjectId Id { get; set; }
@@ -18,14 +18,13 @@ namespace FadingFlame.Playoffs
         public int Season { get; set; }
 
         public List<Round> Rounds { get; set; }
-        public int RoundCount { get; set; }
 
         public static Playoff Create(int season, List<PlayerInLeague> firstPlaces)
         {
 
             var playersWithFreeWins = new List<PlayerInLeague>();
-            var rounds = NormalRounds.Where(r => r < firstPlaces.Count).ToList();
-            var roundIndex = rounds.First();
+            var remainingRounds = NormalRounds.Where(r => r < firstPlaces.Count).ToList();
+            var roundIndex = remainingRounds.First();
             var gamesTooMuch = firstPlaces.Count - roundIndex;
             var remainingGames = gamesTooMuch * 2;
             var freeWinCounter = firstPlaces.Count - remainingGames;
@@ -41,11 +40,24 @@ namespace FadingFlame.Playoffs
 
             var round = Round.Create(playersWithFreeWins);
 
+            var rounds = new List<Round> { round };
+            foreach (var remainingRound in remainingRounds)
+            {
+                var dummyPlayers = new List<PlayerInLeague>();
+                for (int i = 0; i < remainingRound; i++)
+                {
+                    var dummyPlayer1 = PlayerInLeague.Create(ObjectId.GenerateNewId());
+                    dummyPlayers.Add(dummyPlayer1);
+                }
+
+                var item = Round.Create(dummyPlayers);
+                rounds.Add(item);
+            }
+
             var playoff = new Playoff
             {
                 Season = season,
-                Rounds = new List<Round> { round },
-                RoundCount = rounds.Count
+                Rounds = rounds,
             };
             
             var freeWins = round.Matchups.Where(m => m.Player2 == ObjectId.Empty);
@@ -73,10 +85,15 @@ namespace FadingFlame.Playoffs
 
         public void ReportGame(MatchResultDto matchResultDto)
         {
-            var match = Rounds.SelectMany(r => r.Matchups).ToList().SingleOrDefault(m => m.MatchId == matchResultDto.MatchId);
-            if (match == null
-                || match.Player1 != matchResultDto.Player1.Id
-                || match.Player2 != matchResultDto.Player2.Id)
+            var roundIndex = Rounds.FindIndex(r => r.Matchups.Any(m => m.MatchId == matchResultDto.MatchId));
+            if (roundIndex == -1) throw new ValidationException("Match not in this playoffs in this config");
+            var round = Rounds[roundIndex];
+            var matchIndex = round.Matchups.FindIndex(m => m.MatchId == matchResultDto.MatchId);
+            if (matchIndex == -1) throw new ValidationException("Match not in this playoffs in this config");
+
+            var match = round.Matchups[matchIndex];
+
+            if (match.Player1 != matchResultDto.Player1.Id || match.Player2 != matchResultDto.Player2.Id)
             {
                 throw new ValidationException("Match not in this playoffs in this config");
             }
@@ -84,16 +101,26 @@ namespace FadingFlame.Playoffs
             var result = MatchResult.Create(matchResultDto.SecondaryObjective, matchResultDto.Player1, matchResultDto.Player2);
             match.RecordResult(result);
 
-            if (Rounds.Last().Matchups.All(m => m.IsFinished))
-            {
-                AdvanceToNextStage();
-            }
-        }
+            var otherMatchIndex = matchIndex % 2 == 0 ? matchIndex + 1 : matchIndex - 1;
 
-        internal void AdvanceToNextStage()
-        {
-            var advanceToNextStage = Rounds.Last().AdvanceToNextStage();
-            Rounds.Add(advanceToNextStage);
+            var otherMatchuP = round.Matchups[otherMatchIndex];
+
+            if (otherMatchIndex < matchIndex)
+            {
+                var playerInLeague1 = PlayerInLeague.Create(otherMatchuP.Result?.Winner ?? ObjectId.Empty);
+                var playerInLeague2 = PlayerInLeague.Create(match.Result?.Winner ?? ObjectId.Empty);
+                var matchup = Matchup.Create(playerInLeague1, playerInLeague2);
+
+                Rounds[roundIndex + 1].Matchups[otherMatchIndex / 2] = matchup;
+            }
+            else
+            {
+                var playerInLeague1 = PlayerInLeague.Create(otherMatchuP.Result?.Winner ?? ObjectId.Empty);
+                var playerInLeague2 = PlayerInLeague.Create(match.Result?.Winner ?? ObjectId.Empty);
+                var matchup = Matchup.Create(playerInLeague2, playerInLeague1);
+
+                Rounds[roundIndex + 1].Matchups[matchIndex / 2] = matchup;
+            }
         }
     }
 }
