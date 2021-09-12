@@ -35,6 +35,26 @@ namespace FadingFlame.Playoffs
             };
         }
 
+        public void ReportGame(MatchResultDto matchResultDto)
+        {
+            var match = Rounds.Last().Matchups.SingleOrDefault(m => m.MatchId == matchResultDto.MatchId);
+            if (match == null
+                || match.Player1 != matchResultDto.Player1.Id
+                || match.Player2 != matchResultDto.Player2.Id)
+            {
+                throw new ValidationException("Match not in this playoffs in this config");
+            }
+
+            var result = MatchResult.Create(matchResultDto.SecondaryObjective, matchResultDto.Player1, matchResultDto.Player2);
+            match.RecordResult(result);
+        }
+
+        public void AdvanceToNextStage()
+        {
+            var advanceToNextStage = Rounds.Last().AdvanceToNextStage();
+            Rounds.Add(advanceToNextStage);
+        }
+
         private static int GetRounds(List<PlayerInLeague> firstPlaces)
         {
             switch (firstPlaces.Count)
