@@ -47,7 +47,7 @@ namespace FadingFlameTests
         }
 
         [Test]
-        public async Task AdvanceRounds()
+        public async Task AdvanceRoundsAutomatically()
         {
             var leagueRepository = new Mock<ILeagueRepository>();
             leagueRepository.Setup(l => l.LoadForSeason(It.IsAny<int>())).
@@ -89,8 +89,6 @@ namespace FadingFlameTests
                 },
                 MatchId = matchup2.MatchId
             });
-
-            playoffs.AdvanceToNextStage();
 
             Assert.AreEqual(2, playoffs.Rounds[0].Matchups.Count);
             Assert.AreEqual(1, playoffs.Rounds[1].Matchups.Count);

@@ -80,9 +80,14 @@ namespace FadingFlame.Playoffs
 
             var result = MatchResult.Create(matchResultDto.SecondaryObjective, matchResultDto.Player1, matchResultDto.Player2);
             match.RecordResult(result);
+
+            if (Rounds.Last().Matchups.All(m => m.IsFinished))
+            {
+                AdvanceToNextStage();
+            }
         }
 
-        public void AdvanceToNextStage()
+        internal void AdvanceToNextStage()
         {
             var advanceToNextStage = Rounds.Last().AdvanceToNextStage();
             Rounds.Add(advanceToNextStage);
