@@ -17,13 +17,13 @@
 else
 {
     <div>
-        <div style="display: flex; justify-content: space-between">
+        <div style="display: flex;">
             @for (int i = 0; i < _playoffs.RoundCount; i++)
             {
                 <div style="display: flex; flex-direction: column; justify-content: space-around; justify-items: center; ">
                     @foreach (var matchup in _roundsWithEmptyRounds[i].Matchups)
                     {
-                        <div class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)" style="min-width: 12rem">
+                        <div class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)" style="width: 12rem">
                             <div class="card-body" style="padding: 0 !important;">
                                 <div style="border-bottom: 1px solid rgba(0,0,0,.125); padding: 5px !important; padding-left: 1rem !important;">@GetName(matchup.Player1)</div>
                                 <div style="padding: 5px !important; padding-left: 1rem !important;">@GetName(matchup.Player2)</div>
@@ -66,8 +66,8 @@ else
                 var fakeplayers = new List<PlayerInLeague>();
                 for (int i = 0; i < matchCounter; i++)
                 {
-                    fakeplayers.Add(PlayerInLeague.Create(ObjectId.Empty));
-                    fakeplayers.Add(PlayerInLeague.Create(ObjectId.Empty));
+                    fakeplayers.Add(PlayerInLeague.Create(ObjectId.GenerateNewId()));
+                    fakeplayers.Add(PlayerInLeague.Create(ObjectId.GenerateNewId()));
                 }
 
                 rounds.Add(Round.Create(fakeplayers));
@@ -87,7 +87,7 @@ else
     
     private string GetClasses(Matchup matchup)
     {
-        return UserIsOneOfThePlayers(matchup) ? "card bg-light cursor m-2" : "card m-2";
+        return UserIsOneOfThePlayers(matchup) ? "card bg-light cursor mx-4 my-2" : "card mx-4 my-2";
     }
 
     private bool UserIsOneOfThePlayers(Matchup matchup)
@@ -99,6 +99,6 @@ else
     {
         if (playerId == ObjectId.Empty) return "Freewin";
 
-        return _playersInPlayoffs.FirstOrDefault(p => p.Id == playerId)?.DisplayName;
+        return _playersInPlayoffs.FirstOrDefault(p => p.Id == playerId)?.DisplayName ?? "tbd";
     }
 }
