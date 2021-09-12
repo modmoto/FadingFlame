@@ -25,8 +25,14 @@ else
                     {
                         <div class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)" style="width: 12rem">
                             <div class="card-body" style="padding: 0 !important;">
-                                <div style="border-bottom: 1px solid rgba(0,0,0,.125); padding: 5px !important; padding-left: 1rem !important;">@GetName(matchup.Player1)</div>
-                                <div style="padding: 5px !important; padding-left: 1rem !important;">@GetName(matchup.Player2)</div>
+                                <div class="playoff-border playoff-block">
+                                    <div class="playoff-name">@GetName(matchup.Player1)</div>
+                                    <div class="bg-opacity-25 bg-dark playoff-number">@matchup.Result?.Player1?.BattlePoints</div>
+                                </div>
+                                <div class="playoff-block">
+                                    <div class="playoff-name">@GetName(matchup.Player2)</div>
+                                    <div class="bg-opacity-25 bg-dark playoff-number">@matchup.Result?.Player2?.BattlePoints</div>
+                                </div>
                             </div>
                         </div>
                     }
