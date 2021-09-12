@@ -18,21 +18,48 @@ namespace FadingFlame.Playoffs
 
         public List<Round> Rounds { get; set; }
 
-        public int RoundCounter { get; set; }
-
         public static Playoff Create(int season, List<PlayerInLeague> firstPlaces)
         {
-            var roundCounter = GetRounds(firstPlaces);
-            var rounds = new List<Round>();
+            var playersWithFreeWins = new List<PlayerInLeague>();
+            for (int i = 0; i < 2; i++)
+            {
+                var dummyPlayer = PlayerInLeague.Create(ObjectId.Empty);
+                playersWithFreeWins.Add(firstPlaces[i]);
+                playersWithFreeWins.Add(dummyPlayer);
+            }
             
-            rounds.Add(Round.Create(firstPlaces));
+            var lowerBracket = firstPlaces.TakeLast(4).ToList();
+            playersWithFreeWins.AddRange(lowerBracket);
 
-            return new Playoff
+            var round = Round.Create(playersWithFreeWins);
+
+            var playoff = new Playoff
             {
                 Season = season,
-                Rounds = rounds,
-                RoundCounter = roundCounter
+                Rounds = new List<Round> { round }
             };
+            
+            var freeWins = round.Matchups.Where(m => m.Player2 == ObjectId.Empty);
+            foreach (var freeWin in freeWins)
+            {
+                playoff.ReportGame(new MatchResultDto
+                {
+                    MatchId = freeWin.MatchId,
+                    Player1 = new PlayerResultDto
+                    {
+                        Id = freeWin.Player1,
+                        VictoryPoints = 4500
+                    },
+                    Player2 = new PlayerResultDto
+                    {
+                        Id = freeWin.Player2,
+                        VictoryPoints = 0
+                    },
+                    SecondaryObjective = SecondaryObjectiveState.player1
+                });
+            }
+            
+            return playoff;
         }
 
         public void ReportGame(MatchResultDto matchResultDto)
@@ -53,21 +80,6 @@ namespace FadingFlame.Playoffs
         {
             var advanceToNextStage = Rounds.Last().AdvanceToNextStage();
             Rounds.Add(advanceToNextStage);
-        }
-
-        private static int GetRounds(List<PlayerInLeague> firstPlaces)
-        {
-            switch (firstPlaces.Count)
-            {
-                case 2: return 1;
-                case 4: return 2;
-                case 8: return 3;
-                case 16: return 4;
-                case 32: return 5;
-                case 64: return 6;
-                case 128: return 7;
-                default: throw new ValidationException("To dumb for math");
-            }
         }
     }
 
