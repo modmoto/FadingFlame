@@ -1,4 +1,4 @@
-namespace FadingFlame.Playoffs
+namespace FadingFlame.Leagues
 {
     public class Season
     {
