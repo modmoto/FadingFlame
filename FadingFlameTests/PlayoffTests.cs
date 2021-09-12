@@ -119,10 +119,36 @@ namespace FadingFlameTests
             Assert.IsTrue(playoffsRound.Matchups[0].IsFinished);
             Assert.AreEqual(ObjectId.Empty, playoffsRound.Matchups[0].Player2);
             Assert.AreEqual(ObjectId.Empty, playoffsRound.Matchups[1].Player2);
-            Assert.IsTrue(playoffsRound.Matchups[1].IsFinished);
+            Assert.IsTrue(playoffsRound.Matchups[0].IsFinished);
             Assert.IsTrue(playoffsRound.Matchups[1].IsFinished);
             Assert.IsFalse(playoffsRound.Matchups[2].IsFinished);
             Assert.IsFalse(playoffsRound.Matchups[3].IsFinished);
+        }
+        
+        [Test]
+        public async Task PlayoffsTwoTooMany_BigTournament()
+        {
+            var leagueRepository = new Mock<ILeagueRepository>();
+            leagueRepository.Setup(l => l.LoadForSeason(It.IsAny<int>())).
+                ReturnsAsync(TestLeagues(18).ToList());
+
+            var playoffCommandHandler = new PlayoffCommandHandler(
+                leagueRepository.Object,
+                new PlayoffRepository(MongoClient));
+
+            var playoffs = await playoffCommandHandler.CreatePlayoffs();
+            
+            Assert.AreEqual(1, playoffs.Rounds.Count);
+            Assert.AreEqual(16, playoffs.Rounds.Single().Matchups.Count);
+            var playoffsRound = playoffs.Rounds[0];
+            Assert.IsTrue(playoffsRound.Matchups[0].IsFinished);
+            Assert.AreEqual(ObjectId.Empty, playoffsRound.Matchups[0].Player2);
+            Assert.AreEqual(ObjectId.Empty, playoffsRound.Matchups[1].Player2);
+            Assert.IsTrue(playoffsRound.Matchups[0].IsFinished);
+            Assert.IsTrue(playoffsRound.Matchups[1].IsFinished);
+            Assert.IsTrue(playoffsRound.Matchups[13].IsFinished);
+            Assert.IsFalse(playoffsRound.Matchups[14].IsFinished);
+            Assert.IsFalse(playoffsRound.Matchups[15].IsFinished);
         }
 
         private IEnumerable<League> TestLeagues(int count)

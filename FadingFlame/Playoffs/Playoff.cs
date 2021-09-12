@@ -22,7 +22,10 @@ namespace FadingFlame.Playoffs
         public static Playoff Create(int season, List<PlayerInLeague> firstPlaces)
         {
             var playersWithFreeWins = new List<PlayerInLeague>();
-            var freeWinCounter = firstPlaces.Count - _normalRounds.First(r => r <= firstPlaces.Count);
+            var roundIndex = _normalRounds.First(r => r < firstPlaces.Count);
+            var gamesTooMuch = firstPlaces.Count - roundIndex;
+            var remainingGames = gamesTooMuch * 2;
+            var freeWinCounter = firstPlaces.Count - remainingGames;
             for (int i = 0; i < freeWinCounter; i++)
             {
                 var dummyPlayer = PlayerInLeague.Create(ObjectId.Empty);
@@ -30,7 +33,6 @@ namespace FadingFlame.Playoffs
                 playersWithFreeWins.Add(dummyPlayer);
             }
 
-            var remainingGames = firstPlaces.Count - freeWinCounter;
             var lowerBracket = firstPlaces.TakeLast(remainingGames).ToList();
             playersWithFreeWins.AddRange(lowerBracket);
 
