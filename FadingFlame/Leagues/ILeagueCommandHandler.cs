@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FadingFlame.Players;
+using FadingFlame.Playoffs;
 
 namespace FadingFlame.Leagues
 {
@@ -24,10 +25,7 @@ namespace FadingFlame.Leagues
 
         public async Task<List<League>> CreateLeagues()
         {
-            // Todo add season
-            var season = 1;
-
-            await _leagueRepository.DeleteForSeason(season);
+            await _leagueRepository.DeleteForSeason(Season.Current);
 
             var players = await _playerRepository.LoadAll();
             var newLeagues = new List<League>();
@@ -114,7 +112,7 @@ namespace FadingFlame.Leagues
 
             var dateTimeOffset = new DateTimeOffset();
             var startDate = dateTimeOffset.AddDays(14).AddMonths(9).AddYears(2020);
-            var league = League.Create(season, startDate, ids.First(), names.First());
+            var league = League.Create(Season.Current, startDate, ids.First(), names.First());
             for (var index = 0; index < players.Count; index++)
             {
                 var player = players[index];
@@ -123,7 +121,7 @@ namespace FadingFlame.Leagues
                 if (league.IsFull)
                 {
                     newLeagues.Add(league);
-                    league = League.Create(season, startDate, ids[newLeagues.Count], names[newLeagues.Count]);
+                    league = League.Create(Season.Current, startDate, ids[newLeagues.Count], names[newLeagues.Count]);
                 }
 
                 player.ResetLists();
@@ -132,15 +130,6 @@ namespace FadingFlame.Leagues
 
             await _leagueRepository.Insert(newLeagues);
             return newLeagues;
-            //
-            // if (leagues.Count == 0)
-            // {
-            //
-            // }
-            // else
-            // {
-            //     // Todo promote and demote
-            // }
         }
     }
 }

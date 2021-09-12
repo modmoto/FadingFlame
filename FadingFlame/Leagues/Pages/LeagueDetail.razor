@@ -182,7 +182,7 @@ else
     {
         if (UserIsOneOfThePlayers(matchup))
         {
-            _navigation.NavigateTo($"league/{_league.Id}/match/{matchup.MatchId}");
+            _navigation.NavigateTo($"match/{matchup.MatchId}?leagueId={_league.Id}");
         }
     }
 

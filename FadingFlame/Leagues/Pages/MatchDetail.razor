@@ -1,9 +1,11 @@
-﻿@page "/league/{leagueId}/match/{matchId}"
+﻿@page "/match/{matchId}"
 @using MongoDB.Bson
 @using FadingFlame.Leagues
 @using FadingFlame.Players
+@using FadingFlame.Playoffs
 @using FadingFlame.UserAccounts
 @using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.WebUtilities
 
 @if (_league == null)
 {
@@ -135,11 +137,10 @@ else
 @inject NavigationManager _navigation
 @inject ILeagueRepository _leagueRepository
 @inject IPlayerRepository _playerRepository
+@inject IPlayoffRepository _playoffRepository
 @inject UserState _userState
 
 @code {
-    [Parameter]
-    public string LeagueId { get; set; }
     [Parameter]
     public string MatchId { get; set; }
     private MatchResultDto _model = new();
@@ -157,6 +158,7 @@ else
     private bool _matchWasFinished;
     private bool _allPlayersSelectedList;
     private bool _selectingList;
+    private Playoff _playoff;
     private bool Player1LoggedIn => _model.Player1.Id == _userState.LoggedInPlayerId;
     private bool Player2LoggedIn =>_model.Player2.Id == _userState.LoggedInPlayerId;
     private bool CanEditMatch => Player1LoggedIn || Player2LoggedIn;
@@ -168,60 +170,87 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        if (ObjectId.TryParse(LeagueId, out var realLeagueId))
+        var uri = _navigation.ToAbsoluteUri(_navigation.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("leagueId", out var leagueId))
         {
-            var league = await _leagueRepository.Load(realLeagueId);
-            if (league == null)
+            if (ObjectId.TryParse(leagueId, out var realLeagueId))
             {
-                _navigation.NavigateTo("notfound");
-            }
-            else
-            {
-                var match = league.GameDays
-                    .SelectMany(g => g.Matchups)
-                    .SingleOrDefault(m => m.MatchId.ToString() ==  MatchId);
-                if (match == null)
+                var league = await _leagueRepository.Load(realLeagueId);
+                if (league == null)
                 {
                     _navigation.NavigateTo("notfound");
                 }
                 else
                 {
-                    var player1 = await _playerRepository.Load(match.Player1);
-                    var player2 = await _playerRepository.Load(match.Player2);
-
-                    _model.Player1.Id = match.Player1;
-                    _model.Player1.Id = match.Player1;
-                    _model.Player2.Id = match.Player2;
-
-                    _name1 = player1.DisplayName;
-                    _name2 = player2.DisplayName;
-                    _model.MatchId = match.MatchId;
-                    _matchWasFinished = match.Result != null;
-                    _allPlayersSelectedList = match.PlayersSelectedList;
-                    _selectedListPlayer1 = match.Player1List;
-                    _selectedListPlayer2 = match.Player2List;
-                    _league = league;
-
-                    if (Player1LoggedIn)
+                    var match = league.GameDays
+                        .SelectMany(g => g.Matchups)
+                        .SingleOrDefault(m => m.MatchId.ToString() ==  MatchId);
+                    if (match == null)
                     {
-                        _listsOfLoggedInPlayer = player1.Army;
-                        _selectedListAsString = $"{match.Player1List}";
+                        _navigation.NavigateTo("notfound");
                     }
-
-                    if (Player2LoggedIn)
+                    else
                     {
-                        _listsOfLoggedInPlayer = player2.Army;
-                        _selectedListAsString = $"{match.Player2List}";
-                    }
+                        _league = league;
 
-                    StateHasChanged();
+                        await ExtractMatch(match);
+                    }
                 }
             }
+            else
+            {
+                _navigation.NavigateTo("notfound");
+            }
+        }
+        else if(QueryHelpers.ParseQuery(uri.Query).TryGetValue("playoffSeason", out var playoffSeason))
+        {
+            var playoff = await _playoffRepository.LoadForSeason(Int32.Parse(playoffSeason));
+            _playoff = playoff;
+            var matchup = _playoff.Rounds.SelectMany(r => r.Matchups).FirstOrDefault(m => m.MatchId.ToString() == MatchId);
+            await ExtractMatch(matchup);
         }
         else
         {
             _navigation.NavigateTo("notfound");
         }
+    }
+
+    private async Task ExtractMatch(Matchup match)
+    {
+        if (match == null)
+        {
+            _navigation.NavigateTo("notfound");
+        }
+
+        var player1 = await _playerRepository.Load(match.Player1);
+        var player2 = await _playerRepository.Load(match.Player2);
+
+        _model.Player1.Id = match.Player1;
+        _model.Player1.Id = match.Player1;
+        _model.Player2.Id = match.Player2;
+
+        _name1 = player1.DisplayName;
+        _name2 = player2.DisplayName;
+        _model.MatchId = match.MatchId;
+        _matchWasFinished = match.Result != null;
+        _allPlayersSelectedList = match.PlayersSelectedList;
+        _selectedListPlayer1 = match.Player1List;
+        _selectedListPlayer2 = match.Player2List;
+
+
+        if (Player1LoggedIn)
+        {
+            _listsOfLoggedInPlayer = player1.Army;
+            _selectedListAsString = $"{match.Player1List}";
+        }
+
+        if (Player2LoggedIn)
+        {
+            _listsOfLoggedInPlayer = player2.Army;
+            _selectedListAsString = $"{match.Player2List}";
+        }
+
+        StateHasChanged();
     }
 
     private string GetListFacion(SeasonArmy army, string listName)
@@ -242,7 +271,7 @@ else
             }
 
             _loading = false;
-            _navigation.NavigateTo($"league/{LeagueId}");
+            _navigation.NavigateTo($"league/{_league.Id}");
         }
     }
 

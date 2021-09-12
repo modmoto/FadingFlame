@@ -23,10 +23,7 @@ namespace FadingFlame.Playoffs
 
         public async Task<Playoff> CreatePlayoffs()
         {
-            // Todo add season
-            var season = 1;
-
-            var leagues = await _leagueRepository.LoadForSeason(season);
+            var leagues = await _leagueRepository.LoadForSeason(Season.Current);
 
             var firstPlaces = leagues.Select(l => l.Players.First()).ToList();
 
@@ -40,7 +37,7 @@ namespace FadingFlame.Playoffs
                 sortedFirstPlaces.Add(player2);
             }
 
-            var playoffs = Playoff.Create(season, sortedFirstPlaces);
+            var playoffs = Playoff.Create(Season.Current, sortedFirstPlaces);
 
             await _playoffRepository.Insert(playoffs);
 

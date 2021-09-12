@@ -1,0 +1,42 @@
+@page "/playoffs"
+@using MongoDB.Bson
+@inject IPlayoffRepository _playoffRepository
+@inject NavigationManager _navigation
+
+@if (_playoffs == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <div class="row row-cols-auto justify-content-around">
+        @foreach (var matchup in _playoffs.Rounds.SelectMany(r => r.Matchups))
+        {
+            <div class="col mb-4 cursor" @onclick="() => GoToMatch(matchup.MatchId)">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">@matchup.Player1 VS @matchup.Player2</h5>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code
+{
+    private Playoff _playoffs;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        _playoffs = await _playoffRepository.LoadForSeason(Season.Current);
+        StateHasChanged();
+    }
+
+    public void GoToMatch(ObjectId matchId)
+    {
+        _navigation.NavigateTo($"match/{matchId}?playoffSeason={_playoffs.Season}");
+    }
+}

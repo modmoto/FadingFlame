@@ -8,6 +8,7 @@ namespace FadingFlame.Playoffs
     {
         Task Insert(Playoff playoffs);
         Task Update(Playoff playoffs);
+        Task<Playoff> LoadForSeason(int season);
     }
 
     public class PlayoffRepository : MongoDbRepositoryBase, IPlayoffRepository
@@ -20,6 +21,11 @@ namespace FadingFlame.Playoffs
         public Task Update(Playoff playoffs)
         {
             return Upsert(playoffs);
+        }
+
+        public Task<Playoff> LoadForSeason(int season)
+        {
+            return LoadFirst<Playoff>(p => p.Season == season);
         }
 
         public PlayoffRepository(MongoClient mongoClient) : base(mongoClient)
