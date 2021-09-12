@@ -1,8 +1,12 @@
 @page "/playoffs"
 @using MongoDB.Bson
 @using FadingFlame.Leagues
+@using FadingFlame.Players
+@using FadingFlame.UserAccounts
 @inject IPlayoffRepository _playoffRepository
+@inject IPlayerRepository _playerRepository
 @inject NavigationManager _navigation
+@inject UserState _userState
 
 @if (_playoffs == null)
 {
@@ -15,10 +19,10 @@ else
     <div class="row row-cols-auto justify-content-around">
         @foreach (var matchup in _playoffs.Rounds.SelectMany(r => r.Matchups))
         {
-            <div class="col mb-4 cursor" @onclick="() => GoToMatch(matchup.MatchId)">
+            <div class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)">
                 <div class="card" style="width: 18rem;">
                     <div class="card-body">
-                        <h5 class="card-title">@matchup.Player1 VS @matchup.Player2</h5>
+                        <h5 class="card-title">@GetName(matchup.Player1) VS @GetName(matchup.Player2)</h5>
                     </div>
                 </div>
             </div>
@@ -29,15 +33,37 @@ else
 @code
 {
     private Playoff _playoffs;
+    private List<Player> _playersInPlayoffs = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         _playoffs = await _playoffRepository.LoadForSeason(Season.Current);
+        var listOfPlayerInPlayoffs = _playoffs.Rounds.First().Matchups.SelectMany(m => new List<ObjectId> { m.Player1, m.Player2 }).ToList();
+        _playersInPlayoffs = await _playerRepository.LoadForLeague(listOfPlayerInPlayoffs);
         StateHasChanged();
     }
 
-    public void GoToMatch(ObjectId matchId)
+    public void GoToMatch(Matchup matchup)
     {
-        _navigation.NavigateTo($"match/{matchId}?playoffSeason={_playoffs.Season}");
+        if (UserIsOneOfThePlayers(matchup))
+        {
+            _navigation.NavigateTo($"match/{matchup.MatchId}?playoffSeason={_playoffs.Season}");    
+        }
+    }
+    
+    private string GetClasses(Matchup matchup)
+    {
+        return UserIsOneOfThePlayers(matchup) ? "card bg-light cursor" : "card";
+    }
+
+    private bool UserIsOneOfThePlayers(Matchup matchup)
+    {
+        return _userState.LoggedInPlayerId == matchup.Player1 || _userState.LoggedInPlayerId == matchup.Player2;
+    }
+    
+    private string GetName(ObjectId playerId)
+    {
+        if (playerId == ObjectId.Empty) return "Freewin";
+        return _playersInPlayoffs.FirstOrDefault(p => p.Id == playerId)?.DisplayName;
     }
 }

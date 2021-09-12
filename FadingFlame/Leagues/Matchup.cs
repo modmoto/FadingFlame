@@ -23,6 +23,19 @@ namespace FadingFlame.Leagues
                 MatchId = ObjectId.GenerateNewId()
             };
         }
+        
+        public void SelectList(ObjectId playerId, string listName)
+        {
+            if (Player1 == playerId)
+            {
+                Player1List = listName;
+            }
+            
+            if (Player2 == playerId)
+            {
+                Player2List = listName;
+            }
+        }
 
         public void RecordResult(MatchResult result)
         {
