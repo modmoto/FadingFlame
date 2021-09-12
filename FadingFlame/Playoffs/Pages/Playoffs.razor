@@ -8,7 +8,7 @@
 @inject NavigationManager _navigation
 @inject UserState _userState
 
-@if (_playoffs == null)
+@if (_loading)
 {
     <p>
         <em>Loading...</em>
@@ -44,14 +44,25 @@ else
 
 @code
 {
+    private bool _loading = true;
     private Playoff _playoffs;
     private List<Player> _playersInPlayoffs = new();
 
     protected override async Task OnInitializedAsync()
     {
         _playoffs = await _playoffRepository.LoadForSeason(Season.Current);
+        if (_playoffs == null)
+        {
+            var playerInLeagues = new List<PlayerInLeague>();
+            for (int i = 0; i < 32; i++)
+            {
+                playerInLeagues.Add(PlayerInLeague.Create(ObjectId.GenerateNewId()));
+            }
+            _playoffs = Playoff.Create(0, playerInLeagues);
+        }
         var listOfPlayerInPlayoffs = _playoffs.Rounds.First().Matchups.SelectMany(m => new List<ObjectId> { m.Player1, m.Player2 }).ToList();
         _playersInPlayoffs = await _playerRepository.LoadForLeague(listOfPlayerInPlayoffs);
+        _loading = false;
     }
 
     public void GoToMatch(Matchup matchup)
