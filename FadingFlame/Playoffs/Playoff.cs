@@ -18,6 +18,7 @@ namespace FadingFlame.Playoffs
         public int Season { get; set; }
 
         public List<Round> Rounds { get; set; }
+        public List<Matchup> Matchups => Rounds.SelectMany(r => r.Matchups).ToList();
 
         public static Playoff Create(int season, List<PlayerInLeague> firstPlaces)
         {
@@ -69,7 +70,7 @@ namespace FadingFlame.Playoffs
 
         public void ReportGame(MatchResultDto matchResultDto)
         {
-            var match = Rounds.Last().Matchups.SingleOrDefault(m => m.MatchId == matchResultDto.MatchId);
+            var match = Matchups.SingleOrDefault(m => m.MatchId == matchResultDto.MatchId);
             if (match == null
                 || match.Player1 != matchResultDto.Player1.Id
                 || match.Player2 != matchResultDto.Player2.Id)
@@ -85,38 +86,6 @@ namespace FadingFlame.Playoffs
         {
             var advanceToNextStage = Rounds.Last().AdvanceToNextStage();
             Rounds.Add(advanceToNextStage);
-        }
-    }
-
-    public class Round
-    {
-        public List<Matchup> Matchups { get; set; }
-
-        public static Round Create(List<PlayerInLeague> playerIds)
-        {
-            var matchups = new List<Matchup>();
-
-            for (var index = 0; index < playerIds.Count; index += 2)
-            {
-                var matchup = Matchup.Create(playerIds[index], playerIds[index + 1]);
-                matchups.Add(matchup);
-            }
-
-            return new Round
-            {
-                Matchups = matchups
-            };
-        }
-
-        public Round AdvanceToNextStage()
-        {
-            if (Matchups.Any(m => !m.IsFinished))
-            {
-                throw new ValidationException("Can not advance to next round as games are still missing");
-            }
-
-            var winners = Matchups.Select(m => PlayerInLeague.Create(m.Result.Winner)).ToList();
-            return Create(winners);
         }
     }
 }
