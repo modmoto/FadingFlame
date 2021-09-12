@@ -107,16 +107,16 @@ namespace FadingFlame.Playoffs
 
             if (otherMatchIndex < matchIndex)
             {
-                var playerInLeague1 = PlayerInLeague.Create(otherMatchuP.Result?.Winner ?? ObjectId.Empty);
-                var playerInLeague2 = PlayerInLeague.Create(match.Result?.Winner ?? ObjectId.Empty);
+                var playerInLeague1 = PlayerInLeague.Create(otherMatchuP.Result?.Winner ?? ObjectId.GenerateNewId());
+                var playerInLeague2 = PlayerInLeague.Create(match.Result?.Winner ?? ObjectId.GenerateNewId());
                 var matchup = Matchup.Create(playerInLeague1, playerInLeague2);
 
                 Rounds[roundIndex + 1].Matchups[otherMatchIndex / 2] = matchup;
             }
             else
             {
-                var playerInLeague1 = PlayerInLeague.Create(otherMatchuP.Result?.Winner ?? ObjectId.Empty);
-                var playerInLeague2 = PlayerInLeague.Create(match.Result?.Winner ?? ObjectId.Empty);
+                var playerInLeague1 = PlayerInLeague.Create(otherMatchuP.Result?.Winner ?? ObjectId.GenerateNewId());
+                var playerInLeague2 = PlayerInLeague.Create(match.Result?.Winner ?? ObjectId.GenerateNewId());
                 var matchup = Matchup.Create(playerInLeague2, playerInLeague1);
 
                 Rounds[roundIndex + 1].Matchups[matchIndex / 2] = matchup;
