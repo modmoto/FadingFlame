@@ -27,7 +27,7 @@ namespace FadingFlameTests
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
 
             Assert.AreEqual(1, playoffs.Rounds.Count);
-            Assert.AreEqual(playoffs.Rounds.First().Matchups.Count, 4);
+            Assert.AreEqual(4, playoffs.Rounds.First().Matchups.Count);
         }
 
         [Test]

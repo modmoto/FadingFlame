@@ -10,7 +10,8 @@ namespace FadingFlame.Playoffs
 {
     public class Playoff : IIdentifiable
     {
-
+        private static readonly List<int> _normalRounds = new() { 256, 128, 64, 32, 16, 8, 4, 2 };
+        
         [BsonId]
         public ObjectId Id { get; set; }
 
@@ -21,14 +22,16 @@ namespace FadingFlame.Playoffs
         public static Playoff Create(int season, List<PlayerInLeague> firstPlaces)
         {
             var playersWithFreeWins = new List<PlayerInLeague>();
-            for (int i = 0; i < 2; i++)
+            var freeWinCounter = firstPlaces.Count - _normalRounds.First(r => r <= firstPlaces.Count);
+            for (int i = 0; i < freeWinCounter; i++)
             {
                 var dummyPlayer = PlayerInLeague.Create(ObjectId.Empty);
                 playersWithFreeWins.Add(firstPlaces[i]);
                 playersWithFreeWins.Add(dummyPlayer);
             }
-            
-            var lowerBracket = firstPlaces.TakeLast(4).ToList();
+
+            var remainingGames = firstPlaces.Count - freeWinCounter;
+            var lowerBracket = firstPlaces.TakeLast(remainingGames).ToList();
             playersWithFreeWins.AddRange(lowerBracket);
 
             var round = Round.Create(playersWithFreeWins);
