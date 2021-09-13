@@ -36,12 +36,21 @@ a, .btn-link {
 }
 
 .playoff-name {
-    padding: 5px !important;
+    padding: 0.3rem !important;
     padding-left: 1rem !important;
 }
+
+.playoff-number-bottom {
+    border-bottom-right-radius: 0.2rem;
+}
+
+.playoff-number-top {
+    border-top-right-radius: 0.2rem;
+}
+
 .playoff-number {
-    width: 28px;
-    line-height: 34px;
+    width: 1.75rem;
+    line-height: 2.125rem;
     text-align: center
 }
 
