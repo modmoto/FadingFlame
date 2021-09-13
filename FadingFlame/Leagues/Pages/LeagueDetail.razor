@@ -179,10 +179,7 @@ else
 
     private void GoToMatch(Matchup matchup)
     {
-        if (UserIsOneOfThePlayers(matchup))
-        {
-            _navigation.NavigateTo($"match/{matchup.MatchId}?leagueId={_league.Id}");
-        }
+        _navigation.NavigateTo($"match/{matchup.MatchId}?leagueId={_league.Id}");
     }
 
     private string GetSecondaryStringForPlayer1(SecondaryObjectiveState resultSecondaryObjective)
@@ -197,7 +194,7 @@ else
 
     private string GetClasses(Matchup matchup)
     {
-        return UserIsOneOfThePlayers(matchup) ? "card bg-light cursor" : "card";
+        return UserIsOneOfThePlayers(matchup) ? "bg-light card cursor" : "card cursor";
     }
 
     private bool UserIsOneOfThePlayers(Matchup matchup)

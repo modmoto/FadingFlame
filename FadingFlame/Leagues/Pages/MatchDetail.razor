@@ -19,7 +19,7 @@ else
     {
         if (_matchup.PlayersSelectedList)
         {
-            <div class="row align-items-start">
+            <div class="row align-items-start my-2">
                 <div class="col">
                     <div class="form-group">
                         <label>List of @_player1.DisplayName : </label>
@@ -36,12 +36,11 @@ else
 
             <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
             <DataAnnotationsValidator/>
-            <div class="row align-items-start">
+            <div class="row align-items-start mt-3">
                 <div class="col form-group">
                     <label>Victory Points @_player1.DisplayName :</label>
-                    <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control"/>
+                    <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control my-3"/>
                     <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
-                    <hr class="my-2">
                     <div class="form-check">
                         <InputCheckbox class="form-check-input" @onclick="() => Select2ndObjective(1)" @bind-Value="_secondaryObjectivePlayer1"/>
                         <label class="form-check-label">
@@ -51,9 +50,8 @@ else
                 </div>
                 <div class="col form-group">
                     <label>Victory Points @_player2.DisplayName :</label>
-                    <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control"/>
+                    <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control my-3"/>
                     <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
-                    <hr class="my-2">
                     <div class="form-check">
                         <InputCheckbox class="form-check-input" @onclick="() => Select2ndObjective(2)" @bind-Value="_secondaryObjectivePlayer2"/>
                         <label class="form-check-label">
@@ -121,7 +119,7 @@ else
     {
         if (_matchup.PlayersSelectedList)
         {
-            <div class="row align-items-start">
+            <div class="row align-items-start my-2">
                 <div class="col">
                     <div class="form-group">
                         <label>List of @_player1.DisplayName : </label>
@@ -138,12 +136,14 @@ else
         }
         else
         {
-            <div class="row align-items-center">Players are still selecting their lists...</div>
+            <div class="row align-items-start my-2">
+                <div class="col">Players are still selecting their lists...</div>
+            </div>
         }
 
         if (_matchup.IsFinished)
         {
-            <div class="row align-items-start">
+            <div class="row align-items-start my-3">
                 <div class="col form-group">
                     <label>Battle Points:</label>
                     <div><b>@_matchup.Result.Player1.BattlePoints</b></div>
@@ -180,6 +180,12 @@ else
                         </label>
                     }
                 </div>
+            </div>
+        }
+        else
+        {
+            <div class="row align-items-start my-2">
+                <div class="col">Game was not reported yet...</div>
             </div>
         }
 
