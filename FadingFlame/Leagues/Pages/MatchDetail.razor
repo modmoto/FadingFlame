@@ -17,7 +17,7 @@ else
     <h1>
         <span class="cursor" @onclick="() => GoTolayer(_player1)">@_player1.DisplayName</span>
         VS
-        <span class="cursor" @onclick="() => GoTolayer(_player2)">@_player2.DisplayName</span>
+        <span class="cursor" @onclick="() => GoTolayer(_player2)">@(Player2Name)</span>
     </h1>
     if (CanEditMatch && !_matchup.IsFinished)
     {
@@ -32,7 +32,7 @@ else
                 </div>
                 <div class="col">
                     <div class="form-group">
-                        <label>List of @_player2.DisplayName : </label>
+                        <label>List of @(Player2Name) : </label>
                         <div><b>@_matchup.Player2List</b></div>
                     </div>
                 </div>
@@ -53,7 +53,7 @@ else
                     </div>
                 </div>
                 <div class="col form-group">
-                    <label>Victory Points @_player2.DisplayName :</label>
+                    <label>Victory Points @_player2?.DisplayName :</label>
                     <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control my-3"/>
                     <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
                     <div class="form-check">
@@ -132,7 +132,7 @@ else
                 </div>
                 <div class="col">
                     <div class="form-group">
-                        <label>List of @_player2.DisplayName : </label>
+                        <label>List of @Player2Name : </label>
                         <div><b>@_matchup.Player2List</b></div>
                     </div>
                 </div>
@@ -211,6 +211,7 @@ else
     private SeasonArmy _listsOfLoggedInPlayer;
     private Player _player1;
     private Player _player2;
+    private string Player2Name => _player2?.DisplayName ?? "Freewin";
     private int _selectedList;
     private bool _loading = true;
     private bool _secondaryObjectivePlayer1;
@@ -219,7 +220,7 @@ else
     private bool _selectingList;
     private Playoff _playoff;
     private bool Player1LoggedIn => _model.Player1.Id == _userState.LoggedInPlayerId;
-    private bool Player2LoggedIn =>_model.Player2.Id == _userState.LoggedInPlayerId;
+    private bool Player2LoggedIn =>_model.Player2?.Id == _userState.LoggedInPlayerId;
     private bool CanEditMatch => Player1LoggedIn || Player2LoggedIn;
 
     protected override void OnInitialized()
@@ -396,7 +397,6 @@ else
 
     private void GoTolayer(Player player)
     {
-        _navigation.NavigateTo($"players/{player.Id}");
+        _navigation.NavigateTo($"players/{player?.Id}");
     }
-
 }
