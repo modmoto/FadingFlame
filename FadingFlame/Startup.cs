@@ -4,7 +4,6 @@ using FadingFlame.Discord;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
 using FadingFlame.Playoffs;
-using FadingFlame.UserAccounts;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

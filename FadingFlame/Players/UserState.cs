@@ -5,7 +5,7 @@ using IdentityModel;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
 
-namespace FadingFlame.UserAccounts
+namespace FadingFlame.Players
 {
     public class UserState
     {

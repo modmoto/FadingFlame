@@ -11,4 +11,10 @@
       <PackageReference Include="MongoDB.Driver" Version="2.13.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="Pages\_Host.cshtml.cs">
+        <DependentUpon>_Host.cshtml</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>

@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace FadingFlame.UserAccounts
+namespace FadingFlame.Pages
 {
-    public class HostAuthModel : PageModel
+    public class HostModel : PageModel
     {
         public IActionResult OnGetLogin()
         {
