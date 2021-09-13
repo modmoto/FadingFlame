@@ -71,15 +71,12 @@ else
 
     public void GoToMatch(Matchup matchup)
     {
-        if (UserIsOneOfThePlayers(matchup))
-        {
-            _navigation.NavigateTo($"match/{matchup.MatchId}?playoffSeason={_playoffs.Season}");    
-        }
+        _navigation.NavigateTo($"match/{matchup.MatchId}?playoffSeason={_playoffs.Season}");
     }
     
     private string GetClasses(Matchup matchup)
     {
-        return UserIsOneOfThePlayers(matchup) ? "card bg-light cursor mx-4 my-2" : "card mx-4 my-2";
+        return UserIsOneOfThePlayers(matchup) ? "bg-light cursor card mx-4 my-2" : "cursor card mx-4 my-2";
     }
 
     private bool UserIsOneOfThePlayers(Matchup matchup)
