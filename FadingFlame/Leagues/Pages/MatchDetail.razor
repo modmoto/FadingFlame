@@ -15,9 +15,9 @@
 else
 {
     <h1>
-        <span class="cursor" @onclick="() => GoTolayer(_player1)">@Player1Name</span>
+        <span class="cursor" @onclick="() => GoToPlayer(_player1)">@Player1Name</span>
         VS
-        <span class="cursor" @onclick="() => GoTolayer(_player2)">@Player2Name</span>
+        <span class="cursor" @onclick="() => GoToPlayer(_player2)">@Player2Name</span>
     </h1>
     if (CanEditMatch && !_matchup.IsFinished)
     {
@@ -396,8 +396,8 @@ else
         }
     }
 
-    private void GoTolayer(Player player)
+    private void GoToPlayer(Player player)
     {
-        _navigation.NavigateTo($"players/{player?.Id}");
+        _navigation.NavigateTo($"player/{player?.Id}");
     }
 }
