@@ -14,7 +14,11 @@
 }
 else
 {
-    <h1>@_player1.DisplayName VS @_player2.DisplayName</h1>
+    <h1>
+        <span class="cursor" @onclick="() => GoTolayer(_player1)">@_player1.DisplayName</span>
+        VS
+        <span class="cursor" @onclick="() => GoTolayer(_player2)">@_player2.DisplayName</span>
+    </h1>
     if (CanEditMatch && !_matchup.IsFinished)
     {
         if (_matchup.PlayersSelectedList)
@@ -278,7 +282,6 @@ else
         if (match == null)
         {
             _navigation.NavigateTo("notfound");
-            return;
         }
 
         _matchup = match;
@@ -389,6 +392,11 @@ else
         {
             _secondaryObjectivePlayer1 = false;
         }
+    }
+
+    private void GoTolayer(Player player)
+    {
+        _navigation.NavigateTo($"players/{player.Id}");
     }
 
 }
