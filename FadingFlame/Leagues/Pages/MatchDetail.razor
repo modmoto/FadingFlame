@@ -26,7 +26,7 @@ else
             <div class="row align-items-start my-2">
                 <div class="col">
                     <div class="form-group">
-                        <label>List of @_player1.DisplayName : </label>
+                        <label>List of @Player1Name : </label>
                         <div><b>@_matchup.Player1List</b></div>
                     </div>
                 </div>
@@ -42,7 +42,7 @@ else
             <DataAnnotationsValidator/>
             <div class="row align-items-start mt-3">
                 <div class="col form-group">
-                    <label>Victory Points @_player1.DisplayName :</label>
+                    <label>Victory Points @Player1Name :</label>
                     <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control my-3"/>
                     <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
                     <div class="form-check">
@@ -126,7 +126,7 @@ else
             <div class="row align-items-start my-2">
                 <div class="col">
                     <div class="form-group">
-                        <label>List of @_player1.DisplayName : </label>
+                        <label>List of @Player1Name : </label>
                         <div><b>@_matchup.Player1List</b></div>
                     </div>
                 </div>
@@ -211,6 +211,7 @@ else
     private SeasonArmy _listsOfLoggedInPlayer;
     private Player _player1;
     private Player _player2;
+    private string Player1Name => _matchup.Player1 == ObjectId.Empty ? "Freewin" : _player1?.DisplayName ?? "tbd";
     private string Player2Name => _matchup.Player2 == ObjectId.Empty ? "Freewin" : _player2?.DisplayName ?? "tbd";
     private int _selectedList;
     private bool _loading = true;
@@ -302,7 +303,7 @@ else
 
         if (Player2LoggedIn)
         {
-            _listsOfLoggedInPlayer = _player2?.Army;
+            _listsOfLoggedInPlayer = _player2.Army;
             _selectedListAsString = $"{match.Player2List}";
         }
     }
