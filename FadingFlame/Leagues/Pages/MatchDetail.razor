@@ -15,9 +15,9 @@
 else
 {
     <h1>
-        <span class="cursor" @onclick="() => GoTolayer(_player1)">@_player1.DisplayName</span>
+        <span class="cursor" @onclick="() => GoTolayer(_player1)">@Player1Name</span>
         VS
-        <span class="cursor" @onclick="() => GoTolayer(_player2)">@(Player2Name)</span>
+        <span class="cursor" @onclick="() => GoTolayer(_player2)">@Player2Name</span>
     </h1>
     if (CanEditMatch && !_matchup.IsFinished)
     {
@@ -32,7 +32,7 @@ else
                 </div>
                 <div class="col">
                     <div class="form-group">
-                        <label>List of @(Player2Name) : </label>
+                        <label>List of @Player2Name : </label>
                         <div><b>@_matchup.Player2List</b></div>
                     </div>
                 </div>
