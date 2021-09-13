@@ -211,7 +211,7 @@ else
     private SeasonArmy _listsOfLoggedInPlayer;
     private Player _player1;
     private Player _player2;
-    private string Player2Name => _player2?.DisplayName ?? "Freewin";
+    private string Player2Name => _matchup.Player2 == ObjectId.Empty ? "Freewin" : _player2?.DisplayName ?? "tbd";
     private int _selectedList;
     private bool _loading = true;
     private bool _secondaryObjectivePlayer1;
