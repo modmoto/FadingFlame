@@ -14,122 +14,175 @@
 }
 else
 {
-    if (CanEditMatch)
+    <h1>@_player1.DisplayName VS @_player2.DisplayName</h1>
+    if (CanEditMatch && !_matchup.IsFinished)
     {
-        if (_matchWasFinished)
+        if (_matchup.PlayersSelectedList)
         {
-            <div class="alert alert-danger" role="alert">
-                The match was allready reported, you can not alter it anymore
+            <div class="row align-items-start">
+                <div class="col">
+                    <div class="form-group">
+                        <label>List of @_player1.DisplayName : </label>
+                        <div><b>@_matchup.Player1List</b></div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>List of @_player2.DisplayName : </label>
+                        <div><b>@_matchup.Player2List</b></div>
+                    </div>
+                </div>
             </div>
+
+            <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator/>
+            <div class="row align-items-start">
+                <div class="col form-group">
+                    <label>Victory Points @_player1.DisplayName :</label>
+                    <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control"/>
+                    <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
+                    <hr class="my-2">
+                    <div class="form-check">
+                        <InputCheckbox class="form-check-input" @onclick="() => Select2ndObjective(1)" @bind-Value="_secondaryObjectivePlayer1"/>
+                        <label class="form-check-label">
+                            Won secondary objective
+                        </label>
+                    </div>
+                </div>
+                <div class="col form-group">
+                    <label>Victory Points @_player2.DisplayName :</label>
+                    <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control"/>
+                    <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
+                    <hr class="my-2">
+                    <div class="form-check">
+                        <InputCheckbox class="form-check-input" @onclick="() => Select2ndObjective(2)" @bind-Value="_secondaryObjectivePlayer2"/>
+                        <label class="form-check-label">
+                            Won secondary objective
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-3">
+            <button disabled="@_loading" class="btn btn-primary">
+                @if (_loading)
+                {
+                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                }
+                Report Game
+            </button>
+            </EditForm>
         }
         else
         {
-            if (_allPlayersSelectedList)
+            if (_listsOfLoggedInPlayer == null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    You did not submit a list, submit a list on your profile!
+                </div>
+            }
+            else if (!string.IsNullOrEmpty(_selectedListAsString))
             {
                 <div class="row align-items-start">
                     <div class="col">
                         <div class="form-group">
-                            <label>List of @_name1 : </label>
-                            <div><b>@_selectedListPlayer1</b></div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-group">
-                            <label>List of @_name2 : </label>
-                            <div><b>@_selectedListPlayer2</b></div>
+                            <label>Your list for the match: </label>
+                            <div><b>@_selectedListAsString</b></div>
+                            <div>Waiting for your opponent to select his list...</div>
                         </div>
                     </div>
                 </div>
-                
-                <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
-                <DataAnnotationsValidator/>
-                <div class="row align-items-start">
-                    <div class="col form-group">
-                        <label>Victory Points @_name1 :</label>
-                        <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control"/>
-                        <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
-                        <hr class="my-2">
-                        <div class="form-check">
-                            <InputCheckbox class="form-check-input" @onclick="() => Select2ndObjective(1)" @bind-Value="_secondaryObjectivePlayer1"/>
-                            <label class="form-check-label">
-                                Won secondary objective
-                            </label>
-                        </div>
-                    </div>
-                    <div class="col form-group">
-                        <label>Victory Points @_name2 :</label>
-                        <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control"/>
-                        <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
-                        <hr class="my-2">
-                        <div class="form-check">
-                            <InputCheckbox class="form-check-input" @onclick="() => Select2ndObjective(2)" @bind-Value="_secondaryObjectivePlayer2"/>
-                            <label class="form-check-label">
-                                Won secondary objective
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <hr class="my-3">
-                <button disabled="@_loading" class="btn btn-primary">
-                    @if (_loading)
-                    {
-                        <span class="spinner-border spinner-border-sm mr-1"></span>
-                    }
-                    Report Game
-                </button>
-                </EditForm>
             }
             else
             {
-                if (_listsOfLoggedInPlayer == null)
-                {
-                    <div class="alert alert-danger" role="alert">
-                        You did not submit a list, submit a list on your profile!
-                    </div>
-                }
-                else if (!string.IsNullOrEmpty(_selectedListAsString))
-                {
-                    <div class="row align-items-start">
-                        <div class="col">
-                            <div class="form-group">
-                                <label>Your list for the match: </label>
-                                <div><b>@_selectedListAsString</b></div>
-                                <div>Waiting for your opponent to select his list...</div>
-                            </div>
+                <div class="row align-items-start">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>List: </label>
+                            <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_selectedList">
+                                <option selected value="0">Select your list</option>
+                                <option value="1">@_listsOfLoggedInPlayer.List1.Name (@(GetListFacion(_listsOfLoggedInPlayer, _listsOfLoggedInPlayer.List1.Name)))</option>
+                                <option value="2">@_listsOfLoggedInPlayer.List2.Name (@(GetListFacion(_listsOfLoggedInPlayer, _listsOfLoggedInPlayer.List2.Name)))</option>
+                            </select>
                         </div>
                     </div>
-                }
-                else
-                {
-                    <div class="row align-items-start">
-                        <div class="col">
-                            <div class="form-group">
-                                <label>List: </label>
-                                <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_selectedList">
-                                    <option selected value="0">Select your list</option>
-                                    <option value="1">@_listsOfLoggedInPlayer.List1.Name (@(GetListFacion(_listsOfLoggedInPlayer, _listsOfLoggedInPlayer.List1.Name)))</option>
-                                    <option value="2">@_listsOfLoggedInPlayer.List2.Name (@(GetListFacion(_listsOfLoggedInPlayer, _listsOfLoggedInPlayer.List2.Name)))</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <button disabled="@_selectingList" class="btn btn-primary" @onclick="() => SelectListForMatch()">
-                        @if (_selectingList)
-                        {
-                            <span class="spinner-border spinner-border-sm mr-1"></span>
-                        }
-                        Select list for match
-                    </button>
-                    <hr class="my-5">
-                }
+                </div>
+                <button disabled="@_selectingList" class="btn btn-primary" @onclick="() => SelectListForMatch()">
+                    @if (_selectingList)
+                    {
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                    }
+                    Select list for match
+                </button>
+                <hr class="my-5">
             }
         }
     }
     else
     {
-        <div class="alert alert-danger" role="alert">
-            You are not allowed to edit the match
-        </div>
+        if (_matchup.PlayersSelectedList)
+        {
+            <div class="row align-items-start">
+                <div class="col">
+                    <div class="form-group">
+                        <label>List of @_player1.DisplayName : </label>
+                        <div><b>@_matchup.Player1List</b></div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>List of @_player2.DisplayName : </label>
+                        <div><b>@_matchup.Player2List</b></div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row align-items-center">Players are still selecting their lists...</div>
+        }
+
+        if (_matchup.IsFinished)
+        {
+            <div class="row align-items-start">
+                <div class="col form-group">
+                    <label>Battle Points:</label>
+                    <div><b>@_matchup.Result.Player1.BattlePoints</b></div>
+                    <label>Victory Points:</label>
+                    <div>@_matchup.Result.Player1.VictoryPoints</div>
+                    @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.player1)
+                    {
+                        <label class="form-check-label">
+                            Won secondary objective
+                        </label>
+                    }
+                    @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.draw)
+                    {
+                        <label class="form-check-label">
+                            Draw on secondary objective
+                        </label>
+                    }
+                </div>
+                <div class="col form-group">
+                    <label>Battle Points:</label>
+                    <div><b>@_matchup.Result.Player2.BattlePoints</b></div>
+                    <label>Victory Points:</label>
+                    <div>@_matchup.Result.Player2.VictoryPoints</div>
+                    @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.player2)
+                    {
+                        <label class="form-check-label">
+                            Won secondary objective
+                        </label>
+                    }
+                    @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.draw)
+                    {
+                        <label class="form-check-label">
+                            Draw on secondary objective
+                        </label>
+                    }
+                </div>
+            </div>
+        }
+
     }
 }
 
@@ -146,17 +199,13 @@ else
     private League _league;
     private Matchup _matchup;
     private SeasonArmy _listsOfLoggedInPlayer;
+    private Player _player1;
+    private Player _player2;
     private int _selectedList;
     private bool _loading = true;
-    private string _name1;
-    private string _name2;
-    private string _selectedListPlayer1;
-    private string _selectedListPlayer2;
     private bool _secondaryObjectivePlayer1;
     private bool _secondaryObjectivePlayer2;
     private string _selectedListAsString;
-    private bool _matchWasFinished => _matchup.IsFinished;
-    private bool _allPlayersSelectedList;
     private bool _selectingList;
     private Playoff _playoff;
     private bool Player1LoggedIn => _model.Player1.Id == _userState.LoggedInPlayerId;
@@ -223,33 +272,27 @@ else
         if (match == null)
         {
             _navigation.NavigateTo("notfound");
+            return;
         }
 
         _matchup = match;
 
-        var player1 = await _playerRepository.Load(match.Player1);
-        var player2 = await _playerRepository.Load(match.Player2);
+        _player1 = await _playerRepository.Load(match.Player1);
+        _player2 = await _playerRepository.Load(match.Player2);
 
-        _model.Player1.Id = match.Player1;
         _model.Player1.Id = match.Player1;
         _model.Player2.Id = match.Player2;
-
-        _name1 = player1.DisplayName;
-        _name2 = player2?.DisplayName ?? "Freewin";
         _model.MatchId = match.MatchId;
-        _allPlayersSelectedList = match.PlayersSelectedList;
-        _selectedListPlayer1 = match.Player1List;
-        _selectedListPlayer2 = match.Player2List;
 
         if (Player1LoggedIn)
         {
-            _listsOfLoggedInPlayer = player1.Army;
+            _listsOfLoggedInPlayer = _player1.Army;
             _selectedListAsString = $"{match.Player1List}";
         }
 
         if (Player2LoggedIn)
         {
-            _listsOfLoggedInPlayer = player2?.Army;
+            _listsOfLoggedInPlayer = _player2?.Army;
             _selectedListAsString = $"{match.Player2List}";
         }
     }
@@ -261,32 +304,22 @@ else
 
     private async Task OnValidSubmit()
     {
-        if (CanEditMatch)
+        _loading = true;
+        if (_league != null)
         {
-            _loading = true;
-            if (_league != null)
-            {
-                _model.SecondaryObjective = ConvertToEnum();
-                _league.ReportGame(_model);
-                await _leagueRepository.Update(_league);
-            }
-            else
-            {
-                _model.SecondaryObjective = ConvertToEnum();
-                _playoff.ReportGame(_model);
-                await _playoffRepository.Update(_playoff);
-            }
-
-            _loading = false;
-            if (_league == null)
-            {
-                _navigation.NavigateTo($"playoffs");    
-            }
-            else
-            {
-                _navigation.NavigateTo($"league/{_league.Id}");    
-            }
+            _model.SecondaryObjective = ConvertToEnum();
+            _league.ReportGame(_model);
+            await _leagueRepository.Update(_league);
         }
+        else
+        {
+            _model.SecondaryObjective = ConvertToEnum();
+            _playoff.ReportGame(_model);
+            await _playoffRepository.Update(_playoff);
+        }
+
+        _loading = false;
+        StateHasChanged();
     }
 
     private SecondaryObjectiveState ConvertToEnum()
@@ -321,9 +354,6 @@ else
             await _leagueRepository.Update(_league);
         }
         
-        _allPlayersSelectedList = _matchup.PlayersSelectedList;
-        _selectedListPlayer1 = _matchup.Player1List;
-        _selectedListPlayer2 = _matchup.Player2List;
         _selectingList = false;
     }
 
