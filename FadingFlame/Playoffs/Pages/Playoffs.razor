@@ -76,7 +76,12 @@ else
     
     private string GetClasses(Matchup matchup)
     {
-        return UserIsOneOfThePlayers(matchup) ? "bg-light cursor card mx-4 my-2" : "cursor card mx-4 my-2";
+        var classes = UserIsOneOfThePlayers(matchup) ? "bg-light cursor card mx-4 my-2" : "cursor card mx-4 my-2";
+        if (matchup.Player2 == ObjectId.Empty)
+        {
+            classes += " invisible";
+        }
+        return classes;
     }
 
     private bool UserIsOneOfThePlayers(Matchup matchup)
