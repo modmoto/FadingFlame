@@ -16,7 +16,7 @@
         <div class="top-row px-4">
             <AuthorizeView>
                 <Authorized>
-                    <span>Hello<a href="@Link">@_userState.UserName</a></span>
+                    <span>Hello<a href="@($"/player/{_userState.LoggedInPlayerId}")">@_userState.UserName</a></span>
                     <a href="/Logout">
                         <span class="oi oi-account-logout" aria-hidden="true"></span>
                     </a>
@@ -41,7 +41,6 @@
 
 @code
 {
-    public string Link => $"/player/{_userState.LoggedInPlayerId}";
 
     protected override void OnInitialized()
     {
