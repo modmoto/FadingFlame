@@ -192,6 +192,16 @@ else
                     }
                 </div>
             </div>
+            if (_userState.UserIsAdmin && _league != null)
+            {
+                <button disabled="@_loadingDeleteResult" class="btn btn-danger mt-3" @onclick="() => DeleteGameResult()">
+                    @if (_loadingDeleteResult)
+                    {
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                    }
+                    <span class="oi oi-shield" aria-hidden="true"></span> Delete game result
+                </button>
+            }
         }
         else
         {
@@ -222,6 +232,7 @@ else
     private string Player2Name => _matchup.Player2 == ObjectId.Empty ? "Freewin" : _player2?.DisplayName ?? "tbd";
     private int _selectedList;
     private bool _loading = true;
+    private bool _loadingDeleteResult;
     private bool _secondaryObjectivePlayer1;
     private bool _secondaryObjectivePlayer2;
     private string _selectedListAsString;
@@ -407,4 +418,16 @@ else
     {
         _navigation.NavigateTo($"player/{player?.Id}");
     }
+
+    private async Task DeleteGameResult()
+    {
+        _loadingDeleteResult = true;
+        if (_league != null)
+        {
+            _league.DeleteGameReport(_matchup.MatchId);
+            await _leagueRepository.Update(_league);
+        }
+        _loadingDeleteResult = false;
+    }
+
 }

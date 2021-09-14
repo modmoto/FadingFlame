@@ -75,8 +75,8 @@ namespace FadingFlameTests
             league.Players[0].Id.Should().Be(player1.Id);
             league.Players[1].Id.Should().Be(player2.Id);
 
-            league.Players[0].Points.Should().Be(exectedoints1);
-            league.Players[1].Points.Should().Be(expectedPoints2);
+            league.Players[0].BattlePoints.Should().Be(exectedoints1);
+            league.Players[1].BattlePoints.Should().Be(expectedPoints2);
         }
 
         [TestCase(1000, 1000, 13, 7)]
@@ -131,8 +131,56 @@ namespace FadingFlameTests
             league.Players[0].Id.Should().Be(player2.Id);
             league.Players[1].Id.Should().Be(player1.Id);
 
-            league.Players[0].Points.Should().Be(expectedPoints2);
-            league.Players[1].Points.Should().Be(exectedoints1);
+            league.Players[0].BattlePoints.Should().Be(expectedPoints2);
+            league.Players[1].BattlePoints.Should().Be(exectedoints1);
+        }
+
+        [Test]
+        public void DeleteGameReport()
+        {
+            var league = new League();
+
+            var player1 = Player.Create("peter", "213");
+            player1.Id = ObjectId.GenerateNewId();
+            var player2 = Player.Create("wolf", "213");
+            player2.Id = ObjectId.GenerateNewId();
+
+            league.AddPlayer(player2);
+            league.AddPlayer(player1);
+            league.CreateGameDays();
+
+            var result = new MatchResultDto
+            {
+                MatchId = league.GameDays.First().Matchups.First().MatchId,
+                SecondaryObjective = SecondaryObjectiveState.player1,
+                Player1 = new PlayerResultDto
+                {
+                    Id = player1.Id,
+                    VictoryPoints = 500
+                },
+                Player2 = new PlayerResultDto
+                {
+                    Id = player2.Id,
+                    VictoryPoints = 100
+                }
+            };
+
+            league.ReportGame(result);
+
+            league.Players[0].Id.Should().Be(player1.Id);
+            league.Players[1].Id.Should().Be(player2.Id);
+
+            league.Players[0].VictoryPoints.Should().Be(500);
+            league.Players[1].VictoryPoints.Should().Be(100);
+            
+            league.DeleteGameReport(result.MatchId);
+            
+            league.Players[0].VictoryPoints.Should().Be(0);
+            league.Players[1].VictoryPoints.Should().Be(0);
+            league.Players[0].BattlePoints.Should().Be(0);
+            league.Players[1].BattlePoints.Should().Be(0);
+            league.Players[0].GamesCount.Should().Be(0);
+            league.Players[1].GamesCount.Should().Be(0);
         }
         
         [Test]

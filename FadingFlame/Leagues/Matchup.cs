@@ -46,5 +46,10 @@ namespace FadingFlame.Leagues
 
             Result = result;
         }
+
+        public void DeleteResult()
+        {
+            Result = null;
+        }
     }
 }
