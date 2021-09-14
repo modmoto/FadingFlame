@@ -159,7 +159,7 @@ else
                     <label>Battle Points:</label>
                     <div><b>@_matchup.Result.Player1.BattlePoints</b></div>
                     <label>Victory Points:</label>
-                    <div>@_matchup.Result.Player1.VictoryPoints</div>
+                    <div>@_matchup.Result.Player1.VictoryPoints (Diff.: @_matchup.Result.VictoryPointsDifference)</div>
                     @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.player1)
                     {
                         <label class="form-check-label">
@@ -177,7 +177,7 @@ else
                     <label>Battle Points:</label>
                     <div><b>@_matchup.Result.Player2.BattlePoints</b></div>
                     <label>Victory Points:</label>
-                    <div>@_matchup.Result.Player2.VictoryPoints</div>
+                    <div>@_matchup.Result.Player2.VictoryPoints (Diff.: @_matchup.Result.VictoryPointsDifference)</div>
                     @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.player2)
                     {
                         <label class="form-check-label">

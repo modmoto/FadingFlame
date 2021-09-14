@@ -12,6 +12,7 @@ namespace FadingFlame.Leagues
         public PlayerResult Player1 { get; set; }
         public PlayerResult Player2 { get; set; }
         public SecondaryObjectiveState SecondaryObjective { get; set; }
+        public int VictoryPointsDifference => Math.Abs((Player1?.VictoryPoints ?? 0) - (Player2?.VictoryPoints ?? 0));
         public DateTimeOffset RecordedAt { get; set; }
 
         public ObjectId Winner { get; set; }
