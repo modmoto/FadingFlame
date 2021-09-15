@@ -7,7 +7,7 @@ namespace FadingFlame.Leagues
     public class LeagueConstants
     {
         public static DateTimeOffset StartDate => new DateTimeOffset().AddDays(14).AddMonths(9).AddYears(2020);
-        public static DateTimeOffset ListSubmissionDeadline => new DateTimeOffset().AddDays(25).AddMonths(8).AddYears(2020);
+        public static DateTimeOffset ListSubmissionDeadline => new DateTimeOffset().AddDays(24).AddMonths(8).AddYears(2020);
         public static bool ListSubmissionIsOver => DateTimeOffset.UtcNow > new DateTimeOffset().AddDays(25).AddMonths(8).AddYears(2020);
         public static int CurrentSeason => 1;
         public static List<string> Names => new()
