@@ -20,7 +20,8 @@ namespace FadingFlame.Players
 
         private List<string> Admins = new()
         {
-            "simonheiss87@gmail.com"
+            "simonheiss87@gmail.com",
+            "tulmir@gmail.com",
         };
 
         public virtual void SetUserData(ObjectId playerId)
