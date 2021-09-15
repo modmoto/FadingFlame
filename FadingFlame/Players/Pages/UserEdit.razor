@@ -34,7 +34,7 @@
             @if (!_listSubmitted)
             {
                 <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
-                    To participate in the next season, submit your lists here. This can not be undone once you submitted the lists.
+                    To participate in the next season, submit your lists here until @LeagueConstants.ListSubmissionDeadline.ToString("M"). This can not be undone once you submitted the lists.
                 </div>
                 <EditForm Model="@_listModel" OnValidSubmit="OnValidSubmitList">
                 <DataAnnotationsValidator/>
