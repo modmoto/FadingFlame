@@ -70,7 +70,7 @@ namespace FadingFlame
             
             services.AddSingleton<IDiscordBot>(option =>
             {
-                var token = Environment.GetEnvironmentVariable("DISCORD_TOKEN") ?? "ODgwNDk0NDk1MzIwMzk1ODA4.YSfGZg.XblqHYwT6xhWBjGWYVZ7PXqe4ss";
+                var token = Environment.GetEnvironmentVariable("DISCORD_TOKEN");
                 var discordBot = new DiscordBot(token, option.GetService<IPlayerRepository>());
                 return discordBot;
             });
