@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using FadingFlame.Leagues;
+using FadingFlame.Players;
 using Microsoft.Extensions.Logging;
 
 namespace FadingFlame.Discord
 {
     public interface IDiscordBot
     {
-        Task CreateLeagueChannels(List<League> leagues);
+        Task CreateLeagueChannels(List<League> leagues, List<Player> players);
     }
 
     public class DiscordBot : IDiscordBot
@@ -32,7 +33,7 @@ namespace FadingFlame.Discord
             _client.ConnectAsync().Wait();
         }
         
-        public async Task CreateLeagueChannels(List<League> leagues)
+        public async Task CreateLeagueChannels(List<League> leagues, List<Player> players)
         {
             var channels = _client.Guilds.SelectMany(g => g.Value.Channels).Where(c => c.Value.Type == ChannelType.Text);
             var regex = new Regex("league-([0-9]{1,2}[a-b])-\\w+");
@@ -46,34 +47,6 @@ namespace FadingFlame.Discord
                 }
             }
 
-            var discordColors = new List<DiscordColor>()
-            {
-                DiscordColor.Aquamarine,
-                DiscordColor.Azure,
-                DiscordColor.Blue,
-                DiscordColor.Blurple,
-                DiscordColor.Brown,
-                DiscordColor.Chartreuse,
-                DiscordColor.Cyan,
-                DiscordColor.Gold,
-                DiscordColor.Goldenrod,
-                DiscordColor.Gray,
-                DiscordColor.Grayple,
-                DiscordColor.Green,
-                DiscordColor.Lilac,
-                DiscordColor.Magenta,
-                DiscordColor.Orange,
-                DiscordColor.Purple,
-                DiscordColor.Red,
-                DiscordColor.Rose,
-                DiscordColor.Rose,
-                DiscordColor.Sienna,
-                DiscordColor.Teal,
-                DiscordColor.Turquoise,
-                DiscordColor.Violet,
-                DiscordColor.Wheat
-            };
-
             foreach (var clientGuild in _client.Guilds)
             {
                 var leaguesCategory = clientGuild.Value.Channels.FirstOrDefault(c => c.Value.IsCategory && c.Value.Name == "leagues").Value;
@@ -85,29 +58,30 @@ namespace FadingFlame.Discord
                 var position = 1;
                 foreach (var league in leagues)
                 {
-                    var leagueChannel = clientGuild.Value.Channels.FirstOrDefault(c => c.Value.Type == ChannelType.Text && c.Value.Name == ToLeagueName(league)).Value;
-                    if (leagueChannel == null)
-                    {
-                        leagueChannel = await clientGuild.Value.CreateTextChannelAsync($"league-{league.DivisionId}-{league.Name}", leaguesCategory);
-                    }
-                    
-                    await leagueChannel.ModifyPositionAsync(position);
-
+                    // var leagueChannel = clientGuild.Value.Channels.FirstOrDefault(c => c.Value.Type == ChannelType.Text && c.Value.Name == ToLeagueName(league)).Value;
+                    // if (leagueChannel == null)
+                    // {
+                    //     leagueChannel = await clientGuild.Value.CreateTextChannelAsync($"league-{league.DivisionId}-{league.Name}", leaguesCategory);
+                    // }
+                    //
+                    // await leagueChannel.ModifyPositionAsync(position);
+                    //
                     var role = clientGuild.Value.Roles.FirstOrDefault(r => r.Value.Name == league.DivisionId.ToLower()).Value;
                     if (role == null)
                     {
-                        role = await clientGuild.Value.CreateRoleAsync(league.DivisionId.ToLower(), color: discordColors[position - 1]);
+                        role = await clientGuild.Value.CreateRoleAsync(league.DivisionId.ToLower(), color: LeagueConstants.DiscordColors[position - 1]);
                     }
 
-                    // foreach (var discordMember in clientGuild.Value.Members)
-                    // {
-                    //     var username = discordMember.Value.Username.ToLower();
-                    //     var playerInLeagues = leagues.SelectMany(l => l.Players).FirstOrDefault(p => p.DiscordTag?.Split("#")[0].ToLower() == username);
-                    //     if (playerInLeagues != null)
-                    //     {
-                    //         await discordMember.Value.GrantRoleAsync(role);
-                    //     }
-                    // }
+                    foreach (var discordMember in clientGuild.Value.Members)
+                    {
+                        var member = discordMember.Value;
+                        var username = member.Username.ToLower() + "#" + member.Discriminator;
+                        var playerInLeagues = players.FirstOrDefault(p => p.DiscordTag?.ToLower() == username);
+                        if (playerInLeagues != null)
+                        {
+                            await member.GrantRoleAsync(role);
+                        }
+                    }
                     
                     position++;
                 }

@@ -3,9 +3,11 @@
 @using FadingFlame.Discord
 @using FadingFlame.Players
 @using FadingFlame.Playoffs
+@using MongoDB.Bson
 @inject UserState _userState
 @inject ILeagueCommandHandler _leagueCommandHandler
 @inject IPlayoffCommandHandler _playoffCommandHandler
+@inject IPlayerRepository _playerRepository
 @inject IDiscordBot _discordBot
 
 @if (_userState.UserIsAdmin)
@@ -45,7 +47,8 @@
     {
         _loadingLeagues = true;
         var leagues = await _leagueCommandHandler.CreateLeagues();
-        await _discordBot.CreateLeagueChannels(leagues);
+        var players = await _playerRepository.LoadForLeague(leagues.Select(l => l.Id).ToList());
+        await _discordBot.CreateLeagueChannels(leagues, players);
         _loadingLeagues = false;
     }
     
