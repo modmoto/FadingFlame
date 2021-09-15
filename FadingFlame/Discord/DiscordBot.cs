@@ -28,7 +28,6 @@ namespace FadingFlame.Discord
                 Token = token,
                 TokenType = TokenType.Bot,
                 AutoReconnect = true,
-                MinimumLogLevel = LogLevel.Debug,
                 Intents = DiscordIntents.GuildMembers
                         | DiscordIntents.GuildPresences
                         | DiscordIntents.Guilds
