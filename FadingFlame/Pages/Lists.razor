@@ -1,49 +1,57 @@
 @page "/lists"
 @using FadingFlame.Players
 @using MongoDB.Bson
+@using FadingFlame.Leagues
 @inject IPlayerRepository _playerRepository
 @inject NavigationManager _navigation
 
 <div>
     <h1>Lists played this season</h1>
     <hr class="my-4">
-    @foreach (var player in _enlistedPlayers)
+    @if (LeagueConstants.ListSubmissionIsOver)
     {
-        <div class="card">
-            <div class="card-header cursor" @onclick="() => GoToPlayer(player.Id)">
-                <div><b>@player.DisplayName: </b></div>
-            </div>
-            <div class="card-body">
-                <div class="row align-items-start">
-                    <div class="col">
-                        <div class="form-group">
-                            <label>First List: </label>
-                            <div><b>@player.Army.List1.Faction.ToFactionString()</b></div>
-                            <div><b>@player.Army.List1.Name</b></div>
+        @foreach (var player in _enlistedPlayers)
+        {
+            <div class="card">
+                <div class="card-header cursor" @onclick="() => GoToPlayer(player.Id)">
+                    <div><b>@player.DisplayName: </b></div>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-start">
+                        <div class="col">
+                            <div class="form-group">
+                                <label>First List: </label>
+                                <div><b>@player.Army.List1.Faction.ToFactionString()</b></div>
+                                <div><b>@player.Army.List1.Name</b></div>
+                            </div>
+                            <hr class="my-3">
+                            <div class="form-group">
+                                <div style="white-space:pre-wrap;">@player.Army.List1.List</div>
+                            </div>
                         </div>
-                        <hr class="my-3">
-                        <div class="form-group">
-                            <div style="white-space:pre-wrap;">@player.Army.List1.List</div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-group">
-                            <label>Second List: </label>
-                            <div><b>@player.Army.List2.Faction.ToFactionString()</b></div>
-                            <div><b>@player.Army.List2.Name</b></div>
-                        </div>
-                        <hr class="my-3">
-                        <div class="form-group">
-                            <div style="white-space:pre-wrap;">@player.Army.List2.List</div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label>Second List: </label>
+                                <div><b>@player.Army.List2.Faction.ToFactionString()</b></div>
+                                <div><b>@player.Army.List2.Name</b></div>
+                            </div>
+                            <hr class="my-3">
+                            <div class="form-group">
+                                <div style="white-space:pre-wrap;">@player.Army.List2.List</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-            
             <hr class="my-3">
-            }
-        </div>
+        }
+    }
+    else
+    {
+        <h4>Lists will be displayed after @LeagueConstants.ListSubmissionDeadline.ToString("M")</h4>
+    }
+    
+</div>
 
 @code
 {

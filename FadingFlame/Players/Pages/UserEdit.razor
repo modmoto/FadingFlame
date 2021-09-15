@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components
 @using FadingFlame.Players
 @using MongoDB.Bson
+@using FadingFlame.Leagues
 
 @inject IPlayerRepository _playerRepository
 @inject UserState _userState
@@ -99,7 +100,8 @@
                 <span>@_model.DiscordTag</span>
             </div>
         }
-        @if (_listSubmitted)
+        
+        @if (_listSubmitted && LeagueConstants.ListSubmissionIsOver || _listSubmitted && IsTheRightUser())
         {
             <div class="row align-items-start">
                 <div class="col">
@@ -145,6 +147,10 @@
                     <span class="oi oi-shield" aria-hidden="true"></span> Delete lists for user
                 </button>
             }
+        }
+        else
+        {
+            <div>User is participating in the next season, lists will be displayed after @LeagueConstants.ListSubmissionDeadline.ToString("M")</div>
         }
     </div>
 </div>

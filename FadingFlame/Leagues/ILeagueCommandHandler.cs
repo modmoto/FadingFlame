@@ -29,9 +29,7 @@ namespace FadingFlame.Leagues
             var players = await _playerRepository.LoadAll();
             var newLeagues = new List<League>();
 
-            var dateTimeOffset = new DateTimeOffset();
-            var startDate = dateTimeOffset.AddDays(14).AddMonths(9).AddYears(2020);
-            var league = League.Create(LeagueConstants.CurrentSeason, startDate, LeagueConstants.Ids.First(), LeagueConstants.Names.First());
+            var league = League.Create(LeagueConstants.CurrentSeason, LeagueConstants.StartDate, LeagueConstants.Ids.First(), LeagueConstants.Names.First());
             for (var index = 0; index < players.Count; index++)
             {
                 var player = players[index];
@@ -40,7 +38,7 @@ namespace FadingFlame.Leagues
                 if (league.IsFull)
                 {
                     newLeagues.Add(league);
-                    league = League.Create(LeagueConstants.CurrentSeason, startDate, LeagueConstants.Ids[newLeagues.Count], LeagueConstants.Names[newLeagues.Count]);
+                    league = League.Create(LeagueConstants.CurrentSeason, LeagueConstants.StartDate, LeagueConstants.Ids[newLeagues.Count], LeagueConstants.Names[newLeagues.Count]);
                 }
 
                 player.ResetLists();
