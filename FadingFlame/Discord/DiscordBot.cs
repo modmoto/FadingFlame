@@ -49,7 +49,7 @@ namespace FadingFlame.Discord
                 if (!leagueNames.Contains(channelsForLeague.Value.Name))
                 {
                     await channelsForLeague.Value.DeleteAsync();
-                    await Task.Delay(50);
+                    Task.Delay(50).Wait();
                 }
             }
 
@@ -60,7 +60,7 @@ namespace FadingFlame.Discord
                 if (leaguesCategory == null)
                 {
                     leaguesCategory = await guild.CreateChannelCategoryAsync("leagues");
-                    await Task.Delay(50);
+                    Task.Delay(50).Wait();
                 }
 
                 var position = 1;
@@ -71,7 +71,7 @@ namespace FadingFlame.Discord
                     if (leagueChannel == null)
                     {
                         leagueChannel = await guild.CreateTextChannelAsync($"league-{league.DivisionId}-{league.Name}", leaguesCategory);
-                        await Task.Delay(50);
+                        Task.Delay(50).Wait();
                     }
                     
                     await leagueChannel.ModifyPositionAsync(position);
@@ -80,7 +80,7 @@ namespace FadingFlame.Discord
                     if (role == null)
                     {
                         role = await guild.CreateRoleAsync(league.DivisionId.ToLower(), color: LeagueConstants.DiscordColors[position - 1]);
-                        await Task.Delay(50);
+                        Task.Delay(50).Wait();
                     }
 
                     foreach (var discordMember in guild.Members)
@@ -103,10 +103,10 @@ namespace FadingFlame.Discord
                 foreach (var oldLeagueRole in oldLeagueRoles)
                 {
                     await member.RevokeRoleAsync(oldLeagueRole);
-                    await Task.Delay(50);
+                    Task.Delay(50).Wait();
                 }
                 await member.GrantRoleAsync(role);
-                await Task.Delay(50);
+                Task.Delay(50).Wait();
             }
         }
 
