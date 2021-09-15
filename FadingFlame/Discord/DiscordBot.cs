@@ -46,6 +46,7 @@ namespace FadingFlame.Discord
                 if (!leagueNames.Contains(channelsForLeague.Value.Name))
                 {
                     await channelsForLeague.Value.DeleteAsync();
+                    await Task.Delay(50);
                 }
             }
 
@@ -55,6 +56,7 @@ namespace FadingFlame.Discord
                 if (leaguesCategory == null)
                 {
                     leaguesCategory = await clientGuild.Value.CreateChannelCategoryAsync("leagues");
+                    await Task.Delay(50);
                 }
 
                 var position = 1;
@@ -65,6 +67,7 @@ namespace FadingFlame.Discord
                     if (leagueChannel == null)
                     {
                         leagueChannel = await clientGuild.Value.CreateTextChannelAsync($"league-{league.DivisionId}-{league.Name}", leaguesCategory);
+                        await Task.Delay(50);
                     }
                     
                     await leagueChannel.ModifyPositionAsync(position);
@@ -73,6 +76,7 @@ namespace FadingFlame.Discord
                     if (role == null)
                     {
                         role = await clientGuild.Value.CreateRoleAsync(league.DivisionId.ToLower(), color: LeagueConstants.DiscordColors[position - 1]);
+                        await Task.Delay(50);
                     }
 
                     var owner = clientGuild.Value.Owner;
@@ -97,8 +101,10 @@ namespace FadingFlame.Discord
                 foreach (var oldLeagueRole in oldLeagueRoles)
                 {
                     await member.RevokeRoleAsync(oldLeagueRole);
+                    await Task.Delay(50);
                 }
                 await member.GrantRoleAsync(role);
+                await Task.Delay(50);
             }
         }
 
