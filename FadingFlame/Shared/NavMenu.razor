@@ -10,15 +10,6 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
-         <AuthorizeView>
-             <Authorized>
-                 <li class="nav-item px-3 d-xxl-none d-xl-none d-lg-none d-md-none d-sm-none">
-                     <NavLink class="nav-link" href="@($"/player/{_userState.LoggedInPlayerId}")" Match="NavLinkMatch.All">
-                         <span class="oi oi-person" aria-hidden="true"></span>My profile
-                     </NavLink>
-                 </li>
-             </Authorized>
-         </AuthorizeView>   
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
                 <span class="oi oi-sort-descending" aria-hidden="true"></span>Leagues
@@ -46,6 +37,11 @@
         </li>
         <AuthorizeView>
             <Authorized>
+                <li class="nav-item px-3 d-xxl-none d-xl-none d-lg-none d-md-none d-sm-none">
+                    <NavLink class="nav-link" href="@($"/player/{_userState.LoggedInPlayerId}")" Match="NavLinkMatch.All">
+                        <span class="oi oi-person" aria-hidden="true"></span>My profile
+                    </NavLink>
+                </li>
                 <li class="nav-item px-3 d-xxl-none d-xl-none d-lg-none d-md-none d-sm-none">
                     <NavLink class="nav-link" href="/Logout" Match="NavLinkMatch.All">
                         <span class="oi oi-account-logout" aria-hidden="true"></span>Logout
