@@ -1,5 +1,6 @@
 @page "/"
 @using FadingFlame.Leagues
+@using FadingFlame.Players
 @using MongoDB.Bson
 @inject ILeagueRepository _leagueRepository
 @inject NavigationManager _navigation
@@ -20,21 +21,29 @@
                     @league.DivisionId @league.Name
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">@league.Name</h5>
+                     <span class="oi oi-star" aria-hidden="true"></span><span class="card-title mx-2">@GetName(league.Players.First().Id)</span>
                 </div>
             </div>
         </div>  
     }
 </div>
 
+@inject IPlayerRepository _playerRepository
+
 @code
 {
     private List<League> _leagues = new();
+    private List<Player> _playersInLeague = new();
 
     protected override async Task OnInitializedAsync()
     {
         _leagues = await _leagueRepository.LoadForSeason(1);
-        StateHasChanged();
+        _playersInLeague = await _playerRepository.LoadForLeague(_leagues.SelectMany(l => l.Players).Select(p => p.Id).ToList());
+    }
+    
+    private string GetName(ObjectId playerId)
+    {
+        return _playersInLeague.FirstOrDefault(p => p.Id == playerId)?.DisplayName;
     }
 
     public void GoToLeague(ObjectId leagueId)
