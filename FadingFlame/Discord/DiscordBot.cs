@@ -60,6 +60,9 @@ namespace FadingFlame.Discord
                 }
 
                 var position = 1;
+                // var allMembers = await clientGuild.Value.GetAllMembersAsync();
+                var allMembers = clientGuild.Value.Members;
+                
                 foreach (var league in leagues)
                 {
                     var players = await _playerRepository.LoadForLeague(league.Players.Select(p => p.Id).ToList());
@@ -79,9 +82,7 @@ namespace FadingFlame.Discord
                         await Task.Delay(50);
                     }
 
-                    var owner = clientGuild.Value.Owner;
-                    await GrantRoleForLeague(players, owner, role);
-                    foreach (var discordMember in clientGuild.Value.Members)
+                    foreach (var discordMember in allMembers)
                     {
                         await GrantRoleForLeague(players, discordMember.Value, role);
                     }
@@ -91,7 +92,10 @@ namespace FadingFlame.Discord
             }
         }
 
-        private static async Task GrantRoleForLeague(List<Player> players, DiscordMember member, DiscordRole role)
+        private static async Task GrantRoleForLeague(
+            List<Player> players,
+            DiscordMember member, 
+            DiscordRole role)
         {
             var username = member.Username.ToLower() + "#" + member.Discriminator;
             var playerInLeagues = players.FirstOrDefault(p => p.DiscordTag?.ToLower() == username);
@@ -103,6 +107,7 @@ namespace FadingFlame.Discord
                     await member.RevokeRoleAsync(oldLeagueRole);
                     await Task.Delay(50);
                 }
+
                 await member.GrantRoleAsync(role);
                 await Task.Delay(50);
             }
