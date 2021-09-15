@@ -44,14 +44,13 @@ namespace FadingFlame
                 })
                 .AddOpenIdConnect("oidc", options =>
                 {
-                    options.Authority = $"https://{Environment.GetEnvironmentVariable("IDENTITY_BASE_URI")}";
+                    options.Authority = Environment.GetEnvironmentVariable("IDENTITY_BASE_URI") != null ? $"https://{Environment.GetEnvironmentVariable("IDENTITY_BASE_URI")}" : "https://test.identity.fading-flame.com/";
+                    options.ClientSecret = Environment.GetEnvironmentVariable("FADING_FLAME_SECRET") ?? "NnsTfzUSswFVARczALPmncmKvT53j7zN";
+                    options.SignedOutRedirectUri = Environment.GetEnvironmentVariable("SIGNOUT_URI") != null ? $"https://{Environment.GetEnvironmentVariable("SIGNOUT_URI")}/signout-callback-oidc" : "https://localhost:5000/signout-callback-oidc";
 
                     options.ClientId = "fading-flame";
-                    var secret = Environment.GetEnvironmentVariable("FADING_FLAME_SECRET");
-                    options.ClientSecret = secret;
                     options.ResponseType = "code";
-                    options.SignedOutRedirectUri = $"https://{Environment.GetEnvironmentVariable("SIGNOUT_URI")}/signout-callback-oidc";
-
+                   
                     options.Scope.Add("profile");
                     options.Scope.Add("email");
                     options.Scope.Add("offline_access");
@@ -65,14 +64,14 @@ namespace FadingFlame
            
             services.AddSingleton(_ =>
             {
-                var mongoConnectionString = Environment.GetEnvironmentVariable("MONGO_DB_CONNECTION_STRING");
+                var mongoConnectionString = Environment.GetEnvironmentVariable("MONGO_DB_CONNECTION_STRING") ?? "mongodb://admin:vgwG9FRzS77tGGP4@65.21.139.246:1001";
                 return new MongoClient(mongoConnectionString);
             });
             
-            services.AddSingleton<IDiscordBot>(_ =>
+            services.AddSingleton<IDiscordBot>(option =>
             {
-                var token = Environment.GetEnvironmentVariable("DISCORD_TOKEN");
-                var discordBot = new DiscordBot(token);
+                var token = Environment.GetEnvironmentVariable("DISCORD_TOKEN") ?? "ODgwNDk0NDk1MzIwMzk1ODA4.YSfGZg.XblqHYwT6xhWBjGWYVZ7PXqe4ss";
+                var discordBot = new DiscordBot(token, option.GetService<IPlayerRepository>());
                 return discordBot;
             });
 

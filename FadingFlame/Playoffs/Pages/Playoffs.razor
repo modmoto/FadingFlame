@@ -9,7 +9,7 @@
 
 
 <div>
-    <h1>Playoffs Season @Season.Current</h1>
+    <h1>Playoffs Season @LeagueConstants.CurrentSeason</h1>
     <hr class="my-4">
 </div>
 @if (_loading)
@@ -54,7 +54,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _playoffs = await _playoffRepository.LoadForSeason(Season.Current);
+        _playoffs = await _playoffRepository.LoadForSeason(LeagueConstants.CurrentSeason);
         if (_playoffs == null)
         {
             var playerInLeagues = new List<PlayerInLeague>();

@@ -12,15 +12,17 @@ namespace FadingFlame.Discord
 {
     public interface IDiscordBot
     {
-        Task CreateLeagueChannels(List<League> leagues, List<Player> players);
+        Task CreateLeagueChannelsAndTags(List<League> leagues);
     }
 
     public class DiscordBot : IDiscordBot
     {
+        private readonly IPlayerRepository _playerRepository;
         private readonly DiscordClient _client;
 
-        public DiscordBot(string token)
+        public DiscordBot(string token, IPlayerRepository playerRepository)
         {
+            _playerRepository = playerRepository;
             var discordConfiguration = new DiscordConfiguration
             {
                 Token = token,
@@ -33,7 +35,7 @@ namespace FadingFlame.Discord
             _client.ConnectAsync().Wait();
         }
         
-        public async Task CreateLeagueChannels(List<League> leagues, List<Player> players)
+        public async Task CreateLeagueChannelsAndTags(List<League> leagues)
         {
             var channels = _client.Guilds.SelectMany(g => g.Value.Channels).Where(c => c.Value.Type == ChannelType.Text);
             var regex = new Regex("league-([0-9]{1,2}[a-b])-\\w+");
@@ -58,33 +60,45 @@ namespace FadingFlame.Discord
                 var position = 1;
                 foreach (var league in leagues)
                 {
-                    // var leagueChannel = clientGuild.Value.Channels.FirstOrDefault(c => c.Value.Type == ChannelType.Text && c.Value.Name == ToLeagueName(league)).Value;
-                    // if (leagueChannel == null)
-                    // {
-                    //     leagueChannel = await clientGuild.Value.CreateTextChannelAsync($"league-{league.DivisionId}-{league.Name}", leaguesCategory);
-                    // }
-                    //
-                    // await leagueChannel.ModifyPositionAsync(position);
-                    //
+                    var players = await _playerRepository.LoadForLeague(league.Players.Select(p => p.Id).ToList());
+                    var leagueChannel = clientGuild.Value.Channels.FirstOrDefault(c => c.Value.Type == ChannelType.Text && c.Value.Name == ToLeagueName(league)).Value;
+                    if (leagueChannel == null)
+                    {
+                        leagueChannel = await clientGuild.Value.CreateTextChannelAsync($"league-{league.DivisionId}-{league.Name}", leaguesCategory);
+                    }
+                    
+                    await leagueChannel.ModifyPositionAsync(position);
+                    
                     var role = clientGuild.Value.Roles.FirstOrDefault(r => r.Value.Name == league.DivisionId.ToLower()).Value;
                     if (role == null)
                     {
                         role = await clientGuild.Value.CreateRoleAsync(league.DivisionId.ToLower(), color: LeagueConstants.DiscordColors[position - 1]);
                     }
 
+                    var owner = clientGuild.Value.Owner;
+                    await GrantRoleForLeague(players, owner, role);
                     foreach (var discordMember in clientGuild.Value.Members)
                     {
-                        var member = discordMember.Value;
-                        var username = member.Username.ToLower() + "#" + member.Discriminator;
-                        var playerInLeagues = players.FirstOrDefault(p => p.DiscordTag?.ToLower() == username);
-                        if (playerInLeagues != null)
-                        {
-                            await member.GrantRoleAsync(role);
-                        }
+                        await GrantRoleForLeague(players, discordMember.Value, role);
                     }
                     
                     position++;
                 }
+            }
+        }
+
+        private static async Task GrantRoleForLeague(List<Player> players, DiscordMember member, DiscordRole role)
+        {
+            var username = member.Username.ToLower() + "#" + member.Discriminator;
+            var playerInLeagues = players.FirstOrDefault(p => p.DiscordTag?.ToLower() == username);
+            if (playerInLeagues != null)
+            {
+                var oldLeagueRoles = member.Roles.Where(r => LeagueConstants.Ids.Select(l => l.ToLower()).Contains(r.Name));
+                foreach (var oldLeagueRole in oldLeagueRoles)
+                {
+                    await member.RevokeRoleAsync(oldLeagueRole);
+                }
+                await member.GrantRoleAsync(role);
             }
         }
 

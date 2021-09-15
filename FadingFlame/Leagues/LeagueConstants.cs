@@ -5,6 +5,7 @@ namespace FadingFlame.Leagues
 {
     public class LeagueConstants
     {
+        public static int CurrentSeason => 1;
         public static List<string> Names => new()
         {
             "Sunna",
