@@ -40,9 +40,6 @@ namespace FadingFlame.Leagues
                     newLeagues.Add(league);
                     league = League.Create(LeagueConstants.CurrentSeason, LeagueConstants.StartDate, LeagueConstants.Ids[newLeagues.Count], LeagueConstants.Names[newLeagues.Count]);
                 }
-
-                player.ResetLists();
-                await _playerRepository.Update(player);
             }
 
             await _leagueRepository.Insert(newLeagues);
