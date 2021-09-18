@@ -5,6 +5,7 @@
 @using FadingFlame.Leagues
 
 @inject IPlayerRepository _playerRepository
+@inject ILeagueRepository _leagueRepository
 @inject UserState _userState
 @inject NavigationManager _navigation
 
@@ -100,7 +101,7 @@
                 <span>@_model.DiscordTag</span>
             </div>
         }
-        
+
         @if (_listSubmitted && LeagueConstants.ListSubmissionIsOver || _listSubmitted && IsTheRightUser())
         {
             <div class="row align-items-start">
@@ -152,12 +153,19 @@
         {
             <div>User is participating in the next season, lists will be displayed after @LeagueConstants.ListSubmissionDeadline.ToString("M")</div>
         }
+
+        <h4 class="mt-4">Participated in Seasons</h4>
+        @foreach (var league in _playerLeagues)
+        {
+            <div class="cursor" @onclick="() => NavigateToLeague(league.Id)">Season @league.Season, Division @league.DivisionId, Rank @GetRank(league)</div>
+        }
     </div>
 </div>
 
 @code{
     private EditUserModel _model = new();
     private EditListsModel _listModel = new();
+    private List<League> _playerLeagues = new();
     private bool _loading;
     private bool _loadingLists;
     private bool _listSubmitted;
@@ -181,6 +189,8 @@
             }
             else
             {
+                _playerLeagues = (await _leagueRepository.LoadLeaguesForPlayer(player.Id))
+                    .OrderByDescending(r => r.Season).ToList();
                 _model = new EditUserModel
                 {
                     DiscordTag = player.DiscordTag,
@@ -271,5 +281,18 @@
             await _playerRepository.Update(player);
             _loadingLists = false;
         }
+    }
+
+    private void NavigateToLeague(ObjectId leagueId)
+    {
+        _navigation.NavigateTo($"league/{leagueId}");
+    }
+
+    private int GetRank(League league)
+    {
+        return league.Players
+            .Select((value, index) => new { value, index })
+            .Single(x => x.value.Id == new ObjectId(Id))
+            .index + 1;
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
 using FluentAssertions;
@@ -10,7 +11,7 @@ using NUnit.Framework;
 namespace FadingFlameTests
 {
     [TestFixture]
-    public class LeagueTests
+    public class LeagueTests : IntegrationTestBase
     {
         [Test]
         public void AddPlayer()
@@ -195,6 +196,34 @@ namespace FadingFlameTests
 
             AssertMatchIsNeverPlayedTwice(gameDays);
             Assert.IsTrue(AssertMatchIsNeverPlayedTwice(gameDays));
+        }
+
+        [Test]
+        public async Task LoadLeaguesOflayer()
+        {
+            var league1 = League.Create(1, DateTimeOffset.Now, "1a", "123");
+            var league2 = League.Create(1, DateTimeOffset.Now, "2a", "123");
+            var league3 = League.Create(2, DateTimeOffset.Now, "1a", "123");
+
+            var player = Player.Create("dude", "mail");
+            var playerRepository = new PlayerRepository(MongoClient);
+            await playerRepository.Insert(player);
+
+            league2.AddPlayer(player);
+            league3.AddPlayer(player);
+
+            var leagueRepository = new LeagueRepository(MongoClient);
+
+            await leagueRepository.Insert(new List<League> { league1, league2, league3 });
+
+            var leaguesForPlayer = await leagueRepository.LoadLeaguesForPlayer(player.Id);
+
+            Assert.AreEqual(2, leaguesForPlayer.Count);
+
+            Assert.AreEqual(1, leaguesForPlayer[0].Season);
+            Assert.AreEqual("2a", leaguesForPlayer[0].DivisionId);
+            Assert.AreEqual(2, leaguesForPlayer[1].Season);
+            Assert.AreEqual("1a", leaguesForPlayer[1].DivisionId);
         }
 
         [Test]

@@ -6,7 +6,6 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
-using Microsoft.Extensions.Logging;
 
 namespace FadingFlame.Discord
 {
