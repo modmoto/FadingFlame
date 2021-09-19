@@ -32,7 +32,7 @@ namespace FadingFlame.Leagues
             return match;
         }
 
-        public void ReportGame(MatchResultDto matchResultDto)
+        public MatchResult ReportGame(MatchResultDto matchResultDto)
         {
             var player1Result = matchResultDto.Player1;
             var player2Result = matchResultDto.Player2;
@@ -54,6 +54,8 @@ namespace FadingFlame.Leagues
             player2.RecordResult(result.Player2.BattlePoints, result.Player2.VictoryPoints);
 
             Players = Players.OrderByDescending(p => p.BattlePoints).ThenByDescending(p => p.VictoryPoints).ToList();
+
+            return result;
         }
 
         public void AddPlayer(Player player)

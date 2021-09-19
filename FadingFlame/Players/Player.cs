@@ -13,14 +13,22 @@ namespace FadingFlame.Players
         public string AccountEmail { get; private set; }
         public string DiscordTag { get; set; }
         public SeasonArmy Army  { get; set; }
-       
+        public Mmr Mmr  { get; set; }
+
         public static Player Create(string name, string accountMail)
         {
             return new()
             {
                 DisplayName = name,
-                AccountEmail = accountMail
+                AccountEmail = accountMail,
+                Mmr = Mmr.Create()
             };
+        }
+
+
+        public void UpdateMmr(Mmr mmr)
+        {
+            Mmr = mmr;
         }
 
         public void SubmitLists(GameList list1, GameList list2)

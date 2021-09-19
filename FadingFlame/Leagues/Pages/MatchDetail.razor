@@ -218,6 +218,7 @@ else
 @inject IPlayerRepository _playerRepository
 @inject IPlayoffRepository _playoffRepository
 @inject UserState _userState
+@inject MmrRepository _mmrRepository
 
 @code {
     [Parameter]
@@ -334,21 +335,36 @@ else
     private async Task OnValidSubmit()
     {
         _loading = true;
+        MatchResult result;
         if (_league != null)
         {
             _model.SecondaryObjective = ConvertToEnum();
-            _league.ReportGame(_model);
+            result = _league.ReportGame(_model);
             await _leagueRepository.Update(_league);
         }
         else
         {
             _model.SecondaryObjective = ConvertToEnum();
-            _playoff.ReportGame(_model);
+            result =_playoff.ReportGame(_model);
             await _playoffRepository.Update(_playoff);
         }
 
+        await UpdateMmrs(result);
+
         _loading = false;
         StateHasChanged();
+    }
+
+    private async Task UpdateMmrs(MatchResult matchResult)
+    {
+        var layer = _player1.Id == matchResult.Player1.Id ? 1 : 2;
+        var mmrsOld = new List<Mmr> { _player1.Mmr ?? Mmr.Create(), _player2.Mmr ?? Mmr.Create()};
+        var mmrsNew = await _mmrRepository.UpdateMmrs(UpdateMmrRequest.Create(mmrsOld, layer));
+        _player1.UpdateMmr(mmrsNew[0]);
+        _player2.UpdateMmr(mmrsNew[1]);
+
+        await _playerRepository.Update(_player1);
+        await _playerRepository.Update(_player2);
     }
 
     private SecondaryObjectiveState ConvertToEnum()

@@ -83,7 +83,7 @@ namespace FadingFlame.Playoffs
             return playoff;
         }
 
-        public void ReportGame(MatchResultDto matchResultDto)
+        public MatchResult ReportGame(MatchResultDto matchResultDto)
         {
             var roundIndex = Rounds.FindIndex(r => r.Matchups.Any(m => m.MatchId == matchResultDto.MatchId));
             if (roundIndex == -1) throw new ValidationException("Match not in this playoffs in this config");
@@ -121,6 +121,8 @@ namespace FadingFlame.Playoffs
 
                 Rounds[roundIndex + 1].Matchups[matchIndex / 2] = matchup;
             }
+
+            return result;
         }
     }
 }
