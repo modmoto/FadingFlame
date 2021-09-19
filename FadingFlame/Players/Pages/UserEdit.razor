@@ -149,7 +149,7 @@
                 </button>
             }
         }
-        else
+        @if(_listSubmitted && !IsTheRightUser())
         {
             <div>User is participating in the next season, lists will be displayed after @LeagueConstants.ListSubmissionDeadline.ToString("M")</div>
         }
