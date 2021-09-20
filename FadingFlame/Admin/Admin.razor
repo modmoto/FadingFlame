@@ -42,22 +42,31 @@
             Create Playoffs Season 1
         </button>
     </div>
-    <h3 class="m-2">Users with lists (@_playersWithList.Count):</h3>
-    <ul class="list-group w-50">
-        @foreach (var player in _playersWithList)
-        {
-            <li class="list-group-item cursor" @onclick="() => GoToPlayer(player)">@player.DisplayName / @player.DiscordTag</li>
-        }
-    </ul>
-    <h3 class="m-2">Users without lists (@_playersWithOutList.Count):</h3>
-    <ul class="list-group w-50">
-        @foreach (var player in _playersWithOutList)
-        {
-            <li class="list-group-item cursor" @onclick="() => GoToPlayer(player)">@player.DisplayName / @player.DiscordTag</li>
-        }
-    </ul>
-    
-    
+    <div class="row">
+        <div class="card m-2" style="width: 28rem;">
+            <div class="card-body">
+                <div class="card-title">Users without lists (@_playersWithList.Count):</div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var player in _playersWithList)
+                    {
+                        <li class="list-group-item cursor" @onclick="() => GoToPlayer(player)">@player.DisplayName / @player.DiscordTag</li>
+                    }
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card m-2" style="width: 28rem;">
+            <div class="card-body">
+                <div class="card-title">Users without lists (@_playersWithOutList.Count):</div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var player in _playersWithOutList)
+                    {
+                        <li class="list-group-item cursor" @onclick="() => GoToPlayer(player)">@player.DisplayName / @player.DiscordTag</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
 }
 
 @code {
