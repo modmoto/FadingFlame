@@ -3,6 +3,7 @@
 @using FadingFlame.Players
 @using MongoDB.Bson
 @using FadingFlame.Leagues
+@using System.Text.RegularExpressions
 
 @inject IPlayerRepository _playerRepository
 @inject ILeagueRepository _leagueRepository
@@ -10,16 +11,22 @@
 @inject NavigationManager _navigation
 
 <div class="card">
-    <h4 class="card-header">Profile @_model.DisplayName</h4>
+    <h4 class="card-header">Profile @_player.DisplayName</h4>
     <div class="card-body">
         @if (IsTheRightUser())
         {
-            <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
+            <EditForm OnSubmit="OnSubmit" EditContext="@_editContextUser">
                 <DataAnnotationsValidator/>
                 <div class="form-group">
-                    <div class="pb-2">Discord Tag: </div>
-                    <InputText @bind-Value="_model.DiscordTag" class="form-control mb-3"/>
-                    <ValidationMessage For="@(() => _model.DiscordTag)"/>
+                    <div class="pb-2">Display name: </div>
+                    <InputText @bind-Value="_editUserModel.DisplayName" class="form-control mb-3"/>
+                    <ValidationMessage For="@(() => _editUserModel.DisplayName)"/>
+                </div>
+                <DataAnnotationsValidator/>
+                <div class="form-group">
+                    <div class="pb-2">Discord tag: </div>
+                    <InputText @bind-Value="_editUserModel.DiscordTag" class="form-control mb-3"/>
+                    <ValidationMessage For="@(() => _editUserModel.DiscordTag)"/>
                 </div>
                 <button disabled="@_loading" class="btn btn-primary">
                     @if (_loading)
@@ -32,7 +39,7 @@
             
             <hr class="my-3">
             
-            @if (!_listSubmitted)
+            @if (!_player.SubmittedLists)
             {
                 <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
                     To participate in the next season, submit your lists here until @LeagueConstants.ListSubmissionDeadline.ToString("M"). This can not be undone once you submitted the lists.
@@ -98,11 +105,11 @@
         {
             <div class="form-group pb-3">
                 <label>Discord Tag: </label>
-                <span>@_model.DiscordTag</span>
+                <span>@_editUserModel.DiscordTag</span>
             </div>
         }
 
-        @if (_listSubmitted && LeagueConstants.ListSubmissionIsOver || _listSubmitted && IsTheRightUser())
+        @if (_player.SubmittedLists && LeagueConstants.ListSubmissionIsOver || _player.SubmittedLists && IsTheRightUser())
         {
             <div class="row align-items-start">
                 <div class="col">
@@ -149,7 +156,7 @@
                 </button>
             }
         }
-        @if(_listSubmitted && !IsTheRightUser())
+        @if(_player.SubmittedLists && !IsTheRightUser())
         {
             <div>User is participating in the next season, lists will be displayed after @LeagueConstants.ListSubmissionDeadline.ToString("M")</div>
         }
@@ -163,18 +170,25 @@
 </div>
 
 @code{
-    private EditUserModel _model = new();
+    private EditUserModel _editUserModel = new();
     private EditListsModel _listModel = new();
     private List<League> _playerLeagues = new();
+    private Player _player = new();
     private bool _loading;
     private bool _loadingLists;
-    private bool _listSubmitted;
 
     [ParameterAttribute]
     public string Id { get; set; }
 
+    private ValidationMessageStore _messageStore;
+    private EditContext _editContextUser;
+    
     protected override void OnInitialized()
     {
+        _editContextUser = new EditContext(_editUserModel);
+        _messageStore = new ValidationMessageStore(_editContextUser);
+        _editContextUser.OnValidationRequested += (_, _) => OnSubmit();
+
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
     }
     
@@ -182,39 +196,31 @@
     {
         if (ObjectId.TryParse(Id, out var realId))
         {
-            var player = await _playerRepository.Load(realId);
-            if (player == null)
+            _player = await _playerRepository.Load(realId);
+            if (_player == null)
             {
                 _navigation.NavigateTo("notfound");
             }
             else
             {
-                _playerLeagues = (await _leagueRepository.LoadLeaguesForPlayer(player.Id))
+                _playerLeagues = (await _leagueRepository.LoadLeaguesForPlayer(_player.Id))
                     .OrderByDescending(r => r.Season).ToList();
-                _model = new EditUserModel
+                _editUserModel = new EditUserModel
                 {
-                    DiscordTag = player.DiscordTag,
-                    DisplayName = player.DisplayName
+                    DiscordTag = _player.DiscordTag,
+                    DisplayName = _player.DisplayName
                 };
 
                 _listModel = new EditListsModel
                 {
-                    List1 = player.Army?.List1.List,
-                    List2 = player.Army?.List2.List,
-                    List1Name = player.Army?.List1.Name,
-                    List2Name = player.Army?.List2.Name,
-                    Faction1 = player.Army?.List1.Faction ?? 0,
-                    Faction2 = player.Army?.List2.Faction ?? 0
+                    List1 = _player.Army?.List1.List,
+                    List2 = _player.Army?.List2.List,
+                    List1Name = _player.Army?.List1.Name,
+                    List2Name = _player.Army?.List2.Name,
+                    Faction1 = _player.Army?.List1.Faction ?? 0,
+                    Faction2 = _player.Army?.List2.Faction ?? 0
                 };
 
-                if (_listModel.List1 != null
-                    && _listModel.List2 != null
-                    && _listModel.List1Name != null
-                    && _listModel.List2Name != null)
-                {
-                    _listSubmitted = true;
-                }
-                
                 StateHasChanged();
             }
         }
@@ -226,61 +232,63 @@
 
     private async Task OnValidSubmitList()
     {
-        if (IsTheRightUser())
+        _loadingLists = true;
+        if (_listModel.List1Name == _listModel.List2Name)
         {
-            _loadingLists = true;
-            var player = await _playerRepository.Load(new ObjectId(Id));
-            if (_listModel.List1Name == _listModel.List2Name)
-            {
-                _listModel.List1Name += "_1";
-                _listModel.List2Name += "_2";
-            }
-
-            var list1 = GameList.Create(_listModel.List1Name, _listModel.List1, _listModel.Faction1);
-            var list2 = GameList.Create(_listModel.List2Name, _listModel.List2, _listModel.Faction2);
-            player.SubmitLists(list1, list2);
-            await _playerRepository.Update(player);
-
-            _loadingLists = false;
-            _listSubmitted = true;
+            _listModel.List1Name += "_1";
+            _listModel.List2Name += "_2";
         }
+
+        var list1 = GameList.Create(_listModel.List1Name, _listModel.List1, _listModel.Faction1);
+        var list2 = GameList.Create(_listModel.List2Name, _listModel.List2, _listModel.Faction2);
+        _player.SubmitLists(list1, list2);
+        await _playerRepository.Update(_player);
+
+        _loadingLists = false;
     }
     
-    private async Task OnValidSubmit()
+    private async void OnSubmit()
     {
-        if (IsTheRightUser())
+        _loading = true;
+        _messageStore.Clear();
+        var regex = new Regex("\\w+#[0-9]+");
+        var isValid = true;
+        if (!regex.Match(_editUserModel.DiscordTag).Success)
         {
-            _loading = true;
-            var player = await _playerRepository.Load(new ObjectId(Id));
-            player.DiscordTag = _model.DiscordTag;
-            await _playerRepository.Update(player);
-            _userState.SetUserData(player.Id);
-            _loading = false;
+            _messageStore.Add(() => _editUserModel.DiscordTag, "Discord tag has to of the form example#123");
+            isValid = false;
         }
+        
+        if (_editUserModel.DisplayName.Length < 3 || _editUserModel.DisplayName.Length > 30)
+        {
+            _messageStore.Add(() => _editUserModel.DisplayName, "Displayname hast to be between 3 and 30 characters");
+            isValid = false;
+        }
+
+        if (!isValid)
+        {
+            _loading = false;
+            return;
+        }
+        _player.Update(_editUserModel);
+        await _playerRepository.Update(_player);
+        _loading = false;
+        StateHasChanged();
     }
 
     private bool IsTheRightUser()
     {
-        return _userState.LoggedInPlayerId?.ToString() == Id;
+        return Id == _userState.LoggedInPlayerId?.ToString();
     }
 
     private async Task DeleteLists()
     {
-        if (_userState.UserIsAdmin)
-        {
-            _loadingLists = true;
-            var player = await _playerRepository.Load(new ObjectId(Id));
-            player.ResetLists();
-            _listModel.List1 = null;
-            _listModel.List2 = null;
-            _listModel.List1Name = null;
-            _listModel.List2Name = null;
-            _listModel.Faction1 = 0;
-            _listModel.Faction2 = 0;
-            _listSubmitted = false;
-            await _playerRepository.Update(player);
-            _loadingLists = false;
-        }
+        _loadingLists = true;
+        _player.ResetLists();
+        _listModel = new EditListsModel();
+        await _playerRepository.Update(_player);
+        StateHasChanged();
+        _loadingLists = false;
     }
 
     private void NavigateToLeague(ObjectId leagueId)

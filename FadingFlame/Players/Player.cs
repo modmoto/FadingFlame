@@ -14,6 +14,7 @@ namespace FadingFlame.Players
         public string DiscordTag { get; set; }
         public SeasonArmy Army  { get; set; }
         public Mmr Mmr  { get; set; }
+        public bool SubmittedLists => Army != null;
 
         public static Player Create(string name, string accountMail)
         {
@@ -44,6 +45,12 @@ namespace FadingFlame.Players
         public void ResetLists()
         {
             Army = null;
+        }
+
+        public void Update(EditUserModel model)
+        {
+            DiscordTag = model.DiscordTag;
+            DisplayName = model.DisplayName;
         }
     }
 

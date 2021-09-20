@@ -16,7 +16,7 @@
         <div class="top-row px-4">
             <AuthorizeView>
                 <Authorized>
-                    <span>Hello<a href="@($"/player/{_userState.LoggedInPlayerId}")">@_userState.UserName</a></span>
+                    <span><a href="@($"/player/{_userState.LoggedInPlayerId}")">My profile</a></span>
                     <a href="/Logout">
                         <span class="oi oi-account-logout" aria-hidden="true"></span>
                     </a>
