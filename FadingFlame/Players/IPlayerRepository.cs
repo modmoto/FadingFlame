@@ -15,6 +15,8 @@ namespace FadingFlame.Players
         Task<Player> LoadByEmail(string accountEmail);
         Task<List<Player>> PlayersThatEnlisted();
         Task<List<Player>> LoadForLeague(List<ObjectId> playerIds);
+        Task<List<Player>> LoadAllWithoutList();
+        Task<List<Player>> LoadAllWitList();
     }
 
     public class PlayerRepository : MongoDbRepositoryBase, IPlayerRepository
@@ -56,6 +58,17 @@ namespace FadingFlame.Players
         public Task<List<Player>> LoadForLeague(List<ObjectId> playerIds)
         {
             return LoadAll<Player>(p => playerIds.Contains(p.Id));
+        }
+
+        public Task<List<Player>> LoadAllWithoutList()
+        {
+            return LoadAll<Player>(p => p.Army == null);
+        }
+
+        public Task<List<Player>> LoadAllWitList()
+        {
+            
+            return LoadAll<Player>(p => p.Army != null);
         }
     }
 }
