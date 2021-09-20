@@ -39,10 +39,10 @@
             
             <hr class="my-3">
             
-            @if (!_player.SubmittedLists)
+            @if (!LeagueConstants.ListSubmissionIsOver)
             {
                 <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
-                    To participate in the next season, submit your lists here until @LeagueConstants.ListSubmissionDeadline.ToString("M"). This can not be undone once you submitted the lists.
+                    To participate in the next season, submit your lists here. The lists can not be changed after @LeagueConstants.ListSubmissionDeadline.ToString("M") and are not visible to other players until then.
                 </div>
                 <EditForm Model="@_listModel" OnValidSubmit="OnValidSubmitList">
                 <DataAnnotationsValidator/>
@@ -96,7 +96,7 @@
                     {
                         <span class="spinner-border spinner-border-sm mr-1"></span>
                     }
-                    Submit final lists
+                    Save lists
                 </button>
                 </EditForm>
             }
@@ -107,58 +107,48 @@
                 <label>Discord Tag: </label>
                 <span>@_editUserModel.DiscordTag</span>
             </div>
-        }
 
-        @if (_player.SubmittedLists && LeagueConstants.ListSubmissionIsOver || _player.SubmittedLists && IsTheRightUser())
-        {
-            <div class="row align-items-start">
-                <div class="col">
-                    <div class="form-group">
-                        <div>Faction: </div>
-                        <div class="pb-3"><b>@_listModel.Faction1.ToFactionString()</b></div>
-                    </div>
-                    <div class="form-group">
-                        <div>Faction: </div>
-                        <div class="pb-3"><b>@_listModel.Faction2.ToFactionString()</b></div>
-                    </div>
-                </div>
-            </div>
-            <div class="row align-items-start">
-                <div class="col">
-                    <div class="form-group">
-                        <label>First List: </label>
-                        <div><b>@_listModel.List1Name</b></div>
-                    </div>
-                    <hr class="my-3">
-                    <div class="form-group">
-                        <div style="white-space:pre-wrap;">@_listModel.List1</div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="form-group">
-                        <label>Second List: </label>
-                        <div><b>@_listModel.List2Name</b></div>
-                    </div>
-                    <hr class="my-3">
-                    <div class="form-group">
-                        <div style="white-space:pre-wrap;">@_listModel.List2</div>
-                    </div>
-                </div>
-            </div>
-            if (_userState.UserIsAdmin)
+            @if (_player.SubmittedLists && LeagueConstants.ListSubmissionIsOver)
             {
-                <button disabled="@_loadingLists" class="btn btn-danger mt-3" @onclick="() => DeleteLists()">
-                    @if (_loadingLists)
-                    {
-                        <span class="spinner-border spinner-border-sm mr-1"></span>
-                    }
-                    <span class="oi oi-shield" aria-hidden="true"></span> Delete lists for user
-                </button>
+                <div class="row align-items-start">
+                    <div class="col">
+                        <div class="form-group">
+                            <div>Faction: </div>
+                            <div class="pb-3"><b>@_listModel.Faction1.ToFactionString()</b></div>
+                        </div>
+                        <div class="form-group">
+                            <div>Faction: </div>
+                            <div class="pb-3"><b>@_listModel.Faction2.ToFactionString()</b></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row align-items-start">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>First List: </label>
+                            <div><b>@_listModel.List1Name</b></div>
+                        </div>
+                        <hr class="my-3">
+                        <div class="form-group">
+                            <div style="white-space:pre-wrap;">@_listModel.List1</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Second List: </label>
+                            <div><b>@_listModel.List2Name</b></div>
+                        </div>
+                        <hr class="my-3">
+                        <div class="form-group">
+                            <div style="white-space:pre-wrap;">@_listModel.List2</div>
+                        </div>
+                    </div>
+                </div>
             }
-        }
-        @if(_player.SubmittedLists && !IsTheRightUser())
-        {
-            <div>User is participating in the next season, lists will be displayed after @LeagueConstants.ListSubmissionDeadline.ToString("M")</div>
+            else 
+            {
+                <div>User is participating in the next season, lists will be displayed after @LeagueConstants.ListSubmissionDeadline.ToString("M")</div>
+            }
         }
 
         <h4 class="mt-4">Participated in Seasons</h4>
@@ -279,16 +269,6 @@
     private bool IsTheRightUser()
     {
         return Id == _userState.LoggedInPlayerId?.ToString();
-    }
-
-    private async Task DeleteLists()
-    {
-        _loadingLists = true;
-        _player.ResetLists();
-        _listModel = new EditListsModel();
-        await _playerRepository.Update(_player);
-        StateHasChanged();
-        _loadingLists = false;
     }
 
     private void NavigateToLeague(ObjectId leagueId)
