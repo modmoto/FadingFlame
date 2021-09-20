@@ -45,12 +45,6 @@ namespace FadingFlame.Players
             DiscordTag = model.DiscordTag;
             DisplayName = model.DisplayName;
         }
-
-        public void Update(EditUserModel model)
-        {
-            DiscordTag = model.DiscordTag;
-            DisplayName = model.DisplayName;
-        }
     }
 
     public class SeasonArmy
