@@ -4,7 +4,6 @@ namespace FadingFlame.Players
 {
     public class EditUserModel
     {
-        public string DisplayName { get; set; }
         public string DiscordTag { get; set; }
     }
     
