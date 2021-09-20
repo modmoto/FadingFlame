@@ -15,12 +15,18 @@
     <div class="card-body">
         @if (IsTheRightUser())
         {
-            <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
+            <EditForm OnSubmit="OnSubmit" EditContext="@_editContextUser">
                 <DataAnnotationsValidator/>
                 <div class="form-group">
-                    <div class="pb-2">Discord Tag: </div>
-                    <InputText @bind-Value="_model.DiscordTag" class="form-control mb-3"/>
-                    <ValidationMessage For="@(() => _model.DiscordTag)"/>
+                    <div class="pb-2">Display name: </div>
+                    <InputText @bind-Value="_editUserModel.DisplayName" class="form-control mb-3"/>
+                    <ValidationMessage For="@(() => _editUserModel.DisplayName)"/>
+                </div>
+                <DataAnnotationsValidator/>
+                <div class="form-group">
+                    <div class="pb-2">Discord tag: </div>
+                    <InputText @bind-Value="_editUserModel.DiscordTag" class="form-control mb-3"/>
+                    <ValidationMessage For="@(() => _editUserModel.DiscordTag)"/>
                 </div>
                 <button disabled="@_loading" class="btn btn-primary">
                     @if (_loading)
@@ -99,7 +105,7 @@
         {
             <div class="form-group pb-3">
                 <label>Discord Tag: </label>
-                <span>@_model.DiscordTag</span>
+                <span>@_editUserModel.DiscordTag</span>
             </div>
         }
 
@@ -164,10 +170,10 @@
 </div>
 
 @code{
-    private EditUserModel _model = new();
+    private EditUserModel _editUserModel = new();
     private EditListsModel _listModel = new();
     private List<League> _playerLeagues = new();
-    private Player _player;
+    private Player _player = new();
     private bool _loading;
     private bool _loadingLists;
 
@@ -175,14 +181,13 @@
     public string Id { get; set; }
 
     private ValidationMessageStore _messageStore;
-
-    [CascadingParameter] EditContext CurrentEditContext { get; set; }
-
+    private EditContext _editContextUser;
+    
     protected override void OnInitialized()
     {
-        _messageStore = new ValidationMessageStore(CurrentEditContext);
-        CurrentEditContext.OnValidationRequested += (_, _) => _messageStore.Clear();
-        CurrentEditContext.OnFieldChanged += (_, e) => _messageStore.Clear(e.FieldIdentifier);
+        _editContextUser = new EditContext(_editUserModel);
+        _messageStore = new ValidationMessageStore(_editContextUser);
+        _editContextUser.OnValidationRequested += (_, _) => OnSubmit();
 
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
     }
@@ -200,9 +205,10 @@
             {
                 _playerLeagues = (await _leagueRepository.LoadLeaguesForPlayer(_player.Id))
                     .OrderByDescending(r => r.Season).ToList();
-                _model = new EditUserModel
+                _editUserModel = new EditUserModel
                 {
                     DiscordTag = _player.DiscordTag,
+                    DisplayName = _player.DisplayName
                 };
 
                 _listModel = new EditListsModel
@@ -241,24 +247,38 @@
         _loadingLists = false;
     }
     
-    private async Task OnValidSubmit()
+    private async void OnSubmit()
     {
         _loading = true;
-        var regex = new Regex("[a-zA-Z]+#[0-9]+");
-        if (!regex.Match(_model.DiscordTag).Success)
+        _messageStore.Clear();
+        var regex = new Regex("\\w+#[0-9]+");
+        var isValid = true;
+        if (!regex.Match(_editUserModel.DiscordTag).Success)
         {
-            _messageStore.Add(new FieldIdentifier(_model, nameof(EditUserModel.DiscordTag)), "Discord tag has to of the form example#123");
+            _messageStore.Add(() => _editUserModel.DiscordTag, "Discord tag has to of the form example#123");
+            isValid = false;
+        }
+        
+        if (_editUserModel.DisplayName.Length < 3 || _editUserModel.DisplayName.Length > 30)
+        {
+            _messageStore.Add(() => _editUserModel.DisplayName, "Displayname hast to be between 3 and 30 characters");
+            isValid = false;
+        }
+
+        if (!isValid)
+        {
+            _loading = false;
             return;
         }
-        _player.DiscordTag = _model.DiscordTag;
+        _player.Update(_editUserModel);
         await _playerRepository.Update(_player);
-        StateHasChanged();
         _loading = false;
+        StateHasChanged();
     }
 
     private bool IsTheRightUser()
     {
-        return _userState.LoggedInPlayerId?.ToString() == Id;
+        return Id == _userState.LoggedInPlayerId?.ToString();
     }
 
     private async Task DeleteLists()
