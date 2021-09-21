@@ -2,14 +2,16 @@
 @using MongoDB.Bson
 @using FadingFlame.Leagues
 @using FadingFlame.Players
+@using FadingFlame.Admin
 @inject IPlayoffRepository _playoffRepository
 @inject IPlayerRepository _playerRepository
 @inject NavigationManager _navigation
 @inject UserState _userState
+@inject SeasonState _seasonState
 
 
 <div>
-    <h1>Playoffs Season @LeagueConstants.CurrentSeason</h1>
+    <h1>Playoffs Season @_seasonState.CurrentSeason.SeasonId</h1>
     <hr class="my-4">
 </div>
 @if (_loading)
@@ -54,7 +56,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _playoffs = await _playoffRepository.LoadForSeason(LeagueConstants.CurrentSeason);
+        _playoffs = await _playoffRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
         if (_playoffs == null)
         {
             var playerInLeagues = new List<PlayerInLeague>();

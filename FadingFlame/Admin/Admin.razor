@@ -11,6 +11,7 @@
 @inject IDiscordBot _discordBot
 @inject NavigationManager _navigation
 @inject ISeasonRepository _seasonRepository
+@inject SeasonState _seasonState
 
 @if (_userState.UserIsAdmin)
 {
@@ -53,18 +54,18 @@
 
         <div class="col">
             <h4>Current Season:</h4>
-            <EditForm OnSubmit="() => SaveSeason(_editCurrentSeasonModel)" Model="@_editCurrentSeasonModel">
+            <EditForm OnSubmit="() => SaveSeason(_seasonState.CurrentSeason)" Model="@_seasonState.CurrentSeason">
                 <DataAnnotationsValidator/>
                 <div class="form-group">
                     <div class="pb-2">List Submission deadline:</div>
-                    <InputDate @bind-Value="_editCurrentSeasonModel.ListSubmissionDeadline" class="form-control mb-3"/>
-                    <ValidationMessage For="@(() => _editCurrentSeasonModel.ListSubmissionDeadline)"/>
+                    <InputDate @bind-Value="_seasonState.CurrentSeason.ListSubmissionDeadline" class="form-control mb-3"/>
+                    <ValidationMessage For="@(() => _seasonState.CurrentSeason.ListSubmissionDeadline)"/>
                 </div>
                 <DataAnnotationsValidator/>
                 <div class="form-group">
                   <div class="pb-2">Start date:</div>
-                  <InputDate @bind-Value="_editCurrentSeasonModel.StartDate" class="form-control mb-3"/>
-                  <ValidationMessage For="@(() => _editCurrentSeasonModel.StartDate)"/>
+                  <InputDate @bind-Value="_seasonState.CurrentSeason.StartDate" class="form-control mb-3"/>
+                  <ValidationMessage For="@(() => _seasonState.CurrentSeason.StartDate)"/>
                 </div>
                 <button disabled="@_loadingSeasons" class="btn btn-primary">
                     @if (_loadingSeasons)
@@ -77,18 +78,18 @@
         </div>
         <div class="col">
             <h4>Next Season:</h4>
-            <EditForm OnSubmit="() => SaveSeason(_editNextSeasonModel)" Model="@_editNextSeasonModel">
+            <EditForm OnSubmit="() => SaveSeason(_seasonState.NextSeason)" Model="@_seasonState.NextSeason">
                 <DataAnnotationsValidator/>
                 <div class="form-group">
                     <div class="pb-2">List Submission deadline:</div>
-                    <InputDate @bind-Value="_editNextSeasonModel.ListSubmissionDeadline" class="form-control mb-3"/>
-                    <ValidationMessage For="@(() => _editNextSeasonModel.ListSubmissionDeadline)"/>
+                    <InputDate @bind-Value="_seasonState.NextSeason.ListSubmissionDeadline" class="form-control mb-3"/>
+                    <ValidationMessage For="@(() => _seasonState.NextSeason.ListSubmissionDeadline)"/>
                 </div>
                 <DataAnnotationsValidator/>
                 <div class="form-group">
                     <div class="pb-2">Start date:</div>
-                    <InputDate @bind-Value="_editNextSeasonModel.StartDate" class="form-control mb-3"/>
-                    <ValidationMessage For="@(() => _editNextSeasonModel.StartDate)"/>
+                    <InputDate @bind-Value="_seasonState.NextSeason.StartDate" class="form-control mb-3"/>
+                    <ValidationMessage For="@(() => _seasonState.NextSeason.StartDate)"/>
                 </div>
                 <button disabled="@_loadingSeasons" class="btn btn-primary">
                     @if (_loadingSeasons)
@@ -137,34 +138,17 @@
     private bool _loadingSeasons;
     private List<Player> _playersWithList = new();
     private List<Player> _playersWithOutList = new();
-    private Season _editCurrentSeasonModel = new();
-    private Season _editNextSeasonModel = new();
 
     protected override void OnInitialized()
     {
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
+        _seasonState.SeasonsChanged += (_, _) => StateHasChanged();
     }
     
     protected override async Task OnInitializedAsync()
     {
         _playersWithList = await _playerRepository.LoadAllWitList();
         _playersWithOutList = await _playerRepository.LoadAllWithoutList();
-        var loadSeasons = await _seasonRepository.LoadSeasons();
-        if (loadSeasons.Count > 1)
-        {
-            _editNextSeasonModel = loadSeasons[0];
-            _editCurrentSeasonModel = loadSeasons[1];
-        }
-        else if (loadSeasons.Count > 0)
-        {
-            _editCurrentSeasonModel = loadSeasons[0];
-            _editNextSeasonModel.SeasonId = 3;
-        }
-        else
-        {
-            _editNextSeasonModel.SeasonId = 3;
-            _editCurrentSeasonModel.SeasonId = 2;
-        }
     }
 
     private async Task CreateLeagues()
@@ -177,7 +161,7 @@
     private async Task SyncDiscord()
     {
         _loadingDiscord = true;
-        var leagues = await _leagueRepository.LoadForSeason(LeagueConstants.CurrentSeason);
+        var leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
         await _discordBot.CreateLeagueChannelsAndTags(leagues);
         _loadingDiscord = false;
     }

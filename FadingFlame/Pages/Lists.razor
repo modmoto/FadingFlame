@@ -1,14 +1,15 @@
 @page "/lists"
 @using FadingFlame.Players
 @using MongoDB.Bson
-@using FadingFlame.Leagues
+@using FadingFlame.Admin
 @inject IPlayerRepository _playerRepository
 @inject NavigationManager _navigation
+@inject SeasonState _seasonState
 
 <div>
     <h1>Lists played this season</h1>
     <hr class="my-4">
-    @if (LeagueConstants.ListSubmissionIsOver)
+    @if (_seasonState.CurrentSeason.ListSubmissionIsOver)
     {
         @foreach (var player in _enlistedPlayers)
         {
@@ -48,7 +49,7 @@
     }
     else
     {
-        <h4>Lists will be displayed after @LeagueConstants.ListSubmissionDeadline.ToString("M")</h4>
+        <h4>Lists will be displayed after @(_seasonState.CurrentSeason.StartDate.ToString("M"))</h4>
     }
     
 </div>
@@ -56,10 +57,11 @@
 @code
 {
     private List<Player> _enlistedPlayers = new();
-    
+
     protected override async Task OnInitializedAsync()
     {
         _enlistedPlayers = await _playerRepository.PlayersThatEnlisted();
+        _seasonState.SeasonsChanged += (_, _) => StateHasChanged();
     }
 
     private void GoToPlayer(ObjectId playerId)

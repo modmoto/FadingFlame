@@ -1,11 +1,14 @@
 @using FadingFlame.Players
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Http
+@using FadingFlame.Admin
 @inherits LayoutComponentBase
 @inject IPlayerRepository _playerRepository
 @inject UserState _userState
+@inject SeasonState _seasonState
 @inject NavigationManager _navigation
 @inject IHttpContextAccessor _httpContextAccessor
+@inject ISeasonRepository _seasonRepository
 
 <div class="page">
     <div class="sidebar">
@@ -41,7 +44,6 @@
 
 @code
 {
-
     protected override void OnInitialized()
     {
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
@@ -65,6 +67,9 @@
                 _userState.SetUserData(player.Id);
             }
         }
+
+        var loadSeasons = await _seasonRepository.LoadSeasons();
+        _seasonState.SetSeasons(loadSeasons[1], loadSeasons[0]);
     }
 
     public void GoToImprint()

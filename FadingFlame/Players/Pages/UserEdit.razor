@@ -4,10 +4,12 @@
 @using MongoDB.Bson
 @using FadingFlame.Leagues
 @using System.Text.RegularExpressions
+@using FadingFlame.Admin
 
 @inject IPlayerRepository _playerRepository
 @inject ILeagueRepository _leagueRepository
 @inject UserState _userState
+@inject SeasonState _seasonState
 @inject NavigationManager _navigation
 
 <div class="card">
@@ -39,10 +41,10 @@
             
             <hr class="my-3">
             
-            @if (!LeagueConstants.ListSubmissionIsOver)
+            @if (!_seasonState.CurrentSeason.ListSubmissionIsOver)
             {
                 <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
-                    To participate in the next season, submit your lists here. The lists can not be changed after @LeagueConstants.ListSubmissionDeadline.ToString("M") and are not visible to other players until then.
+                    To participate in the next season, submit your lists here. The lists can not be changed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToString("M") and are not visible to other players until then.
                 </div>
                 <EditForm Model="@_listModel" OnValidSubmit="OnValidSubmitList">
                 <DataAnnotationsValidator/>
@@ -108,7 +110,7 @@
                 <span>@_editUserModel.DiscordTag</span>
             </div>
 
-            @if (_player.SubmittedLists && LeagueConstants.ListSubmissionIsOver)
+            @if (_player.SubmittedLists && _seasonState.CurrentSeason.ListSubmissionIsOver)
             {
                 <div class="row align-items-start">
                     <div class="col">
@@ -146,9 +148,9 @@
                 </div>
             }
             
-            @if (_player.SubmittedLists && !LeagueConstants.ListSubmissionIsOver)
+            @if (_player.SubmittedLists && !_seasonState.CurrentSeason.ListSubmissionIsOver)
             {
-                <div>User is participating in the next season, lists will be displayed after @LeagueConstants.ListSubmissionDeadline.ToString("M")</div>
+                <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToString("M")</div>
             }
         }
 
@@ -181,6 +183,7 @@
         _editContextUser.OnValidationRequested += (_, _) => OnSubmit();
 
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
+        _seasonState.SeasonsChanged += (_, _) => StateHasChanged();
     }
     
     protected override async Task OnInitializedAsync()

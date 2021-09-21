@@ -89,6 +89,7 @@ namespace FadingFlame
             services.AddTransient<IPlayoffRepository, PlayoffRepository>();
             services.AddTransient<ISeasonRepository, SeasonRepository>();
             services.AddScoped<UserState>();
+            services.AddScoped<SeasonState>();
             services.AddHttpContextAccessor();
 
             // var buildServiceProvider = services.BuildServiceProvider();

@@ -35,7 +35,6 @@ namespace FadingFlame.Players
 
         public void SubmitLists(GameList list1, GameList list2)
         {
-            if (LeagueConstants.ListSubmissionIsOver) throw new ValidationException("List changing after the league started is not allowed");
             Army = new SeasonArmy
             {
                 List1 = list1,
