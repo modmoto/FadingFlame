@@ -15,6 +15,37 @@
 
 @if (_userState.UserIsAdmin)
 {
+    <h3 class="m-2">Registered players: (@(_playersWithOutList.Count + _playersWithList.Count))</h3>
+    <div class="row">
+        <div class="card m-2" style="width: 28rem;">
+            <div class="card-body">
+                <div class="card-title">Users with lists (@_playersWithList.Count):</div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var player in _playersWithList)
+                    {
+                        <li class="list-group-item cursor" @onclick="() => GoToPlayer(player)">@player.DisplayName / @player.DiscordTag</li>
+                    }
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card m-2" style="width: 28rem;">
+            <div class="card-body">
+                <div class="card-title">Users without lists (@_playersWithOutList.Count):</div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var player in _playersWithOutList)
+                    {
+                        <li class="list-group-item cursor" @onclick="() => GoToPlayer(player)">@player.DisplayName / @player.DiscordTag</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="pt-3 pb-3 alert alert-danger text-center" role="alert">
+        Danger Zone! I recomend asking modmoto to see what each button does ;)
+    </div>
+
     <div class="container">
         <div class="row">
             <div class="m-2 col">
@@ -110,33 +141,6 @@
             }
             End current season
         </button>
-    </div>
-
-    <h3 class="m-2">Registered players: (@(_playersWithOutList.Count + _playersWithList.Count))</h3>
-    <div class="row">
-        <div class="card m-2" style="width: 28rem;">
-            <div class="card-body">
-                <div class="card-title">Users with lists (@_playersWithList.Count):</div>
-                <ul class="list-group list-group-flush">
-                    @foreach (var player in _playersWithList)
-                    {
-                        <li class="list-group-item cursor" @onclick="() => GoToPlayer(player)">@player.DisplayName / @player.DiscordTag</li>
-                    }
-                </ul>
-            </div>
-        </div>
-        
-        <div class="card m-2" style="width: 28rem;">
-            <div class="card-body">
-                <div class="card-title">Users without lists (@_playersWithOutList.Count):</div>
-                <ul class="list-group list-group-flush">
-                    @foreach (var player in _playersWithOutList)
-                    {
-                        <li class="list-group-item cursor" @onclick="() => GoToPlayer(player)">@player.DisplayName / @player.DiscordTag</li>
-                    }
-                </ul>
-            </div>
-        </div>
     </div>
 }
 
