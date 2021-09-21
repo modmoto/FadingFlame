@@ -86,6 +86,10 @@ namespace FadingFlame.Leagues
         public void CreateGameDays()
         {
             var teams = Players.ToList();
+            if (teams.Count % 2 != 0)
+            {
+                teams.Add(PlayerInLeague.Create(ObjectId.Empty));
+            }
             var numberOfRounds = teams.Count - 1;
             var numberOfMatchesInARound = teams.Count / 2;
 
@@ -113,7 +117,14 @@ namespace FadingFlame.Leagues
                     var firstPlayerIndex = (gameDayIndex + index) % numberOfPlayers;
                     var secondPlayerIndex = (gameDayIndex + numberOfPlayers - index) % numberOfPlayers;
 
-                    var matchupInner = Matchup.Create(teamsTemp[firstPlayerIndex], teamsTemp[secondPlayerIndex]);
+                    var playerInLeague = teamsTemp[firstPlayerIndex];
+                    var playerAsGuest = teamsTemp[secondPlayerIndex];
+                    if (playerInLeague.Id == ObjectId.Empty || playerAsGuest.Id == ObjectId.Empty)
+                    {
+                        continue;
+                    }
+
+                    var matchupInner = Matchup.Create(playerInLeague, playerAsGuest);
                     matchups.Add(matchupInner);
                 }
 
@@ -121,6 +132,7 @@ namespace FadingFlame.Leagues
                 gameDays.Add(round);
             }
 
+            Players = Players.Where(l => l.Id != ObjectId.Empty).ToList();
             GameDays = gameDays;
         }
 

@@ -307,6 +307,24 @@ namespace FadingFlameTests
         }
 
         [Test]
+        public void MakePairings_PairingsOk_fivePlayers()
+        {
+            var player1 = ObjectId.GenerateNewId();
+            var player2 = ObjectId.GenerateNewId();
+            var player3 = ObjectId.GenerateNewId();
+            var player4 = ObjectId.GenerateNewId();
+            var player5 = ObjectId.GenerateNewId();
+            var league = TestUtils.CreateLeagueWithPlayers(player1, player2, player3, player4, player5);
+
+            league.CreateGameDays();
+
+            var domainEventGameDays = league.GameDays.ToList();
+            Assert.AreEqual(5, domainEventGameDays.Count);
+            Assert.AreEqual(5, league.Players.Count);
+            Assert.IsTrue(AssertMatchIsNeverPlayedTwice(domainEventGameDays));
+        }
+
+        [Test]
         public void MakePairings_PairingsOk_sixPlayers()
         {
             var player1 = ObjectId.GenerateNewId();
