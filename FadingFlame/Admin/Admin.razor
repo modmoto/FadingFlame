@@ -53,7 +53,7 @@
         <div class="row">
 
         <div class="col">
-            <h4>Current Season:</h4>
+            <h4>Current Season (@_seasonState.CurrentSeason.SeasonId):</h4>
             <EditForm OnSubmit="() => SaveSeason(_seasonState.CurrentSeason)" Model="@_seasonState.CurrentSeason">
                 <DataAnnotationsValidator/>
                 <div class="form-group">
@@ -77,7 +77,7 @@
             </EditForm>
         </div>
         <div class="col">
-            <h4>Next Season:</h4>
+            <h4>Next Season (@_seasonState.NextSeason.SeasonId):</h4>
             <EditForm OnSubmit="() => SaveSeason(_seasonState.NextSeason)" Model="@_seasonState.NextSeason">
                 <DataAnnotationsValidator/>
                 <div class="form-group">
@@ -101,6 +101,15 @@
             </EditForm>
         </div>
     </div>
+    </div>
+    <div class="m-2">
+        <button disabled="@_loadingEndingSeason" type="button" class="btn btn-danger" @onclick="EndCurrentSeason">
+            @if (_loadingEndingSeason)
+            {
+                <span class="spinner-border spinner-border-sm mr-1"></span>
+            }
+            End current season
+        </button>
     </div>
 
     <h3 class="m-2">Registered players: (@(_playersWithOutList.Count + _playersWithList.Count))</h3>
@@ -136,6 +145,7 @@
     private bool _loadingPlayoffs;
     private bool _loadingDiscord;
     private bool _loadingSeasons;
+    private bool _loadingEndingSeason;
     private List<Player> _playersWithList = new();
     private List<Player> _playersWithOutList = new();
 
@@ -184,4 +194,18 @@
         await _seasonRepository.Update(season);
         _loadingSeasons = false;
     }
+
+    private async Task EndCurrentSeason()
+    {
+        _loadingEndingSeason = true;
+
+        _seasonState.SetSeasons(_seasonState.NextSeason, new Season
+        {
+            SeasonId = _seasonState.NextSeason.SeasonId + 1
+        });
+
+        await _seasonRepository.Update(_seasonState.NextSeason);
+        _loadingEndingSeason = false;
+    }
+
 }
