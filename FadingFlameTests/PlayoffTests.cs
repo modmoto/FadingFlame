@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FadingFlame.Admin;
 using FadingFlame.Leagues;
 using FadingFlame.Playoffs;
 using MongoDB.Bson;
@@ -21,7 +22,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient));
+                new PlayoffRepository(MongoClient), new SeasonState());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
 
@@ -38,7 +39,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient));
+                new PlayoffRepository(MongoClient), new SeasonState());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
 
@@ -90,7 +91,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient));
+                new PlayoffRepository(MongoClient), new SeasonState());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
             
@@ -115,7 +116,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient));
+                new PlayoffRepository(MongoClient), new SeasonState());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
             
