@@ -1,5 +1,6 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using FadingFlame.Admin;
 using FadingFlame.Discord;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
@@ -86,6 +87,7 @@ namespace FadingFlame
             services.AddTransient<ILeagueCommandHandler, LeagueCommandHandler>();
             services.AddTransient<IPlayoffCommandHandler, PlayoffCommandHandler>();
             services.AddTransient<IPlayoffRepository, PlayoffRepository>();
+            services.AddTransient<ISeasonRepository, SeasonRepository>();
             services.AddScoped<UserState>();
             services.AddHttpContextAccessor();
 
