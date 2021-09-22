@@ -9,7 +9,7 @@ namespace FadingFlameTests
     {
         public static League CreateLeagueWithPlayers(params ObjectId[] identities)
         {
-            var league = League.Create(1, DateTimeOffset.Now, "1A", "bogota");
+            var league = League.Create(1, DateTime.Now, "1A", "bogota");
             foreach (var guidIdentity in identities)
             {
                 league.AddPlayer(new Player()

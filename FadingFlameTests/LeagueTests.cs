@@ -201,9 +201,9 @@ namespace FadingFlameTests
         [Test]
         public async Task LoadLeaguesOflayer()
         {
-            var league1 = League.Create(1, DateTimeOffset.Now, "1a", "123");
-            var league2 = League.Create(1, DateTimeOffset.Now, "2a", "123");
-            var league3 = League.Create(2, DateTimeOffset.Now, "1a", "123");
+            var league1 = League.Create(1, DateTime.Now, "1a", "123");
+            var league2 = League.Create(1, DateTime.Now, "2a", "123");
+            var league3 = League.Create(2, DateTime.Now, "1a", "123");
 
             var player = Player.Create("dude", "mail");
             var playerRepository = new PlayerRepository(MongoClient);
@@ -263,7 +263,7 @@ namespace FadingFlameTests
                 match, matchSwitched
             };
 
-            var gameDay = GameDay.Create(DateTimeOffset.Now, matchups);
+            var gameDay = GameDay.Create(DateTime.Now, matchups);
             return gameDay;
         }
 

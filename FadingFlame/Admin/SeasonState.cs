@@ -16,4 +16,12 @@ namespace FadingFlame.Admin
         public Season CurrentSeason { get; private set; } = new();
         public Season NextSeason { get; private set; } = new();
     }
+
+    public static class DateExtensions
+    {
+        public static string ToMyDate(this DateTime time)
+        {
+            return time.ToString("dd.MM.");
+        }
+    }
 }

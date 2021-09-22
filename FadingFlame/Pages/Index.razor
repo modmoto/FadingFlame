@@ -2,13 +2,15 @@
 @using FadingFlame.Leagues
 @using FadingFlame.Players
 @using MongoDB.Bson
+@using FadingFlame.Admin
 @inject ILeagueRepository _leagueRepository
 @inject NavigationManager _navigation
+@inject SeasonState _seasonState
 
 <div>
     <h1>Welcome to the Fading Flame League!</h1>
     <hr class="my-4">
-    <p class="lead">The next season starts on 4.10.2021 and list submission will end on the 25.09.2021!</p>
+    <p class="lead">The next season starts on @_seasonState.CurrentSeason.StartDate.ToMyDate() and list submission will end on the @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()!</p>
     <hr class="my-4">
 </div>
 
@@ -35,12 +37,23 @@
     private List<League> _leagues = new();
     private List<Player> _playersInLeague = new();
 
+    protected override void OnInitialized()
+    {
+        _seasonState.SeasonsChanged += OnInitializedAsync;
+    }
+
+    private async void OnInitializedAsync(object sender, EventArgs e)
+    {
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        _leagues = await _leagueRepository.LoadForSeason(1);
+        _leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
         _playersInLeague = await _playerRepository.LoadForLeague(_leagues.SelectMany(l => l.Players).Select(p => p.Id).ToList());
     }
-    
+
     private string GetName(ObjectId playerId)
     {
         return _playersInLeague.FirstOrDefault(p => p.Id == playerId)?.DisplayName;

@@ -19,7 +19,7 @@ namespace FadingFlame.Leagues
         public string DivisionId { get; set; }
         public List<GameDay> GameDays { get; set; } = new();
         public bool IsFull => Players.Count == 6;
-        public DateTimeOffset StartDate { get; set; }
+        public DateTime StartDate { get; set; }
 
         private Matchup GetMatchup(ObjectId matchId)
         {
@@ -72,7 +72,7 @@ namespace FadingFlame.Leagues
             }
         }
 
-        public static League Create(int season, DateTimeOffset startDate, string divisionId, string name)
+        public static League Create(int season, DateTime startDate, string divisionId, string name)
         {
             return new()
             {

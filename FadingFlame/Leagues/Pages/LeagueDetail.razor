@@ -2,6 +2,7 @@
 @using MongoDB.Bson
 @using FadingFlame.Leagues
 @using FadingFlame.Players
+@using FadingFlame.Admin
 
 @inject NavigationManager _navigation
 @inject UserState _userState
@@ -93,7 +94,7 @@ else
         {
             @if (_activeDay == gameDay.index)
             {
-                <p class="lead">@gameDay.value.StartDate.ToString("dd.MM.") - @gameDay.value.EndDate.ToString("dd.MM.")</p>
+                <p class="lead">@gameDay.value.StartDate.ToMyDate() - @gameDay.value.EndDate.ToMyDate()</p>
                 <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
                     <div class="row row-cols-auto justify-content-around">
                         @foreach (var matchup in gameDay.value.Matchups)
@@ -103,7 +104,7 @@ else
                                     <div class="card-header">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h5 class="mb-1">@(GetName(matchup.Player1)) vs @(GetName(matchup.Player2))</h5>
-                                            <small>@matchup.Result?.RecordedAt.ToString("dd.MM.")</small>
+                                            <small>@matchup.Result?.RecordedAt.ToMyDate()</small>
                                         </div>
                                     </div>
                                     <div class="card-body">
@@ -154,7 +155,7 @@ else
         {
             _league = await _leagueRepository.Load(parsed);
             _playersInLeague = await _playerRepository.LoadForLeague(_league.Players.Select(p => p.Id).ToList());
-            var now = DateTimeOffset.UtcNow;
+            var now = DateTime.UtcNow;
             for (int i = 0; i < _league.GameDays.Count; i++)
             {
                 if (now < _league.GameDays[i].EndDate)

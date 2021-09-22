@@ -13,7 +13,7 @@ namespace FadingFlame.Leagues
         public PlayerResult Player2 { get; set; }
         public SecondaryObjectiveState SecondaryObjective { get; set; }
         public int VictoryPointsDifference => Math.Abs((Player1?.VictoryPoints ?? 0) - (Player2?.VictoryPoints ?? 0));
-        public DateTimeOffset RecordedAt { get; set; }
+        public DateTime RecordedAt { get; set; }
 
         public ObjectId Winner { get; set; }
 
@@ -32,7 +32,7 @@ namespace FadingFlame.Leagues
             return new MatchResult
             {
                 MatchId = ObjectId.GenerateNewId(),
-                RecordedAt = DateTimeOffset.UtcNow,
+                RecordedAt = DateTime.UtcNow,
                 SecondaryObjective = secondaryObjective,
                 Winner = GetWinnerId(player1Result, player2Result, pointsAfteObjective),
                 Player1 = PlayerResult.Create(player1Result.Id, player1Result.VictoryPoints, pointsAfteObjective.Player1),

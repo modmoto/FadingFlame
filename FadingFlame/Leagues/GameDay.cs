@@ -6,9 +6,9 @@ namespace FadingFlame.Leagues
     public class GameDay
     {
         public List<Matchup> Matchups { get; set; }
-        public DateTimeOffset StartDate { get; set; }
-        public DateTimeOffset EndDate => StartDate.AddDays(14);
-        public static GameDay Create(DateTimeOffset startDate, List<Matchup> matchups)
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate => StartDate.AddDays(14);
+        public static GameDay Create(DateTime startDate, List<Matchup> matchups)
         {
             return new()
             {

@@ -44,7 +44,7 @@
             @if (!_seasonState.CurrentSeason.ListSubmissionIsOver)
             {
                 <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
-                    To participate in the next season, submit your lists here. The lists can not be changed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToString("M") and are not visible to other players until then.
+                    To participate in the next season, submit your lists here. The lists can not be changed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate() and are not visible to other players until then.
                 </div>
                 <EditForm Model="@_listModel" OnValidSubmit="OnValidSubmitList">
                 <DataAnnotationsValidator/>
@@ -150,7 +150,7 @@
             
             @if (_player.SubmittedLists && !_seasonState.CurrentSeason.ListSubmissionIsOver)
             {
-                <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToString("M")</div>
+                <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()</div>
             }
         }
 
