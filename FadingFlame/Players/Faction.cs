@@ -19,7 +19,11 @@ namespace FadingFlame.Players
         UndyingDynasties = 13,
         VampireConvenant = 14,
         VerminSwarm = 15,
-        WarriorsOfTheDarkGods = 16
+        WarriorsOfTheDarkGods = 16,
+        Asklanders = 17,
+        Makhar = 18,
+        Cultists = 19,
+        Hobgoblins = 20,
     }
 
     public static class FactionExtensions
@@ -29,6 +33,7 @@ namespace FadingFlame.Players
             return Regex.Replace(faction.ToString(), "(\\B[A-Z])", " $1")
                 .Replace("And", "and")
                 .Replace("The", "the")
+                .Replace("Asklanders", "Åsklanders")
                 .Replace("Of", "of");
         }
     }
