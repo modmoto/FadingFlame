@@ -53,12 +53,11 @@ namespace FadingFlame.Leagues
                 {
                     var index = playerIndex + 1 * playerIndex;
                     var discordTag = commaDelimitedValues[index][leagueIndex];
-                    var discordTagLower = discordTag.ToLower();
-                    var name = commaDelimitedValues[index + 1][leagueIndex].ToLower();
+                    var name = commaDelimitedValues[index + 1][leagueIndex];
 
                     var foundPlayer = players.FirstOrDefault(p => 
-                        p.DiscordTag?.ToLower() == discordTagLower
-                        || p.DisplayName.ToLower() == name);
+                        p.DiscordTag?.ToLower() == discordTag.ToLower()
+                        || p.DisplayName.ToLower() == name.ToLower());
 
                     if (foundPlayer != null)
                     {
@@ -67,7 +66,7 @@ namespace FadingFlame.Leagues
                     else
                     {
                         var player = Player.Create($"missing_{discordTag}", _notfoundMail);
-                        notFoundPlayers.Add($"{discordTag}");
+                        notFoundPlayers.Add($"{discordTag},{name}");
                         await _playerRepository.Insert(player);
                         league.AddPlayer(player);
                     }
