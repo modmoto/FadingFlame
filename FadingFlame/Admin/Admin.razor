@@ -82,65 +82,74 @@
 
     <div class="container">
         <div class="row">
-
-        <div class="col">
-            <h4>Current Season (@_seasonState.CurrentSeason.SeasonId):</h4>
-            <EditForm OnSubmit="() => SaveSeason(_seasonState.CurrentSeason)" Model="@_seasonState.CurrentSeason">
-                <DataAnnotationsValidator/>
-                <div class="form-group">
-                    <div class="pb-2">List Submission deadline:</div>
-                    <InputDate @bind-Value="_seasonState.CurrentSeason.ListSubmissionDeadline" class="form-control mb-3"/>
-                    <ValidationMessage For="@(() => _seasonState.CurrentSeason.ListSubmissionDeadline)"/>
-                </div>
-                <DataAnnotationsValidator/>
-                <div class="form-group">
-                  <div class="pb-2">Start date:</div>
-                  <InputDate @bind-Value="_seasonState.CurrentSeason.StartDate" class="form-control mb-3"/>
-                  <ValidationMessage For="@(() => _seasonState.CurrentSeason.StartDate)"/>
-                </div>
-                <button disabled="@_loadingSeasons" class="btn btn-primary">
-                    @if (_loadingSeasons)
+            <div class="col">
+                <h4>Current Season (@_seasonState.CurrentSeason.SeasonId):</h4>
+                <EditForm OnSubmit="() => SaveSeason(_seasonState.CurrentSeason)" Model="@_seasonState.CurrentSeason">
+                    <DataAnnotationsValidator/>
+                    <div class="form-group">
+                        <div class="pb-2">List Submission deadline:</div>
+                        <InputDate @bind-Value="_seasonState.CurrentSeason.ListSubmissionDeadline" class="form-control mb-3"/>
+                        <ValidationMessage For="@(() => _seasonState.CurrentSeason.ListSubmissionDeadline)"/>
+                    </div>
+                    <DataAnnotationsValidator/>
+                    <div class="form-group">
+                        <div class="pb-2">Start date:</div>
+                        <InputDate @bind-Value="_seasonState.CurrentSeason.StartDate" class="form-control mb-3"/>
+                        <ValidationMessage For="@(() => _seasonState.CurrentSeason.StartDate)"/>
+                    </div>
+                    <button disabled="@_loadingSeasons" class="btn btn-primary">
+                        @if (_loadingSeasons)
+                        {
+                            <span class="spinner-border spinner-border-sm mr-1"></span>
+                        }
+                        Save current season
+                    </button>
+                </EditForm>
+            </div>
+            <div class="col">
+                <h4>Next Season (@_seasonState.NextSeason.SeasonId):</h4>
+                <EditForm OnSubmit="() => SaveSeason(_seasonState.NextSeason)" Model="@_seasonState.NextSeason">
+                    <DataAnnotationsValidator/>
+                    <div class="form-group">
+                        <div class="pb-2">List Submission deadline:</div>
+                        <InputDate @bind-Value="_seasonState.NextSeason.ListSubmissionDeadline" class="form-control mb-3"/>
+                        <ValidationMessage For="@(() => _seasonState.NextSeason.ListSubmissionDeadline)"/>
+                    </div>
+                    <DataAnnotationsValidator/>
+                    <div class="form-group">
+                        <div class="pb-2">Start date:</div>
+                        <InputDate @bind-Value="_seasonState.NextSeason.StartDate" class="form-control mb-3"/>
+                        <ValidationMessage For="@(() => _seasonState.NextSeason.StartDate)"/>
+                    </div>
+                    <button disabled="@_loadingSeasons" class="btn btn-primary">
+                        @if (_loadingSeasons)
+                        {
+                            <span class="spinner-border spinner-border-sm mr-1"></span>
+                        }
+                        Save next season
+                    </button>
+                </EditForm>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col"></div>
+            <div class="col">
+                <button disabled="@_loadingEndingSeason" type="button" class="btn btn-danger" @onclick="CreateNextSeason">
+                    @if (_loadingEndingSeason)
                     {
                         <span class="spinner-border spinner-border-sm mr-1"></span>
                     }
-                    Save current season
+                    Create new next season
                 </button>
-            </EditForm>
-        </div>
-        <div class="col">
-            <h4>Next Season (@_seasonState.NextSeason.SeasonId):</h4>
-            <EditForm OnSubmit="() => SaveSeason(_seasonState.NextSeason)" Model="@_seasonState.NextSeason">
-                <DataAnnotationsValidator/>
-                <div class="form-group">
-                    <div class="pb-2">List Submission deadline:</div>
-                    <InputDate @bind-Value="_seasonState.NextSeason.ListSubmissionDeadline" class="form-control mb-3"/>
-                    <ValidationMessage For="@(() => _seasonState.NextSeason.ListSubmissionDeadline)"/>
-                </div>
-                <DataAnnotationsValidator/>
-                <div class="form-group">
-                    <div class="pb-2">Start date:</div>
-                    <InputDate @bind-Value="_seasonState.NextSeason.StartDate" class="form-control mb-3"/>
-                    <ValidationMessage For="@(() => _seasonState.NextSeason.StartDate)"/>
-                </div>
-                <button disabled="@_loadingSeasons" class="btn btn-primary">
-                    @if (_loadingSeasons)
+                <button disabled="@_loadingEndingSeason" class="btn btn-danger" @onclick="DeleteCurrentSeason">
+                    @if (_loadingEndingSeason)
                     {
                         <span class="spinner-border spinner-border-sm mr-1"></span>
                     }
-                    Save next season
+                    Delete next season
                 </button>
-            </EditForm>
+            </div>
         </div>
-    </div>
-    </div>
-    <div class="m-2">
-        <button disabled="@_loadingEndingSeason" type="button" class="btn btn-danger" @onclick="EndCurrentSeason">
-            @if (_loadingEndingSeason)
-            {
-                <span class="spinner-border spinner-border-sm mr-1"></span>
-            }
-            End current season
-        </button>
     </div>
 }
 
@@ -199,11 +208,11 @@
         _loadingSeasons = false;
     }
 
-    private async Task EndCurrentSeason()
+    private async Task CreateNextSeason()
     {
         _loadingEndingSeason = true;
 
-        _seasonState.SetSeasons(_seasonState.NextSeason, new Season
+        _seasonState.AppendSeason(new Season
         {
             SeasonId = _seasonState.NextSeason.SeasonId + 1
         });
@@ -212,4 +221,13 @@
         _loadingEndingSeason = false;
     }
 
+    private async Task DeleteCurrentSeason()
+    {
+        _loadingEndingSeason = true;
+
+        var season = _seasonState.PopLastSeason();
+
+        await _seasonRepository.Delete(season);
+        _loadingEndingSeason = false;
+    }
 }

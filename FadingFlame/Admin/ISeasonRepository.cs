@@ -10,6 +10,7 @@ namespace FadingFlame.Admin
     {
         Task<List<Season>> LoadSeasons();
         Task Update(Season season);
+        Task Delete(Season season);
     }
 
     public class SeasonRepository : MongoDbRepositoryBase, ISeasonRepository
@@ -27,6 +28,11 @@ namespace FadingFlame.Admin
         public Task Update(Season season)
         {
             return Upsert(season, s => s.SeasonId == season.SeasonId);
+        }
+
+        public Task Delete(Season season)
+        {
+            return Delete<Season>(s => s.SeasonId == season.SeasonId);
         }
     }
 }

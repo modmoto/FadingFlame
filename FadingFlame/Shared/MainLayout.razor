@@ -69,7 +69,7 @@
         }
 
         var loadSeasons = await _seasonRepository.LoadSeasons();
-        _seasonState.SetSeasons(loadSeasons[1], loadSeasons[0]);
+        _seasonState.SetSeasons(loadSeasons);
     }
 
     public void GoToImprint()
