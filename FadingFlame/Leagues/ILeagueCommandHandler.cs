@@ -17,19 +17,16 @@ namespace FadingFlame.Leagues
     {
         private readonly ILeagueRepository _leagueRepository;
         private readonly IPlayerRepository _playerRepository;
-        private readonly ILogger<LeagueCommandHandler> _logger;
         private readonly SeasonState _seasonState;
         private string _notfoundMail = "NotFoundPlayer@lel.de";
 
         public LeagueCommandHandler(
             ILeagueRepository leagueRepository,
             IPlayerRepository playerRepository,
-            ILogger<LeagueCommandHandler> logger,
             SeasonState seasonState)
         {
             _leagueRepository = leagueRepository;
             _playerRepository = playerRepository;
-            _logger = logger;
             _seasonState = seasonState;
         }
 
@@ -40,7 +37,7 @@ namespace FadingFlame.Leagues
             await _leagueRepository.DeleteForSeason(currentSeason.SeasonId);
 
             var players = await _playerRepository.LoadAll();
-            await _playerRepository.DeleteWithMail(_notfoundMail);
+            await _playerRepository.DeleteAllWithMail(_notfoundMail);
             var newLeagues = new List<League>();
 
             var allLines = await File.ReadAllLinesAsync("Leagues/leagues.csv");
