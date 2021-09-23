@@ -59,6 +59,8 @@ namespace FadingFlame.Leagues
 
         public void AddPlayer(Player player)
         {
+            if (Players.Count == 6) return;
+            
             Players = Players.Where(p => p.Id != player.Id).ToList();
             var playerInLeague = PlayerInLeague.Create(player.Id);
             Players.Add(playerInLeague);

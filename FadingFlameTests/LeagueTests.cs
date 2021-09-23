@@ -353,8 +353,7 @@ namespace FadingFlameTests
             var player6 = ObjectId.GenerateNewId();
             var player7 = ObjectId.GenerateNewId();
             var player8 = ObjectId.GenerateNewId();
-            var league = TestUtils.CreateLeagueWithPlayers(player1, player2, player3, player4, player5, player6, player7,
-            player8);
+            var league = TestUtils.CreateLeagueWithPlayers(player1, player2, player3, player4, player5, player6, player7, player8);
 
             league.CreateGameDays();
 
@@ -362,7 +361,6 @@ namespace FadingFlameTests
             Assert.AreEqual(5, domainEventGameDays.Count);
             Assert.IsTrue(AssertMatchIsNeverPlayedTwice(domainEventGameDays));
         }
-
 
         private static Matchup CreateDefaultMatchup(ObjectId? player1 = null, ObjectId? player2 = null)
         {
