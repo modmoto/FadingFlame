@@ -18,7 +18,6 @@ namespace FadingFlame.Leagues
         public List<PlayerInLeague> Players { get; set; } = new();
         public string DivisionId { get; set; }
         public List<GameDay> GameDays { get; set; } = new();
-        public bool IsFull => Players.Count == 6;
         public DateTime StartDate { get; set; }
 
         private Matchup GetMatchup(ObjectId matchId)
@@ -60,13 +59,11 @@ namespace FadingFlame.Leagues
 
         public void AddPlayer(Player player)
         {
-            if (IsFull) return;
-            
             Players = Players.Where(p => p.Id != player.Id).ToList();
             var playerInLeague = PlayerInLeague.Create(player.Id);
             Players.Add(playerInLeague);
 
-            if (IsFull)
+            if (Players.Count == 6)
             {
                 CreateGameDays();
             }

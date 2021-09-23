@@ -18,6 +18,7 @@ namespace FadingFlame.Admin
         public Season CurrentSeason { get; private set; } = new();
         public Season NextSeason { get; private set; } = new();
         public List<Season> Seasons { get; private set; } = new();
+        public List<string> NotFoundPlayers { get; private set; } = new();
 
         public void AppendSeason(Season season)
         {
@@ -31,6 +32,12 @@ namespace FadingFlame.Admin
             Seasons.RemoveAt(0);
             SetSeasons(Seasons);
             return season;
+        }
+
+        public void SetNotFoundPlayer(List<string> notFoundPlayers)
+        {
+            NotFoundPlayers = notFoundPlayers;
+            SeasonsChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
