@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using FadingFlame.Leagues;
 using FadingFlame.Repositories;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;

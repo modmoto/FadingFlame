@@ -17,7 +17,7 @@ namespace FadingFlame.Players
         public string List1 { get; set; }
 
         [Required(ErrorMessage = Errors.FieldRequired)]
-        [Range(1,16, ErrorMessage = Errors.FactionRequired)]
+        [Range(1, 20, ErrorMessage = Errors.FactionRequired)]
         public Faction Faction1 { get; set; }
 
         [Required(ErrorMessage = Errors.FieldRequired)]
@@ -27,7 +27,7 @@ namespace FadingFlame.Players
         public string List2 { get; set; }
 
         [Required(ErrorMessage = Errors.FieldRequired)]
-        [Range(1,16, ErrorMessage = Errors.FactionRequired)]
+        [Range(1, 20, ErrorMessage = Errors.FactionRequired)]
         public Faction Faction2 { get; set; }
     }
 

@@ -24,6 +24,7 @@ namespace FadingFlame.Players
         Makhar = 18,
         Cultists = 19,
         Hobgoblins = 20,
+        // look at the length of the allowed factions in EditListsModel, as this has to be hardcoded!!!!
     }
 
     public static class FactionExtensions
