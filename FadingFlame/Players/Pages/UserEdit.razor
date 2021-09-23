@@ -43,9 +43,19 @@
             
             @if (!_seasonState.CurrentSeason.ListSubmissionIsOver)
             {
-                <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
-                    To participate in the next season, submit your lists here. The lists can not be changed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate() and are not visible to other players until then.
-                </div>
+                @if (!_player.SubmittedLists)
+                {
+                    <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
+                        To participate in the next season, submit your lists here. The lists can not be changed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate() and are not visible to other players until then.
+                    </div>
+                }
+                else
+                {
+                    <div class="pt-3 pb-3 alert alert-success text-center" role="alert">
+                        Lists submitted. You can still change the lists until @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate() . They are not visible to other players until then.
+                    </div>
+                }
+
                 <EditForm Model="@_listModel" OnValidSubmit="OnValidSubmitList">
                 <DataAnnotationsValidator/>
                 <div class="row align-items-start">
