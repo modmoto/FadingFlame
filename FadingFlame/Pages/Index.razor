@@ -6,12 +6,19 @@
 @inject ILeagueRepository _leagueRepository
 @inject NavigationManager _navigation
 @inject SeasonState _seasonState
+@inject UserState _userState
 
 <div>
     <h1>Welcome to the Fading Flame League!</h1>
     <hr class="my-4">
     <p class="lead">The next season starts on @_seasonState.CurrentSeason.StartDate.ToMyDate() and list submission will end on the @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()!</p>
     <hr class="my-4">
+    @if(!_userState.LoadingPlayer && (!_userState.LoggedInPlayer.SubmittedLists || _userState.LoggedInPlayer.DiscordTag == null))
+    {
+        <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
+            You did not submit your lists or discord tag yet, to participate in the next season make sure to do that in your profile!
+        </div>
+    }
 </div>
 
 <div class="row row-cols-auto justify-content-around">
@@ -40,6 +47,7 @@
     protected override void OnInitialized()
     {
         _seasonState.SeasonsChanged += OnInitializedAsync;
+        _userState.UserLoggedIn += (_, _) => StateHasChanged();
     }
 
     private async void OnInitializedAsync(object sender, EventArgs e)

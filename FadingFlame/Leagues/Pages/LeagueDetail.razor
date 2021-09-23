@@ -200,7 +200,7 @@ else
 
     private bool UserIsOneOfThePlayers(Matchup matchup)
     {
-        return _userState.LoggedInPlayerId == matchup.Player1 || _userState.LoggedInPlayerId == matchup.Player2;
+        return _userState.LoggedInPlayer.Id == matchup.Player1 || _userState.LoggedInPlayer.Id == matchup.Player2;
     }
 
     private string GetOriginalPointsString(MatchResult result)

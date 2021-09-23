@@ -19,7 +19,7 @@
         <div class="top-row px-4">
             <AuthorizeView>
                 <Authorized>
-                    <span><a href="@($"/player/{_userState.LoggedInPlayerId}")">My profile</a></span>
+                    <span><a href="@($"/player/{_userState.LoggedInPlayer.Id}")">My profile</a></span>
                     <a href="/Logout">
                         <span class="oi oi-account-logout" aria-hidden="true"></span>
                     </a>
@@ -64,7 +64,7 @@
                     player = Player.Create(_userState.UserName, _userState.AccountEmail);
                     await _playerRepository.Insert(player);
                 }
-                _userState.SetUserData(player.Id);
+                _userState.SetUserData(player);
             }
         }
 

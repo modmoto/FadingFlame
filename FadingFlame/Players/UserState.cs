@@ -25,15 +25,17 @@ namespace FadingFlame.Players
             "herzog1602@googlemail.com", //almentro
         };
 
-        public virtual void SetUserData(ObjectId playerId)
+        public virtual void SetUserData(Player player)
         {
-            LoggedInPlayerId = playerId;
+            LoggedInPlayer = player;
+            LoadingPlayer = false;
             UserLoggedIn?.Invoke(this, EventArgs.Empty);
         }
 
         public bool UserIsLoggedIn => _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;
         public bool UserIsAdmin => Admins.Contains(AccountEmail);
-        public ObjectId? LoggedInPlayerId { get; private set; }
+        public Player LoggedInPlayer { get; private set; } = new();
+        public bool LoadingPlayer { get; private set; } = true;
         public string UserName => _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == JwtClaimTypes.GivenName)?.Value;
         public string AccountEmail => _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
     }

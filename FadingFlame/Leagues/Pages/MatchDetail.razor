@@ -239,8 +239,8 @@ else
     private string _selectedListAsString;
     private bool _selectingList;
     private Playoff _playoff;
-    private bool Player1LoggedIn => _model.Player1.Id == _userState.LoggedInPlayerId;
-    private bool Player2LoggedIn =>_model.Player2?.Id == _userState.LoggedInPlayerId;
+    private bool Player1LoggedIn => _model.Player1.Id == _userState.LoggedInPlayer.Id;
+    private bool Player2LoggedIn =>_model.Player2?.Id == _userState.LoggedInPlayer.Id;
     private bool CanEditMatch => Player1LoggedIn || Player2LoggedIn;
 
     protected override void OnInitialized()
