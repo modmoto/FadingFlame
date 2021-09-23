@@ -17,10 +17,4 @@
       </Compile>
     </ItemGroup>
 
-    <ItemGroup>
-      <None Update="Leagues\leagues.csv">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
 </Project>

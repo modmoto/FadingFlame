@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FadingFlame.Admin;
 using FadingFlame.Players;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Hosting;
 
 namespace FadingFlame.Leagues
 {
@@ -17,16 +17,19 @@ namespace FadingFlame.Leagues
     {
         private readonly ILeagueRepository _leagueRepository;
         private readonly IPlayerRepository _playerRepository;
+        private readonly IWebHostEnvironment _hostEnvironment;
         private readonly SeasonState _seasonState;
         private string _notfoundMail = "NotFoundPlayer@lel.de";
 
         public LeagueCommandHandler(
             ILeagueRepository leagueRepository,
             IPlayerRepository playerRepository,
+            IWebHostEnvironment hostEnvironment,
             SeasonState seasonState)
         {
             _leagueRepository = leagueRepository;
             _playerRepository = playerRepository;
+            _hostEnvironment = hostEnvironment;
             _seasonState = seasonState;
         }
 
@@ -40,7 +43,7 @@ namespace FadingFlame.Leagues
             await _playerRepository.DeleteAllWithMail(_notfoundMail);
             var newLeagues = new List<League>();
 
-            var allLines = await File.ReadAllLinesAsync("Leagues/leagues.csv");
+            var allLines = await File.ReadAllLinesAsync($"{_hostEnvironment.WebRootPath}/leagues.csv");
             var notFoundPlayers = new List<string>();
             var commaDelimitedValues = allLines.Select(l => l.Split(",")).ToList();
             for (int leagueIndex = 0; leagueIndex < 19; leagueIndex++)
