@@ -7,6 +7,7 @@ namespace FadingFlame.Admin
     {
         [BsonId]
         public int SeasonId { get; set; }
+        public bool IsPubliclyVisible { get; set; }
         public DateTime StartDate { get; set; } = DateTime.MaxValue;
         public DateTime ListSubmissionDeadline { get; set; } = DateTime.MaxValue;
 

@@ -97,6 +97,12 @@
                         <InputDate @bind-Value="_seasonState.CurrentSeason.StartDate" class="form-control mb-3"/>
                         <ValidationMessage For="@(() => _seasonState.CurrentSeason.StartDate)"/>
                     </div>
+                    <div class="form-group">
+                        <InputCheckbox class="form-check-input" @bind-Value="_seasonState.CurrentSeason.IsPubliclyVisible"/>
+                        <label class="form-check-label">
+                            Season is publicly visible
+                        </label>
+                    </div>
                     <button disabled="@_loadingSeasons" class="btn btn-primary">
                         @if (_loadingSeasons)
                         {
@@ -120,6 +126,12 @@
                         <div class="pb-2">Start date:</div>
                         <InputDate @bind-Value="_seasonState.NextSeason.StartDate" class="form-control mb-3"/>
                         <ValidationMessage For="@(() => _seasonState.NextSeason.StartDate)"/>
+                    </div>
+                    <div class="form-group">
+                        <InputCheckbox class="form-check-input" @bind-Value="_seasonState.NextSeason.IsPubliclyVisible"/>
+                        <label class="form-check-label">
+                            Season is publicly visible
+                        </label>
                     </div>
                     <button disabled="@_loadingSeasons" class="btn btn-primary">
                         @if (_loadingSeasons)
