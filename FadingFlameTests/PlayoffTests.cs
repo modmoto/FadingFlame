@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FadingFlame.Admin;
 using FadingFlame.Leagues;
+using FadingFlame.Matchups;
 using FadingFlame.Playoffs;
 using MongoDB.Bson;
 using Moq;
@@ -57,7 +58,7 @@ namespace FadingFlameTests
                     Id = matchup1.Player2,
                     VictoryPoints = 1200
                 },
-                MatchId = matchup1.MatchId
+                MatchId = matchup1.Id
             });
             playoffs.ReportGame(new MatchResultDto
             {
@@ -71,7 +72,7 @@ namespace FadingFlameTests
                     Id = matchup2.Player2,
                     VictoryPoints = 1000
                 },
-                MatchId = matchup2.MatchId
+                MatchId = matchup2.Id
             });
 
             Assert.AreEqual(2, playoffs.Rounds[0].Matchups.Count);

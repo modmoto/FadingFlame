@@ -264,7 +264,7 @@ else
                 {
                     var match = league.GameDays
                         .SelectMany(g => g.Matchups)
-                        .SingleOrDefault(m => m.MatchId.ToString() ==  MatchId);
+                        .SingleOrDefault(m => m.Id.ToString() ==  MatchId);
                     if (match == null)
                     {
                         _navigation.NavigateTo("notfound");
@@ -286,7 +286,7 @@ else
         {
             var playoff = await _playoffRepository.LoadForSeason(Int32.Parse(playoffSeason));
             _playoff = playoff;
-            var matchup = _playoff.Rounds.SelectMany(r => r.Matchups).FirstOrDefault(m => m.MatchId.ToString() == MatchId);
+            var matchup = _playoff.Rounds.SelectMany(r => r.Matchups).FirstOrDefault(m => m.Id.ToString() == MatchId);
             await ExtractMatch(matchup);
         }
         else
@@ -312,7 +312,7 @@ else
 
         _model.Player1.Id = match.Player1;
         _model.Player2.Id = match.Player2;
-        _model.MatchId = match.MatchId;
+        _model.MatchId = match.Id;
 
         if (Player1LoggedIn)
         {
@@ -440,7 +440,7 @@ else
         _loadingDeleteResult = true;
         if (_league != null)
         {
-            _league.DeleteGameReport(_matchup.MatchId);
+            _league.DeleteGameReport(_matchup.Id);
             await _leagueRepository.Update(_league);
         }
         _loadingDeleteResult = false;

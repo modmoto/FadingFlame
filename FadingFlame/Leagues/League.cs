@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using FadingFlame.Matchups;
 using FadingFlame.Players;
 using FadingFlame.Repositories;
 using MongoDB.Bson;
@@ -22,7 +23,7 @@ namespace FadingFlame.Leagues
 
         private Matchup GetMatchup(ObjectId matchId)
         {
-            var match = GameDays.SelectMany(g => g.Matchups).FirstOrDefault(m => m.MatchId == matchId);
+            var match = GameDays.SelectMany(g => g.Matchups).FirstOrDefault(m => m.Id == matchId);
             if (match == null)
             {
                 throw new ValidationException("Match not in this gameday");
@@ -108,7 +109,7 @@ namespace FadingFlame.Leagues
                 var playerIndex = gameDayIndex % numberOfPlayers;
 
                 var offset = StartDate.AddDays(14 * gameDayIndex);
-                var matchup = Matchup.Create(teamsTemp[playerIndex], teams.First());
+                var matchup = Matchup.CreateForLeague(teamsTemp[playerIndex], teams.First());
                 matchups.Add(matchup);
 
                 for (var index = 1; index < numberOfMatchesInARound; index++)
@@ -123,7 +124,7 @@ namespace FadingFlame.Leagues
                         continue;
                     }
 
-                    var matchupInner = Matchup.Create(playerInLeague, playerAsGuest);
+                    var matchupInner = Matchup.CreateForLeague(playerInLeague, playerAsGuest);
                     matchups.Add(matchupInner);
                 }
 

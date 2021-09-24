@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using FadingFlame.Leagues;
+using FadingFlame.Matchups;
 using FadingFlame.Repositories;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -64,7 +65,7 @@ namespace FadingFlame.Playoffs
             {
                 playoff.ReportGame(new MatchResultDto
                 {
-                    MatchId = freeWin.MatchId,
+                    MatchId = freeWin.Id,
                     Player1 = new PlayerResultDto
                     {
                         Id = freeWin.Player1,
@@ -84,10 +85,10 @@ namespace FadingFlame.Playoffs
 
         public MatchResult ReportGame(MatchResultDto matchResultDto)
         {
-            var roundIndex = Rounds.FindIndex(r => r.Matchups.Any(m => m.MatchId == matchResultDto.MatchId));
+            var roundIndex = Rounds.FindIndex(r => r.Matchups.Any(m => m.Id == matchResultDto.MatchId));
             if (roundIndex == -1) throw new ValidationException("Match not in this playoffs in this config");
             var round = Rounds[roundIndex];
-            var matchIndex = round.Matchups.FindIndex(m => m.MatchId == matchResultDto.MatchId);
+            var matchIndex = round.Matchups.FindIndex(m => m.Id == matchResultDto.MatchId);
             if (matchIndex == -1) throw new ValidationException("Match not in this playoffs in this config");
 
             var match = round.Matchups[matchIndex];
@@ -108,7 +109,7 @@ namespace FadingFlame.Playoffs
             {
                 var playerInLeague1 = PlayerInLeague.Create(otherMatchuP.Result?.Winner ?? ObjectId.GenerateNewId());
                 var playerInLeague2 = PlayerInLeague.Create(match.Result?.Winner ?? ObjectId.GenerateNewId());
-                var matchup = Matchup.Create(playerInLeague1, playerInLeague2);
+                var matchup = Matchup.CreateForLeague(playerInLeague1, playerInLeague2);
 
                 Rounds[roundIndex + 1].Matchups[otherMatchIndex / 2] = matchup;
             }
@@ -116,7 +117,7 @@ namespace FadingFlame.Playoffs
             {
                 var playerInLeague1 = PlayerInLeague.Create(otherMatchuP.Result?.Winner ?? ObjectId.GenerateNewId());
                 var playerInLeague2 = PlayerInLeague.Create(match.Result?.Winner ?? ObjectId.GenerateNewId());
-                var matchup = Matchup.Create(playerInLeague2, playerInLeague1);
+                var matchup = Matchup.CreateForLeague(playerInLeague2, playerInLeague1);
 
                 Rounds[roundIndex + 1].Matchups[matchIndex / 2] = matchup;
             }

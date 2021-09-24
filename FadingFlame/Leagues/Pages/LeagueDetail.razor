@@ -3,6 +3,7 @@
 @using FadingFlame.Leagues
 @using FadingFlame.Players
 @using FadingFlame.Admin
+@using FadingFlame.Matchups
 
 @inject NavigationManager _navigation
 @inject UserState _userState
@@ -180,7 +181,7 @@ else
 
     private void GoToMatch(Matchup matchup)
     {
-        _navigation.NavigateTo($"match/{matchup.MatchId}?leagueId={_league.Id}");
+        _navigation.NavigateTo($"match/{matchup.Id}?leagueId={_league.Id}");
     }
 
     private string GetSecondaryStringForPlayer1(SecondaryObjectiveState resultSecondaryObjective)

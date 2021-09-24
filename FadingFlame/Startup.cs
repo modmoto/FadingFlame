@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using FadingFlame.Admin;
 using FadingFlame.Discord;
 using FadingFlame.Leagues;
+using FadingFlame.Matchups;
 using FadingFlame.Players;
 using FadingFlame.Playoffs;
 using Microsoft.AspNetCore.Authentication;
@@ -88,6 +89,7 @@ namespace FadingFlame
             services.AddTransient<IPlayoffCommandHandler, PlayoffCommandHandler>();
             services.AddTransient<IPlayoffRepository, PlayoffRepository>();
             services.AddTransient<ISeasonRepository, SeasonRepository>();
+            services.AddTransient<IMatchupRepository, MatchupRepository>();
             services.AddScoped<UserState>();
             services.AddScoped<SeasonState>();
             services.AddHttpContextAccessor();
