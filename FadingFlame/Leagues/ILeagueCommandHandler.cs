@@ -22,7 +22,7 @@ namespace FadingFlame.Leagues
         private readonly IPlayerRepository _playerRepository;
         private readonly IWebHostEnvironment _hostEnvironment;
         private readonly SeasonState _seasonState;
-        private string _notfoundMail = "NotFoundPlayer@lel.de";
+        public static readonly string NotfoundMail = "NotFoundPlayer@lel.de";
 
         public LeagueCommandHandler(
             ILeagueRepository leagueRepository,
@@ -38,14 +38,12 @@ namespace FadingFlame.Leagues
 
         public async Task CreateLeagues()
         {
-            _seasonState.SetNotFoundPlayer(new List<string>());
             var currentSeason = _seasonState.CurrentSeason;
             await _leagueRepository.DeleteForSeason(currentSeason.SeasonId);
 
             var players = await _playerRepository.LoadAll();
-            await _playerRepository.DeleteAllWithMail(_notfoundMail);
+            await _playerRepository.DeleteAllWithMail(NotfoundMail);
             var newLeagues = new List<League>();
-            var notFoundPlayers = new List<string>();
 
             var serviceValues = GetSheetsService().Spreadsheets.Values;
             
@@ -69,8 +67,7 @@ namespace FadingFlame.Leagues
                     }
                     else
                     {
-                        var player = Player.Create($"MISSING_{discordTag}", _notfoundMail);
-                        notFoundPlayers.Add($"{discordTag},{name}");
+                        var player = Player.Create($"MISSING_{discordTag}", NotfoundMail);
                         await _playerRepository.Insert(player);
                         league.AddPlayer(player);
                     }
@@ -79,8 +76,6 @@ namespace FadingFlame.Leagues
                 newLeagues.Add(league);
             }
 
-            _seasonState.SetNotFoundPlayer(notFoundPlayers);
-            
             await _leagueRepository.Insert(newLeagues);
         }
         
