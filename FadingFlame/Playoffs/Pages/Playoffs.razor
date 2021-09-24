@@ -3,6 +3,7 @@
 @using FadingFlame.Leagues
 @using FadingFlame.Players
 @using FadingFlame.Admin
+@using FadingFlame.Matchups
 @inject IPlayoffRepository _playoffRepository
 @inject IPlayerRepository _playerRepository
 @inject NavigationManager _navigation
@@ -73,7 +74,7 @@ else
 
     public void GoToMatch(Matchup matchup)
     {
-        _navigation.NavigateTo($"match/{matchup.MatchId}?playoffSeason={_playoffs.Season}");
+        _navigation.NavigateTo($"match/{matchup.Id}?playoffSeason={_playoffs.Season}");
     }
     
     private string GetClasses(Matchup matchup)

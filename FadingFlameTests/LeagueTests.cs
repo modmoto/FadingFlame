@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FadingFlame.Leagues;
+using FadingFlame.Matchups;
 using FadingFlame.Players;
 using FluentAssertions;
 using MongoDB.Bson;
@@ -57,7 +58,7 @@ namespace FadingFlameTests
 
             var result = new MatchResultDto
             {
-                MatchId = league.GameDays.First().Matchups.First().MatchId,
+                MatchId = league.GameDays.First().Matchups.First().Id,
                 SecondaryObjective = SecondaryObjectiveState.player1,
                 Player1 = new PlayerResultDto
                 {
@@ -113,7 +114,7 @@ namespace FadingFlameTests
 
             var result = new MatchResultDto
             {
-                MatchId = league.GameDays.First().Matchups.First().MatchId,
+                MatchId = league.GameDays.First().Matchups.First().Id,
                 SecondaryObjective = SecondaryObjectiveState.player2,
                 Player1 = new PlayerResultDto
                 {
@@ -152,7 +153,7 @@ namespace FadingFlameTests
 
             var result = new MatchResultDto
             {
-                MatchId = league.GameDays.First().Matchups.First().MatchId,
+                MatchId = league.GameDays.First().Matchups.First().Id,
                 SecondaryObjective = SecondaryObjectiveState.player1,
                 Player1 = new PlayerResultDto
                 {
@@ -212,7 +213,7 @@ namespace FadingFlameTests
             league2.AddPlayer(player);
             league3.AddPlayer(player);
 
-            var leagueRepository = new LeagueRepository(MongoClient);
+            var leagueRepository = new LeagueRepository(MongoClient, new MatchupRepository(MongoClient));
 
             await leagueRepository.Insert(new List<League> { league1, league2, league3 });
 
@@ -366,7 +367,7 @@ namespace FadingFlameTests
         {
             var playerInLeague1 = PlayerInLeague.Create(player1 ?? ObjectId.GenerateNewId());
             var playerInLeague2 = PlayerInLeague.Create(player2 ?? ObjectId.GenerateNewId());
-            var matchup = Matchup.Create(playerInLeague1, playerInLeague2);
+            var matchup = Matchup.CreateForLeague(playerInLeague1, playerInLeague2);
             return matchup;
         }
 

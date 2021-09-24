@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using FadingFlame.Leagues;
 using MongoDB.Bson;
 
-namespace FadingFlame.Leagues
+namespace FadingFlame.Matchups
 {
     public class MatchResult
     {

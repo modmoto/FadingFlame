@@ -1,11 +1,16 @@
 using System.ComponentModel.DataAnnotations;
+using FadingFlame.Leagues;
+using FadingFlame.Players;
+using FadingFlame.Repositories;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
-namespace FadingFlame.Leagues
+namespace FadingFlame.Matchups
 {
-    public class Matchup
+    public class Matchup : IIdentifiable
     {
-        public ObjectId MatchId { get; set; }
+        [BsonId]
+        public ObjectId Id { get; set; }
         public ObjectId Player1 { get; set; }
         public ObjectId Player2 { get; set; }
         public MatchResult Result { get; set; }
@@ -14,13 +19,22 @@ namespace FadingFlame.Leagues
         public string Player2List { get; set; }
         public bool IsFinished => Result != null;
 
-        public static Matchup Create(PlayerInLeague playerAtHome, PlayerInLeague playerAsGuest)
+        public static Matchup CreateForLeague(PlayerInLeague playerAtHome, PlayerInLeague playerAsGuest)
         {
             return new()
             {
                 Player1 = playerAtHome.Id,
                 Player2 = playerAsGuest.Id,
-                MatchId = ObjectId.GenerateNewId()
+                Id = ObjectId.GenerateNewId()
+            };
+        }
+        
+        public static Matchup CreateSoloGame(Player playerAtHome, Player playerAsGuest)
+        {
+            return new()
+            {
+                Player1 = playerAtHome.Id,
+                Player2 = playerAsGuest.Id
             };
         }
         
