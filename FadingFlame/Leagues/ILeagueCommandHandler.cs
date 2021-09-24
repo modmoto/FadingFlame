@@ -69,7 +69,7 @@ namespace FadingFlame.Leagues
                     }
                     else
                     {
-                        var player = Player.Create($"!MISSING_{discordTag}", _notfoundMail);
+                        var player = Player.Create($"MISSING_{discordTag}", _notfoundMail);
                         notFoundPlayers.Add($"{discordTag},{name}");
                         await _playerRepository.Insert(player);
                         league.AddPlayer(player);
@@ -114,7 +114,7 @@ namespace FadingFlame.Leagues
 
         private List<string> _chars = new()
         {
-            "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "R", "P", "R", "S", "T", "U",
+            "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
             "V", "W", "X"
         };
     }
