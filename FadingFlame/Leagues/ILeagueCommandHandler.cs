@@ -50,6 +50,8 @@ namespace FadingFlame.Leagues
             for (int leagueIndex = 0; leagueIndex < 19; leagueIndex++)
             {
                 var stringsOfExcel = await ReadAsync(serviceValues, leagueIndex);
+                var mmr = Mmr.Create();
+                mmr.Rating = 2000 - 100 * (leagueIndex / 2);
                 var league = League.Create(currentSeason.SeasonId, currentSeason.StartDate, LeagueConstants.Ids[leagueIndex], LeagueConstants.Names[leagueIndex]);
                 for (int playerIndex = 0; playerIndex < 6; playerIndex++)
                 {
@@ -64,10 +66,13 @@ namespace FadingFlame.Leagues
                     if (foundPlayer != null)
                     {
                         league.AddPlayer(foundPlayer);
+                        foundPlayer.UpdateMmr(mmr);
+                        await _playerRepository.Update(foundPlayer);
                     }
                     else
                     {
                         var player = Player.Create($"MISSING_{discordTag}", NotfoundMail);
+                        player.UpdateMmr(mmr);
                         await _playerRepository.Insert(player);
                         league.AddPlayer(player);
                     }

@@ -21,7 +21,6 @@ namespace FadingFlame.Playoffs
 
         public static Playoff Create(int season, List<PlayerInLeague> firstPlaces)
         {
-
             var playersWithFreeWins = new List<PlayerInLeague>();
             var remainingRounds = NormalRounds.Where(r => r < firstPlaces.Count).ToList();
             var roundIndex = remainingRounds.First();
