@@ -119,8 +119,10 @@
                 <label>Discord Tag: </label>
                 <span>@_editUserModel.DiscordTag</span>
             </div>
-
-            @if (_player.SubmittedLists && _seasonState.CurrentSeason.ListSubmissionIsOver)
+        }
+        @if (_player.SubmittedLists)
+        {
+            if (_seasonState.CurrentSeason.ListSubmissionIsOver)
             {
                 <div class="row align-items-start">
                     <div class="col">
@@ -157,11 +159,11 @@
                     </div>
                 </div>
             }
-            
-            @if (_player.SubmittedLists && !_seasonState.CurrentSeason.ListSubmissionIsOver)
+            else
             {
                 <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()</div>
             }
+            
         }
 
         <h4 class="mt-4">Participated in Seasons</h4>
