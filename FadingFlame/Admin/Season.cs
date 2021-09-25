@@ -10,7 +10,6 @@ namespace FadingFlame.Admin
         public bool IsPubliclyVisible { get; set; }
         public DateTime StartDate { get; set; } = DateTime.MaxValue;
         public DateTime ListSubmissionDeadline { get; set; } = DateTime.MaxValue;
-
-        public bool ListSubmissionIsOver => DateTime.UtcNow > ListSubmissionDeadline;
+        public bool ListSubmissionIsOver => DateTime.UtcNow > ListSubmissionDeadline.AddDays(1);
     }
 }
