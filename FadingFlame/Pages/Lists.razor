@@ -11,6 +11,13 @@
     <hr class="my-4">
     @if (_seasonState.CurrentSeason.ListSubmissionIsOver)
     {
+        <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @onchange="SelectFaction">
+            <option selected value="0">All factions</option>
+            @foreach (var faction in Enum.GetValues<Faction>())
+            {
+                <option value="@faction">@faction.ToFactionString()</option>
+            }
+        </select>
         @foreach (var player in _enlistedPlayers)
         {
             <div class="card">
@@ -57,15 +64,37 @@
 @code
 {
     private List<Player> _enlistedPlayers = new();
+    private List<Player> _enlistedPlayersOriginal = new();
 
     protected override async Task OnInitializedAsync()
     {
-        _enlistedPlayers = await _playerRepository.PlayersThatEnlisted();
+        _enlistedPlayersOriginal = await _playerRepository.PlayersThatEnlisted();
+        _enlistedPlayers = _enlistedPlayersOriginal;
         _seasonState.SeasonsChanged += (_, _) => StateHasChanged();
     }
 
     private void GoToPlayer(ObjectId playerId)
     {
         _navigation.NavigateTo($"player/{playerId}");
+    }
+
+    private void SelectFaction(ChangeEventArgs e)
+    {
+        var enumString = e.Value?.ToString();
+        if (Enum.TryParse<Faction>(enumString, out var en))
+        {
+            if (en == 0)
+            {
+                _enlistedPlayers = _enlistedPlayersOriginal;
+            }
+            else
+            {
+                _enlistedPlayers = _enlistedPlayersOriginal.Where(l =>
+                    l.Army.List1.Faction == en
+                    || l.Army.List2.Faction == en).ToList();
+            }
+        }
+
+        StateHasChanged();
     }
 }
