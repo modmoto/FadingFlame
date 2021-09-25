@@ -161,7 +161,10 @@
             }
             else
             {
-                <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()</div>
+                if (!IsTheRightUser())
+                {
+                    <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()</div>    
+                }
             }
             
         }
