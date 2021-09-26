@@ -15,7 +15,7 @@
 <div class="card">
     <h4 class="card-header">Profile @_player.DisplayName</h4>
     <div class="card-body">
-        @if (IsTheRightUser())
+        @if (IsTheRightUser() || _userState.UserIsAdmin)
         {
             <EditForm OnSubmit="OnSubmit" EditContext="@_editContextUser">
                 <DataAnnotationsValidator/>
@@ -41,7 +41,7 @@
             
             <hr class="my-3">
             
-            @if (!_seasonState.CurrentSeason.ListSubmissionIsOver)
+            @if (!_seasonState.CurrentSeason.ListSubmissionIsOver  || _userState.UserIsAdmin)
             {
                 @if (!_player.SubmittedLists)
                 {
