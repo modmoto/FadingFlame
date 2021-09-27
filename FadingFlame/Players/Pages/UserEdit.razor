@@ -189,7 +189,7 @@
     private bool _loading;
     private bool _loadingLists;
 
-    [ParameterAttribute]
+    [Parameter]
     public string Id { get; set; }
 
     private ValidationMessageStore _messageStore;
@@ -203,6 +203,12 @@
 
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
         _seasonState.SeasonsChanged += (_, _) => StateHasChanged();
+    }
+    
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters);
+        await OnInitializedAsync();
     }
     
     protected override async Task OnInitializedAsync()
