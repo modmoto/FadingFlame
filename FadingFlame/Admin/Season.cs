@@ -9,7 +9,7 @@ namespace FadingFlame.Admin
         public int SeasonId { get; set; }
         public bool IsPubliclyVisible { get; set; }
         public DateTime StartDate { get; set; } = DateTime.MaxValue;
-        public DateTime ListSubmissionDeadline { get; set; } = DateTime.MaxValue;
+        public DateTime ListSubmissionDeadline { get; set; } = DateTime.MaxValue.AddDays(-1);
         public bool ListSubmissionIsOver => DateTime.UtcNow > ListSubmissionDeadline.AddDays(1);
     }
 }

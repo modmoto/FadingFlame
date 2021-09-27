@@ -15,6 +15,12 @@
 <div class="card">
     <h4 class="card-header">Profile @_player.DisplayName</h4>
     <div class="card-body">
+        @if (UserParticipatesInCurrentSeason())
+        {
+            <div class="pt-3 pb-3 alert alert-success w-25" role="alert">
+                <div class="cursor" @onclick="() => NavigateToLeague(_playerLeagues[0].Id)">Current league: @_playerLeagues[0].DivisionId @_playerLeagues[0].Name</div>
+            </div>
+        }
         @if (IsTheRightUser() || _userState.UserIsAdmin)
         {
             <EditForm OnSubmit="OnSubmit" EditContext="@_editContextUser">
@@ -38,10 +44,10 @@
                     Save profile
                 </button>
             </EditForm>
-            
+
             <hr class="my-3">
-            
-            @if (!_seasonState.CurrentSeason.ListSubmissionIsOver  || _userState.UserIsAdmin)
+
+            @if (!_seasonState.CurrentSeason.ListSubmissionIsOver || _userState.UserIsAdmin)
             {
                 @if (!_player.SubmittedLists)
                 {
@@ -57,59 +63,59 @@
                 }
 
                 <EditForm Model="@_listModel" OnValidSubmit="OnValidSubmitList">
-                <DataAnnotationsValidator/>
-                <div class="row align-items-start">
-                    <div class="col">
-                        <div class="form-group">
-                            <div class="pb-3">First List: </div>
-                            <InputText @bind-Value="_listModel.List1Name" placeholder="Name" class="form-control mb-3"/>
-                            <ValidationMessage For="@(() => _listModel.List1Name)"/>
+                    <DataAnnotationsValidator/>
+                    <div class="row align-items-start">
+                        <div class="col">
+                            <div class="form-group">
+                                <div class="pb-3">First List: </div>
+                                <InputText @bind-Value="_listModel.List1Name" placeholder="Name" class="form-control mb-3"/>
+                                <ValidationMessage For="@(() => _listModel.List1Name)"/>
+                            </div>
+                            <div class="form-group">
+                                <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_listModel.Faction1">
+                                    <option selected value="0">Select faction</option>
+                                    @foreach (var faction in Enum.GetValues<Faction>())
+                                    {
+                                        <option value="@faction">@faction.ToFactionString()</option>
+                                    }
+                                </select>
+                                <ValidationMessage For="@(() => _listModel.Faction1)"/>
+                            </div>
+                            <div class="form-group">
+                                <InputTextArea @bind-Value="_listModel.List1" placeholder="List" class="form-control mb-3" style="min-height: 300px"/>
+                                <ValidationMessage For="@(() => _listModel.List1)"/>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_listModel.Faction1">
-                                <option selected value="0">Select faction</option>
-                                @foreach (var faction in Enum.GetValues<Faction>())
-                                {
-                                    <option value="@faction">@faction.ToFactionString()</option>
-                                }
-                            </select>
-                            <ValidationMessage For="@(() => _listModel.Faction1)"/>
-                        </div>
-                        <div class="form-group">
-                            <InputTextArea @bind-Value="_listModel.List1" placeholder="List" class="form-control mb-3" style="min-height: 300px"/>
-                            <ValidationMessage For="@(() => _listModel.List1)"/>
+                        <div class="col">
+                            <div class="form-group">
+                                <div class="pb-3">Second List: </div>
+                                <InputText @bind-Value="_listModel.List2Name" placeholder="Name" class="form-control mb-3"/>
+                                <ValidationMessage For="@(() => _listModel.List2Name)"/>
+                            </div>
+                            <div class="form-group">
+                                <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_listModel.Faction2">
+                                    <option selected value="0">Select faction</option>
+                                    @foreach (var faction in Enum.GetValues<Faction>())
+                                    {
+                                        <option value="@faction">@faction.ToFactionString()</option>
+                                    }
+                                </select>
+                                <ValidationMessage For="@(() => _listModel.Faction2)"/>
+                            </div>
+                            <div class="form-group">
+                                <InputTextArea @bind-Value="_listModel.List2" placeholder="List" class="form-control mb-3" style="min-height: 300px"/>
+                                <ValidationMessage For="@(() => _listModel.List2)"/>
+                            </div>
                         </div>
                     </div>
-                    <div class="col">
-                        <div class="form-group">
-                            <div class="pb-3">Second List: </div>
-                            <InputText @bind-Value="_listModel.List2Name" placeholder="Name" class="form-control mb-3"/>
-                            <ValidationMessage For="@(() => _listModel.List2Name)"/>
-                        </div>
-                        <div class="form-group">
-                            <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_listModel.Faction2">
-                                <option selected value="0">Select faction</option>
-                                @foreach (var faction in Enum.GetValues<Faction>())
-                                {
-                                    <option value="@faction">@faction.ToFactionString()</option>
-                                }
-                            </select>
-                            <ValidationMessage For="@(() => _listModel.Faction2)"/>
-                        </div>
-                        <div class="form-group">
-                            <InputTextArea @bind-Value="_listModel.List2" placeholder="List" class="form-control mb-3" style="min-height: 300px"/>
-                            <ValidationMessage For="@(() => _listModel.List2)"/>
-                        </div>
-                    </div>
-                </div>
-                
-                <button disabled="@_loadingLists" class="btn btn-primary">
-                    @if (_loadingLists)
-                    {
-                        <span class="spinner-border spinner-border-sm mr-1"></span>
-                    }
-                    Save lists
-                </button>
+
+                    <button disabled="@_loadingLists" class="btn btn-primary">
+                        @if (_loadingLists)
+                        {
+                            <span class="spinner-border spinner-border-sm mr-1"></span>
+                        }
+                        Save lists
+                    </button>
                 </EditForm>
             }
         }
@@ -122,22 +128,16 @@
         }
         @if (_player.SubmittedLists)
         {
-            if (_seasonState.CurrentSeason.ListSubmissionIsOver)
+            if (_seasonState.CurrentSeason.ListSubmissionIsOver && !_userState.UserIsAdmin)
             {
+                <h4>Lists this season</h4>
+                <hr class="my-3">
                 <div class="row align-items-start">
                     <div class="col">
                         <div class="form-group">
                             <div>Faction: </div>
                             <div class="pb-3"><b>@_listModel.Faction1.ToFactionString()</b></div>
                         </div>
-                        <div class="form-group">
-                            <div>Faction: </div>
-                            <div class="pb-3"><b>@_listModel.Faction2.ToFactionString()</b></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row align-items-start">
-                    <div class="col">
                         <div class="form-group">
                             <label>First List: </label>
                             <div><b>@_listModel.List1Name</b></div>
@@ -148,6 +148,10 @@
                         </div>
                     </div>
                     <div class="col">
+                        <div class="form-group">
+                            <div>Faction: </div>
+                            <div class="pb-3"><b>@_listModel.Faction2.ToFactionString()</b></div>
+                        </div>
                         <div class="form-group">
                             <label>Second List: </label>
                             <div><b>@_listModel.List2Name</b></div>
@@ -163,10 +167,10 @@
             {
                 if (!IsTheRightUser())
                 {
-                    <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()</div>    
+                    <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()</div>
                 }
             }
-            
+
         }
 
         <h4 class="mt-4">Participated in Seasons</h4>
@@ -303,5 +307,11 @@
             .Select((value, index) => new { value, index })
             .Single(x => x.value.Id == new ObjectId(Id))
             .index + 1;
+    }
+
+    private bool UserParticipatesInCurrentSeason()
+    {
+        if (!_playerLeagues.Any()) return false;
+        return _playerLeagues[0].Season == _seasonState.CurrentSeason.SeasonId;
     }
 }
