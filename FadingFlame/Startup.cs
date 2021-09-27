@@ -85,7 +85,6 @@ namespace FadingFlame
 
             services.AddTransient<ILeagueRepository, LeagueRepository>();
             services.AddTransient<IPlayerRepository, PlayerRepository>();
-            services.AddTransient<ILeagueCommandHandler, LeagueCommandHandler>();
             services.AddTransient<IPlayoffCommandHandler, PlayoffCommandHandler>();
             services.AddTransient<IPlayoffRepository, PlayoffRepository>();
             services.AddTransient<ISeasonRepository, SeasonRepository>();

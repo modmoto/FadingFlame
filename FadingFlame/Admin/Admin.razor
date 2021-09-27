@@ -31,29 +31,6 @@
                 </ul>
             </div>
         </div>
-        
-        <div class="card m-2" style="width: 28rem;">
-            <div class="card-body">
-                <div class="card-title">Not found users for league (@_playersNotFound.Count):</div>
-                <ul class="list-group list-group-flush">
-                    @foreach (var player in _playersNotFound)
-                    {
-                        <li class="list-group-item cursor" @onclick="() => GoToPlayer(player)">@player.DisplayName / @player.DiscordTag</li>
-                    }
-                </ul>
-            </div>
-        </div>
-        <div class="card m-2" style="width: 28rem;">
-            <div class="card-body">
-                <div class="card-title">Users not in excel but with list on website (@_playersNotInExcelButWithList.Count):</div>
-                <ul class="list-group list-group-flush">
-                    @foreach (var player in _playersNotInExcelButWithList)
-                    {
-                        <li class="list-group-item cursor" @onclick="() => GoToPlayer(player)">@player.DisplayName / @player.DiscordTag</li>
-                    }
-                </ul>
-            </div>
-        </div>
     </div>
 
     <div class="pt-3 pb-3 alert alert-danger text-center" role="alert">
@@ -62,16 +39,6 @@
 
     <div class="container">
         <div class="row">
-            <div class="m-2 col">
-                <button disabled="@_loadingLeagues" type="button" class="btn btn-primary" @onclick="CreateLeagues">
-                    @if (_loadingLeagues)
-                    {
-                        <span class="spinner-border spinner-border-sm mr-1"></span>
-                    }
-                    Reset Season 1
-                </button>
-            </div>
-
             <div class="m-2 col">
                 <button disabled="@_loadingDiscord" type="button" class="btn btn-primary" @onclick="SyncDiscord">
                     @if (_loadingDiscord)
@@ -180,7 +147,6 @@
 }
 
 @inject UserState _userState
-@inject ILeagueCommandHandler _leagueCommandHandler
 @inject IPlayoffCommandHandler _playoffCommandHandler
 @inject IPlayerRepository _playerRepository
 @inject ILeagueRepository _leagueRepository
@@ -190,51 +156,23 @@
 @inject SeasonState _seasonState
 
 @code {
-    private bool _loadingLeagues;
     private bool _loadingPlayoffs;
     private bool _loadingDiscord;
     private bool _loadingSeasons;
     private bool _loadingEndingSeason;
     private List<Player> _playersWithList = new();
     private List<Player> _playersWithOutList = new();
-    private List<Player> _playersNotFound = new();
-    private List<Player> _playersNotInExcelButWithList = new();
 
     protected override void OnInitialized()
     {
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
-        _seasonState.SeasonsChanged += LoadUsersNotInList;
-    }
-
-    private async void LoadUsersNotInList(object sender, EventArgs eventArgs)
-    {
-        await LoadUsersWithListButNotInExcel();
-        StateHasChanged();
-    }
-
-    private async Task LoadUsersWithListButNotInExcel()
-    {
-        var leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
-        var playerInLeagues = leagues.SelectMany(l => l.Players);
-        var playerIds = playerInLeagues.Select(p => p.Id).ToList();
-        _playersNotInExcelButWithList = _playersWithList.Where(p => !playerIds.Contains(p.Id)).ToList();
     }
 
     protected override async Task OnInitializedAsync()
     {
         _playersWithList = await _playerRepository.LoadAllWitList();
         _playersWithOutList = (await _playerRepository.LoadAllWithoutList()).Where(u => !u.DisplayName.StartsWith("MISSING")).ToList();
-        _playersNotFound = await _playerRepository.FindAllWithFakeMail(LeagueCommandHandler.NotfoundMail);
         _playersWithList = await _playerRepository.LoadAllWitList();
-        await LoadUsersWithListButNotInExcel();
-    }
-
-    private async Task CreateLeagues()
-    {
-        _loadingLeagues = true;
-        await _leagueCommandHandler.CreateLeagues();
-        _playersNotFound = await _playerRepository.FindAllWithFakeMail(LeagueCommandHandler.NotfoundMail);
-        _loadingLeagues = false;
     }
     
     private async Task SyncDiscord()
