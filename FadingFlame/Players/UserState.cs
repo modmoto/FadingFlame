@@ -23,6 +23,7 @@ namespace FadingFlame.Players
             "simonheiss87@gmail.com", // modmoto
             "tulmir@gmail.com", // tulmir
             "herzog1602@googlemail.com", //almentro
+            "antonhermann1989@gmail.com", //Sterotony
         };
 
         public virtual void SetUserData(Player player)
