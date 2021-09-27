@@ -59,9 +59,8 @@ namespace FadingFlame.Leagues
                     var discordTag = stringsOfExcel[index];
                     var name = stringsOfExcel[index + 1];
 
-                    var foundPlayer = players.FirstOrDefault(p => 
-                        p.DiscordTag?.ToLower() == discordTag.ToLower()
-                        || p.DisplayName.ToLower() == name?.ToLower());
+                    var foundPlayer = players.FirstOrDefault(p => p.DiscordTag?.ToLower().Trim() == discordTag.ToLower().Trim()
+                                                                  || p.DisplayName.ToLower().Trim() == name?.ToLower().Trim());
 
                     if (foundPlayer != null)
                     {
@@ -83,7 +82,7 @@ namespace FadingFlame.Leagues
 
             await _leagueRepository.Insert(newLeagues);
         }
-        
+
         private static readonly string[] Scopes = { SheetsService.Scope.Spreadsheets };
         private const string SpreadsheetId = "1WY2I-Nl0n2HgWp2MMjnEpRQ3DmbErQFsNZvR8DMgJeM";
         private const string GoogleCredentialsFileName = "fading-flame-babbfd3eb7b2.json";

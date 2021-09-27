@@ -3,15 +3,6 @@
 @using FadingFlame.Discord
 @using FadingFlame.Players
 @using FadingFlame.Playoffs
-@inject UserState _userState
-@inject ILeagueCommandHandler _leagueCommandHandler
-@inject IPlayoffCommandHandler _playoffCommandHandler
-@inject IPlayerRepository _playerRepository
-@inject ILeagueRepository _leagueRepository
-@inject IDiscordBot _discordBot
-@inject NavigationManager _navigation
-@inject ISeasonRepository _seasonRepository
-@inject SeasonState _seasonState
 
 @if (_userState.UserIsAdmin)
 {
@@ -46,6 +37,17 @@
                 <div class="card-title">Not found users for league (@_playersNotFound.Count):</div>
                 <ul class="list-group list-group-flush">
                     @foreach (var player in _playersNotFound)
+                    {
+                        <li class="list-group-item cursor" @onclick="() => GoToPlayer(player)">@player.DisplayName / @player.DiscordTag</li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="card m-2" style="width: 28rem;">
+            <div class="card-body">
+                <div class="card-title">Users not in excel but with list on website (@_playersNotInExcelButWithList.Count):</div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var player in _playersNotInExcelButWithList)
                     {
                         <li class="list-group-item cursor" @onclick="() => GoToPlayer(player)">@player.DisplayName / @player.DiscordTag</li>
                     }
@@ -177,6 +179,16 @@
     </div>
 }
 
+@inject UserState _userState
+@inject ILeagueCommandHandler _leagueCommandHandler
+@inject IPlayoffCommandHandler _playoffCommandHandler
+@inject IPlayerRepository _playerRepository
+@inject ILeagueRepository _leagueRepository
+@inject IDiscordBot _discordBot
+@inject NavigationManager _navigation
+@inject ISeasonRepository _seasonRepository
+@inject SeasonState _seasonState
+
 @code {
     private bool _loadingLeagues;
     private bool _loadingPlayoffs;
@@ -186,18 +198,35 @@
     private List<Player> _playersWithList = new();
     private List<Player> _playersWithOutList = new();
     private List<Player> _playersNotFound = new();
+    private List<Player> _playersNotInExcelButWithList = new();
 
     protected override void OnInitialized()
     {
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
-        _seasonState.SeasonsChanged += (_, _) => StateHasChanged();
+        _seasonState.SeasonsChanged += LoadUsersNotInList;
     }
-    
+
+    private async void LoadUsersNotInList(object sender, EventArgs eventArgs)
+    {
+        await LoadUsersWithListButNotInExcel();
+        StateHasChanged();
+    }
+
+    private async Task LoadUsersWithListButNotInExcel()
+    {
+        var leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
+        var playerInLeagues = leagues.SelectMany(l => l.Players);
+        var playerIds = playerInLeagues.Select(p => p.Id).ToList();
+        _playersNotInExcelButWithList = _playersWithList.Where(p => !playerIds.Contains(p.Id)).ToList();
+    }
+
     protected override async Task OnInitializedAsync()
     {
         _playersWithList = await _playerRepository.LoadAllWitList();
         _playersWithOutList = (await _playerRepository.LoadAllWithoutList()).Where(u => !u.DisplayName.StartsWith("MISSING")).ToList();
         _playersNotFound = await _playerRepository.FindAllWithFakeMail(LeagueCommandHandler.NotfoundMail);
+        _playersWithList = await _playerRepository.LoadAllWitList();
+        await LoadUsersWithListButNotInExcel();
     }
 
     private async Task CreateLeagues()

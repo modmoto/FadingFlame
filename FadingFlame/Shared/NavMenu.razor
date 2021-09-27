@@ -1,5 +1,4 @@
 ﻿@using FadingFlame.Players
-@inject UserState _userState
 
 <div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand ms-4" href="">Fading Flame</a>
@@ -59,6 +58,8 @@
     </ul>
 </div>
 
+@inject UserState _userState
+@inject NavigationManager _navigation
 @code {
     private bool _collapseNavMenu = true;
     private string NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
