@@ -256,7 +256,6 @@
         var list2 = GameList.Create(_listModel.List2Name, _listModel.List2, _listModel.Faction2);
         _player.SubmitLists(list1, list2);
         await _playerRepository.Update(_player);
-        _userState.SetUserData(_player);
 
         _loadingLists = false;
     }
@@ -286,7 +285,6 @@
         }
         _player.Update(_editUserModel);
         await _playerRepository.Update(_player);
-        _userState.SetUserData(_player);
         _loading = false;
         StateHasChanged();
     }
@@ -305,8 +303,8 @@
     {
         return league.Players
             .Select((value, index) => new { value, index })
-            .Single(x => x.value.Id == new ObjectId(Id))
-            .index + 1;
+            .SingleOrDefault(x => x.value.Id == new ObjectId(Id))
+            ?.index ?? 0 + 1;
     }
 
     private bool UserParticipatesInCurrentSeason()
