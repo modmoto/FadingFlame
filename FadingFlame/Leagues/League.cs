@@ -53,7 +53,7 @@ namespace FadingFlame.Leagues
             player1.RecordResult(result.Player1.BattlePoints, result.Player1.VictoryPoints);
             player2.RecordResult(result.Player2.BattlePoints, result.Player2.VictoryPoints);
 
-            Players = Players.OrderByDescending(p => p.BattlePoints).ThenByDescending(p => p.VictoryPoints).ToList();
+            ReorderPlayers();
 
             return result;
         }
@@ -136,6 +136,18 @@ namespace FadingFlame.Leagues
             GameDays = gameDays;
         }
 
+        public void PenaltyPointsForPlayer(ObjectId playerId, int penaltyPoints)
+        {
+            var player = Players.FirstOrDefault(p => p.Id == playerId);
+            if (player == null)
+            {
+                throw new ValidationException("Players are not in this league");
+            }
+            
+            player.Penalty(penaltyPoints);
+            ReorderPlayers();
+        }
+
         public void DeleteGameReport(ObjectId matchId)
         {
             var match = GetMatchup(matchId);
@@ -151,9 +163,14 @@ namespace FadingFlame.Leagues
             player1.DeleteResult(match.Result.Player1.BattlePoints, match.Result.Player1.VictoryPoints);
             player2.DeleteResult(match.Result.Player2.BattlePoints, match.Result.Player2.VictoryPoints);
 
-            Players = Players.OrderByDescending(p => p.BattlePoints).ThenByDescending(p => p.VictoryPoints).ToList();
+            ReorderPlayers();
             
             match.DeleteResult();
+        }
+
+        private void ReorderPlayers()
+        {
+            Players = Players.OrderByDescending(p => p.BattlePoints + p.PenaltyPoints).ThenByDescending(p => p.VictoryPoints).ToList();
         }
     }
 }

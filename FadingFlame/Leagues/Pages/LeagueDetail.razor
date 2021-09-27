@@ -28,18 +28,44 @@ else
             <th>Faction</th>
             <th>Battle Points</th>
             <th>Victory Points</th>
+            <th>Penalty Points</th>
             <th>Matches</th>
         </tr>
         </thead>
         <tbody class="league">
-        @foreach (var playerInLeague in _league.Players)
+        @foreach (var item in _league.Players.Select((value, index) => new { value, index }))
         {
-            <tr @onclick="() => GoToPlayer(playerInLeague.Id)" class="cursor" >
-                <td>@GetName(playerInLeague.Id)</td>
-                <td>@GetRace(playerInLeague.Id)</td>
-                <td>@playerInLeague.BattlePoints</td>
-                <td>@playerInLeague.VictoryPoints</td>
-                <td>@playerInLeague.GamesCount</td>
+            <tr @onclick="() => GoToPlayer(item.value.Id)" class="cursor">
+                <td>@GetName(item.value.Id)</td>
+                <td>@GetRace(item.value.Id)</td>
+                <td>@item.value.BattlePoints</td>
+                <td>@item.value.VictoryPoints</td>
+                <td @onclick:stopPropagation="true">
+                    @if (_userState.UserIsAdmin)
+                    {
+                        <EditForm OnSubmit="() => OnSubmitPenalty(_penalties[item.index])" Model="@_penalties[item.index]">
+                            <DataAnnotationsValidator/>
+                            <div style="display: flex; flex-direction: row;">
+                                 <div class="form-group" style="max-width: 5rem; margin-bottom: 0!important;">
+                                    <InputNumber @bind-Value="_penalties[item.index].PenaltyPoints" class="form-control"/>
+                                    <ValidationMessage For="@(() => _penalties[item.index].PenaltyPoints)"/>
+                                </div>
+                                <button @onclick:stopPropagation="false" disabled="@_loadingPenalty" class="btn btn-danger ms-3">
+                                    @if (_loadingPenalty)
+                                    {
+                                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                                    }
+                                    <span class="oi oi-shield me-3" aria-hidden="true"></span>Save penalty
+                                </button>
+                            </div>
+                        </EditForm>
+                    }
+                    else
+                    {
+                        @(_penalties[item.index].PenaltyPoints)
+                    }
+                </td>
+                <td>@item.value.GamesCount</td>
             </tr>
         }
         </tbody>
@@ -143,7 +169,9 @@ else
     
     private League _league;
     private int _activeDay;
+    private bool _loadingPenalty;
     private List<Player> _playersInLeague = new();
+    private List<PenaltyModel> _penalties = new();
 
     protected override void OnInitialized()
     {
@@ -156,6 +184,7 @@ else
         {
             _league = await _leagueRepository.Load(parsed);
             _playersInLeague = await _playerRepository.LoadForLeague(_league.Players.Select(p => p.Id).ToList());
+            _penalties = MapPenalties(_league);
             var now = DateTime.UtcNow;
             for (int i = 0; i < _league.GameDays.Count; i++)
             {
@@ -221,4 +250,19 @@ else
         var factions = new List<Faction?> { player.Army?.List1?.Faction, player?.Army?.List2?.Faction }.Where(l => l != null).Distinct();
         return string.Join("/", factions.Select(f => f.Value.ToFactionString()));
     }
+
+    private void OnSubmitPenalty(PenaltyModel model)
+    {
+        _loadingPenalty = true;
+        _league.PenaltyPointsForPlayer(model.PlayerId, model.PenaltyPoints);
+        _penalties = MapPenalties(_league);
+        _leagueRepository.Update(_league);
+        _loadingPenalty = false;
+    }
+
+    private List<PenaltyModel> MapPenalties(League league)
+    {
+        return league.Players.Select(p => new PenaltyModel(p.Id, p.PenaltyPoints)).ToList();
+    }
+
 }
