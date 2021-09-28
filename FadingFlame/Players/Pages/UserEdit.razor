@@ -6,16 +6,14 @@
 @using System.Text.RegularExpressions
 @using FadingFlame.Admin
 @using System.Globalization
-@using System.Collections
-
-@inject IPlayerRepository _playerRepository
-@inject ILeagueRepository _leagueRepository
-@inject UserState _userState
-@inject SeasonState _seasonState
-@inject NavigationManager _navigation
 
 <div class="card">
-    <h4 class="card-header">Profile @_player.DisplayName</h4>
+    <h4 class="card-header">Profile @_player.DisplayName 
+        @if (_editUserModel.Country != null)
+        {
+            <span class="@_regionCss"></span> 
+            <span> (@GetTimeDiffToLalTime() to your local time)</span>
+        }</h4>
     <div class="card-body">
         @if (UserParticipatesInCurrentSeason())
         {
@@ -46,7 +44,7 @@
                         @foreach (var country in _countries)
                         {
                             <option value="@country.TwoLetterISORegionName">
-                                <span class="flag-container flag-icon flag-icon-gr"></span> @country.EnglishName
+                                @country.EnglishName
                             </option>
                         }
                     </select>
@@ -197,6 +195,13 @@
     </div>
 </div>
 
+@inject IJSRuntime _jsRuntime
+@inject IPlayerRepository _playerRepository
+@inject ILeagueRepository _leagueRepository
+@inject UserState _userState
+@inject SeasonState _seasonState
+@inject NavigationManager _navigation
+
 @code{
     private EditUserModel _editUserModel = new();
     private EditListsModel _listModel = new();
@@ -211,7 +216,11 @@
 
     private ValidationMessageStore _messageStore;
     private EditContext _editContextUser;
-    
+    private string _regionCss;
+
+    private DateTimeOffset _localTime;
+    private TimeSpan? _userTime;
+  
     protected override void OnInitialized()
     {
         _countries = PopulateCountries();
@@ -257,6 +266,8 @@
                     Country = _player.Country?.TwoLetterISORegionName,
                 };
 
+                _regionCss = $"flag-container flag-icon flag-icon-{_editUserModel.Country?.ToLower()}";
+
                 _listModel = new EditListsModel
                 {
                     List1 = _player.Army?.List1.List,
@@ -274,6 +285,23 @@
         {
             _navigation.NavigateTo("notfound");
         }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (_userTime == null)
+            {
+                var timeDiffer = await _jsRuntime.InvokeAsync<int>("GetTimezoneOffset");
+                _userTime = TimeSpan.FromMinutes(-timeDiffer);
+            }
+
+            _localTime = DateTimeOffset.UtcNow.ToOffset(_userTime.Value);
+            StateHasChanged();
+        }
+        
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     private async Task OnValidSubmitList()
@@ -346,9 +374,10 @@
         return _playerLeagues[0].Season == _seasonState.CurrentSeason.SeasonId;
     }
 
-    private string GetClass(RegionInfo country)
+    private string GetTimeDiffToLalTime()
     {
-        return $"flag-container flag-icon flag-icon-{country.TwoLetterISORegionName}";
+        var abs = Math.Abs(_localTime.Hour - (_userTime?.TotalHours ?? 0));
+        return (abs).ToString();
     }
 
 }
