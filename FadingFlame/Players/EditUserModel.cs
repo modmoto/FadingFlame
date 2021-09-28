@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 
 namespace FadingFlame.Players
 {
@@ -6,6 +7,7 @@ namespace FadingFlame.Players
     {
         public string DiscordTag { get; set; }
         public string DisplayName { get; set; }
+        public string? Country { get; set; }
     }
     
     public class EditListsModel

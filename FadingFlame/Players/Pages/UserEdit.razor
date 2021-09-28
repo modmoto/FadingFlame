@@ -5,6 +5,8 @@
 @using FadingFlame.Leagues
 @using System.Text.RegularExpressions
 @using FadingFlame.Admin
+@using System.Globalization
+@using System.Collections
 
 @inject IPlayerRepository _playerRepository
 @inject ILeagueRepository _leagueRepository
@@ -35,6 +37,20 @@
                     <div class="pb-2">Discord tag: </div>
                     <InputText @bind-Value="_editUserModel.DiscordTag" class="form-control mb-3"/>
                     <ValidationMessage For="@(() => _editUserModel.DiscordTag)"/>
+                </div>
+                <DataAnnotationsValidator/>
+                <div class="form-group">
+                    <div class="pb-2">Country and timezone: </div>
+                    <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_editUserModel.Country">
+                        <option selected value="">Select country</option>
+                        @foreach (var country in _countries)
+                        {
+                            <option value="@country.TwoLetterISORegionName">
+                                <span class="flag-container flag-icon flag-icon-gr"></span> @country.EnglishName
+                            </option>
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => _editUserModel.Country)"/>
                 </div>
                 <button disabled="@_loading" class="btn btn-primary">
                     @if (_loading)
@@ -185,6 +201,7 @@
     private EditUserModel _editUserModel = new();
     private EditListsModel _listModel = new();
     private List<League> _playerLeagues = new();
+    private List<RegionInfo> _countries = new();
     private Player _player = new();
     private bool _loading;
     private bool _loadingLists;
@@ -197,6 +214,8 @@
     
     protected override void OnInitialized()
     {
+        _countries = PopulateCountries();
+        
         _editContextUser = new EditContext(_editUserModel);
         _messageStore = new ValidationMessageStore(_editContextUser);
         _editContextUser.OnValidationRequested += (_, _) => OnSubmit();
@@ -204,7 +223,14 @@
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
         _seasonState.SeasonsChanged += (_, _) => StateHasChanged();
     }
-    
+
+    private List<RegionInfo> PopulateCountries()
+    {
+        var cultureInfos = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
+        var regionInfos = cultureInfos.Select(c => new RegionInfo(c.LCID)).Distinct().OrderBy(c => c.EnglishName);
+        return regionInfos.ToList();
+    }
+
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         await base.SetParametersAsync(parameters);
@@ -227,7 +253,8 @@
                 _editUserModel = new EditUserModel
                 {
                     DiscordTag = _player.DiscordTag,
-                    DisplayName = _player.DisplayName
+                    DisplayName = _player.DisplayName,
+                    Country = _player.Country?.TwoLetterISORegionName,
                 };
 
                 _listModel = new EditListsModel
@@ -318,4 +345,10 @@
         if (!_playerLeagues.Any()) return false;
         return _playerLeagues[0].Season == _seasonState.CurrentSeason.SeasonId;
     }
+
+    private string GetClass(RegionInfo country)
+    {
+        return $"flag-container flag-icon flag-icon-{country.TwoLetterISORegionName}";
+    }
+
 }

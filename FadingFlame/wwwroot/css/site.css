@@ -8,6 +8,11 @@ a, .btn-link {
     color: #0366d6;
 }
 
+.flag-container {
+    width: 3rem !important;
+    height: 2rem !important;
+}
+
 .league tr:nth-child(1) {
     background-color: rgba(197, 255, 210, 0.7);
 }
