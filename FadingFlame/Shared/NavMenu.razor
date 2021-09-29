@@ -8,7 +8,11 @@
 </div>
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <div class="warhall-banner cursor" @onclick="GoToWarhall">Sponsored by:</div>
+    <NavLink href="https://www.warhall.eu/" target="_blank" style="text-decoration: none !important;">
+        <div class="warhall-banner">
+            Sponsored by:
+        </div>
+    </NavLink>
     <ul class="nav flex-column">
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
@@ -60,7 +64,7 @@
 </div>
 
 @inject UserState _userState
-@inject NavigationManager _navigation
+
 @code {
     private bool _collapseNavMenu = true;
     private string NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
@@ -73,10 +77,4 @@
     {
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
     }
-
-    private void GoToWarhall()
-    {
-        _navigation.NavigateTo("https://www.warhall.eu/");
-    }
-
 }
