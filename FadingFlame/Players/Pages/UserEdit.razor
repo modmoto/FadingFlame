@@ -225,8 +225,6 @@
     private EditListsModel _listModel = new();
     private List<League> _playerLeagues = new();
     private readonly List<RegionInfo> _countries = CultureInfo.GetCultures(CultureTypes.SpecificCultures)
-        .Where(x => !x.Equals(CultureInfo.InvariantCulture))
-        .Where(x => !x.IsNeutralCulture)
         .Select(x => new RegionInfo(x.LCID))
         .OrderBy(i => i.EnglishName)
         .Distinct()
