@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using FadingFlame.Admin;
 using FadingFlame.Matchups;
 using FadingFlame.Players;
 using FadingFlame.Repositories;
@@ -208,6 +209,14 @@ namespace FadingFlame.Leagues
         public void ReplaceDummyPlayer(ObjectId playerId)
         {
             SwapPlayer(ObjectId.Empty, playerId);
+        }
+
+        public void SetScenarioAndDeployments(SecondaryObjective[] secondaryObjectives, Deployment[] deployments)
+        {
+            for (int i = 0; i < GameDays.Count; i++)
+            {
+                GameDays[i].SetScenarioAndDeployments(secondaryObjectives[i], deployments[i]);
+            }
         }
     }
 }

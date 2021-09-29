@@ -14,7 +14,7 @@
                 <option selected value="0">All factions</option>
                 @foreach (var faction in Enum.GetValues<Faction>())
                 {
-                    <option value="@faction">@faction.ToFactionString()</option>
+                    <option value="@faction">@faction.ToCamelCaseString()</option>
                 }
             </select>
             <select class="form-select form-select-lg mb-3 ms-2" aria-label=".form-select-lg example" @onchange="SelectLeague">
@@ -36,7 +36,7 @@
                         <div class="col">
                             <div class="form-group">
                                 <label>First List: </label>
-                                <div><b>@player.Army.List1.Faction.ToFactionString()</b></div>
+                                <div><b>@player.Army.List1.Faction.ToCamelCaseString()</b></div>
                                 <div><b>@player.Army.List1.Name</b></div>
                             </div>
                             <hr class="my-3">
@@ -47,7 +47,7 @@
                         <div class="col">
                             <div class="form-group">
                                 <label>Second List: </label>
-                                <div><b>@player.Army.List2.Faction.ToFactionString()</b></div>
+                                <div><b>@player.Army.List2.Faction.ToCamelCaseString()</b></div>
                                 <div><b>@player.Army.List2.Name</b></div>
                             </div>
                             <hr class="my-3">

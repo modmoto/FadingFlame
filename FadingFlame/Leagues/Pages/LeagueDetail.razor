@@ -150,7 +150,7 @@ else
         {
             @if (_activeDay == gameDay.index)
             {
-                <p class="lead">@gameDay.value.StartDate.ToMyDate() - @gameDay.value.EndDate.ToMyDate()</p>
+                <div class="lead mb-3">@gameDay.value.StartDate.ToMyDate() - @gameDay.value.EndDate.ToMyDate()  —  @gameDay.value.Deployment.ToCamelCaseString() with @gameDay.value.SecondaryObjective.ToCamelCaseString()</div>
                 <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
                     <div class="row row-cols-auto justify-content-around">
                         @foreach (var matchup in gameDay.value.Matchups)
@@ -280,7 +280,7 @@ else
         var player = _playersInLeague.FirstOrDefault(p => p.Id == playerId);
         if (player == null) return "";
         var factions = new List<Faction?> { player.Army?.List1?.Faction, player?.Army?.List2?.Faction }.Where(l => l != null).Distinct();
-        return string.Join("/", factions.Select(f => f.Value.ToFactionString()));
+        return string.Join("/", factions.Select(f => f.Value.ToCamelCaseString()));
     }
 
     private void OnSubmitPenalty(PenaltyModel model)

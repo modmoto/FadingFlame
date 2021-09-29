@@ -1,3 +1,4 @@
+using System;
 using System.Text.RegularExpressions;
 
 namespace FadingFlame.Players
@@ -27,9 +28,9 @@ namespace FadingFlame.Players
         // look at the length of the allowed factions in EditListsModel, as this has to be hardcoded!!!!
     }
 
-    public static class FactionExtensions
+    public static class EnumExtensions
     {
-        public static string ToFactionString(this Faction faction)
+        public static string ToCamelCaseString(this Enum faction)
         {
             return Regex.Replace(faction.ToString(), "(\\B[A-Z])", " $1")
                 .Replace("And", "and")

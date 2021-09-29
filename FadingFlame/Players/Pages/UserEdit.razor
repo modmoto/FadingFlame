@@ -109,7 +109,7 @@
                                     <option selected value="0">Select faction</option>
                                     @foreach (var faction in Enum.GetValues<Faction>())
                                     {
-                                        <option value="@faction">@faction.ToFactionString()</option>
+                                        <option value="@faction">@faction.ToCamelCaseString()</option>
                                     }
                                 </select>
                                 <ValidationMessage For="@(() => _listModel.Faction1)"/>
@@ -130,7 +130,7 @@
                                     <option selected value="0">Select faction</option>
                                     @foreach (var faction in Enum.GetValues<Faction>())
                                     {
-                                        <option value="@faction">@faction.ToFactionString()</option>
+                                        <option value="@faction">@faction.ToCamelCaseString()</option>
                                     }
                                 </select>
                                 <ValidationMessage For="@(() => _listModel.Faction2)"/>
@@ -169,7 +169,7 @@
                     <div class="col">
                         <div class="form-group">
                             <div>Faction: </div>
-                            <div class="pb-3"><b>@_listModel.Faction1.ToFactionString()</b></div>
+                            <div class="pb-3"><b>@_listModel.Faction1.ToCamelCaseString()</b></div>
                         </div>
                         <div class="form-group">
                             <label>First List: </label>
@@ -183,7 +183,7 @@
                     <div class="col">
                         <div class="form-group">
                             <div>Faction: </div>
-                            <div class="pb-3"><b>@_listModel.Faction2.ToFactionString()</b></div>
+                            <div class="pb-3"><b>@_listModel.Faction2.ToCamelCaseString()</b></div>
                         </div>
                         <div class="form-group">
                             <label>Second List: </label>

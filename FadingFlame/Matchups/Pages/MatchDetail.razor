@@ -328,7 +328,7 @@ else
 
     private string GetListFacion(SeasonArmy army, string listName)
     {
-        return (army.List1.Name == listName ? army.List1.Faction : army.List2.Faction).ToFactionString();
+        return (army.List1.Name == listName ? army.List1.Faction : army.List2.Faction).ToCamelCaseString();
     }
 
     private async Task OnValidSubmit()

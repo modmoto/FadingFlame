@@ -1,0 +1,12 @@
+namespace FadingFlame.Admin
+{
+    public enum SecondaryObjective
+    {
+        HoldTheGround = 1,
+        Breakthrough = 2,
+        SpoilsOfWar = 3,
+        KingOfTheHill = 4, 
+        CaptureTheFlags = 5,
+        SecureTarget = 6
+    }
+}
