@@ -39,15 +39,19 @@ namespace FadingFlame.Players
             var content = await httpResponseMessage.Content.ReadAsStringAsync();
             var info = JsonConvert.DeserializeObject<LocationDto>(content);
             var timeZoneInfos = TimeZoneInfo.GetSystemTimeZones();
-            
-            var location = new Location
-            {
-                // Ids only works for linux, as the info object return linux ids
-                TimezoneRaw = info.Timezone != null ? timeZoneInfos.FirstOrDefault(ti => ti.Id == info.Timezone)?.Id : null,
-                Country = info.CuntryCode != null ? new RegionInfo(info.CuntryCode) : null
-            };
 
-            if (location.Timezone == null)
+            var location = new Location();
+            if (info != null)
+            {
+                location.TimezoneRaw = info.Timezone != null
+                    ? timeZoneInfos.FirstOrDefault(ti => ti.Id == info.Timezone)?.Id
+                    : null;
+                location.Country = info.CuntryCode != null 
+                    ? new RegionInfo(info.CuntryCode) 
+                    : null;
+            }
+            
+            if (location.TimezoneRaw == null)
             {
                 var timeDiff = await _jsRuntime.InvokeAsync<int>("GetTimezoneOffset");
                 var timeSpanDiff = TimeSpan.FromMinutes(-timeDiff);
