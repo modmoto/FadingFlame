@@ -5,16 +5,17 @@
 @using FadingFlame.Leagues
 @using System.Text.RegularExpressions
 @using FadingFlame.Admin
+@using System.Globalization
 
 <div class="card">
     <h4 class="card-header">Profile @_player.DisplayName 
-        @if (_editUserModel.Location != null)
+        @if (_editUserModel.Country != null)
         {
             <span class="@_regionCss"></span>
         }
     </h4>
     <div class="card-body">
-        @if (_editUserModel.Location != null)
+        @if (_editUserModel.TimeZone != null)
         {
             <div class="form-group pb-3">
                 <label>Time difference to you: @(GetTimeDiff().Hours)h (@_editUserModel.Location.TimezoneRaw)</label>
@@ -41,6 +42,31 @@
                     <InputText @bind-Value="_editUserModel.DiscordTag" class="form-control mb-3"/>
                     <ValidationMessage For="@(() => _editUserModel.DiscordTag)"/>
                 </div>
+                <div class="row">
+                    <div class="form-group col">
+                        <div class="form-group">
+                            <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_editUserModel.Country">
+                                <option selected value="nono">Dont show country</option>
+                                @foreach (var culture in _countries)
+                                {
+                                    <option value="@culture.TwoLetterISORegionName">@culture.EnglishName</option>
+                                }
+                            </select>
+                            <ValidationMessage For="@(() => _editUserModel.Country)"/>
+                        </div>
+                    </div>    
+                    <div class="form-group col">
+                        <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_editUserModel.TimeZone">
+                            <option selected value="nono">Dont show timezone</option>
+                            @foreach (var timeZone in TimeZoneInfo.GetSystemTimeZones().OrderBy(t => t.Id))
+                            {
+                                <option value="@timeZone.Id">@timeZone.Id @(timeZone.BaseUtcOffset)</option>
+                            }
+                        </select>
+                        <ValidationMessage For="@(() => _editUserModel.TimeZone)"/>
+                    </div>
+                </div>
+                
                 <button disabled="@_loading" class="btn btn-primary">
                     @if (_loading)
                     {
@@ -196,6 +222,13 @@
     private EditUserModel _editUserModel = new();
     private EditListsModel _listModel = new();
     private List<League> _playerLeagues = new();
+    private readonly List<RegionInfo> _countries = CultureInfo.GetCultures(CultureTypes.SpecificCultures)
+        .Where(x => !x.Equals(CultureInfo.InvariantCulture))
+        .Where(x => !x.IsNeutralCulture)
+        .Select(x => new RegionInfo(x.LCID))
+        .OrderBy(i => i.EnglishName)
+        .Distinct()
+        .ToList();
     private Player _player = new();
     private bool _loading;
     private bool _loadingLists;
@@ -241,10 +274,12 @@
                 {
                     DiscordTag = _player.DiscordTag,
                     DisplayName = _player.DisplayName,
-                    Location = _player.Location
+                    Location = _player.Location,
+                    Country = _player.Location?.Country?.TwoLetterISORegionName ?? "nono",
+                    TimeZone = _player.Location?.TimezoneRaw ?? "nono"
                 };
 
-                _regionCss = $"ms-2 flag-container flag-icon flag-icon-{_editUserModel.Location?.Country?.TwoLetterISORegionName.ToLower()}";
+                _regionCss = SetRegionCss();
 
                 _listModel = new EditListsModel
                 {
@@ -263,6 +298,11 @@
         {
             _navigation.NavigateTo("notfound");
         }
+    }
+
+    private string SetRegionCss()
+    {
+        return $"ms-2 flag-container flag-icon flag-icon-{_editUserModel.Location?.Country?.TwoLetterISORegionName.ToLower()}";
     }
 
     private async Task OnValidSubmitList()
@@ -306,6 +346,7 @@
             return;
         }
         _player.Update(_editUserModel);
+        SetRegionCss();
         await _playerRepository.Update(_player);
         _loading = false;
         StateHasChanged();

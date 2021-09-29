@@ -17,8 +17,6 @@ namespace FadingFlame.Players
         Task<List<Player>> LoadForLeague(List<ObjectId> playerIds);
         Task<List<Player>> LoadAllWithoutList();
         Task<List<Player>> LoadAllWitList();
-        Task DeleteAllWithMail(string notfoundMail);
-        Task<List<Player>> FindAllWithFakeMail(string notfoundMail);
     }
 
     public class PlayerRepository : MongoDbRepositoryBase, IPlayerRepository
@@ -70,16 +68,6 @@ namespace FadingFlame.Players
         public Task<List<Player>> LoadAllWitList()
         {
             return LoadAll<Player>(p => p.Army != null);
-        }
-
-        public Task DeleteAllWithMail(string notfoundMail)
-        {
-            return DeleteMultiple<Player>(p => p.AccountEmail == notfoundMail);
-        }
-
-        public Task<List<Player>> FindAllWithFakeMail(string notfoundMail)
-        {
-            return LoadAll<Player>(p => p.AccountEmail == notfoundMail);
         }
     }
 }

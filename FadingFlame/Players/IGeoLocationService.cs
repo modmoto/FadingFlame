@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
