@@ -17,7 +17,7 @@
         @if (_editUserModel.Location != null)
         {
             <div class="form-group pb-3">
-                <label>Timedifference to you: @(GetTimeDiff().Hours)h (@_editUserModel.Location.TimezoneRaw)</label>
+                <label>Time difference to you: @(GetTimeDiff().Hours)h (@_editUserModel.Location.TimezoneRaw)</label>
             </div>
         }
         @if (UserParticipatesInCurrentSeason())
