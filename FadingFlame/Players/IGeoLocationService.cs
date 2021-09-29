@@ -59,7 +59,6 @@ namespace FadingFlame.Players
             if (location.Timezone == null)
             {
                 var timeDiff = await _jsRuntime.InvokeAsync<int>("GetTimezoneOffset");
-                _logger.LogInformation($"offset: {timeDiff}");
                 var timeSpanDiff = TimeSpan.FromMinutes(-timeDiff);
                 location.TimezoneRaw = timeZoneInfos.FirstOrDefault(ti => ti.BaseUtcOffset == timeSpanDiff)?.Id;
             }
