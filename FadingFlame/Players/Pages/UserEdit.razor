@@ -380,7 +380,7 @@
 
     private TimeSpan GetTimeDiff()
     {
-        var timeZoneOfPlayer = _editUserModel.Location.Timezone;
+        var timeZoneOfPlayer = _editUserModel.Location?.Timezone;
         if (_userState.CurrentUserTime != null && timeZoneOfPlayer != null)
         {
             if (timeZoneOfPlayer.IsDaylightSavingTime(DateTimeOffset.UtcNow))
