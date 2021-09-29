@@ -6,7 +6,6 @@
 @using System.Text.RegularExpressions
 @using FadingFlame.Admin
 @using System.Globalization
-@using Microsoft.Extensions.Logging
 
 <div class="card">
     <h4 class="card-header">Profile @_player.DisplayName 
@@ -16,10 +15,10 @@
         }
     </h4>
     <div class="card-body">
-        @if (_editUserModel.TimeZone != "nono")
+        @if (_editUserModel.TimeZone != Location.NotSelected && !IsTheRightUser())
         {
             <div class="form-group pb-3">
-                <label>Time difference to you: @(GetTimeDiff().Hours)h (@_editUserModel.TimeZone)</label>
+                <label>Time difference to you: @(_geoLocationService.GetTimeDiff(_userState.CurrentUserTime, _editUserModel.TimeZone).Hours)h (@_editUserModel.TimeZone)</label>
             </div>
         }
         @if (UserParticipatesInCurrentSeason())
@@ -48,7 +47,7 @@
                         <div class="pb-2">Country: </div>
                         <div class="form-group">
                             <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_editUserModel.Country">
-                                <option selected value="nono">Dont show country</option>
+                                <option selected value="@Location.NotSelected">Dont show country</option>
                                 @foreach (var culture in _countries)
                                 {
                                     <option value="@culture.TwoLetterISORegionName">@culture.EnglishName</option>
@@ -60,8 +59,8 @@
                     <div class="form-group col">
                         <div class="pb-2">Timezone: </div>
                         <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_editUserModel.TimeZone">
-                            <option selected value="nono">Dont show timezone</option>
-                            @foreach (var timeZone in TimeZoneInfo.GetSystemTimeZones().OrderBy(t => t.Id))
+                            <option selected value="@Location.NotSelected">Dont show timezone</option>
+                            @foreach (var timeZone in _geoLocationService.GetTimeZones())
                             {
                                 <option value="@timeZone.Id">@timeZone.Id @(timeZone.BaseUtcOffset)</option>
                             }
@@ -220,7 +219,7 @@
 @inject UserState _userState
 @inject SeasonState _seasonState
 @inject NavigationManager _navigation
-@inject ILogger<UserEdit> _logger
+@inject IGeoLocationService _geoLocationService
 
 @code{
     private EditUserModel _editUserModel = new();
@@ -240,12 +239,7 @@
   
     protected override void OnInitialized()
     {
-        _countries = CultureInfo.GetCultures(CultureTypes.SpecificCultures)
-            .Where(c => c.LCID != 4096)
-            .Select(x => new RegionInfo(x.LCID))
-            .OrderBy(i => i.EnglishName)
-            .Distinct()
-            .ToList();
+        _countries = _geoLocationService.GetCountries();
         _editContextUser = new EditContext(_editUserModel);
         _messageStore = new ValidationMessageStore(_editContextUser);
         _editContextUser.OnValidationRequested += (_, _) => OnSubmit();
@@ -278,8 +272,8 @@
                 {
                     DiscordTag = _player.DiscordTag,
                     DisplayName = _player.DisplayName,
-                    Country = _player.Location?.Country?.TwoLetterISORegionName ?? "nono",
-                    TimeZone = _player.Location?.TimezoneRaw ?? "nono"
+                    Country = _player.Location?.Country?.TwoLetterISORegionName ?? Location.NotSelected,
+                    TimeZone = _player.Location?.TimezoneRaw ?? Location.NotSelected
                 };
 
                 _regionCss = SetRegionCss();
@@ -377,21 +371,5 @@
     {
         if (!_playerLeagues.Any()) return false;
         return _playerLeagues[0].Season == _seasonState.CurrentSeason.SeasonId;
-    }
-
-    private TimeSpan GetTimeDiff()
-    {
-        var timeZoneOfPlayer = TimeZoneInfo.GetSystemTimeZones().FirstOrDefault(ti => ti.Id == _editUserModel.TimeZone);
-        if (_userState.CurrentUserTime != null && timeZoneOfPlayer != null)
-        {
-            if (timeZoneOfPlayer.IsDaylightSavingTime(DateTimeOffset.UtcNow))
-            {
-                return timeZoneOfPlayer.BaseUtcOffset + TimeSpan.FromHours(1) - _userState.CurrentUserTime.Value.Offset;
-            }
-            
-            return timeZoneOfPlayer.BaseUtcOffset - _userState.CurrentUserTime.Value.Offset;
-        }
-        
-        return TimeSpan.Zero;
     }
 }

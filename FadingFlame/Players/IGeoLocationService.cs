@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
@@ -6,7 +7,6 @@ using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.JSInterop;
-using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
 namespace FadingFlame.Players
@@ -15,6 +15,9 @@ namespace FadingFlame.Players
     {
         Task<Location> GetLoggedInUserLocation();
         Task<DateTimeOffset> GetLoggedInUserTime();
+        List<RegionInfo> GetCountries();
+        List<TimeZoneInfo> GetTimeZones();
+        TimeSpan GetTimeDiff(DateTimeOffset? timeOfUser, string timeZoneOfSelectedPlayer);
     }
 
     public class GeoLocationService : IGeoLocationService
@@ -30,6 +33,21 @@ namespace FadingFlame.Players
             _accessor = accessor;
         }
         
+        public TimeSpan GetTimeDiff(DateTimeOffset? timeOfUser, string timeZoneOfSelectedPlayer)
+        {
+            var timeZoneOfPlayer = GetTimeZones().FirstOrDefault(ti => ti.Id == timeZoneOfSelectedPlayer);
+            if (timeOfUser != null && timeZoneOfPlayer != null)
+            {
+                if (timeZoneOfPlayer.IsDaylightSavingTime(DateTimeOffset.UtcNow))
+                {
+                    return timeZoneOfPlayer.BaseUtcOffset + TimeSpan.FromHours(1) - timeOfUser.Value.Offset;
+                }
+            
+                return timeZoneOfPlayer.BaseUtcOffset - timeOfUser.Value.Offset;
+            }
+        
+            return TimeSpan.Zero;
+        }
         public async Task<Location> GetLoggedInUserLocation()
         {
             var userIpAdress = _accessor.HttpContext?.Request.Headers["X-Forwarded-For"];
@@ -37,7 +55,7 @@ namespace FadingFlame.Players
             var httpResponseMessage = await _httpClient.GetAsync($"?ip={decodedIp}");
             var content = await httpResponseMessage.Content.ReadAsStringAsync();
             var info = JsonConvert.DeserializeObject<LocationDto>(content);
-            var timeZoneInfos = TimeZoneInfo.GetSystemTimeZones();
+            var timeZoneInfos = GetTimeZones();
 
             var location = new Location();
             if (info != null)
@@ -45,9 +63,17 @@ namespace FadingFlame.Players
                 location.TimezoneRaw = info.Timezone != null
                     ? timeZoneInfos.FirstOrDefault(ti => ti.Id == info.Timezone)?.Id
                     : null;
-                location.Country = info.CuntryCode != null 
-                    ? new RegionInfo(info.CuntryCode) 
-                    : null;
+                try
+                {
+
+                    location.Country = info.CuntryCode != null 
+                        ? new RegionInfo(info.CuntryCode) 
+                        : null;
+                }
+                catch (Exception)
+                {
+                    // ignored because region info sucks ass
+                }
             }
             
             if (location.TimezoneRaw == null)
@@ -67,12 +93,21 @@ namespace FadingFlame.Players
             var timeSpanDiff = TimeSpan.FromMinutes(-timeDiff);
             return DateTimeOffset.Now.ToOffset(timeSpanDiff);
         }
-    }
 
-    public class Location
-    {
-        public RegionInfo Country { get; set; }
-        public string TimezoneRaw { get; set; }
+        public List<RegionInfo> GetCountries()
+        {
+            return CultureInfo.GetCultures(CultureTypes.SpecificCultures)
+                .Where(c => c.LCID != 4096)
+                .Select(x => new RegionInfo(x.LCID))
+                .OrderBy(i => i.EnglishName)
+                .Distinct()
+                .ToList();
+        }
+
+        public List<TimeZoneInfo> GetTimeZones()
+        {
+            return TimeZoneInfo.GetSystemTimeZones().OrderBy(t => t.Id).ToList();
+        }
     }
 
     public class LocationDto

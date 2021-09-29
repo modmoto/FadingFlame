@@ -46,23 +46,7 @@ namespace FadingFlame.Players
         {
             DiscordTag = model.DiscordTag;
             DisplayName = model.DisplayName;
-            if (model.Country == "nono" && Location != null)
-            {
-                Location.Country = null;
-            }
-            else
-            {
-                if (Location != null) Location.Country = new RegionInfo(model.Country);
-            }
-            
-            if (model.TimeZone == "nono" && Location != null)
-            {
-                Location.TimezoneRaw = null;
-            }
-            else
-            {
-                if (Location != null) Location.TimezoneRaw = model.TimeZone;
-            }
+            Location = Location.Create(model.Country, model.TimeZone);
         }
 
         public void SetLocalInformation(Location location)
