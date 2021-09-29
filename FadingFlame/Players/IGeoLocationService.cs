@@ -72,9 +72,6 @@ namespace FadingFlame.Players
     public class Location
     {
         public RegionInfo Country { get; set; }
-
-        [BsonIgnore]
-        public TimeZoneInfo Timezone => TimeZoneInfo.GetSystemTimeZones().FirstOrDefault(ti => ti.Id == TimezoneRaw);
         public string TimezoneRaw { get; set; }
     }
 

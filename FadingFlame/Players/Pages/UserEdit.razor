@@ -18,7 +18,7 @@
         @if (_editUserModel.TimeZone != null)
         {
             <div class="form-group pb-3">
-                <label>Time difference to you: @(GetTimeDiff().Hours)h (@_editUserModel.Location.TimezoneRaw)</label>
+                <label>Time difference to you: @(GetTimeDiff().Hours)h (@_editUserModel.TimeZone)</label>
             </div>
         }
         @if (UserParticipatesInCurrentSeason())
@@ -274,7 +274,6 @@
                 {
                     DiscordTag = _player.DiscordTag,
                     DisplayName = _player.DisplayName,
-                    Location = _player.Location,
                     Country = _player.Location?.Country?.TwoLetterISORegionName ?? "nono",
                     TimeZone = _player.Location?.TimezoneRaw ?? "nono"
                 };
@@ -302,7 +301,7 @@
 
     private string SetRegionCss()
     {
-        return $"ms-2 flag-container flag-icon flag-icon-{_editUserModel.Location?.Country?.TwoLetterISORegionName.ToLower()}";
+        return $"ms-2 flag-container flag-icon flag-icon-{_editUserModel.Country?.ToLower()}";
     }
 
     private async Task OnValidSubmitList()
@@ -378,7 +377,7 @@
 
     private TimeSpan GetTimeDiff()
     {
-        var timeZoneOfPlayer = _editUserModel.Location?.Timezone;
+        var timeZoneOfPlayer = TimeZoneInfo.GetSystemTimeZones().FirstOrDefault(ti => ti.Id == _editUserModel.TimeZone);
         if (_userState.CurrentUserTime != null && timeZoneOfPlayer != null)
         {
             if (timeZoneOfPlayer.IsDaylightSavingTime(DateTimeOffset.UtcNow))
