@@ -21,6 +21,37 @@ namespace FadingFlame.Leagues
         public List<GameDay> GameDays { get; set; } = new();
         public DateTime StartDate { get; set; }
 
+        public void RemoveFromLeague(ObjectId playerId)
+        {
+            SwapPlayer(playerId, ObjectId.Empty);
+        }
+
+        private void SwapPlayer(ObjectId oldPlayer, ObjectId newPlayer)
+        {
+            var player = Players.SingleOrDefault(p => p.Id == oldPlayer);
+            if (player == null)
+            {
+                throw new ValidationException("Player not in this League");
+            }
+
+            player.Id = newPlayer;
+
+            var matchesOfPlayer = GameDays.SelectMany(gameDay => gameDay.Matchups)
+                .Where(m => m.Player1 == oldPlayer || m.Player2 == oldPlayer);
+            foreach (var matchup in matchesOfPlayer)
+            {
+                if (matchup.Player1 == oldPlayer)
+                {
+                    matchup.Player1 = newPlayer;
+                }
+
+                if (matchup.Player2 == oldPlayer)
+                {
+                    matchup.Player2 = newPlayer;
+                }
+            }
+        }
+
         private Matchup GetMatchup(ObjectId matchId)
         {
             var match = GameDays.SelectMany(g => g.Matchups).FirstOrDefault(m => m.Id == matchId);
@@ -138,7 +169,7 @@ namespace FadingFlame.Leagues
 
         public void PenaltyPointsForPlayer(ObjectId playerId, int penaltyPoints)
         {
-            var player = Players.FirstOrDefault(p => p.Id == playerId);
+            var player = Players.SingleOrDefault(p => p.Id == playerId);
             if (player == null)
             {
                 throw new ValidationException("Players are not in this league");
@@ -171,6 +202,12 @@ namespace FadingFlame.Leagues
         private void ReorderPlayers()
         {
             Players = Players.OrderByDescending(p => p.BattlePoints + p.PenaltyPoints).ThenByDescending(p => p.VictoryPoints).ToList();
+        }
+
+        public void ReplaceDummyPlayer(ObjectId playerId)
+        {
+            if (Players.Any(p => p.Id == playerId)) return; 
+            SwapPlayer(ObjectId.Empty, playerId);
         }
     }
 }

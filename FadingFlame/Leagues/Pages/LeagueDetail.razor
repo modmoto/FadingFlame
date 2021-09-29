@@ -43,22 +43,51 @@ else
                 <td @onclick:stopPropagation="true">
                     @if (_userState.UserIsAdmin)
                     {
-                        <EditForm OnSubmit="() => OnSubmitPenalty(_penalties[item.index])" Model="@_penalties[item.index]">
-                            <DataAnnotationsValidator/>
-                            <div style="display: flex; flex-direction: row;">
-                                 <div class="form-group" style="max-width: 5rem; margin-bottom: 0!important;">
-                                    <InputNumber @bind-Value="_penalties[item.index].PenaltyPoints" class="form-control"/>
-                                    <ValidationMessage For="@(() => _penalties[item.index].PenaltyPoints)"/>
-                                </div>
-                                <button @onclick:stopPropagation="false" disabled="@_loadingPenalty" class="btn btn-danger ms-3">
-                                    @if (_loadingPenalty)
+                        <div style="display: flex; flex-direction: row; max-width: 400px">
+                            @if (item.value.Id == ObjectId.Empty)
+                            {
+                                <select class="form-select form-select-lg" aria-label=".form-select-lg example" @bind="_selectedNewPlayerIdRaw" style="max-width: 200px">
+                                    <option selected value="@ObjectId.Empty.ToString()">Select player</option>
+                                    @foreach (var player in _playersNotInLeagues)
+                                    {
+                                        <option value="@player.Id.ToString()">@player.DisplayName / @player.DiscordTag</option>
+                                    }
+                                </select>
+                                <button @onclick="() => AddToLeague(_selectedNewPlayerIdRaw)" disabled="@_loadingAdmin" class="btn btn-danger ms-3">
+                                    @if (_loadingAdmin)
                                     {
                                         <span class="spinner-border spinner-border-sm mr-1"></span>
                                     }
-                                    <span class="oi oi-shield me-3" aria-hidden="true"></span>Save penalty
+                                    <span class="oi oi-shield me-3" aria-hidden="true"></span>Add
                                 </button>
-                            </div>
-                        </EditForm>
+                            }
+                            else
+                            {
+                                <EditForm OnSubmit="() => OnSubmitPenalty(_penalties[item.index])" Model="@_penalties[item.index]">
+                                <DataAnnotationsValidator/>
+                                <div style="display: flex; flex-direction: row;">
+                                     <div class="form-group" style="max-width: 5rem; margin-bottom: 0!important;">
+                                         <InputNumber @bind-Value="_penalties[item.index].PenaltyPoints" class="form-control"/>
+                                         <ValidationMessage For="@(() => _penalties[item.index].PenaltyPoints)"/>
+                                     </div>
+                                     <button @onclick:stopPropagation="false" disabled="@_loadingAdmin" class="btn btn-danger ms-3">
+                                         @if (_loadingAdmin)
+                                         {
+                                             <span class="spinner-border spinner-border-sm mr-1"></span>
+                                         }
+                                         <span class="oi oi-shield me-3" aria-hidden="true"></span>Save
+                                     </button>
+                                </div>
+                                </EditForm>
+                                <button @onclick="() => RemoveFromLeague(item.value.Id)" disabled="@_loadingAdmin" class="btn btn-danger ms-3">
+                                    @if (_loadingAdmin)
+                                    {
+                                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                                    }
+                                    <span class="oi oi-shield me-3" aria-hidden="true"></span>Remove
+                                </button>
+                            }
+                        </div>
                     }
                     else
                     {
@@ -169,7 +198,9 @@ else
     
     private League _league;
     private int _activeDay;
-    private bool _loadingPenalty;
+    private bool _loadingAdmin;
+    private string _selectedNewPlayerIdRaw = ObjectId.Empty.ToString();
+    private List<Player> _playersNotInLeagues = new();
     private List<Player> _playersInLeague = new();
     private List<PenaltyModel> _penalties = new();
 
@@ -183,8 +214,9 @@ else
         if (ObjectId.TryParse(LeagueId, out var parsed))
         {
             _league = await _leagueRepository.Load(parsed);
-            _playersInLeague = await _playerRepository.LoadForLeague(_league.Players.Select(p => p.Id).ToList());
             _penalties = MapPenalties(_league);
+            _playersInLeague = await _playerRepository.LoadForLeague(_league.Players.Select(p => p.Id).ToList());
+            _playersNotInLeagues = (await _playerRepository.LoadAll()).OrderBy(p => p.DisplayName).ToList();
             var now = DateTime.UtcNow;
             for (int i = 0; i < _league.GameDays.Count; i++)
             {
@@ -253,11 +285,11 @@ else
 
     private void OnSubmitPenalty(PenaltyModel model)
     {
-        _loadingPenalty = true;
+        _loadingAdmin = true;
         _league.PenaltyPointsForPlayer(model.PlayerId, model.PenaltyPoints);
         _penalties = MapPenalties(_league);
         _leagueRepository.Update(_league);
-        _loadingPenalty = false;
+        _loadingAdmin = false;
     }
 
     private List<PenaltyModel> MapPenalties(League league)
@@ -265,4 +297,21 @@ else
         return league.Players.Select(p => new PenaltyModel(p.Id, p.PenaltyPoints)).ToList();
     }
 
+    private void RemoveFromLeague(ObjectId playerId)
+    {
+        _loadingAdmin = true;
+        _league.RemoveFromLeague(playerId);
+        _leagueRepository.Update(_league);
+        StateHasChanged();
+        _loadingAdmin = false;
+    }
+    
+    private void AddToLeague(string selectedNewPlayerIdRaw)
+    {
+        _loadingAdmin = true;
+        _league.ReplaceDummyPlayer(new ObjectId(selectedNewPlayerIdRaw));
+        _leagueRepository.Update(_league);
+        StateHasChanged();
+        _loadingAdmin = false;
+    }
 }
