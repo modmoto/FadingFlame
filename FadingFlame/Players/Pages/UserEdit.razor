@@ -16,7 +16,7 @@
         }
     </h4>
     <div class="card-body">
-        @if (_editUserModel.TimeZone != null)
+        @if (_editUserModel.TimeZone != "nono")
         {
             <div class="form-group pb-3">
                 <label>Time difference to you: @(GetTimeDiff().Hours)h (@_editUserModel.TimeZone)</label>
