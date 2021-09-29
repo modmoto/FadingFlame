@@ -35,7 +35,7 @@ namespace FadingFlame.Players
         
         public async Task<Location> GetLoggedInUserLocation()
         {
-            var userIpAdress = _accessor.HttpContext?.Connection.RemoteIpAddress;
+            var userIpAdress = _accessor.HttpContext?.Request.Headers["X-Forwarded-For"];
             var decodedIp = HttpUtility.UrlEncode(userIpAdress?.ToString());
             _logger.LogInformation($"using ip: {decodedIp}");
             var httpResponseMessage = await _httpClient.GetAsync($"?ip={decodedIp}");

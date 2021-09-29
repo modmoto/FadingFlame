@@ -1,5 +1,6 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using FadingFlame.Admin;
 using FadingFlame.Discord;
 using FadingFlame.Leagues;
@@ -9,6 +10,7 @@ using FadingFlame.Playoffs;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -97,6 +99,14 @@ namespace FadingFlame
             services.AddScoped<UserState>();
             services.AddScoped<SeasonState>();
             services.AddHttpContextAccessor();
+            
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                options.RequireHeaderSymmetry = false;
+                options.ForwardLimit = null;
+                options.KnownProxies.Add(IPAddress.Parse("::ffff:172.20.0.3"));
+            });
 
             // var buildServiceProvider = services.BuildServiceProvider();
             // var playerRepository = buildServiceProvider.GetService<IPlayerRepository>();
