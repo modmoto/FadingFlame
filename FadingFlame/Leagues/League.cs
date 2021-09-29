@@ -28,6 +28,7 @@ namespace FadingFlame.Leagues
 
         private void SwapPlayer(ObjectId oldPlayer, ObjectId newPlayer)
         {
+            if (Players.Any(p => p.Id == newPlayer)) return; 
             var player = Players.SingleOrDefault(p => p.Id == oldPlayer);
             if (player == null)
             {
@@ -206,7 +207,6 @@ namespace FadingFlame.Leagues
 
         public void ReplaceDummyPlayer(ObjectId playerId)
         {
-            if (Players.Any(p => p.Id == playerId)) return; 
             SwapPlayer(ObjectId.Empty, playerId);
         }
     }
