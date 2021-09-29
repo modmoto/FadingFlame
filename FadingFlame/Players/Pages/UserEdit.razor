@@ -244,7 +244,7 @@
                     Location = _player.Location
                 };
 
-                _regionCss = $"ms-2 flag-container flag-icon flag-icon-{_editUserModel.Location?.Country.TwoLetterISORegionName.ToLower()}";
+                _regionCss = $"ms-2 flag-container flag-icon flag-icon-{_editUserModel.Location?.Country?.TwoLetterISORegionName.ToLower()}";
 
                 _listModel = new EditListsModel
                 {
