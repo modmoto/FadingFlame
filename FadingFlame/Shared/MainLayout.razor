@@ -30,7 +30,6 @@
             </AuthorizeView>
         </div>
         <div class="content px-4">
-            <button @onclick="() => SetLocationData(null, EventArgs.Empty)">do thing</button>
             @Body
         </div>
         
@@ -47,7 +46,6 @@
 @inject IHttpContextAccessor _httpContextAccessor
 @inject ISeasonRepository _seasonRepository
 @inject IGeoLocationService _geoLocationService
-@inject ILogger<MainLayout> _logger
 
 @code
 {
@@ -56,31 +54,12 @@
         _userState.UserLoggedIn += (_,_) => StateHasChanged();
     }
 
-    private async void SetLocationData(object sender, EventArgs eventArgs)
-    {
-        _logger.LogInformation("Went into Set Location data");
-        var player = _userState.LoggedInPlayer;
-        if (player.Location == null)
-        {
-            _logger.LogInformation("player loc null");
-            var location = await _geoLocationService.GetLoggedInUserLocation();
-            player.SetLocalInformation(location);
-            await _playerRepository.Update(player);
-            
-            StateHasChanged();
-        }
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        _logger.LogInformation("on after render");
         if (firstRender)
         {
-            _logger.LogInformation("on after render INSISDe");
             var loggedInUserTime = await _geoLocationService.GetLoggedInUserTime();
             _userState.SetUserTime(loggedInUserTime);
-            
-            _userState.UserLoggedIn += SetLocationData;
             
             StateHasChanged();
         }
@@ -102,11 +81,22 @@
                     player = Player.Create(_userState.UserName, _userState.AccountEmail);
                     await _playerRepository.Insert(player);
                 }
+                
+                Task.Run(() =>
+                {
+                    if (player.Location == null)
+                    {
+                        Task.Delay(5000).Wait();
+                        var location = _geoLocationService.GetLoggedInUserLocation().Result;
+                        player.SetLocalInformation(location);
+                        _playerRepository.Update(player).Wait();
+                    }
+                });
 
                 _userState.SetUserData(player);
             }
         }
-
+        
         var loadSeasons = await _seasonRepository.LoadSeasons();
         _seasonState.SetSeasons(loadSeasons);
     }
