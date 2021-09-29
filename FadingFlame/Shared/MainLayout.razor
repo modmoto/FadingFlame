@@ -86,7 +86,7 @@
                 {
                     if (player.Location == null)
                     {
-                        Task.Delay(5000).Wait();
+                        Task.Delay(1000).Wait();
                         var location = _geoLocationService.GetLoggedInUserLocation().Result;
                         player.SetLocalInformation(location);
                         _playerRepository.Update(player).Wait();
