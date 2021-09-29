@@ -44,6 +44,7 @@ namespace FadingFlame.Players
             _logger.LogInformation($"return value geocode: {content}");
             _logger.LogInformation($"item: {JsonConvert.SerializeObject(info)}");
             var timeZoneInfos = TimeZoneInfo.GetSystemTimeZones();
+            _logger.LogInformation($"Zones: {string.Join(", ", timeZoneInfos.Select(t => t.DisplayName))}");
             var strings = info.Timezone?.Split("/");
             if (strings?.Length > 1)
             {
