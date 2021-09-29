@@ -2,22 +2,29 @@
 @using FadingFlame.Players
 @using MongoDB.Bson
 @using FadingFlame.Admin
-@inject IPlayerRepository _playerRepository
-@inject NavigationManager _navigation
-@inject SeasonState _seasonState
+@using FadingFlame.Leagues
 
 <div>
     <h1>Lists played this season</h1>
     <hr class="my-4">
     @if (_seasonState.CurrentSeason.ListSubmissionIsOver)
     {
-        <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @onchange="SelectFaction">
-            <option selected value="0">All factions</option>
-            @foreach (var faction in Enum.GetValues<Faction>())
-            {
-                <option value="@faction">@faction.ToFactionString()</option>
-            }
-        </select>
+        <div style="display: flex; flex-direction: row">
+            <select class="form-select form-select-lg mb-3 me-2" aria-label=".form-select-lg example" @onchange="SelectFaction">
+                <option selected value="0">All factions</option>
+                @foreach (var faction in Enum.GetValues<Faction>())
+                {
+                    <option value="@faction">@faction.ToFactionString()</option>
+                }
+            </select>
+            <select class="form-select form-select-lg mb-3 ms-2" aria-label=".form-select-lg example" @onchange="SelectLeague">
+                <option selected value="@ObjectId.Empty.ToString()">All Leagues</option>
+                @foreach (var league in _leagues)
+                {
+                    <option value="@league.Id">@league.DivisionId @league.Name</option>
+                }
+            </select>
+        </div>
         @foreach (var player in _enlistedPlayers)
         {
             <div class="card">
@@ -61,16 +68,34 @@
     
 </div>
 
+@inject IPlayerRepository _playerRepository
+@inject ILeagueRepository _leagueRepository
+@inject NavigationManager _navigation
+@inject SeasonState _seasonState
+
 @code
 {
     private List<Player> _enlistedPlayers = new();
     private List<Player> _enlistedPlayersOriginal = new();
+    private List<League> _leagues = new();
+    private Faction _factionFilter = 0;
+    private ObjectId _leagueFilter = ObjectId.Empty;
+
+    protected override void OnInitialized()
+    {
+        _seasonState.SeasonsChanged += LoadRest;
+    }
 
     protected override async Task OnInitializedAsync()
     {
         _enlistedPlayersOriginal = await _playerRepository.PlayersThatEnlisted();
         _enlistedPlayers = _enlistedPlayersOriginal;
-        _seasonState.SeasonsChanged += (_, _) => StateHasChanged();
+    }
+
+    private async void LoadRest(object sender, EventArgs e)
+    {
+        _leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
+        StateHasChanged();
     }
 
     private void GoToPlayer(ObjectId playerId)
@@ -83,18 +108,48 @@
         var enumString = e.Value?.ToString();
         if (Enum.TryParse<Faction>(enumString, out var en))
         {
-            if (en == 0)
-            {
-                _enlistedPlayers = _enlistedPlayersOriginal;
-            }
-            else
-            {
-                _enlistedPlayers = _enlistedPlayersOriginal.Where(l =>
-                    l.Army.List1.Faction == en
-                    || l.Army.List2.Faction == en).ToList();
-            }
+            _factionFilter = en;
+            FilterLists();
         }
 
         StateHasChanged();
+    }
+
+    private void FilterLists()
+    {
+        var playersAfterFaction = FilterByFaction();
+        _enlistedPlayers = FilterByLeague(playersAfterFaction);
+    }
+
+    private List<Player> FilterByLeague(List<Player> players)
+    {
+        if (_leagueFilter == ObjectId.Empty) return players;
+
+        var league = _leagues.Single(l => l.Id == _leagueFilter);
+        var playerIds = league.Players.Select(p => p.Id);
+        var playersWithFactionInLeague = players.Where(p => playerIds.Contains(p.Id)).ToList();
+        return playersWithFactionInLeague;
+    }
+
+    private List<Player> FilterByFaction()
+    {
+        if (_factionFilter == 0)
+        {
+            return _enlistedPlayersOriginal;
+        }
+        
+        return _enlistedPlayersOriginal.Where(l =>
+            l.Army.List1.Faction == _factionFilter
+            || l.Army.List2.Faction == _factionFilter).ToList();
+    }
+
+    private void SelectLeague(ChangeEventArgs e)
+    {
+        var leagueIdRaw = e.Value?.ToString();
+        if (ObjectId.TryParse(leagueIdRaw, out var leagueId))
+        {
+            _leagueFilter = leagueId;
+            FilterLists();
+        }
     }
 }
