@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
@@ -22,22 +23,26 @@ namespace FadingFlame.Players
         private readonly IJSRuntime _jsRuntime;
         private readonly HttpClient _httpClient;
         private readonly IHttpContextAccessor _accessor;
+        private readonly ILogger<IGeoLocationService> _logger;
 
-        public GeoLocationService(IJSRuntime jsRuntime, HttpClient httpClient, IHttpContextAccessor accessor)
+        public GeoLocationService(IJSRuntime jsRuntime, HttpClient httpClient, IHttpContextAccessor accessor, ILogger<IGeoLocationService> logger)
         {
             _jsRuntime = jsRuntime;
             _httpClient = httpClient;
             _accessor = accessor;
+            _logger = logger;
         }
         
         public async Task<Location> GetLoggedInUserLocation()
         {
             var userIpAdress = _accessor.HttpContext?.Connection.RemoteIpAddress;
             var decodedIp = HttpUtility.UrlEncode(userIpAdress?.ToString());
+            _logger.LogInformation($"using ip: {decodedIp}");
             var httpResponseMessage = await _httpClient.GetAsync($"?ip={decodedIp}");
             var content = await httpResponseMessage.Content.ReadAsStringAsync();
             var info = JsonConvert.DeserializeObject<LocationDto>(content);
-
+            _logger.LogInformation($"return value geocode: {content}");
+            _logger.LogInformation($"item: {JsonConvert.SerializeObject(info)}");
             var timeZoneInfos = TimeZoneInfo.GetSystemTimeZones();
             var strings = info.Timezone?.Split("/");
             if (strings?.Length > 1)
@@ -53,6 +58,7 @@ namespace FadingFlame.Players
             if (location.Timezone == null)
             {
                 var timeDiff = await _jsRuntime.InvokeAsync<int>("GetTimezoneOffset");
+                _logger.LogInformation($"offset: {timeDiff}");
                 var timeSpanDiff = TimeSpan.FromMinutes(-timeDiff);
                 location.TimezoneRaw = timeZoneInfos.FirstOrDefault(ti => ti.BaseUtcOffset == timeSpanDiff)?.Id;
             }
