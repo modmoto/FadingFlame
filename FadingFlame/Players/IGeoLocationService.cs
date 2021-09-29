@@ -44,7 +44,7 @@ namespace FadingFlame.Players
             _logger.LogInformation($"return value geocode: {content}");
             _logger.LogInformation($"item: {JsonConvert.SerializeObject(info)}");
             var timeZoneInfos = TimeZoneInfo.GetSystemTimeZones();
-            _logger.LogInformation($"Zones: {string.Join(", ", timeZoneInfos.Select(t => t.DisplayName))}");
+            _logger.LogInformation($"Zones: {string.Join(", ", timeZoneInfos.Select(t => t.Id))}");
             var strings = info.Timezone?.Split("/");
             if (strings?.Length > 1)
             {
@@ -52,7 +52,7 @@ namespace FadingFlame.Players
             }
             var location = new Location
             {
-                TimezoneRaw = info.Timezone != null ? timeZoneInfos.FirstOrDefault(ti => ti.DisplayName.Contains(info.Timezone))?.Id : null,
+                TimezoneRaw = info.Timezone != null ? timeZoneInfos.FirstOrDefault(ti => ti.Id == info.Timezone)?.Id : null,
                 Country = info.CuntryCode != null ? new RegionInfo(info.CuntryCode) : null
             };
 
