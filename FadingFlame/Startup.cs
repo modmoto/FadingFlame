@@ -100,14 +100,6 @@ namespace FadingFlame
             services.AddScoped<SeasonState>();
             services.AddHttpContextAccessor();
             
-            services.Configure<ForwardedHeadersOptions>(options =>
-            {
-                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-                options.RequireHeaderSymmetry = false;
-                options.ForwardLimit = null;
-                options.KnownProxies.Add(IPAddress.Parse("::ffff:172.20.0.3"));
-            });
-
             // var buildServiceProvider = services.BuildServiceProvider();
             // var playerRepository = buildServiceProvider.GetService<IPlayerRepository>();
             // for (int i = 0; i < 107; i++)
