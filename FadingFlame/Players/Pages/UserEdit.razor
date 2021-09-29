@@ -249,7 +249,7 @@
                 }
                 catch (Exception)
                 {
-                    _logger.LogWarning($"----------------- {x.LCID} {x.TwoLetterISOLanguageName}");
+                    _logger.LogWarning($"----------------- {x.LCID} {x.TwoLetterISOLanguageName}  {x.EnglishName}");
                     return null;
                 }
             })
