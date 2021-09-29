@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Http
 @using FadingFlame.Admin
+@using DnsClient.Internal
 @inherits LayoutComponentBase
 
 <div class="page">
@@ -46,6 +47,7 @@
 @inject IHttpContextAccessor _httpContextAccessor
 @inject ISeasonRepository _seasonRepository
 @inject IGeoLocationService _geoLocationService
+@inject ILogger _logger
 
 @code
 {
@@ -56,9 +58,11 @@
 
     private async void SetLocationData(object sender, EventArgs eventArgs)
     {
+        _logger.LogInformation("Went into Set Location data");
         var player = _userState.LoggedInPlayer;
         if (player.Location == null)
         {
+            _logger.LogInformation("player loc null");
             var location = await _geoLocationService.GetLoggedInUserLocation();
             player.SetLocalInformation(location);
             await _playerRepository.Update(player);
@@ -69,8 +73,10 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        _logger.LogInformation("on after render");
         if (firstRender)
         {
+            _logger.LogInformation("on after render INSISDe");
             var loggedInUserTime = await _geoLocationService.GetLoggedInUserTime();
             _userState.SetUserTime(loggedInUserTime);
             
