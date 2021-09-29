@@ -24,7 +24,7 @@
         }
         @if (UserParticipatesInCurrentSeason())
         {
-            <div class="pt-3 pb-3 alert alert-success w-25" role="alert">
+            <div class="pt-3 pb-3 alert alert-success" role="alert" style="max-width: 25rem">
                 <div class="cursor" @onclick="() => NavigateToLeague(_playerLeagues[0].Id)">Current league: @_playerLeagues[0].DivisionId @_playerLeagues[0].Name</div>
             </div>
         }
