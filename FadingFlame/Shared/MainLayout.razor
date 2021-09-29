@@ -62,6 +62,8 @@
             var location = await _geoLocationService.GetLoggedInUserLocation();
             player.SetLocalInformation(location);
             await _playerRepository.Update(player);
+            
+            StateHasChanged();
         }
     }
 
