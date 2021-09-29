@@ -23,33 +23,23 @@ namespace FadingFlame.Players
         private readonly IJSRuntime _jsRuntime;
         private readonly HttpClient _httpClient;
         private readonly IHttpContextAccessor _accessor;
-        private readonly ILogger<IGeoLocationService> _logger;
 
-        public GeoLocationService(IJSRuntime jsRuntime, HttpClient httpClient, IHttpContextAccessor accessor, ILogger<IGeoLocationService> logger)
+        public GeoLocationService(IJSRuntime jsRuntime, HttpClient httpClient, IHttpContextAccessor accessor)
         {
             _jsRuntime = jsRuntime;
             _httpClient = httpClient;
             _accessor = accessor;
-            _logger = logger;
         }
         
         public async Task<Location> GetLoggedInUserLocation()
         {
             var userIpAdress = _accessor.HttpContext?.Request.Headers["X-Forwarded-For"];
             var decodedIp = HttpUtility.UrlEncode(userIpAdress?.ToString());
-            _logger.LogInformation($"using ip: {decodedIp}");
             var httpResponseMessage = await _httpClient.GetAsync($"?ip={decodedIp}");
             var content = await httpResponseMessage.Content.ReadAsStringAsync();
             var info = JsonConvert.DeserializeObject<LocationDto>(content);
-            _logger.LogInformation($"return value geocode: {content}");
-            _logger.LogInformation($"item: {JsonConvert.SerializeObject(info)}");
             var timeZoneInfos = TimeZoneInfo.GetSystemTimeZones();
-            _logger.LogInformation($"Zones: {string.Join(", ", timeZoneInfos.Select(t => t.Id))}");
-            var strings = info.Timezone?.Split("/");
-            if (strings?.Length > 1)
-            {
-                info.Timezone = strings[1];
-            }
+            
             var location = new Location
             {
                 TimezoneRaw = info.Timezone != null ? timeZoneInfos.FirstOrDefault(ti => ti.Id == info.Timezone)?.Id : null,
