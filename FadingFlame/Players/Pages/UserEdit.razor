@@ -6,6 +6,7 @@
 @using System.Text.RegularExpressions
 @using FadingFlame.Admin
 @using System.Globalization
+@using Microsoft.Extensions.Logging
 
 <div class="card">
     <h4 class="card-header">Profile @_player.DisplayName 
@@ -219,16 +220,13 @@
 @inject UserState _userState
 @inject SeasonState _seasonState
 @inject NavigationManager _navigation
+@inject ILogger<UserEdit> _logger
 
 @code{
     private EditUserModel _editUserModel = new();
     private EditListsModel _listModel = new();
     private List<League> _playerLeagues = new();
-    private readonly List<RegionInfo> _countries = CultureInfo.GetCultures(CultureTypes.SpecificCultures)
-        .Select(x => new RegionInfo(x.LCID))
-        .OrderBy(i => i.EnglishName)
-        .Distinct()
-        .ToList();
+    private List<RegionInfo> _countries = new();
     private Player _player = new();
     private bool _loading;
     private bool _loadingLists;
@@ -242,6 +240,23 @@
   
     protected override void OnInitialized()
     {
+        _countries = CultureInfo.GetCultures(CultureTypes.SpecificCultures)
+            .Select(x =>
+            {
+                try
+                {
+                    return new RegionInfo(x.LCID);
+                }
+                catch (Exception)
+                {
+                    _logger.LogInformation($"----------------- {x.LCID} {x.TwoLetterISOLanguageName}");
+                    return null;
+                }
+            })
+            .Where(c => c != null)
+            .OrderBy(i => i.EnglishName)
+            .Distinct()
+            .ToList();
         _editContextUser = new EditContext(_editUserModel);
         _messageStore = new ValidationMessageStore(_editContextUser);
         _editContextUser.OnValidationRequested += (_, _) => OnSubmit();
