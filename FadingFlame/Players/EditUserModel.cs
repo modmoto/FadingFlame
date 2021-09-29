@@ -7,7 +7,7 @@ namespace FadingFlame.Players
     {
         public string DiscordTag { get; set; }
         public string DisplayName { get; set; }
-        public string? Country { get; set; }
+        public Location Location { get; set; }
     }
     
     public class EditListsModel

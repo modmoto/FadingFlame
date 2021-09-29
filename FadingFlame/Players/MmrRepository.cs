@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace FadingFlame.Players
 {
-
     public class MmrRepository
     {
         private readonly HttpClient _httpClient;

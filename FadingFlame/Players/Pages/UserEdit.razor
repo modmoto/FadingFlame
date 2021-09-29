@@ -5,16 +5,21 @@
 @using FadingFlame.Leagues
 @using System.Text.RegularExpressions
 @using FadingFlame.Admin
-@using System.Globalization
 
 <div class="card">
     <h4 class="card-header">Profile @_player.DisplayName 
-        @if (_editUserModel.Country != null)
+        @if (_editUserModel.Location != null)
         {
-            <span class="@_regionCss"></span> 
-            <span> (@GetTimeDiffToLalTime() to your local time)</span>
-        }</h4>
+            <span class="@_regionCss"></span>
+        }
+    </h4>
     <div class="card-body">
+        @if (_editUserModel.Location != null)
+        {
+            <div class="form-group pb-3">
+                <label>Timedifference to you: @(GetTimeDiff().Hours)h (@_editUserModel.Location.TimezoneRaw)</label>
+            </div>
+        }
         @if (UserParticipatesInCurrentSeason())
         {
             <div class="pt-3 pb-3 alert alert-success w-25" role="alert">
@@ -35,20 +40,6 @@
                     <div class="pb-2">Discord tag: </div>
                     <InputText @bind-Value="_editUserModel.DiscordTag" class="form-control mb-3"/>
                     <ValidationMessage For="@(() => _editUserModel.DiscordTag)"/>
-                </div>
-                <DataAnnotationsValidator/>
-                <div class="form-group">
-                    <div class="pb-2">Country and timezone: </div>
-                    <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_editUserModel.Country">
-                        <option selected value="">Select country</option>
-                        @foreach (var country in _countries)
-                        {
-                            <option value="@country.TwoLetterISORegionName">
-                                @country.EnglishName
-                            </option>
-                        }
-                    </select>
-                    <ValidationMessage For="@(() => _editUserModel.Country)"/>
                 </div>
                 <button disabled="@_loading" class="btn btn-primary">
                     @if (_loading)
@@ -195,7 +186,6 @@
     </div>
 </div>
 
-@inject IJSRuntime _jsRuntime
 @inject IPlayerRepository _playerRepository
 @inject ILeagueRepository _leagueRepository
 @inject UserState _userState
@@ -206,7 +196,6 @@
     private EditUserModel _editUserModel = new();
     private EditListsModel _listModel = new();
     private List<League> _playerLeagues = new();
-    private List<RegionInfo> _countries = new();
     private Player _player = new();
     private bool _loading;
     private bool _loadingLists;
@@ -217,27 +206,16 @@
     private ValidationMessageStore _messageStore;
     private EditContext _editContextUser;
     private string _regionCss;
-
-    private DateTimeOffset _localTime;
-    private TimeSpan? _userTime;
   
     protected override void OnInitialized()
     {
-        _countries = PopulateCountries();
-        
         _editContextUser = new EditContext(_editUserModel);
         _messageStore = new ValidationMessageStore(_editContextUser);
         _editContextUser.OnValidationRequested += (_, _) => OnSubmit();
 
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
+        _userState.UserTimeSet += (_, _) => StateHasChanged();
         _seasonState.SeasonsChanged += (_, _) => StateHasChanged();
-    }
-
-    private List<RegionInfo> PopulateCountries()
-    {
-        var cultureInfos = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
-        var regionInfos = cultureInfos.Select(c => new RegionInfo(c.LCID)).Distinct().OrderBy(c => c.EnglishName);
-        return regionInfos.ToList();
     }
 
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -245,7 +223,7 @@
         await base.SetParametersAsync(parameters);
         await OnInitializedAsync();
     }
-    
+
     protected override async Task OnInitializedAsync()
     {
         if (ObjectId.TryParse(Id, out var realId))
@@ -263,10 +241,10 @@
                 {
                     DiscordTag = _player.DiscordTag,
                     DisplayName = _player.DisplayName,
-                    Country = _player.Country?.TwoLetterISORegionName,
+                    Location = _player.Location
                 };
 
-                _regionCss = $"flag-container flag-icon flag-icon-{_editUserModel.Country?.ToLower()}";
+                _regionCss = $"ms-2 flag-container flag-icon flag-icon-{_editUserModel.Location?.Country.TwoLetterISORegionName.ToLower()}";
 
                 _listModel = new EditListsModel
                 {
@@ -285,23 +263,6 @@
         {
             _navigation.NavigateTo("notfound");
         }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            if (_userTime == null)
-            {
-                var timeDiffer = await _jsRuntime.InvokeAsync<int>("GetTimezoneOffset");
-                _userTime = TimeSpan.FromMinutes(-timeDiffer);
-            }
-
-            _localTime = DateTimeOffset.UtcNow.ToOffset(_userTime.Value);
-            StateHasChanged();
-        }
-        
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     private async Task OnValidSubmitList()
@@ -374,10 +335,19 @@
         return _playerLeagues[0].Season == _seasonState.CurrentSeason.SeasonId;
     }
 
-    private string GetTimeDiffToLalTime()
+    private TimeSpan GetTimeDiff()
     {
-        var abs = Math.Abs(_localTime.Hour - (_userTime?.TotalHours ?? 0));
-        return (abs).ToString();
+        var timeZoneOfPlayer = _editUserModel.Location.Timezone;
+        if (_userState.CurrentUserTime != null && timeZoneOfPlayer != null)
+        {
+            if (timeZoneOfPlayer.IsDaylightSavingTime(DateTimeOffset.UtcNow))
+            {
+                return timeZoneOfPlayer.BaseUtcOffset + TimeSpan.FromHours(1) - _userState.CurrentUserTime.Value.Offset;
+            }
+            
+            return timeZoneOfPlayer.BaseUtcOffset - _userState.CurrentUserTime.Value.Offset;
+        }
+        
+        return TimeSpan.Zero;
     }
-
 }

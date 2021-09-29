@@ -3,12 +3,6 @@
 @using Microsoft.AspNetCore.Http
 @using FadingFlame.Admin
 @inherits LayoutComponentBase
-@inject IPlayerRepository _playerRepository
-@inject UserState _userState
-@inject SeasonState _seasonState
-@inject NavigationManager _navigation
-@inject IHttpContextAccessor _httpContextAccessor
-@inject ISeasonRepository _seasonRepository
 
 <div class="page">
     <div class="sidebar">
@@ -45,11 +39,44 @@
     </div>
 </div>
 
+@inject IPlayerRepository _playerRepository
+@inject UserState _userState
+@inject SeasonState _seasonState
+@inject NavigationManager _navigation
+@inject IHttpContextAccessor _httpContextAccessor
+@inject ISeasonRepository _seasonRepository
+@inject IGeoLocationService _geoLocationService
+
 @code
 {
     protected override void OnInitialized()
     {
-        _userState.UserLoggedIn += (_, _) => StateHasChanged();
+        _userState.UserLoggedIn += (_,_) => StateHasChanged();
+    }
+
+    private async void SetLocationData(object sender, EventArgs eventArgs)
+    {
+        var player = _userState.LoggedInPlayer;
+        if (player.Location == null)
+        {
+            var location = await _geoLocationService.GetLoggedInUserLocation();
+            player.SetLocalInformation(location);
+            await _playerRepository.Update(player);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var loggedInUserTime = await _geoLocationService.GetLoggedInUserTime();
+            _userState.SetUserTime(loggedInUserTime);
+            
+            _userState.UserLoggedIn += SetLocationData;
+            
+            StateHasChanged();
+        }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     protected override async Task OnInitializedAsync()
@@ -67,6 +94,7 @@
                     player = Player.Create(_userState.UserName, _userState.AccountEmail);
                     await _playerRepository.Insert(player);
                 }
+
                 _userState.SetUserData(player);
             }
         }

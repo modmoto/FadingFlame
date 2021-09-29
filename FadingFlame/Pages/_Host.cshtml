@@ -33,7 +33,11 @@
 </div>
 
 
-<script src="~/BlazorInterop.js"></script>
+<script>
+function GetTimezoneOffset() {
+    return new Date().getTimezoneOffset();
+}
+</script>
 <script src="_framework/blazor.server.js"></script>
 </body>
 </html>

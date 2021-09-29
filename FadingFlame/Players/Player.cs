@@ -1,4 +1,3 @@
-using System.Globalization;
 using FadingFlame.Repositories;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -15,7 +14,7 @@ namespace FadingFlame.Players
         public SeasonArmy Army  { get; set; }
         public Mmr Mmr  { get; set; }
         public bool SubmittedLists => Army != null;
-        public RegionInfo Country { get; set; }
+        public Location Location { get; set; }
 
         public static Player Create(string name, string accountMail)
         {
@@ -46,14 +45,11 @@ namespace FadingFlame.Players
         {
             DiscordTag = model.DiscordTag;
             DisplayName = model.DisplayName;
-            if (!string.IsNullOrEmpty(model.Country))
-            {
-                Country = new RegionInfo(model.Country);    
-            }
-            else
-            {
-                Country = null;
-            }
+        }
+
+        public void SetLocalInformation(Location location)
+        {
+            Location = location;
         }
     }
 

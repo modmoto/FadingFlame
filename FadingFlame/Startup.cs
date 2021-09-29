@@ -65,6 +65,11 @@ namespace FadingFlame
             {
                 var mmrUri = Environment.GetEnvironmentVariable("MMR_SERVICE_URI") ?? "https://mmr-service.w3champions.com";
                 c.BaseAddress = new Uri(mmrUri);
+            }); 
+            
+            services.AddHttpClient<IGeoLocationService, GeoLocationService>(c =>
+            {
+                c.BaseAddress = new Uri("http://www.geoplugin.net/json.gp");
             });
 
             services.AddAccessTokenManagement()
