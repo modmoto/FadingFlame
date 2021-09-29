@@ -241,19 +241,8 @@
     protected override void OnInitialized()
     {
         _countries = CultureInfo.GetCultures(CultureTypes.SpecificCultures)
-            .Select(x =>
-            {
-                try
-                {
-                    return new RegionInfo(x.LCID);
-                }
-                catch (Exception)
-                {
-                    _logger.LogWarning($"----------------- {x.LCID} {x.TwoLetterISOLanguageName}  {x.EnglishName}");
-                    return null;
-                }
-            })
-            .Where(c => c != null)
+            .Where(c => c.LCID != 4096)
+            .Select(x => new RegionInfo(x.LCID))
             .OrderBy(i => i.EnglishName)
             .Distinct()
             .ToList();
