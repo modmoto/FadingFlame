@@ -46,7 +46,7 @@ else
                         <div style="display: flex; flex-direction: row; max-width: 400px">
                             @if (item.value.Id == ObjectId.Empty)
                             {
-                                <select class="form-select form-select-lg" aria-label=".form-select-lg example" @bind="_selectedNewPlayerIdRaw" style="max-width: 200px">
+                                <select class="form-select" @bind="_selectedNewPlayerIdRaw" style="max-width: 200px">
                                     <option selected value="@ObjectId.Empty.ToString()">Select player</option>
                                     @foreach (var player in _playersNotInLeagues)
                                     {
