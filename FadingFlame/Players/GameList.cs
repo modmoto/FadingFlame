@@ -22,7 +22,7 @@ namespace FadingFlame.Players
             ProposedListChange = null;
         }
         
-        public void AcceptListChange()
+        public void ApproveListChange()
         {
             List = ProposedListChange;
             ProposedListChange = null;

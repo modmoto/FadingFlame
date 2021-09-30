@@ -17,6 +17,7 @@ namespace FadingFlame.Players
         Task<List<Player>> LoadForLeague(List<ObjectId> playerIds);
         Task<List<Player>> LoadAllWithoutList();
         Task<List<Player>> LoadAllWitList();
+        Task<List<Player>> LoadWithPendingChanges();
     }
 
     public class PlayerRepository : MongoDbRepositoryBase, IPlayerRepository
@@ -68,6 +69,11 @@ namespace FadingFlame.Players
         public Task<List<Player>> LoadAllWitList()
         {
             return LoadAll<Player>(p => p.Army != null);
+        }
+
+        public Task<List<Player>> LoadWithPendingChanges()
+        {
+            return LoadAll<Player>(p => p.Army.List1.ProposedListChange != null || p.Army.List2.ProposedListChange != null);
         }
     }
 }

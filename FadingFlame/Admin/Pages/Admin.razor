@@ -9,6 +9,7 @@
     <nav>
         <div class="nav nav-tabs" id="nav-tab" role="tablist">
             <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Players</button>
+            <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Proposed list changes (@_pendingListChanges.Count)</button>
             <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Season Management</button>
         </div>
     </nav>
@@ -37,6 +38,172 @@
                                 <li class="list-group-item cursor" @onclick="() => GoToPlayer(player)">@player.DisplayName / @player.DiscordTag</li>
                             }
                         </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+            <div class="container">
+                @foreach (var player in _pendingListChanges)
+                {
+                    <div class="card-header cursor" @onclick="() => GoToPlayer(player)">
+                        <div><b>@player.DisplayName: </b></div>
+                    </div>
+                    @if (player.Army.List1.ProposedListChange != null)
+                    {
+                        <ListApproveComponent 
+                            List="player.Army.List1" 
+                            Loading="_loadingApproval" 
+                            OnApproveListChange="() => ApproveList1(player)" 
+                            OnRejectListChange="() => RejectList1(player)" />
+                    }
+                    @if (player.Army.List2.ProposedListChange != null)
+                    {
+                        <ListApproveComponent 
+                            List="player.Army.List2" 
+                            Loading="_loadingApproval" 
+                            OnApproveListChange="() => ApproveList2(player)" 
+                            OnRejectListChange="() => RejectList2(player)" />
+                    }
+                    <div class="card-body">
+                        <div class="row align-items-start">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Old List: </label>
+                                    <div><b>@player.Army.List1.Faction.ToCamelCaseString()</b></div>
+                                    <div><b>@player.Army.List1.Name</b></div>
+                                </div>
+                                <hr class="my-3">
+                                <div class="form-group">
+                                    <div style="white-space:pre-wrap;">@player.Army.List1.List</div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>New List: </label>
+                                    <div><b>@player.Army.List2.Faction.ToCamelCaseString()</b></div>
+                                    <div><b>@player.Army.List2.Name</b></div>
+                                </div>
+                                <hr class="my-3">
+                                <div class="form-group">
+                                    <div style="white-space:pre-wrap;">@player.Army.List2.List</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    <div class="m-2 col">
+                        <button disabled="@_loadingDiscord" type="button" class="btn btn-primary" @onclick="CreateSecondObjectives">
+                            @if (_loadingDiscord)
+                            {
+                                <span class="spinner-border spinner-border-sm mr-1"></span>
+                            }
+                            Create Secondary objectives
+                        </button>
+                    </div>
+                    <div class="m-2 col">
+                        <button disabled="@_loadingDiscord" type="button" class="btn btn-primary" @onclick="SyncDiscord">
+                            @if (_loadingDiscord)
+                            {
+                                <span class="spinner-border spinner-border-sm mr-1"></span>
+                            }
+                            Sync Discord Tags
+                        </button>
+                    </div>
+
+                    <div class="m-2 col">
+                        <button disabled="@_loadingPlayoffs" type="button" class="btn btn-primary" @onclick="CreatePlayoffs">
+                            @if (_loadingPlayoffs)
+                            {
+                                <span class="spinner-border spinner-border-sm mr-1"></span>
+                            }
+                            Create Playoffs Season 1
+                        </button>
+                    </div>
+                </div>
+            </div>
+               
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <h4>Current Season (@_seasonState.CurrentSeason.SeasonId):</h4>
+                        <EditForm OnSubmit="() => SaveSeason(_seasonState.CurrentSeason)" Model="@_seasonState.CurrentSeason">
+                            <DataAnnotationsValidator/>
+                            <div class="form-group">
+                                <div class="pb-2">List Submission deadline:</div>
+                                <InputDate @bind-Value="_seasonState.CurrentSeason.ListSubmissionDeadline" class="form-control mb-3"/>
+                                <ValidationMessage For="@(() => _seasonState.CurrentSeason.ListSubmissionDeadline)"/>
+                            </div>
+                            <DataAnnotationsValidator/>
+                            <div class="form-group">
+                                <div class="pb-2">Start date:</div>
+                                <InputDate @bind-Value="_seasonState.CurrentSeason.StartDate" class="form-control mb-3"/>
+                                <ValidationMessage For="@(() => _seasonState.CurrentSeason.StartDate)"/>
+                            </div>
+                            <div class="form-group">
+                                <InputCheckbox class="form-check-input" @bind-Value="_seasonState.CurrentSeason.IsPubliclyVisible"/>
+                                <label class="form-check-label">
+                                    Season is publicly visible
+                                </label>
+                            </div>
+                            <button disabled="@_loadingSeasons" class="btn btn-primary">
+                                @if (_loadingSeasons)
+                                {
+                                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                                }
+                                Save current season
+                            </button>
+                        </EditForm>
+                    </div>
+                    <div class="col">
+                        <h4>Next Season (@_seasonState.NextSeason.SeasonId):</h4>
+                        <EditForm OnSubmit="() => SaveSeason(_seasonState.NextSeason)" Model="@_seasonState.NextSeason">
+                            <DataAnnotationsValidator/>
+                            <div class="form-group">
+                                <div class="pb-2">List Submission deadline:</div>
+                                <InputDate @bind-Value="_seasonState.NextSeason.ListSubmissionDeadline" class="form-control mb-3"/>
+                                <ValidationMessage For="@(() => _seasonState.NextSeason.ListSubmissionDeadline)"/>
+                            </div>
+                            <DataAnnotationsValidator/>
+                            <div class="form-group">
+                                <div class="pb-2">Start date:</div>
+                                <InputDate @bind-Value="_seasonState.NextSeason.StartDate" class="form-control mb-3"/>
+                                <ValidationMessage For="@(() => _seasonState.NextSeason.StartDate)"/>
+                            </div>
+                            <div class="form-group">
+                                <InputCheckbox class="form-check-input" @bind-Value="_seasonState.NextSeason.IsPubliclyVisible"/>
+                                <label class="form-check-label">
+                                    Season is publicly visible
+                                </label>
+                            </div>
+                            <button disabled="@_loadingSeasons" class="btn btn-primary">
+                                @if (_loadingSeasons)
+                                {
+                                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                                }
+                                Save next season
+                            </button>
+                        </EditForm>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col"></div>
+                    <div class="col">
+                        <button disabled="@_loadingEndingSeason" type="button" class="btn btn-danger" @onclick="CreateNextSeason">
+                            @if (_loadingEndingSeason)
+                            {
+                                <span class="spinner-border spinner-border-sm mr-1"></span>
+                            }
+                            Create new next season
+                        </button>
+                        <button disabled="@_loadingEndingSeason" class="btn btn-danger" @onclick="DeleteCurrentSeason">
+                            @if (_loadingEndingSeason)
+                            {
+                                <span class="spinner-border spinner-border-sm mr-1"></span>
+                            }
+                            Delete next season
+                        </button>
                     </div>
                 </div>
             </div>
@@ -181,8 +348,10 @@
     private bool _loadingDiscord;
     private bool _loadingSeasons;
     private bool _loadingEndingSeason;
+    private bool _loadingApproval;
     private List<Player> _playersWithList = new();
     private List<Player> _playersWithOutList = new();
+    private List<Player> _pendingListChanges = new();
 
     protected override void OnInitialized()
     {
@@ -194,6 +363,7 @@
         _playersWithList = await _playerRepository.LoadAllWitList();
         _playersWithOutList = (await _playerRepository.LoadAllWithoutList()).Where(u => !u.DisplayName.StartsWith("MISSING")).ToList();
         _playersWithList = await _playerRepository.LoadAllWitList();
+        _pendingListChanges = await _playerRepository.LoadWithPendingChanges();
     }
     
     private async Task SyncDiscord()
@@ -249,5 +419,37 @@
     private async Task CreateSecondObjectives()
     {
         await _leagueCreationService.SetDeployments();
+    }
+
+    private async void ApproveList1(Player player)
+    {
+        _loadingApproval = true;
+        player.Army.List1.ApproveListChange();
+        await _playerRepository.Update(player);
+        _loadingApproval = false;
+    }
+
+    private async void ApproveList2(Player player)
+    {
+        _loadingApproval = true;
+        player.Army.List2.ApproveListChange();
+        await _playerRepository.Update(player);
+        _loadingApproval = false;
+    }
+    
+    private async void RejectList1(Player player)
+    {
+        _loadingApproval = true;
+        player.Army.List1.RejectListChange();
+        await _playerRepository.Update(player);
+        _loadingApproval = false;
+    }
+
+    private async void RejectList2(Player player)
+    {
+        _loadingApproval = true;
+        player.Army.List2.RejectListChange();
+        await _playerRepository.Update(player);
+        _loadingApproval = false;
     }
 }
