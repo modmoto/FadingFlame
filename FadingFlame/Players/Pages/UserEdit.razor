@@ -249,10 +249,10 @@
     {
         return new GameListEditModel
         {
-            Faction = list.Faction,
-            List = list.List,
-            ProposedListChange = list.ProposedListChange,
-            Name = list.Name,
+            Faction = list?.Faction ?? 0,
+            List = list?.List,
+            ProposedListChange = list?.ProposedListChange,
+            Name = list?.Name,
         };
     }
 
