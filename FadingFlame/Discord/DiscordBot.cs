@@ -100,7 +100,7 @@ namespace FadingFlame.Discord
                 var channels = _client.Guilds.SelectMany(g => g.Value.Channels).Where(c => c.Value.Name == "bots");
                 foreach (var channel in channels)
                 {
-                    await channel.Value.SendMessageAsync($"We now have {pendingChanges} pending list changes");
+                    await channel.Value.SendMessageAsync($"{pendingChanges} pending list changes are waiting on the website");
                 }
             }
             catch (Exception)
