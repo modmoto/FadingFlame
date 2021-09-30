@@ -107,14 +107,24 @@
         {
             <h4>Lists this season</h4>
             <hr class="my-3">
-            <EditForm OnValidSubmit="OnValidSubmitList" Model="@_ditListModel">
+            <EditForm OnValidSubmit="OnValidSubmitList" Model="@_editListModel">
             <DataAnnotationsValidator/>
             <div class="row align-items-start">
                 <div class="col">
-                    <UserListComponent List="@(_ditListModel.List1)" ShowEdit="@(!_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser || _userState.UserIsAdmin)" IsCurrentUser="false"/>
+                    <UserListComponent 
+                        List="@(_editListModel.List1)" 
+                        ShowEdit="@(!_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser || _userState.UserIsAdmin)" 
+                        IsCurrentUser="_isTheRightUser"
+                        OnRequestListChange="RequestListChange1"
+                        />
                 </div>
                 <div class="col">
-                    <UserListComponent List="@(_ditListModel.List2)" ShowEdit="@(!_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser || _userState.UserIsAdmin)" IsCurrentUser="false"/>    
+                    <UserListComponent 
+                        List="@(_editListModel.List2)" 
+                        ShowEdit="@(!_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser || _userState.UserIsAdmin)" 
+                        IsCurrentUser="_isTheRightUser"
+                        OnRequestListChange="RequestListChange2"
+                        />    
                 </div>
             </div>
             @if (!_seasonState.CurrentSeason.ListSubmissionIsOver)
@@ -155,7 +165,7 @@
 
 @code{
     private EditUserModel _editUserModel = new();
-    private EditListsModel _ditListModel = new()
+    private EditListsModel _editListModel = new()
     {
         List1 = new(),
         List2 = new()
@@ -215,7 +225,7 @@
 
                 _regionCss = SetRegionCss();
                 _isTheRightUser = Id == _userState.LoggedInPlayer.Id.ToString();
-                _ditListModel = new EditListsModel
+                _editListModel = new EditListsModel
                 {
                     List1 = ToModel(_player.Army?.List1),
                     List2 = ToModel(_player.Army?.List2)
@@ -230,14 +240,14 @@
         }
     }
 
-    private static GameListEditModel ToModel(GameList armyList1)
+    private static GameListEditModel ToModel(GameList list)
     {
         return new GameListEditModel
         {
-            Faction = armyList1.Faction,
-            List = armyList1.List,
-            ProposedListChange = armyList1.ProposedListChange,
-            Name = armyList1.Name,
+            Faction = list.Faction,
+            List = list.List,
+            ProposedListChange = list.ProposedListChange,
+            Name = list.Name,
         };
     }
 
@@ -248,19 +258,22 @@
 
     private async Task OnValidSubmitList()
     {
-        _loadingLists = true;
-        if (_ditListModel.List1.Name == _ditListModel.List2.Name)
+        if (!_player.SubmittedLists)
         {
-            _ditListModel.List1.Name += "_1";
-            _ditListModel.List2.Name += "_2";
+            _loadingLists = true;
+            if (_editListModel.List1.Name == _editListModel.List2.Name)
+            {
+                _editListModel.List1.Name += "_1";
+                _editListModel.List2.Name += "_2";
+            }
+
+            var list1 = GameList.Create(_editListModel.List1.Name, _editListModel.List1.List, _editListModel.List1.Faction);
+            var list2 = GameList.Create(_editListModel.List2.Name, _editListModel.List2.List, _editListModel.List2.Faction);
+            _player.SubmitLists(list1, list2);
+            await _playerRepository.Update(_player);
+
+            _loadingLists = false;
         }
-
-        var list1 = GameList.Create(_ditListModel.List1.Name, _ditListModel.List1.List, _ditListModel.List1.Faction);
-        var list2 = GameList.Create(_ditListModel.List2.Name, _ditListModel.List2.List, _ditListModel.List2.Faction);
-        _player.SubmitLists(list1, list2);
-        await _playerRepository.Update(_player);
-
-        _loadingLists = false;
     }
     
     private async void OnSubmit()
@@ -310,5 +323,17 @@
     {
         if (!_playerLeagues.Any()) return false;
         return _playerLeagues[0].Season == _seasonState.CurrentSeason.SeasonId;
+    }
+
+    private async void RequestListChange1()
+    {
+        _player.Army.List1.ProposeListChange(_editListModel.List1.ProposedListChange);
+        await _playerRepository.Update(_player);
+    }
+    
+    private async void RequestListChange2()
+    {
+        _player.Army.List2.ProposeListChange(_editListModel.List2.ProposedListChange);
+        await _playerRepository.Update(_player);
     }
 }

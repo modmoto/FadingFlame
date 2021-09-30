@@ -1,32 +1,24 @@
-@if (_requestedList1Change || ShowEdit)
+@if (_openEditMask || ShowEdit)
 {
-    if (_requestedList1Change)
+    if (_openEditMask)
     {
-        <button disabled="@_loadingLists" class="btn btn-primary">
-            @if (_loadingLists)
-            {
-                <span class="spinner-border spinner-border-sm mr-1"></span>
-            }
-            Request list change
+        <button class="btn btn-primary" @onclick="OnListChange">
+            Request approval
         </button>
-        <button disabled="@_loadingLists" class="btn btn-secondary" @onclick="() => _requestedList1Change = false">
-            @if (_loadingLists)
-            {
-                <span class="spinner-border spinner-border-sm mr-1"></span>
-            }
+        <button class="btn btn-secondary" @onclick="() => _openEditMask = false">
             Cancel
         </button>    
     }
-    <EditListView List="List"/>
+    <EditListView List="List" EditProposedListChange="_openEditMask"/>
 }
 else
 {
     @if (IsCurrentUser)
     {
-        <button disabled="@_requestedList1Change" class="btn btn-warning" @onclick="() => _requestedList1Change = true">
-            @if (_requestedList1Change)
+        <button class="btn btn-warning" @onclick="() => _openEditMask = true">
+            @if (List.ProposedListChange != null)
             {
-                <span>List change requested</span>
+                <span>List change still pending for approval</span>
             }
             else
             {
@@ -44,7 +36,13 @@ else
     public bool IsCurrentUser { get; set; }
     [Parameter]
     public bool ShowEdit { get; set; }
+    [Parameter] public EventCallback OnRequestListChange { get; set; }
+    private bool _openEditMask;
 
-    private bool _requestedList1Change;
-    private bool _loadingLists;
+    private async void OnListChange()
+    {
+        await OnRequestListChange.InvokeAsync();
+        _openEditMask = false;
+    }
+
 }
