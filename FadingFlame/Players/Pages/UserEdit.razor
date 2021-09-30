@@ -15,7 +15,7 @@
         }
     </h4>
     <div class="card-body">
-        @if (_editUserModel.TimeZone != Location.NotSelected && !IsTheRightUser())
+        @if (_editUserModel.TimeZone != Location.NotSelected && !_isTheRightUser)
         {
             <div class="form-group pb-3">
                 <label>Time difference to you: @(_geoLocationService.GetTimeDiff(_userState.CurrentUserTime, _editUserModel.TimeZone).Hours)h (@_editUserModel.TimeZone)</label>
@@ -27,7 +27,7 @@
                 <div class="cursor" @onclick="() => NavigateToLeague(_playerLeagues[0].Id)">Current league: @_playerLeagues[0].DivisionId @_playerLeagues[0].Name</div>
             </div>
         }
-        @if (IsTheRightUser() || _userState.UserIsAdmin)
+        @if (_isTheRightUser)
         {
             <EditForm OnSubmit="OnSubmit" EditContext="@_editContextUser">
                 <DataAnnotationsValidator/>
@@ -80,7 +80,7 @@
 
             <hr class="my-3">
 
-            @if (!_seasonState.CurrentSeason.ListSubmissionIsOver || _userState.UserIsAdmin)
+            @if (!_seasonState.CurrentSeason.ListSubmissionIsOver)
             {
                 @if (!_player.SubmittedLists)
                 {
@@ -94,62 +94,6 @@
                         Lists submitted, you will participate in the next season. You can still change the lists until @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate() and they are not visible to other players until then.
                     </div>
                 }
-
-                <EditForm Model="@_listModel" OnValidSubmit="OnValidSubmitList">
-                    <DataAnnotationsValidator/>
-                    <div class="row align-items-start">
-                        <div class="col">
-                            <div class="form-group">
-                                <div class="pb-3">First List: </div>
-                                <InputText @bind-Value="_listModel.List1Name" placeholder="Name" class="form-control mb-3"/>
-                                <ValidationMessage For="@(() => _listModel.List1Name)"/>
-                            </div>
-                            <div class="form-group">
-                                <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_listModel.Faction1">
-                                    <option selected value="0">Select faction</option>
-                                    @foreach (var faction in Enum.GetValues<Faction>())
-                                    {
-                                        <option value="@faction">@faction.ToCamelCaseString()</option>
-                                    }
-                                </select>
-                                <ValidationMessage For="@(() => _listModel.Faction1)"/>
-                            </div>
-                            <div class="form-group">
-                                <InputTextArea @bind-Value="_listModel.List1" placeholder="List" class="form-control mb-3" style="min-height: 300px"/>
-                                <ValidationMessage For="@(() => _listModel.List1)"/>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="form-group">
-                                <div class="pb-3">Second List: </div>
-                                <InputText @bind-Value="_listModel.List2Name" placeholder="Name" class="form-control mb-3"/>
-                                <ValidationMessage For="@(() => _listModel.List2Name)"/>
-                            </div>
-                            <div class="form-group">
-                                <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_listModel.Faction2">
-                                    <option selected value="0">Select faction</option>
-                                    @foreach (var faction in Enum.GetValues<Faction>())
-                                    {
-                                        <option value="@faction">@faction.ToCamelCaseString()</option>
-                                    }
-                                </select>
-                                <ValidationMessage For="@(() => _listModel.Faction2)"/>
-                            </div>
-                            <div class="form-group">
-                                <InputTextArea @bind-Value="_listModel.List2" placeholder="List" class="form-control mb-3" style="min-height: 300px"/>
-                                <ValidationMessage For="@(() => _listModel.List2)"/>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button disabled="@_loadingLists" class="btn btn-primary">
-                        @if (_loadingLists)
-                        {
-                            <span class="spinner-border spinner-border-sm mr-1"></span>
-                        }
-                        Save lists
-                    </button>
-                </EditForm>
             }
         }
         else
@@ -161,49 +105,37 @@
         }
         @if (_player.SubmittedLists)
         {
-            if (_seasonState.CurrentSeason.ListSubmissionIsOver && !_userState.UserIsAdmin)
-            {
-                <h4>Lists this season</h4>
-                <hr class="my-3">
-                <div class="row align-items-start">
-                    <div class="col">
-                        <div class="form-group">
-                            <div>Faction: </div>
-                            <div class="pb-3"><b>@_listModel.Faction1.ToCamelCaseString()</b></div>
-                        </div>
-                        <div class="form-group">
-                            <label>First List: </label>
-                            <div><b>@_listModel.List1Name</b></div>
-                        </div>
-                        <hr class="my-3">
-                        <div class="form-group">
-                            <div style="white-space:pre-wrap;">@_listModel.List1</div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-group">
-                            <div>Faction: </div>
-                            <div class="pb-3"><b>@_listModel.Faction2.ToCamelCaseString()</b></div>
-                        </div>
-                        <div class="form-group">
-                            <label>Second List: </label>
-                            <div><b>@_listModel.List2Name</b></div>
-                        </div>
-                        <hr class="my-3">
-                        <div class="form-group">
-                            <div style="white-space:pre-wrap;">@_listModel.List2</div>
-                        </div>
-                    </div>
+            <h4>Lists this season</h4>
+            <hr class="my-3">
+            <EditForm OnValidSubmit="OnValidSubmitList" Model="@_ditListModel">
+            <DataAnnotationsValidator/>
+            <div class="row align-items-start">
+                <div class="col">
+                    <UserListComponent List="@(_ditListModel.List1)" ShowEdit="@(!_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser || _userState.UserIsAdmin)" IsCurrentUser="false"/>
                 </div>
+                <div class="col">
+                    <UserListComponent List="@(_ditListModel.List2)" ShowEdit="@(!_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser || _userState.UserIsAdmin)" IsCurrentUser="false"/>    
+                </div>
+            </div>
+            @if (!_seasonState.CurrentSeason.ListSubmissionIsOver)
+            {
+                <button disabled="@_loadingLists" class="btn btn-primary">
+                    @if (_loadingLists)
+                    {
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                    }
+                    Save lists
+                </button>
             }
             else
             {
-                if (!IsTheRightUser())
+                if (!_isTheRightUser)
                 {
                     <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()</div>
-                }
+                }       
             }
-
+            
+            </EditForm>
         }
 
         <h4 class="mt-4">Participated in Seasons</h4>
@@ -223,7 +155,11 @@
 
 @code{
     private EditUserModel _editUserModel = new();
-    private EditListsModel _listModel = new();
+    private EditListsModel _ditListModel = new()
+    {
+        List1 = new(),
+        List2 = new()
+    };
     private List<League> _playerLeagues = new();
     private List<RegionInfo> _countries = new();
     private Player _player = new();
@@ -236,7 +172,8 @@
     private ValidationMessageStore _messageStore;
     private EditContext _editContextUser;
     private string _regionCss;
-  
+    private bool _isTheRightUser;
+
     protected override void OnInitialized()
     {
         _countries = _geoLocationService.GetCountries();
@@ -277,17 +214,13 @@
                 };
 
                 _regionCss = SetRegionCss();
-
-                _listModel = new EditListsModel
+                _isTheRightUser = Id == _userState.LoggedInPlayer.Id.ToString();
+                _ditListModel = new EditListsModel
                 {
-                    List1 = _player.Army?.List1.List,
-                    List2 = _player.Army?.List2.List,
-                    List1Name = _player.Army?.List1.Name,
-                    List2Name = _player.Army?.List2.Name,
-                    Faction1 = _player.Army?.List1.Faction ?? 0,
-                    Faction2 = _player.Army?.List2.Faction ?? 0
+                    List1 = ToModel(_player.Army?.List1),
+                    List2 = ToModel(_player.Army?.List2)
                 };
-
+                
                 StateHasChanged();
             }
         }
@@ -295,6 +228,17 @@
         {
             _navigation.NavigateTo("notfound");
         }
+    }
+
+    private static GameListEditModel ToModel(GameList armyList1)
+    {
+        return new GameListEditModel
+        {
+            Faction = armyList1.Faction,
+            List = armyList1.List,
+            ProposedListChange = armyList1.ProposedListChange,
+            Name = armyList1.Name,
+        };
     }
 
     private string SetRegionCss()
@@ -305,14 +249,14 @@
     private async Task OnValidSubmitList()
     {
         _loadingLists = true;
-        if (_listModel.List1Name == _listModel.List2Name)
+        if (_ditListModel.List1.Name == _ditListModel.List2.Name)
         {
-            _listModel.List1Name += "_1";
-            _listModel.List2Name += "_2";
+            _ditListModel.List1.Name += "_1";
+            _ditListModel.List2.Name += "_2";
         }
 
-        var list1 = GameList.Create(_listModel.List1Name, _listModel.List1, _listModel.Faction1);
-        var list2 = GameList.Create(_listModel.List2Name, _listModel.List2, _listModel.Faction2);
+        var list1 = GameList.Create(_ditListModel.List1.Name, _ditListModel.List1.List, _ditListModel.List1.Faction);
+        var list2 = GameList.Create(_ditListModel.List2.Name, _ditListModel.List2.List, _ditListModel.List2.Faction);
         _player.SubmitLists(list1, list2);
         await _playerRepository.Update(_player);
 
@@ -347,11 +291,6 @@
         await _playerRepository.Update(_player);
         _loading = false;
         StateHasChanged();
-    }
-
-    private bool IsTheRightUser()
-    {
-        return Id == _userState.LoggedInPlayer.Id.ToString();
     }
 
     private void NavigateToLeague(ObjectId leagueId)

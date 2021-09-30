@@ -1,0 +1,17 @@
+<div class="form-group">
+    <div>Faction: </div>
+    <div class="pb-3"><b>@List.Faction.ToCamelCaseString()</b></div>
+</div>
+<div class="form-group">
+    <label>First List: </label>
+    <div><b>@List.Name</b></div>
+</div>
+<hr class="my-3">
+<div class="form-group">
+    <div style="white-space:pre-wrap;">@List.List</div>
+</div>
+
+@code {
+    [Parameter]
+    public GameListEditModel List { get; set; }
+}

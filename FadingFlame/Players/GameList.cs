@@ -12,10 +12,26 @@ namespace FadingFlame.Players
             };
         }
 
+        public void ProposeListChange(string change)
+        {
+            ProposedListChange = change;
+        }
+        
+        public void RejectListChange()
+        {
+            ProposedListChange = null;
+        }
+        
+        public void AcceptListChange()
+        {
+            List = ProposedListChange;
+            ProposedListChange = null;
+        }
 
         public Faction Faction { get; set; }
 
         public string List { get; set; }
+        public string ProposedListChange { get; set; }
 
         public string Name { get; set; }
     }

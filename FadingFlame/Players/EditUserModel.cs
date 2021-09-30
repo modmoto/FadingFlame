@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using FadingFlame.Players.Pages;
 
 namespace FadingFlame.Players
 {
@@ -13,24 +14,9 @@ namespace FadingFlame.Players
     public class EditListsModel
     {
         [Required(ErrorMessage = Errors.FieldRequired)]
-        public string List1Name { get; set; }
-
+        public GameListEditModel List1 { get; set; }
         [Required(ErrorMessage = Errors.FieldRequired)]
-        public string List1 { get; set; }
-
-        [Required(ErrorMessage = Errors.FieldRequired)]
-        [Range(1, 20, ErrorMessage = Errors.FactionRequired)]
-        public Faction Faction1 { get; set; }
-
-        [Required(ErrorMessage = Errors.FieldRequired)]
-        public string List2Name { get; set; }
-
-        [Required(ErrorMessage = Errors.FieldRequired)]
-        public string List2 { get; set; }
-
-        [Required(ErrorMessage = Errors.FieldRequired)]
-        [Range(1, 20, ErrorMessage = Errors.FactionRequired)]
-        public Faction Faction2 { get; set; }
+        public GameListEditModel List2 { get; set; }
     }
 
     public class Errors

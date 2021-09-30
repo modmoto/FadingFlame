@@ -1,0 +1,50 @@
+@if (_requestedList1Change || ShowEdit)
+{
+    if (_requestedList1Change)
+    {
+        <button disabled="@_loadingLists" class="btn btn-primary">
+            @if (_loadingLists)
+            {
+                <span class="spinner-border spinner-border-sm mr-1"></span>
+            }
+            Request list change
+        </button>
+        <button disabled="@_loadingLists" class="btn btn-secondary" @onclick="() => _requestedList1Change = false">
+            @if (_loadingLists)
+            {
+                <span class="spinner-border spinner-border-sm mr-1"></span>
+            }
+            Cancel
+        </button>    
+    }
+    <EditListView List="List"/>
+}
+else
+{
+    @if (IsCurrentUser)
+    {
+        <button disabled="@_requestedList1Change" class="btn btn-warning" @onclick="() => _requestedList1Change = true">
+            @if (_requestedList1Change)
+            {
+                <span>List change requested</span>
+            }
+            else
+            {
+                <span>Request list change</span>
+            }
+        </button>    
+    }
+    <ReadOnlyListView List="List"/>
+}
+
+@code {
+    [Parameter]
+    public GameListEditModel List { get; set; }
+    [Parameter]
+    public bool IsCurrentUser { get; set; }
+    [Parameter]
+    public bool ShowEdit { get; set; }
+
+    private bool _requestedList1Change;
+    private bool _loadingLists;
+}
