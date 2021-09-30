@@ -113,8 +113,7 @@
                 <div class="col">
                     <UserListComponent 
                         List="@(_editListModel.List1)" 
-                        ShowEdit="false" 
-                        IsCurrentUser="_isTheRightUser"
+                        ShowEdit="@(!_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser || _userState.UserIsAdmin)" IsCurrentUser="_isTheRightUser"
                         OnRequestListChange="RequestListChange1"
                         OnDeleteListChange="DeleteListChange1"
                         />
@@ -122,8 +121,7 @@
                 <div class="col">
                     <UserListComponent 
                         List="@(_editListModel.List2)" 
-                        ShowEdit="false" 
-                        IsCurrentUser="_isTheRightUser"
+                        ShowEdit="@(!_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser || _userState.UserIsAdmin)" IsCurrentUser="_isTheRightUser"
                         OnRequestListChange="RequestListChange2"
                         OnDeleteListChange="DeleteListChange2"
                         />    
