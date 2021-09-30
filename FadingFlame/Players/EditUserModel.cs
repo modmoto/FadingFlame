@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using FadingFlame.Players.Pages;
 
 namespace FadingFlame.Players
@@ -13,9 +12,7 @@ namespace FadingFlame.Players
     
     public class EditListsModel
     {
-        [Required(ErrorMessage = Errors.FieldRequired)]
         public GameListEditModel List1 { get; set; }
-        [Required(ErrorMessage = Errors.FieldRequired)]
         public GameListEditModel List2 { get; set; }
     }
 

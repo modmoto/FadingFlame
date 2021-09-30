@@ -30,17 +30,15 @@
         @if (_isTheRightUser)
         {
             <EditForm OnSubmit="OnSubmit" EditContext="@_editContextUser">
-                <DataAnnotationsValidator/>
                 <div class="form-group">
                     <div class="pb-2">Display name: </div>
-                    <InputText @bind-Value="_editUserModel.DisplayName" class="form-control mb-3"/>
                     <ValidationMessage For="@(() => _editUserModel.DisplayName)"/>
+                    <InputText @bind-Value="_editUserModel.DisplayName" class="form-control mb-3"/>
                 </div>
-                <DataAnnotationsValidator/>
                 <div class="form-group">
                     <div class="pb-2">Discord tag: </div>
-                    <InputText @bind-Value="_editUserModel.DiscordTag" class="form-control mb-3"/>
                     <ValidationMessage For="@(() => _editUserModel.DiscordTag)"/>
+                    <InputText @bind-Value="_editUserModel.DiscordTag" class="form-control mb-3"/>
                 </div>
                 <div class="row">
                     <div class="form-group col">
@@ -53,7 +51,6 @@
                                     <option value="@culture.TwoLetterISORegionName">@culture.EnglishName</option>
                                 }
                             </select>
-                            <ValidationMessage For="@(() => _editUserModel.Country)"/>
                         </div>
                     </div>    
                     <div class="form-group col">
@@ -65,7 +62,6 @@
                                 <option value="@timeZone.Id">@timeZone.Id @(timeZone.BaseUtcOffset)</option>
                             }
                         </select>
-                        <ValidationMessage For="@(() => _editUserModel.TimeZone)"/>
                     </div>
                 </div>
                 
@@ -103,11 +99,11 @@
                 <span>@_editUserModel.DiscordTag</span>
             </div>
         }
-        @if (_player.SubmittedLists)
+        @if (_player.SubmittedLists || _userState.UserIsAdmin)
         {
             <h4>Lists this season</h4>
             <hr class="my-3">
-            <EditForm OnValidSubmit="OnValidSubmitList" Model="@_editListModel">
+            <EditForm OnSubmit="OnSubmitList" EditContext="@_editContextLists">
             <DataAnnotationsValidator/>
             <div class="row align-items-start">
                 <div class="col">
@@ -127,7 +123,7 @@
                         />    
                 </div>
             </div>
-            @if (!_seasonState.CurrentSeason.ListSubmissionIsOver)
+            @if (!_seasonState.CurrentSeason.ListSubmissionIsOver || _userState.UserIsAdmin)
             {
                 <button disabled="@_loadingLists" class="btn btn-primary">
                     @if (_loadingLists)
@@ -139,7 +135,7 @@
             }
             else
             {
-                if (!_isTheRightUser)
+                if (!_isTheRightUser && !_userState.UserIsAdmin)
                 {
                     <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()</div>
                 }       
@@ -179,8 +175,10 @@
     [Parameter]
     public string Id { get; set; }
 
-    private ValidationMessageStore _messageStore;
+    private ValidationMessageStore _messageStoreUser;
+    private ValidationMessageStore _messageStoreLists;
     private EditContext _editContextUser;
+    private EditContext _editContextLists;
     private string _regionCss;
     private bool _isTheRightUser;
 
@@ -188,7 +186,10 @@
     {
         _countries = _geoLocationService.GetCountries();
         _editContextUser = new EditContext(_editUserModel);
-        _messageStore = new ValidationMessageStore(_editContextUser);
+        _messageStoreUser = new ValidationMessageStore(_editContextUser);
+        _editContextLists = new EditContext(_editListModel);
+        _messageStoreLists = new ValidationMessageStore(_editContextLists);
+        
         _editContextUser.OnValidationRequested += (_, _) => OnSubmit();
 
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
@@ -261,11 +262,25 @@
         return $"ms-2 flag-container flag-icon flag-icon-{_editUserModel.Country?.ToLower()}";
     }
 
-    private async Task OnValidSubmitList()
+    private async Task OnSubmitList()
     {
         if (!_player.SubmittedLists)
         {
             _loadingLists = true;
+            _messageStoreLists.Clear();
+            if (_editListModel.List1.Name == null) _messageStoreLists.Add(() => _editListModel.List1.Name, Errors.FieldRequired);
+            if (_editListModel.List2.Name == null) _messageStoreLists.Add(() => _editListModel.List2.Name, Errors.FieldRequired);
+            if (_editListModel.List1.List == null) _messageStoreLists.Add(() => _editListModel.List1.List, Errors.FieldRequired);
+            if (_editListModel.List2.List == null) _messageStoreLists.Add(() => _editListModel.List2.List, Errors.FieldRequired);
+            if (_editListModel.List1.Faction == default) _messageStoreLists.Add(() => _editListModel.List1.Faction, Errors.FactionRequired);
+            if (_editListModel.List2.Faction == default) _messageStoreLists.Add(() => _editListModel.List2.Faction, Errors.FactionRequired);
+
+            if (!_editContextLists.Validate())
+            {
+                _loadingLists = false;
+                return;
+            }
+
             if (_editListModel.List1.Name == _editListModel.List2.Name)
             {
                 _editListModel.List1.Name += "_1";
@@ -284,18 +299,18 @@
     private async void OnSubmit()
     {
         _loading = true;
-        _messageStore.Clear();
+        _messageStoreUser.Clear();
         var regex = new Regex("^.{3,32}#[0-9]{4}$");
         var isValid = true;
         if (!regex.Match(_editUserModel.DiscordTag).Success)
         {
-            _messageStore.Add(() => _editUserModel.DiscordTag, "Discord tag has to of the form example#1234");
+            _messageStoreUser.Add(() => _editUserModel.DiscordTag, "Discord tag has to of the form example#1234");
             isValid = false;
         }
         
         if (_editUserModel.DisplayName.Length < 3 || _editUserModel.DisplayName.Length > 30)
         {
-            _messageStore.Add(() => _editUserModel.DisplayName, "Displayname hast to be between 3 and 30 characters");
+            _messageStoreUser.Add(() => _editUserModel.DisplayName, "Displayname hast to be between 3 and 30 characters");
             isValid = false;
         }
 

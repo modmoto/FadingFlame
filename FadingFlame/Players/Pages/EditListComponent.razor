@@ -10,18 +10,19 @@
     </div>
     <hr class="my-3">
     <div class="form-group">
-        <InputTextArea @bind-Value="List.ProposedListChange" placeholder="Propose list change" class="form-control mb-3" style="min-height: 300px"/>
         <ValidationMessage For="@(() => List.ProposedListChange)"/>
+        <InputTextArea @bind-Value="List.ProposedListChange" placeholder="Propose list change" class="form-control mb-3" style="min-height: 300px"/>
     </div>
 }
 else
 {
     <div class="form-group">
         <div class="pb-3">List: </div>
-        <InputText @bind-Value="List.Name" placeholder="Name" class="form-control mb-3"/>
         <ValidationMessage For="@(() => List.Name)"/>
+        <InputText @bind-Value="List.Name" placeholder="Name" class="form-control mb-3"/>
     </div>
     <div class="form-group">
+        <ValidationMessage For="@(() => List.Faction)"/>
         <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="List.Faction">
             <option selected value="0">Select faction</option>
             @foreach (var faction in Enum.GetValues<Faction>())
@@ -29,11 +30,10 @@ else
                 <option value="@faction">@faction.ToCamelCaseString()</option>
             }
         </select>
-        <ValidationMessage For="@(() => List.Faction)"/>
     </div>
     <div class="form-group">
-        <InputTextArea @bind-Value="List.List" placeholder="List" class="form-control mb-3" style="min-height: 300px"/>
         <ValidationMessage For="@(() => List.List)"/>
+        <InputTextArea @bind-Value="List.List" placeholder="List" class="form-control mb-3" style="min-height: 300px"/>
     </div> 
 }
 
