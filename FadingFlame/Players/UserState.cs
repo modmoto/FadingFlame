@@ -20,7 +20,7 @@ namespace FadingFlame.Players
 
         private List<string> Admins = new()
         {
-            // "simonheiss87@gmail.com", // modmoto
+            "simonheiss87@gmail.com", // modmoto
             "tulmir@gmail.com", // tulmir
             "herzog1602@googlemail.com", //almentro
             "antonhermann1989@gmail.com", //Sterotony

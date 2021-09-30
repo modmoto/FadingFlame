@@ -2,10 +2,10 @@
 {
     if (_openEditMask)
     {
-        <button class="btn btn-primary" @onclick="OnListChange">
+        <button class="btn btn-primary mb-3" @onclick="OnListChange">
             Request approval
         </button>
-        <button class="btn btn-secondary" @onclick="() => _openEditMask = false">
+        <button class="btn btn-secondary mb-3" @onclick="() => _openEditMask = false">
             Cancel
         </button>    
     }
@@ -15,7 +15,7 @@ else
 {
     @if (IsCurrentUser)
     {
-        <button class="btn btn-warning" @onclick="() => _openEditMask = true">
+        <button class="btn btn-warning mb-3" @onclick="() => _openEditMask = true">
             @if (List.ProposedListChange != null)
             {
                 <span>List change still pending for approval</span>
