@@ -95,6 +95,7 @@ namespace FadingFlame
             services.AddTransient<ISeasonRepository, SeasonRepository>();
             services.AddTransient<IMatchupRepository, MatchupRepository>();
             services.AddTransient<ILeagueCreationService, LeagueCreationService>();
+            services.AddTransient<IListAcceptAndRejectService, ListAcceptAndRejectService>();
             services.AddScoped<UserState>();
             services.AddScoped<SeasonState>();
             services.AddHttpContextAccessor();

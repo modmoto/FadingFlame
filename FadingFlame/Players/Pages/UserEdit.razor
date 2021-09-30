@@ -6,6 +6,7 @@
 @using System.Text.RegularExpressions
 @using FadingFlame.Admin
 @using System.Globalization
+@using FadingFlame.Discord
 
 <div class="card">
     <h4 class="card-header">Profile @_player.DisplayName 
@@ -158,6 +159,7 @@
 @inject SeasonState _seasonState
 @inject NavigationManager _navigation
 @inject IGeoLocationService _geoLocationService
+@inject IListAcceptAndRejectService _acceptAndRejectService
 
 @code{
     private EditUserModel _editUserModel = new();
@@ -347,29 +349,25 @@
 
     private async Task RequestListChange1()
     {
-        _player.Army.List1.ProposeListChange(_editListModel.List1.ProposedListChange);
-        await _playerRepository.Update(_player);
+        await _acceptAndRejectService.RequestList1(_player, _editListModel.List1.ProposedListChange);
         SetListEditModel();
     }
     
     private async Task RequestListChange2()
     {
-        _player.Army.List2.ProposeListChange(_editListModel.List2.ProposedListChange);
-        await _playerRepository.Update(_player);
+        await _acceptAndRejectService.RequestList2(_player, _editListModel.List2.ProposedListChange);
         SetListEditModel();
     }
 
     private async Task DeleteListChange1()
     {
-        _player.Army.List1.RejectListChange();
-        await _playerRepository.Update(_player);
+        await _acceptAndRejectService.RejectList1(_player);
         SetListEditModel();
     }
     
     private async Task DeleteListChange2()
     {
-        _player.Army.List2.RejectListChange();
-        await _playerRepository.Update(_player);
+        await _acceptAndRejectService.RejectList2(_player);
         SetListEditModel();
     }
 }

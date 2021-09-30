@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -12,6 +13,7 @@ namespace FadingFlame.Discord
     public interface IDiscordBot
     {
         Task CreateLeagueChannelsAndTags(List<League> leagues);
+        Task SendRequestListChangedToBotsChannel(int pendingChanges);
     }
 
     public class DiscordBot : IDiscordBot
@@ -88,6 +90,22 @@ namespace FadingFlame.Discord
                     
                     position++;
                 }
+            }
+        }
+
+        public async Task SendRequestListChangedToBotsChannel(int pendingChanges)
+        {
+            try
+            {
+                var channels = _client.Guilds.SelectMany(g => g.Value.Channels).Where(c => c.Value.Name == "bots");
+                foreach (var channel in channels)
+                {
+                    await channel.Value.SendMessageAsync($"We now have {pendingChanges} pending list changes");
+                }
+            }
+            catch (Exception)
+            {
+                // ignored, dont care
             }
         }
 

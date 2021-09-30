@@ -202,6 +202,7 @@
 @inject ISeasonRepository _seasonRepository
 @inject SeasonState _seasonState
 @inject ILeagueCreationService _leagueCreationService
+@inject IListAcceptAndRejectService _acceptAndRejectService
 
 @code {
     private bool _loadingPlayoffs;
@@ -284,8 +285,7 @@
     private async void ApproveList1(Player player)
     {
         _loadingApproval = true;
-        player.Army.List1.ApproveListChange();
-        await _playerRepository.Update(player);
+        await _acceptAndRejectService.ApproveList1(player);
         _loadingApproval = false;
         StateHasChanged();
     }
@@ -293,8 +293,7 @@
     private async void ApproveList2(Player player)
     {
         _loadingApproval = true;
-        player.Army.List2.ApproveListChange();
-        await _playerRepository.Update(player);
+        await _acceptAndRejectService.ApproveList2(player);
         _loadingApproval = false;
         StateHasChanged();
     }
@@ -302,8 +301,7 @@
     private async void RejectList1(Player player)
     {
         _loadingApproval = true;
-        player.Army.List1.RejectListChange();
-        await _playerRepository.Update(player);
+        await _acceptAndRejectService.RejectList1(player);
         _loadingApproval = false;
         StateHasChanged();
     }
@@ -311,8 +309,7 @@
     private async void RejectList2(Player player)
     {
         _loadingApproval = true;
-        player.Army.List2.RejectListChange();
-        await _playerRepository.Update(player);
+        await _acceptAndRejectService.RejectList2(player);
         _loadingApproval = false;
         StateHasChanged();
     }
