@@ -113,17 +113,19 @@
                 <div class="col">
                     <UserListComponent 
                         List="@(_editListModel.List1)" 
-                        ShowEdit="@(!_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser || _userState.UserIsAdmin)" 
+                        ShowEdit="false" 
                         IsCurrentUser="_isTheRightUser"
                         OnRequestListChange="RequestListChange1"
+                        OnDeleteListChange="DeleteListChange1"
                         />
                 </div>
                 <div class="col">
                     <UserListComponent 
                         List="@(_editListModel.List2)" 
-                        ShowEdit="@(!_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser || _userState.UserIsAdmin)" 
+                        ShowEdit="false" 
                         IsCurrentUser="_isTheRightUser"
                         OnRequestListChange="RequestListChange2"
+                        OnDeleteListChange="DeleteListChange2"
                         />    
                 </div>
             </div>
@@ -225,11 +227,7 @@
 
                 _regionCss = SetRegionCss();
                 _isTheRightUser = Id == _userState.LoggedInPlayer.Id.ToString();
-                _editListModel = new EditListsModel
-                {
-                    List1 = ToModel(_player.Army?.List1),
-                    List2 = ToModel(_player.Army?.List2)
-                };
+                SetListEditModel();
                 
                 StateHasChanged();
             }
@@ -238,6 +236,15 @@
         {
             _navigation.NavigateTo("notfound");
         }
+    }
+
+    private void SetListEditModel()
+    {
+        _editListModel = new EditListsModel
+        {
+            List1 = ToModel(_player.Army?.List1),
+            List2 = ToModel(_player.Army?.List2)
+        };
     }
 
     private static GameListEditModel ToModel(GameList list)
@@ -325,15 +332,31 @@
         return _playerLeagues[0].Season == _seasonState.CurrentSeason.SeasonId;
     }
 
-    private async void RequestListChange1()
+    private async Task RequestListChange1()
     {
         _player.Army.List1.ProposeListChange(_editListModel.List1.ProposedListChange);
         await _playerRepository.Update(_player);
+        SetListEditModel();
     }
     
-    private async void RequestListChange2()
+    private async Task RequestListChange2()
     {
         _player.Army.List2.ProposeListChange(_editListModel.List2.ProposedListChange);
         await _playerRepository.Update(_player);
+        SetListEditModel();
+    }
+
+    private async Task DeleteListChange1()
+    {
+        _player.Army.List1.RejectListChange();
+        await _playerRepository.Update(_player);
+        SetListEditModel();
+    }
+    
+    private async Task DeleteListChange2()
+    {
+        _player.Army.List2.RejectListChange();
+        await _playerRepository.Update(_player);
+        SetListEditModel();
     }
 }

@@ -2,11 +2,14 @@
 {
     if (_openEditMask)
     {
-        <button class="btn btn-primary mb-3" @onclick="OnListChange">
-            Request approval
+        <button class="btn btn-primary mb-3" @onclick="OnSave">
+            Save request
+        </button>
+        <button class="btn btn-outline-danger mb-3" @onclick="OnDelete">
+            Delete request
         </button>
         <button class="btn btn-secondary mb-3" @onclick="() => _openEditMask = false">
-            Cancel
+            Close
         </button>    
     }
     <EditListView List="List" EditProposedListChange="_openEditMask"/>
@@ -15,16 +18,18 @@ else
 {
     @if (IsCurrentUser)
     {
-        <button class="btn btn-warning mb-3" @onclick="() => _openEditMask = true">
             @if (List.ProposedListChange != null)
             {
-                <span>List change still pending for approval</span>
+                <button class="btn btn-outline-warning mb-3" @onclick="() => _openEditMask = true">
+                    <span>List change still pending for approval</span>
+                </button>
             }
             else
             {
-                <span>Request list change</span>
+                <button class="btn btn-outline-primary mb-3" @onclick="() => _openEditMask = true">
+                    <span>Request list change</span>
+                </button>
             }
-        </button>    
     }
     <ReadOnlyListView List="List"/>
 }
@@ -36,13 +41,21 @@ else
     public bool IsCurrentUser { get; set; }
     [Parameter]
     public bool ShowEdit { get; set; }
-    [Parameter] public EventCallback OnRequestListChange { get; set; }
+    [Parameter] 
+    public EventCallback OnRequestListChange { get; set; }
+    [Parameter] 
+    public EventCallback OnDeleteListChange { get; set; }
     private bool _openEditMask;
 
-    private async void OnListChange()
+    private async void OnSave()
     {
         await OnRequestListChange.InvokeAsync();
         _openEditMask = false;
     }
-
+    
+    private async void OnDelete()
+    {
+        await OnDeleteListChange.InvokeAsync();
+        _openEditMask = false;
+    }
 }
