@@ -53,12 +53,12 @@ else
                                         <option value="@player.Id.ToString()">@player.DisplayName / @player.DiscordTag</option>
                                     }
                                 </select>
-                                <button @onclick="() => AddToLeague(_selectedNewPlayerIdRaw)" disabled="@_loadingAdmin" class="btn btn-danger ms-3">
+                                <button @onclick="() => AddToLeague(_selectedNewPlayerIdRaw)" disabled="@_loadingAdmin" class="btn btn-danger ms-1">
                                     @if (_loadingAdmin)
                                     {
                                         <span class="spinner-border spinner-border-sm mr-1"></span>
                                     }
-                                    <span class="oi oi-shield me-3" aria-hidden="true"></span>Add
+                                    <span class="oi oi-shield me-2" aria-hidden="true"></span>Add
                                 </button>
                             }
                             else
@@ -70,21 +70,21 @@ else
                                          <InputNumber @bind-Value="_penalties[item.index].PenaltyPoints" class="form-control"/>
                                          <ValidationMessage For="@(() => _penalties[item.index].PenaltyPoints)"/>
                                      </div>
-                                     <button @onclick:stopPropagation="false" disabled="@_loadingAdmin" class="btn btn-danger ms-3">
+                                     <button @onclick:stopPropagation="false" disabled="@_loadingAdmin" class="btn btn-danger ms-1">
                                          @if (_loadingAdmin)
                                          {
                                              <span class="spinner-border spinner-border-sm mr-1"></span>
                                          }
-                                         <span class="oi oi-shield me-3" aria-hidden="true"></span>Save
+                                         <span class="oi oi-shield me-2" aria-hidden="true"></span>Save
                                      </button>
                                 </div>
                                 </EditForm>
-                                <button @onclick="() => RemoveFromLeague(item.value.Id)" disabled="@_loadingAdmin" class="btn btn-danger ms-3">
+                                <button @onclick="() => RemoveFromLeague(item.value.Id)" disabled="@_loadingAdmin" class="btn btn-danger ms-1">
                                     @if (_loadingAdmin)
                                     {
                                         <span class="spinner-border spinner-border-sm mr-1"></span>
                                     }
-                                    <span class="oi oi-shield me-3" aria-hidden="true"></span>Remove
+                                    <span class="oi oi-shield me-2" aria-hidden="true"></span>Remove
                                 </button>
                             }
                         </div>
