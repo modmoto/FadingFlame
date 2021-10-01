@@ -133,7 +133,7 @@ namespace FadingFlame.Matchups
     public class PlayerResultDto
     {
         public ObjectId Id { get; set; }
-        [Range(0, 4500)]
+        [Range(0, 4900)]
         public int VictoryPoints { get; set; }
     }
 
