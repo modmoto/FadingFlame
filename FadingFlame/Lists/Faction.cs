@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace FadingFlame.Players
+namespace FadingFlame.Lists
 {
     public enum Faction
     {

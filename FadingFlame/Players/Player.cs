@@ -1,4 +1,5 @@
 using System.Globalization;
+using FadingFlame.Lists;
 using FadingFlame.Repositories;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -12,7 +13,10 @@ namespace FadingFlame.Players
         public string DisplayName { get; private set; }
         public string AccountEmail { get; private set; }
         public string DiscordTag { get; set; }
-        public SeasonArmy Army  { get; set; }
+        public Army Army  { get; set; }
+        public Army ArmyNextSeason  { get; set; }
+        public ObjectId ArmyIdCurrentSeason  { get; set; }
+        public ObjectId ArmyIdNextSeason  { get; set; }
         public Mmr Mmr  { get; set; }
         public bool SubmittedLists => Army != null;
         public Location Location { get; set; }
@@ -35,7 +39,7 @@ namespace FadingFlame.Players
 
         public void SubmitLists(GameList list1, GameList list2)
         {
-            Army = new SeasonArmy
+            Army = new Army
             {
                 List1 = list1,
                 List2 = list2
@@ -53,11 +57,5 @@ namespace FadingFlame.Players
         {
             Location = location;
         }
-    }
-
-    public class SeasonArmy
-    {
-        public GameList List1 { get; set; }
-        public GameList List2 { get; set; }
     }
 }

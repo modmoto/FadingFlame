@@ -1,4 +1,4 @@
-namespace FadingFlame.Players
+namespace FadingFlame.Lists
 {
     public class GameList
     {

@@ -1,6 +1,7 @@
 ﻿@page "/admin"
 @using FadingFlame.Leagues
 @using FadingFlame.Discord
+@using FadingFlame.Lists
 @using FadingFlame.Players
 @using FadingFlame.Playoffs
 
@@ -47,21 +48,18 @@
             <div class="container">
                 @foreach (var player in _pendingListChanges)
                 {
-                    <div class="card-header cursor" @onclick="() => GoToPlayer(player)">
-                        <div><b>@player.DisplayName: </b></div>
-                    </div>
-                    @if (player.Army.List1.ProposedListChange != null)
+                    @if (player.List1.ProposedListChange != null)
                     {
                         <ListApproveComponent
-                            List="player.Army.List1"
+                            List="player.List1"
                             Loading="_loadingApproval"
                             OnApproveListChange="() => ApproveList1(player)"
                             OnRejectListChange="() => RejectList1(player)"/>
                     }
-                    @if (player.Army.List2.ProposedListChange != null)
+                    @if (player.List2.ProposedListChange != null)
                     {
                         <ListApproveComponent
-                            List="player.Army.List2"
+                            List="player.List2"
                             Loading="_loadingApproval"
                             OnApproveListChange="() => ApproveList2(player)"
                             OnRejectListChange="() => RejectList2(player)"/>
@@ -204,6 +202,7 @@
 @inject SeasonState _seasonState
 @inject ILeagueCreationService _leagueCreationService
 @inject IListAcceptAndRejectService _acceptAndRejectService
+@inject IListRepository _listRepository
 
 @code {
     private bool _loadingPlayoffs;
@@ -213,7 +212,7 @@
     private bool _loadingApproval;
     private List<Player> _playersWithList = new();
     private List<Player> _playersWithOutList = new();
-    private List<Player> _pendingListChanges = new();
+    private List<Army> _pendingListChanges = new();
 
     protected override void OnInitialized()
     {
@@ -225,7 +224,7 @@
         _playersWithList = await _playerRepository.LoadAllWitList();
         _playersWithOutList = (await _playerRepository.LoadAllWithoutList()).Where(u => !u.DisplayName.StartsWith("MISSING")).ToList();
         _playersWithList = await _playerRepository.LoadAllWitList();
-        _pendingListChanges = await _playerRepository.LoadWithPendingChanges();
+        _pendingListChanges = await _listRepository.LoadWithPendingChanges();
     }
     
     private async Task SyncDiscord()
@@ -283,7 +282,7 @@
         await _leagueCreationService.SetDeployments();
     }
 
-    private async void ApproveList1(Player player)
+    private async void ApproveList1(Army player)
     {
         _loadingApproval = true;
         await _acceptAndRejectService.ApproveList1(player);
@@ -291,7 +290,7 @@
         StateHasChanged();
     }
 
-    private async void ApproveList2(Player player)
+    private async void ApproveList2(Army player)
     {
         _loadingApproval = true;
         await _acceptAndRejectService.ApproveList2(player);
@@ -299,7 +298,7 @@
         StateHasChanged();
     }
     
-    private async void RejectList1(Player player)
+    private async void RejectList1(Army player)
     {
         _loadingApproval = true;
         await _acceptAndRejectService.RejectList1(player);
@@ -307,7 +306,7 @@
         StateHasChanged();
     }
 
-    private async void RejectList2(Player player)
+    private async void RejectList2(Army player)
     {
         _loadingApproval = true;
         await _acceptAndRejectService.RejectList2(player);

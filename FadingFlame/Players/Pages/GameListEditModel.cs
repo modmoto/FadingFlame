@@ -1,3 +1,5 @@
+using FadingFlame.Lists;
+
 namespace FadingFlame.Players.Pages
 {
     public class GameListEditModel

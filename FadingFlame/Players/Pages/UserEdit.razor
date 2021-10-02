@@ -7,6 +7,7 @@
 @using FadingFlame.Admin
 @using System.Globalization
 @using FadingFlame.Discord
+@using FadingFlame.Lists
 
 <div class="card">
     <h4 class="card-header">Profile @_player.DisplayName 
@@ -292,7 +293,7 @@
             var list1 = GameList.Create(_editListModel.List1.Name, _editListModel.List1.List, _editListModel.List1.Faction);
             var list2 = GameList.Create(_editListModel.List2.Name, _editListModel.List2.List, _editListModel.List2.Faction);
             _player.SubmitLists(list1, list2);
-            await _playerRepository.Update(_player);
+            await _playerRepository.UpdateWithLists(_player, _seasonState.CurrentSeason.SeasonId);
 
             _loadingLists = false;
         }
@@ -349,25 +350,25 @@
 
     private async Task RequestListChange1()
     {
-        await _acceptAndRejectService.RequestList1(_player, _editListModel.List1.ProposedListChange);
+        await _acceptAndRejectService.RequestList1(_player.Army, _editListModel.List1.ProposedListChange);
         SetListEditModel();
     }
     
     private async Task RequestListChange2()
     {
-        await _acceptAndRejectService.RequestList2(_player, _editListModel.List2.ProposedListChange);
+        await _acceptAndRejectService.RequestList2(_player.Army, _editListModel.List2.ProposedListChange);
         SetListEditModel();
     }
 
     private async Task DeleteListChange1()
     {
-        await _acceptAndRejectService.RejectList1(_player);
+        await _acceptAndRejectService.RejectList1(_player.Army);
         SetListEditModel();
     }
     
     private async Task DeleteListChange2()
     {
-        await _acceptAndRejectService.RejectList2(_player);
+        await _acceptAndRejectService.RejectList2(_player.Army);
         SetListEditModel();
     }
 }
