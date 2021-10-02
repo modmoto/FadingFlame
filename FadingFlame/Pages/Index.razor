@@ -3,10 +3,6 @@
 @using FadingFlame.Players
 @using MongoDB.Bson
 @using FadingFlame.Admin
-@inject ILeagueRepository _leagueRepository
-@inject NavigationManager _navigation
-@inject SeasonState _seasonState
-@inject UserState _userState
 
 <div>
     <h1>Welcome to the Fading Flame League!</h1>
@@ -38,6 +34,10 @@
 </div>
 
 @inject IPlayerRepository _playerRepository
+@inject ILeagueRepository _leagueRepository
+@inject NavigationManager _navigation
+@inject SeasonState _seasonState
+@inject UserState _userState
 
 @code
 {
