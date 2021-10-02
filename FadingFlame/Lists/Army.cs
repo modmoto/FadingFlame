@@ -11,5 +11,15 @@ namespace FadingFlame.Lists
         [BsonId]
         public ObjectId Id { get; set; }
         public int Season { get; set; }
+
+        public static Army Create(int season, GameList list1, GameList list2)
+        {
+            return new Army
+            {
+                Season = season,
+                List1 = list1,
+                List2 = list2
+            };
+        }
     }
 }

@@ -101,6 +101,29 @@ namespace FadingFlame
             services.AddScoped<UserState>();
             services.AddScoped<SeasonState>();
             services.AddHttpContextAccessor();
+
+            // migrate lists to own profile
+            // var buildServiceProvider = services.BuildServiceProvider();
+            // var playerRepository = buildServiceProvider.GetService<IPlayerRepository>();
+            // var listRepository = buildServiceProvider.GetService<IListRepository>();
+            // var players = playerRepository.LoadAll().Result;
+            // foreach (var player in players)
+            // {
+            //     if (player.SubmittedLists)
+            //     {
+            //         var seasonArmy = Army.Create(2, player.Army.List1, player.Army.List2);
+            //         listRepository.Insert(seasonArmy).Wait();
+            //
+            //         player.Army = null;
+            //         playerRepository.Update(player).Wait();
+            //     }
+            // }
+            //
+            // var playersNew = playerRepository.LoadAll().Result;
+            // foreach (var player in playersNew)
+            // {
+            //     playerRepository.Update(player).Wait();
+            // }
             
             // var buildServiceProvider = services.BuildServiceProvider();
             // var playerRepository = buildServiceProvider.GetService<IPlayerRepository>();
