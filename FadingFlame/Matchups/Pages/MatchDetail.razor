@@ -125,39 +125,37 @@ else
         {
             <div class="row align-items-start my-3">
                 <div class="col form-group">
-                    <label>Battle Points:</label>
-                    <div><b>@_matchup.Result.Player1.BattlePoints</b></div>
-                    <label>Victory Points:</label>
-                    <div>@_matchup.Result.Player1.VictoryPoints (Diff.: @_matchup.Result.VictoryPointsDifference)</div>
+                    <div>@_player1.DisplayName :</div>
+                    <div>Battle Points: <b>@_matchup.Result.Player1.BattlePoints</b></div>
+                    <div>Victory Points: @_matchup.Result.Player1.VictoryPoints (Diff.: @_matchup.Result.VictoryPointsDifference)</div>
                     @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.player1)
                     {
-                        <label class="form-check-label">
+                        <div class="form-check-label">
                             Won secondary objective
-                        </label>
+                        </div>
                     }
                     @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.draw)
                     {
-                        <label class="form-check-label">
+                        <div class="form-check-label">
                             Draw on secondary objective
-                        </label>
+                        </div>
                     }
                 </div>
                 <div class="col form-group">
-                    <label>Battle Points:</label>
-                    <div><b>@_matchup.Result.Player2.BattlePoints</b></div>
-                    <label>Victory Points:</label>
-                    <div>@_matchup.Result.Player2.VictoryPoints (Diff.: @_matchup.Result.VictoryPointsDifference)</div>
+                    <div>@_player2.DisplayName :</div>
+                    <div>Battle Points: <b>@_matchup.Result.Player2.BattlePoints</b></div>
+                    <div>Victory Points: @_matchup.Result.Player2.VictoryPoints (Diff.: @_matchup.Result.VictoryPointsDifference)</div>
                     @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.player2)
                     {
-                        <label class="form-check-label">
+                        <div class="form-check-label">
                             Won secondary objective
-                        </label>
+                        </div>
                     }
                     @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.draw)
                     {
-                        <label class="form-check-label">
+                        <div class="form-check-label">
                             Draw on secondary objective
-                        </label>
+                        </div>
                     }
                 </div>
             </div>
@@ -181,11 +179,11 @@ else
         
         if (_matchup.PlayersSelectedList)
         {
+            <hr class="my-3">
             <div class="row align-items-start my-2">
                 <div class="col">
                     <div class="form-group">
-                        <label>List of @Player1Name :</label>
-                        <div><b>@_matchup.Player1List</b></div>
+                        <label>List: @_matchup.Player1List :</label>
                         <div><b>@(_player1.ArmyCurrentSeason.List1.Name == _matchup.Player1List ? _player1.ArmyCurrentSeason.List1.Faction.ToCamelCaseString() : _player1.ArmyCurrentSeason.List2.Faction.ToCamelCaseString())</b></div>
                     </div>
                     <hr class="my-3">
@@ -195,8 +193,7 @@ else
                 </div>
                 <div class="col">
                     <div class="form-group">
-                        <label>List of @Player2Name :</label>
-                        <div><b>@_matchup.Player2List</b></div>
+                        <label>List: @_matchup.Player2List :</label>
                         <div><b>@(_player2.ArmyCurrentSeason.List1.Name == _matchup.Player2List ? _player2.ArmyCurrentSeason.List1.Faction.ToCamelCaseString() : _player2.ArmyCurrentSeason.List2.Faction.ToCamelCaseString())</b></div>
                     </div>
                     <hr class="my-3">
