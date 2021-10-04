@@ -11,7 +11,7 @@ namespace FadingFlame.Repositories
     public class MongoDbRepositoryBase
     {
         private readonly MongoClient _mongoClient;
-        private readonly string _databaseName = "FadingFlame";
+        public const string DatabaseName = "FadingFlame";
 
         public MongoDbRepositoryBase(MongoClient mongoClient)
         {
@@ -20,7 +20,7 @@ namespace FadingFlame.Repositories
 
         protected IMongoDatabase CreateClient()
         {
-            var database = _mongoClient.GetDatabase(_databaseName);
+            var database = _mongoClient.GetDatabase(DatabaseName);
             return database;
         }
 

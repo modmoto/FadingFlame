@@ -66,7 +66,7 @@ namespace FadingFlame.Discord
                 var position = 1;
                 foreach (var league in leagues)
                 {
-                    var players = await _playerRepository.LoadForLeague(league.Players.Select(p => p.Id).ToList());
+                    var players = await _playerRepository.LoadForLeague(league.Players.Select(p => p.Id).ToList(), league.Season);
                     var leagueChannel = guild.Channels.FirstOrDefault(c => c.Value.Type == ChannelType.Text && c.Value.Name == ToLeagueName(league)).Value;
                     if (leagueChannel == null)
                     {

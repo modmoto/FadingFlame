@@ -36,23 +36,23 @@
                         <div class="col">
                             <div class="form-group">
                                 <label>First List: </label>
-                                <div><b>@player.Army.List1.Faction.ToCamelCaseString()</b></div>
-                                <div><b>@player.Army.List1.Name</b></div>
+                                <div><b>@player.ArmyCurrentSeason.List1.Faction.ToCamelCaseString()</b></div>
+                                <div><b>@player.ArmyCurrentSeason.List1.Name</b></div>
                             </div>
                             <hr class="my-3">
                             <div class="form-group">
-                                <div style="white-space:pre-wrap;">@player.Army.List1.List</div>
+                                <div style="white-space:pre-wrap;">@player.ArmyCurrentSeason.List1.List</div>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group">
                                 <label>Second List: </label>
-                                <div><b>@player.Army.List2.Faction.ToCamelCaseString()</b></div>
-                                <div><b>@player.Army.List2.Name</b></div>
+                                <div><b>@player.ArmyCurrentSeason.List2.Faction.ToCamelCaseString()</b></div>
+                                <div><b>@player.ArmyCurrentSeason.List2.Name</b></div>
                             </div>
                             <hr class="my-3">
                             <div class="form-group">
-                                <div style="white-space:pre-wrap;">@player.Army.List2.List</div>
+                                <div style="white-space:pre-wrap;">@player.ArmyCurrentSeason.List2.List</div>
                             </div>
                         </div>
                     </div>
@@ -86,15 +86,11 @@
         _seasonState.SeasonsChanged += LoadRest;
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        _enlistedPlayersOriginal = await _playerRepository.PlayersThatEnlisted();
-        _enlistedPlayers = _enlistedPlayersOriginal;
-    }
-
     private async void LoadRest(object sender, EventArgs e)
     {
         _leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
+        _enlistedPlayersOriginal = await _playerRepository.PlayersThatEnlistedInCurrentSeason(_seasonState.CurrentSeason.SeasonId);
+        _enlistedPlayers = _enlistedPlayersOriginal;
         StateHasChanged();
     }
 
@@ -139,8 +135,8 @@
         }
         
         return _enlistedPlayersOriginal.Where(l =>
-            l.Army.List1.Faction == _factionFilter
-            || l.Army.List2.Faction == _factionFilter).ToList();
+            l.ArmyCurrentSeason.List1.Faction == _factionFilter
+            || l.ArmyCurrentSeason.List2.Faction == _factionFilter).ToList();
     }
 
     private void SelectLeague(ChangeEventArgs e)

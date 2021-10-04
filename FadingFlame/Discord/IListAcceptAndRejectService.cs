@@ -1,69 +1,71 @@
 using System.Threading.Tasks;
-using FadingFlame.Players;
+using FadingFlame.Lists;
 
 namespace FadingFlame.Discord
 {
     public interface IListAcceptAndRejectService
     {
-        Task ApproveList1(Player player);
-        Task ApproveList2(Player player);
-        Task RejectList1(Player player);
-        Task RejectList2(Player player);
-        Task RequestList1(Player player, string list);
-        Task RequestList2(Player player, string list);
+        Task ApproveList1(Army army);
+        Task ApproveList2(Army army);
+        Task RejectList1(Army army);
+        Task RejectList2(Army army);
+        Task RequestList1(Army army, string list);
+        Task RequestList2(Army army, string list);
     }
 
     public class ListAcceptAndRejectService : IListAcceptAndRejectService
     {
-        private readonly IPlayerRepository _playerRepository;
         private readonly IDiscordBot _discordBot;
+        private readonly IListRepository _listRepository;
 
-        public ListAcceptAndRejectService(IPlayerRepository playerRepository, IDiscordBot discordBot)
+        public ListAcceptAndRejectService(
+            IDiscordBot discordBot,
+            IListRepository listRepository)
         {
-            _playerRepository = playerRepository;
             _discordBot = discordBot;
+            _listRepository = listRepository;
         }
         
-        public async Task ApproveList1(Player player)
+        public async Task ApproveList1(Army army)
         {
-            player.Army.List1.ApproveListChange();
-            await UpdateAndSendMessage(player);
+            army.List1.ApproveListChange();
+            await UpdateAndSendMessage(army);
         }
 
-        public async Task ApproveList2(Player player)
+        public async Task ApproveList2(Army army)
         {
-            player.Army.List2.ApproveListChange();
-            await UpdateAndSendMessage(player);
+            army.List2.ApproveListChange();
+            await UpdateAndSendMessage(army);
         }
     
-        public async Task RejectList1(Player player)
+        public async Task RejectList1(Army army)
         {
-            player.Army.List1.RejectListChange();
-            await UpdateAndSendMessage(player);
+            army.List1.RejectListChange();
+            await UpdateAndSendMessage(army);
         }
 
-        public async Task RejectList2(Player player)
+        public async Task RejectList2(Army army)
         {
-            player.Army.List2.RejectListChange();
-            await UpdateAndSendMessage(player);
+            army.List2.RejectListChange();
+            await UpdateAndSendMessage(army);
         }
 
-        public async Task RequestList1(Player player, string list)
+        public async Task RequestList1(Army army, string list)
         {
-            player.Army.List1.ProposeListChange(list);
-            await UpdateAndSendMessage(player);
+            army.List1.ProposeListChange(list);
+            await UpdateAndSendMessage(army);
         }
 
-        public async Task RequestList2(Player player, string list)
+        public async Task RequestList2(Army army, string list)
         {
-            player.Army.List2.ProposeListChange(list);
-            await UpdateAndSendMessage(player);
+            army.List2.ProposeListChange(list);
+            await UpdateAndSendMessage(army);
         }
 
-        private async Task UpdateAndSendMessage(Player player)
+        private async Task UpdateAndSendMessage(Army army)
         {
-            await _playerRepository.Update(player);
-            var count = (await _playerRepository.LoadWithPendingChanges()).Count;
+            await _listRepository.Update(army);
+            var count = (await _listRepository.LoadWithPendingChanges()).Count;
             await _discordBot.SendRequestListChangedToBotsChannel(count);
         }
     }

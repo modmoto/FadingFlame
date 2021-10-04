@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FadingFlame.Leagues;
+using FadingFlame.Lists;
 using FadingFlame.Matchups;
 using FadingFlame.Players;
 using FluentAssertions;
@@ -207,7 +208,7 @@ namespace FadingFlameTests
             var league3 = League.Create(2, DateTime.Now, "1a", "123");
 
             var player = Player.Create("dude", "mail");
-            var playerRepository = new PlayerRepository(MongoClient);
+            var playerRepository = new PlayerRepository(MongoClient, new ListRepository(MongoClient));
             await playerRepository.Insert(player);
 
             league2.AddPlayer(player);

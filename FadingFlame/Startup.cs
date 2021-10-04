@@ -3,9 +3,11 @@ using System.IdentityModel.Tokens.Jwt;
 using FadingFlame.Admin;
 using FadingFlame.Discord;
 using FadingFlame.Leagues;
+using FadingFlame.Lists;
 using FadingFlame.Matchups;
 using FadingFlame.Players;
 using FadingFlame.Playoffs;
+using FadingFlame.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -96,10 +98,42 @@ namespace FadingFlame
             services.AddTransient<IMatchupRepository, MatchupRepository>();
             services.AddTransient<ILeagueCreationService, LeagueCreationService>();
             services.AddTransient<IListAcceptAndRejectService, ListAcceptAndRejectService>();
+            services.AddTransient<IListRepository, ListRepository>();
             services.AddScoped<UserState>();
             services.AddScoped<SeasonState>();
             services.AddHttpContextAccessor();
-            
+
+            // migrate lists to own profile
+            var buildServiceProvider = services.BuildServiceProvider();
+            var playerRepository = buildServiceProvider.GetService<IPlayerRepository>();
+            var listRepository = buildServiceProvider.GetService<IListRepository>();
+            var mongoConnectionString = Environment.GetEnvironmentVariable("MONGO_DB_CONNECTION_STRING") ?? "mongodb://admin:vgwG9FRzS77tGGP4@65.21.139.246:1001";
+            var client = new MongoClient(mongoConnectionString);
+            var mongoDatabase = client.GetDatabase(MongoDbRepositoryBase.DatabaseName);
+            var mongoCollection = mongoDatabase.GetCollection<PlayerLegacy>(nameof(Player));
+            var players = mongoCollection.Find(p => true).ToListAsync().Result;
+            foreach (var playerLegacy in players)
+            {
+                if (playerLegacy.SubmittedLists)
+                {
+                    var seasonArmy = Army.Create(2, playerLegacy.Army.List1, playerLegacy.Army.List2);
+                    listRepository.Insert(seasonArmy).Wait();
+
+                    var player = new Player
+                    {
+                        DiscordTag = playerLegacy.DiscordTag,
+                        Location = playerLegacy.Location,
+                        Mmr = playerLegacy.Mmr,
+                        Id = playerLegacy.Id,
+                        ArmyIdCurrentSeason = seasonArmy.Id,
+                        AccountEmail = playerLegacy.AccountEmail,
+                        DisplayName = playerLegacy.DisplayName
+                    };
+
+                    playerRepository.Update(player).Wait();
+                }
+            }
+
             // var buildServiceProvider = services.BuildServiceProvider();
             // var playerRepository = buildServiceProvider.GetService<IPlayerRepository>();
             // for (int i = 0; i < 107; i++)

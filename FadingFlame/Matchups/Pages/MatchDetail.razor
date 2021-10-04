@@ -1,6 +1,7 @@
 ﻿@page "/match/{matchId}"
 @using MongoDB.Bson
 @using FadingFlame.Leagues
+@using FadingFlame.Lists
 @using FadingFlame.Players
 @using FadingFlame.Playoffs
 @using Microsoft.AspNetCore.Components
@@ -225,7 +226,7 @@ else
     private MatchResultDto _model = new();
     private League _league;
     private Matchup _matchup;
-    private SeasonArmy _listsOfLoggedInPlayer;
+    private Army _listsOfLoggedInPlayer;
     private Player _player1;
     private Player _player2;
     private string Player1Name => _matchup.Player1 == ObjectId.Empty ? "Freewin" : _player1?.DisplayName ?? "tbd";
@@ -315,18 +316,18 @@ else
 
         if (Player1LoggedIn)
         {
-            _listsOfLoggedInPlayer = _player1.Army;
+            _listsOfLoggedInPlayer = _player1.ArmyCurrentSeason;
             _selectedListAsString = $"{match.Player1List}";
         }
 
         if (Player2LoggedIn)
         {
-            _listsOfLoggedInPlayer = _player2.Army;
+            _listsOfLoggedInPlayer = _player2.ArmyCurrentSeason;
             _selectedListAsString = $"{match.Player2List}";
         }
     }
 
-    private string GetListFacion(SeasonArmy army, string listName)
+    private string GetListFacion(Army army, string listName)
     {
         return (army.List1.Name == listName ? army.List1.Faction : army.List2.Faction).ToCamelCaseString();
     }
@@ -356,9 +357,9 @@ else
 
     private async Task UpdateMmrs(MatchResult matchResult)
     {
-        var layer = _player1.Id == matchResult.Player1.Id ? 1 : 2;
+        var player = _player1.Id == matchResult.Player1.Id ? 1 : 2;
         var mmrsOld = new List<Mmr> { _player1.Mmr ?? Mmr.Create(), _player2.Mmr ?? Mmr.Create()};
-        var mmrsNew = await _mmrRepository.UpdateMmrs(UpdateMmrRequest.Create(mmrsOld, layer));
+        var mmrsNew = await _mmrRepository.UpdateMmrs(UpdateMmrRequest.Create(mmrsOld, player));
         _player1.UpdateMmr(mmrsNew[0]);
         _player2.UpdateMmr(mmrsNew[1]);
 

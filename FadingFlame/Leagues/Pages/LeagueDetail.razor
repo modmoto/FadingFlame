@@ -3,6 +3,7 @@
 @using FadingFlame.Leagues
 @using FadingFlame.Players
 @using FadingFlame.Admin
+@using FadingFlame.Lists
 @using FadingFlame.Matchups
 
 @inject NavigationManager _navigation
@@ -215,7 +216,7 @@ else
         {
             _league = await _leagueRepository.Load(parsed);
             _penalties = MapPenalties(_league);
-            _playersInLeague = await _playerRepository.LoadForLeague(_league.Players.Select(p => p.Id).ToList());
+            _playersInLeague = await _playerRepository.LoadForLeague(_league.Players.Select(p => p.Id).ToList(), _league.Season);
             _playersNotInLeagues = (await _playerRepository.LoadAll()).OrderBy(p => p.DisplayName).ToList();
             var now = DateTime.UtcNow;
             for (int i = 0; i < _league.GameDays.Count; i++)
@@ -279,7 +280,7 @@ else
     {
         var player = _playersInLeague.FirstOrDefault(p => p.Id == playerId);
         if (player == null) return "";
-        var factions = new List<Faction?> { player.Army?.List1?.Faction, player?.Army?.List2?.Faction }.Where(l => l != null).Distinct();
+        var factions = new List<Faction?> { player.ArmyCurrentSeason?.List1?.Faction, player?.ArmyCurrentSeason?.List2?.Faction }.Where(l => l != null).Distinct();
         return string.Join("/", factions.Select(f => f.Value.ToCamelCaseString()));
     }
 
