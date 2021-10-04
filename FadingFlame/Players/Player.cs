@@ -1,4 +1,3 @@
-using System.Globalization;
 using FadingFlame.Lists;
 using FadingFlame.Repositories;
 using MongoDB.Bson;
@@ -6,6 +5,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace FadingFlame.Players
 {
+    [BsonIgnoreExtraElements]
     public class Player : IIdentifiable
     {
         [BsonId]

@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using FadingFlame.Lists;
-using FadingFlame.Players;
 
 namespace FadingFlame.Discord
 {
