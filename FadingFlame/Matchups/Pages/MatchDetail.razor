@@ -316,13 +316,13 @@ else
 
         if (Player1LoggedIn)
         {
-            _listsOfLoggedInPlayer = _player1.Army;
+            _listsOfLoggedInPlayer = _player1.ArmyCurrentSeason;
             _selectedListAsString = $"{match.Player1List}";
         }
 
         if (Player2LoggedIn)
         {
-            _listsOfLoggedInPlayer = _player2.Army;
+            _listsOfLoggedInPlayer = _player2.ArmyCurrentSeason;
             _selectedListAsString = $"{match.Player2List}";
         }
     }

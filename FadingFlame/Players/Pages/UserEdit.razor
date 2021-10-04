@@ -244,8 +244,8 @@
     {
         _editListModel = new EditListsModel
         {
-            List1 = ToModel(_player.Army?.List1),
-            List2 = ToModel(_player.Army?.List2)
+            List1 = ToModel(_player.ArmyCurrentSeason?.List1),
+            List2 = ToModel(_player.ArmyCurrentSeason?.List2)
         };
     }
 
@@ -350,25 +350,25 @@
 
     private async Task RequestListChange1()
     {
-        await _acceptAndRejectService.RequestList1(_player.Army, _editListModel.List1.ProposedListChange);
+        await _acceptAndRejectService.RequestList1(_player.ArmyCurrentSeason, _editListModel.List1.ProposedListChange);
         SetListEditModel();
     }
     
     private async Task RequestListChange2()
     {
-        await _acceptAndRejectService.RequestList2(_player.Army, _editListModel.List2.ProposedListChange);
+        await _acceptAndRejectService.RequestList2(_player.ArmyCurrentSeason, _editListModel.List2.ProposedListChange);
         SetListEditModel();
     }
 
     private async Task DeleteListChange1()
     {
-        await _acceptAndRejectService.RejectList1(_player.Army);
+        await _acceptAndRejectService.RejectList1(_player.ArmyCurrentSeason);
         SetListEditModel();
     }
     
     private async Task DeleteListChange2()
     {
-        await _acceptAndRejectService.RejectList2(_player.Army);
+        await _acceptAndRejectService.RejectList2(_player.ArmyCurrentSeason);
         SetListEditModel();
     }
 }

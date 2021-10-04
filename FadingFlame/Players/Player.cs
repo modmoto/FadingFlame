@@ -10,15 +10,17 @@ namespace FadingFlame.Players
     {
         [BsonId]
         public ObjectId Id { get; set; }
-        public string DisplayName { get; private set; }
-        public string AccountEmail { get; private set; }
+        public string DisplayName { get; set; }
+        public string AccountEmail { get; set; }
         public string DiscordTag { get; set; }
-        public Army Army  { get; set; }
+        [BsonIgnore]
+        public Army ArmyCurrentSeason  { get; set; }
+        [BsonIgnore]
         public Army ArmyNextSeason  { get; set; }
         public ObjectId ArmyIdCurrentSeason  { get; set; }
         public ObjectId ArmyIdNextSeason  { get; set; }
         public Mmr Mmr  { get; set; }
-        public bool SubmittedLists => Army != null;
+        public bool SubmittedLists => ArmyCurrentSeason != null;
         public Location Location { get; set; }
 
         public static Player Create(string name, string accountMail)
@@ -39,7 +41,7 @@ namespace FadingFlame.Players
 
         public void SubmitLists(GameList list1, GameList list2)
         {
-            Army = new Army
+            ArmyCurrentSeason = new Army
             {
                 List1 = list1,
                 List2 = list2

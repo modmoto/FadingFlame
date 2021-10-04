@@ -42,15 +42,15 @@ namespace FadingFlame.Players
 
         public async Task UpdateWithLists(Player player, int season)
         {
-            if (player.Army != null)
+            if (player.ArmyCurrentSeason != null)
             {
-                if (player.Army.Id == default)
+                if (player.ArmyCurrentSeason.Id == default)
                 {
-                    await _listRepository.Insert(player.Army);
+                    await _listRepository.Insert(player.ArmyCurrentSeason);
                 }
                 else
                 {
-                    await _listRepository.Update(player.Army);
+                    await _listRepository.Update(player.ArmyCurrentSeason);
                 }
             }
 
@@ -83,7 +83,7 @@ namespace FadingFlame.Players
             foreach (var player in players)
             {
                 var list = await _listRepository.Load(player.ArmyIdCurrentSeason);
-                player.Army = list;
+                player.ArmyCurrentSeason = list;
             }
 
             return players;
