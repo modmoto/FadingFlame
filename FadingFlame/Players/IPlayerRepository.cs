@@ -35,9 +35,14 @@ namespace FadingFlame.Players
             return LoadAll<Player>();
         }
 
-        public Task<Player> Load(ObjectId id)
+        public async Task<Player> Load(ObjectId id)
         {
-            return LoadFirst<Player>(id);
+            var player = await LoadFirst<Player>(id);
+            var currentList = await _listRepository.Load(player.ArmyIdCurrentSeason);
+            var nextList = await _listRepository.Load(player.ArmyIdNextSeason);
+            player.ArmyCurrentSeason = currentList;
+            player.ArmyNextSeason = nextList;
+            return player;
         }
 
         public async Task UpdateWithLists(Player player, int season)
