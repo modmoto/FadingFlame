@@ -121,37 +121,6 @@ else
     }
     else
     {
-        if (_matchup.PlayersSelectedList)
-        {
-            <div class="row align-items-start my-2">
-                <div class="col">
-                    <div class="form-group">
-                        <label>List of @Player1Name : </label>
-                        <div><b>@_matchup.Player1List</b></div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="form-group">
-                        <label>List of @Player2Name : </label>
-                        <div><b>@_matchup.Player2List</b></div>
-                    </div>
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="row align-items-start my-2">
-            @if (_matchup.Player2 == ObjectId.Empty)
-            {
-                <div class="col">This game was a freewin for @Player1Name</div>
-            }
-            else
-            {
-                <div class="col">Players are still selecting their lists...</div>
-            }
-            </div>
-        }
-
         if (_matchup.IsFinished)
         {
             <div class="row align-items-start my-3">
@@ -209,7 +178,47 @@ else
                 <div class="col">Game was not reported yet...</div>
             </div>
         }
-
+        
+        if (_matchup.PlayersSelectedList)
+        {
+            <div class="row align-items-start my-2">
+                <div class="col">
+                    <div class="form-group">
+                        <label>List of @Player1Name :</label>
+                        <div><b>@_matchup.Player1List</b></div>
+                        <div><b>@(_player1.ArmyCurrentSeason.List1.Name == _matchup.Player1List ? _player1.ArmyCurrentSeason.List1.Faction.ToCamelCaseString() : _player1.ArmyCurrentSeason.List2.Faction.ToCamelCaseString())</b></div>
+                    </div>
+                    <hr class="my-3">
+                    <div class="form-group">
+                        <div style="white-space:pre-wrap;">@(_player1.ArmyCurrentSeason.List1.Name == _matchup.Player1List ? _player1.ArmyCurrentSeason.List1.List : _player1.ArmyCurrentSeason.List2.List)</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>List of @Player2Name :</label>
+                        <div><b>@_matchup.Player2List</b></div>
+                        <div><b>@(_player2.ArmyCurrentSeason.List1.Name == _matchup.Player2List ? _player2.ArmyCurrentSeason.List1.Faction.ToCamelCaseString() : _player2.ArmyCurrentSeason.List2.Faction.ToCamelCaseString())</b></div>
+                    </div>
+                    <hr class="my-3">
+                    <div class="form-group">
+                        <div style="white-space:pre-wrap;">@(_player2.ArmyCurrentSeason.List1.Name == _matchup.Player2List ? _player2.ArmyCurrentSeason.List1.List : _player2.ArmyCurrentSeason.List2.List)</div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row align-items-start my-2">
+            @if (_matchup.Player2 == ObjectId.Empty)
+            {
+                <div class="col">This game was a freewin for @Player1Name</div>
+            }
+            else
+            {
+                <div class="col">Players are still selecting their lists...</div>
+            }
+            </div>
+        }
     }
 }
 
