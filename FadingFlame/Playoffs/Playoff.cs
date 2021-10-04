@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using FadingFlame.Leagues;
 using FadingFlame.Matchups;
@@ -86,17 +85,10 @@ namespace FadingFlame.Playoffs
         public MatchResult ReportGame(MatchResultDto matchResultDto)
         {
             var roundIndex = Rounds.FindIndex(r => r.Matchups.Any(m => m.Id == matchResultDto.MatchId));
-            if (roundIndex == -1) throw new ValidationException("Match not in this playoffs in this config");
             var round = Rounds[roundIndex];
             var matchIndex = round.Matchups.FindIndex(m => m.Id == matchResultDto.MatchId);
-            if (matchIndex == -1) throw new ValidationException("Match not in this playoffs in this config");
 
             var match = round.Matchups[matchIndex];
-
-            if (match.Player1 != matchResultDto.Player1.Id || match.Player2 != matchResultDto.Player2.Id)
-            {
-                throw new ValidationException("Match not in this playoffs in this config");
-            }
 
             var result = MatchResult.Create(matchResultDto.SecondaryObjective, matchResultDto.Player1, matchResultDto.Player2);
             match.RecordResult(result);

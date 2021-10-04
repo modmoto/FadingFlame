@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using FadingFlame.Admin;
 using FadingFlame.Matchups;
@@ -30,11 +29,7 @@ namespace FadingFlame.Leagues
         private void SwapPlayer(ObjectId oldPlayer, ObjectId newPlayer)
         {
             if (Players.Any(p => p.Id == newPlayer)) return; 
-            var player = Players.SingleOrDefault(p => p.Id == oldPlayer);
-            if (player == null)
-            {
-                throw new ValidationException("Player not in this League");
-            }
+            var player = Players.Single(p => p.Id == oldPlayer);
 
             player.Id = newPlayer;
 
@@ -56,13 +51,7 @@ namespace FadingFlame.Leagues
 
         private Matchup GetMatchup(ObjectId matchId)
         {
-            var match = GameDays.SelectMany(g => g.Matchups).FirstOrDefault(m => m.Id == matchId);
-            if (match == null)
-            {
-                throw new ValidationException("Match not in this gameday");
-            }
-
-            return match;
+            return GameDays.SelectMany(g => g.Matchups).Single(m => m.Id == matchId);
         }
 
         public MatchResult ReportGame(MatchResultDto matchResultDto)
@@ -70,13 +59,8 @@ namespace FadingFlame.Leagues
             var player1Result = matchResultDto.Player1;
             var player2Result = matchResultDto.Player2;
 
-            var player1 = Players.FirstOrDefault(p => p.Id == player1Result.Id);
-            var player2 = Players.FirstOrDefault(p => p.Id == player2Result.Id);
-
-            if (player1 == null || player2 == null)
-            {
-                throw new ValidationException("Players are not in this league");
-            }
+            var player1 = Players.Single(p => p.Id == player1Result.Id);
+            var player2 = Players.Single(p => p.Id == player2Result.Id);
 
             var match = GetMatchup(matchResultDto.MatchId);
             
@@ -171,12 +155,7 @@ namespace FadingFlame.Leagues
 
         public void PenaltyPointsForPlayer(ObjectId playerId, int penaltyPoints)
         {
-            var player = Players.SingleOrDefault(p => p.Id == playerId);
-            if (player == null)
-            {
-                throw new ValidationException("Players are not in this league");
-            }
-            
+            var player = Players.Single(p => p.Id == playerId);
             player.Penalty(penaltyPoints);
             ReorderPlayers();
         }
@@ -185,14 +164,9 @@ namespace FadingFlame.Leagues
         {
             var match = GetMatchup(matchId);
             
-            var player1 = Players.FirstOrDefault(p => p.Id == match.Player1);
-            var player2 = Players.FirstOrDefault(p => p.Id == match.Player2);
+            var player1 = Players.First(p => p.Id == match.Player1);
+            var player2 = Players.First(p => p.Id == match.Player2);
 
-            if (player1 == null || player2 == null)
-            {
-                throw new ValidationException("Players are not in this league");
-            }
-            
             player1.DeleteResult(match.Result.Player1.BattlePoints, match.Result.Player1.VictoryPoints);
             player2.DeleteResult(match.Result.Player2.BattlePoints, match.Result.Player2.VictoryPoints);
 

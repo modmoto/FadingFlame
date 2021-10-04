@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
 using FadingFlame.Repositories;
@@ -53,11 +52,6 @@ namespace FadingFlame.Matchups
 
         public void RecordResult(MatchResult result)
         {
-            if (IsFinished)
-            {
-                throw new ValidationException("Match allready reported");
-            }
-
             Result = result;
         }
 
