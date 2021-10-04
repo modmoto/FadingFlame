@@ -183,7 +183,7 @@ else
             <div class="row align-items-start my-2">
                 <div class="col">
                     <div class="form-group">
-                        <label>List: @_matchup.Player1List :</label>
+                        <div>List: @_matchup.Player1List</div>
                         <div><b>@(_player1.ArmyCurrentSeason.List1.Name == _matchup.Player1List ? _player1.ArmyCurrentSeason.List1.Faction.ToCamelCaseString() : _player1.ArmyCurrentSeason.List2.Faction.ToCamelCaseString())</b></div>
                     </div>
                     <hr class="my-3">
@@ -193,7 +193,7 @@ else
                 </div>
                 <div class="col">
                     <div class="form-group">
-                        <label>List: @_matchup.Player2List :</label>
+                        <div>List: @_matchup.Player2List</div>
                         <div><b>@(_player2.ArmyCurrentSeason.List1.Name == _matchup.Player2List ? _player2.ArmyCurrentSeason.List1.Faction.ToCamelCaseString() : _player2.ArmyCurrentSeason.List2.Faction.ToCamelCaseString())</b></div>
                     </div>
                     <hr class="my-3">
