@@ -315,7 +315,8 @@ else
         _model.Player1.VictoryPoints = match.Result?.Player1.VictoryPoints ?? 0;
         _model.Player2.Id = match.Player2;
         _model.Player2.VictoryPoints = match.Result?.Player2.VictoryPoints ?? 0;
-        _model.SecondaryObjective = match.Result?.SecondaryObjective ?? SecondaryObjectiveState.draw; 
+        _secondaryObjectivePlayer1 = match.Result?.SecondaryObjective == SecondaryObjectiveState.player1; 
+        _secondaryObjectivePlayer2 = match.Result?.SecondaryObjective == SecondaryObjectiveState.player2; 
         _model.MatchId = match.Id;
         
         if (Player1LoggedIn)
