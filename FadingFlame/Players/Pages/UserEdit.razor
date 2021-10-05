@@ -105,7 +105,7 @@
         {
             <h4>Lists this season</h4>
             <hr class="my-3">
-            <EditForm OnSubmit="OnSubmitList" EditContext="@_editContextLists">
+            <EditForm EditContext="@_editContextLists">
             <DataAnnotationsValidator/>
             <div class="row align-items-start">
                 <div class="col">
@@ -127,7 +127,7 @@
             </div>
             @if (!_seasonState.CurrentSeason.ListSubmissionIsOver || _userState.UserIsAdmin)
             {
-                <button disabled="@_loadingLists" class="btn btn-primary">
+                <button disabled="@_loadingLists" class="btn btn-primary" @onclick="OnSubmitList">
                     @if (_loadingLists)
                     {
                         <span class="spinner-border spinner-border-sm mr-1"></span>
@@ -267,36 +267,33 @@
 
     private async Task OnSubmitList()
     {
-        if (!_player.SubmittedLists)
+        _loadingLists = true;
+        _messageStoreLists.Clear();
+        if (string.IsNullOrEmpty(_editListModel.List1.Name)) _messageStoreLists.Add(() => _editListModel.List1.Name, Errors.FieldRequired);
+        if (string.IsNullOrEmpty(_editListModel.List2.Name)) _messageStoreLists.Add(() => _editListModel.List2.Name, Errors.FieldRequired);
+        if (string.IsNullOrEmpty(_editListModel.List1.List)) _messageStoreLists.Add(() => _editListModel.List1.List, Errors.FieldRequired);
+        if (string.IsNullOrEmpty(_editListModel.List2.List)) _messageStoreLists.Add(() => _editListModel.List2.List, Errors.FieldRequired);
+        if (_editListModel.List1.Faction == default) _messageStoreLists.Add(() => _editListModel.List1.Faction, Errors.FactionRequired);
+        if (_editListModel.List2.Faction == default) _messageStoreLists.Add(() => _editListModel.List2.Faction, Errors.FactionRequired);
+
+        if (!_editContextLists.Validate())
         {
-            _loadingLists = true;
-            _messageStoreLists.Clear();
-            if (_editListModel.List1.Name == null) _messageStoreLists.Add(() => _editListModel.List1.Name, Errors.FieldRequired);
-            if (_editListModel.List2.Name == null) _messageStoreLists.Add(() => _editListModel.List2.Name, Errors.FieldRequired);
-            if (_editListModel.List1.List == null) _messageStoreLists.Add(() => _editListModel.List1.List, Errors.FieldRequired);
-            if (_editListModel.List2.List == null) _messageStoreLists.Add(() => _editListModel.List2.List, Errors.FieldRequired);
-            if (_editListModel.List1.Faction == default) _messageStoreLists.Add(() => _editListModel.List1.Faction, Errors.FactionRequired);
-            if (_editListModel.List2.Faction == default) _messageStoreLists.Add(() => _editListModel.List2.Faction, Errors.FactionRequired);
-
-            if (!_editContextLists.Validate())
-            {
-                _loadingLists = false;
-                return;
-            }
-
-            if (_editListModel.List1.Name == _editListModel.List2.Name)
-            {
-                _editListModel.List1.Name += "_1";
-                _editListModel.List2.Name += "_2";
-            }
-
-            var list1 = GameList.Create(_editListModel.List1.Name, _editListModel.List1.List, _editListModel.List1.Faction);
-            var list2 = GameList.Create(_editListModel.List2.Name, _editListModel.List2.List, _editListModel.List2.Faction);
-            _player.SubmitLists(list1, list2);
-            await _playerRepository.UpdateWithLists(_player, _seasonState.CurrentSeason.SeasonId);
-
             _loadingLists = false;
+            return;
         }
+
+        if (_editListModel.List1.Name == _editListModel.List2.Name)
+        {
+            _editListModel.List1.Name += "_1";
+            _editListModel.List2.Name += "_2";
+        }
+
+        var list1 = GameList.Create(_editListModel.List1.Name, _editListModel.List1.List, _editListModel.List1.Faction);
+        var list2 = GameList.Create(_editListModel.List2.Name, _editListModel.List2.List, _editListModel.List2.Faction);
+        _player.SubmitLists(list1, list2, _seasonState.CurrentSeason.SeasonId);
+        await _playerRepository.UpdateWithLists(_player, _seasonState.CurrentSeason.SeasonId);
+
+        _loadingLists = false;
     }
     
     private async void OnSubmit()

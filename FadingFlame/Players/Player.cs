@@ -39,10 +39,12 @@ namespace FadingFlame.Players
             Mmr = mmr;
         }
 
-        public void SubmitLists(GameList list1, GameList list2)
+        public void SubmitLists(GameList list1, GameList list2, int season)
         {
             ArmyCurrentSeason = new Army
             {
+                Id = ArmyIdCurrentSeason,
+                Season = season,
                 List1 = list1,
                 List2 = list2
             };

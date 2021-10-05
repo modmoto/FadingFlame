@@ -54,9 +54,10 @@ namespace FadingFlame.Players
         {
             if (player.ArmyCurrentSeason != null)
             {
-                if (player.ArmyCurrentSeason.Id == default)
+                if (player.ArmyIdCurrentSeason == default)
                 {
                     await _listRepository.Insert(player.ArmyCurrentSeason);
+                    player.ArmyIdCurrentSeason = player.ArmyCurrentSeason.Id;
                 }
                 else
                 {
