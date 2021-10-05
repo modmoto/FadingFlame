@@ -126,93 +126,90 @@ else
             }
         }
     }
+    if (_matchup.IsFinished)
+    {
+        <div class="row align-items-start my-3">
+            <div class="col form-group">
+                <div>@_player1.DisplayName :</div>
+                <div>Battle Points: <b>@_matchup.Result.Player1.BattlePoints</b></div>
+                <div>Victory Points: @_matchup.Result.Player1.VictoryPoints (Diff.: @_matchup.Result.VictoryPointsDifference)</div>
+                @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.player1)
+                {
+                    <div class="form-check-label">
+                        Won secondary objective
+                    </div>
+                }
+                @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.draw)
+                {
+                    <div class="form-check-label">
+                        Draw on secondary objective
+                    </div>
+                }
+            </div>
+            <div class="col form-group">
+                <div>@_player2.DisplayName :</div>
+                <div>Battle Points: <b>@_matchup.Result.Player2.BattlePoints</b></div>
+                <div>Victory Points: @_matchup.Result.Player2.VictoryPoints (Diff.: @_matchup.Result.VictoryPointsDifference)</div>
+                @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.player2)
+                {
+                    <div class="form-check-label">
+                        Won secondary objective
+                    </div>
+                }
+                @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.draw)
+                {
+                    <div class="form-check-label">
+                        Draw on secondary objective
+                    </div>
+                }
+            </div>
+        </div>
+    }
     else
     {
-        if (_matchup.IsFinished)
-        {
-            <div class="row align-items-start my-3">
-                <div class="col form-group">
-                    <div>@_player1.DisplayName :</div>
-                    <div>Battle Points: <b>@_matchup.Result.Player1.BattlePoints</b></div>
-                    <div>Victory Points: @_matchup.Result.Player1.VictoryPoints (Diff.: @_matchup.Result.VictoryPointsDifference)</div>
-                    @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.player1)
-                    {
-                        <div class="form-check-label">
-                            Won secondary objective
-                        </div>
-                    }
-                    @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.draw)
-                    {
-                        <div class="form-check-label">
-                            Draw on secondary objective
-                        </div>
-                    }
-                </div>
-                <div class="col form-group">
-                    <div>@_player2.DisplayName :</div>
-                    <div>Battle Points: <b>@_matchup.Result.Player2.BattlePoints</b></div>
-                    <div>Victory Points: @_matchup.Result.Player2.VictoryPoints (Diff.: @_matchup.Result.VictoryPointsDifference)</div>
-                    @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.player2)
-                    {
-                        <div class="form-check-label">
-                            Won secondary objective
-                        </div>
-                    }
-                    @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.draw)
-                    {
-                        <div class="form-check-label">
-                            Draw on secondary objective
-                        </div>
-                    }
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="row align-items-start my-2">
-                <div class="col">Game was not reported yet...</div>
-            </div>
-        }
+        <div class="row align-items-start my-2">
+            <div class="col">Game was not reported yet...</div>
+        </div>
+    }
         
-        if (_matchup.PlayersSelectedList)
-        {
-            <hr class="my-3">
-            <div class="row align-items-start my-2">
-                <div class="col">
-                    <div class="form-group">
-                        <div>List: @_matchup.Player1List</div>
-                        <div><b>@(_player1.ArmyCurrentSeason.List1.Name == _matchup.Player1List ? _player1.ArmyCurrentSeason.List1.Faction.ToCamelCaseString() : _player1.ArmyCurrentSeason.List2.Faction.ToCamelCaseString())</b></div>
-                    </div>
-                    <hr class="my-3">
-                    <div class="form-group">
-                        <div style="white-space:pre-wrap;">@(_player1.ArmyCurrentSeason.List1.Name == _matchup.Player1List ? _player1.ArmyCurrentSeason.List1.List : _player1.ArmyCurrentSeason.List2.List)</div>
-                    </div>
+    if (_matchup.PlayersSelectedList)
+    {
+        <hr class="my-3">
+        <div class="row align-items-start my-2">
+            <div class="col">
+                <div class="form-group">
+                    <div>List: @_matchup.Player1List</div>
+                    <div><b>@(_player1.ArmyCurrentSeason.List1.Name == _matchup.Player1List ? _player1.ArmyCurrentSeason.List1.Faction.ToCamelCaseString() : _player1.ArmyCurrentSeason.List2.Faction.ToCamelCaseString())</b></div>
                 </div>
-                <div class="col">
-                    <div class="form-group">
-                        <div>List: @_matchup.Player2List</div>
-                        <div><b>@(_player2.ArmyCurrentSeason.List1.Name == _matchup.Player2List ? _player2.ArmyCurrentSeason.List1.Faction.ToCamelCaseString() : _player2.ArmyCurrentSeason.List2.Faction.ToCamelCaseString())</b></div>
-                    </div>
-                    <hr class="my-3">
-                    <div class="form-group">
-                        <div style="white-space:pre-wrap;">@(_player2.ArmyCurrentSeason.List1.Name == _matchup.Player2List ? _player2.ArmyCurrentSeason.List1.List : _player2.ArmyCurrentSeason.List2.List)</div>
-                    </div>
+                <hr class="my-3">
+                <div class="form-group">
+                    <div style="white-space:pre-wrap;">@(_player1.ArmyCurrentSeason.List1.Name == _matchup.Player1List ? _player1.ArmyCurrentSeason.List1.List : _player1.ArmyCurrentSeason.List2.List)</div>
                 </div>
             </div>
+            <div class="col">
+                <div class="form-group">
+                    <div>List: @_matchup.Player2List</div>
+                    <div><b>@(_player2.ArmyCurrentSeason.List1.Name == _matchup.Player2List ? _player2.ArmyCurrentSeason.List1.Faction.ToCamelCaseString() : _player2.ArmyCurrentSeason.List2.Faction.ToCamelCaseString())</b></div>
+                </div>
+                <hr class="my-3">
+                <div class="form-group">
+                    <div style="white-space:pre-wrap;">@(_player2.ArmyCurrentSeason.List1.Name == _matchup.Player2List ? _player2.ArmyCurrentSeason.List1.List : _player2.ArmyCurrentSeason.List2.List)</div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row align-items-start my-2">
+        @if (_matchup.Player2 == ObjectId.Empty)
+        {
+            <div class="col">This game was a freewin for @Player1Name</div>
         }
         else
         {
-            <div class="row align-items-start my-2">
-            @if (_matchup.Player2 == ObjectId.Empty)
-            {
-                <div class="col">This game was a freewin for @Player1Name</div>
-            }
-            else
-            {
-                <div class="col">Players are still selecting their lists...</div>
-            }
-            </div>
+            <div class="col">Players are still selecting their lists...</div>
         }
+        </div>
     }
 }
 
@@ -314,9 +311,12 @@ else
         _player2 = await _playerRepository.Load(match.Player2);
 
         _model.Player1.Id = match.Player1;
+        _model.Player1.VictoryPoints = match.Result?.Player1.VictoryPoints ?? 0;
         _model.Player2.Id = match.Player2;
+        _model.Player2.VictoryPoints = match.Result?.Player2.VictoryPoints ?? 0;
+        _model.SecondaryObjective = match.Result?.SecondaryObjective ?? SecondaryObjectiveState.draw; 
         _model.MatchId = match.Id;
-
+        
         if (Player1LoggedIn)
         {
             _listsOfLoggedInPlayer = _player1.ArmyCurrentSeason;
