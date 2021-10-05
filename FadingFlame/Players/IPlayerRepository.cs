@@ -38,11 +38,16 @@ namespace FadingFlame.Players
         public async Task<Player> Load(ObjectId id)
         {
             var player = await LoadFirst<Player>(id);
+            await LoadLists(player);
+            return player;
+        }
+
+        private async Task LoadLists(Player player)
+        {
             var currentList = await _listRepository.Load(player.ArmyIdCurrentSeason);
             var nextList = await _listRepository.Load(player.ArmyIdNextSeason);
             player.ArmyCurrentSeason = currentList;
             player.ArmyNextSeason = nextList;
-            return player;
         }
 
         public async Task UpdateWithLists(Player player, int season)
@@ -72,9 +77,11 @@ namespace FadingFlame.Players
             return base.Insert(player);
         }
 
-        public Task<Player> LoadByEmail(string accountEmail)
+        public async Task<Player> LoadByEmail(string accountEmail)
         {
-            return LoadFirst<Player>(p => p.AccountEmail == accountEmail);
+            var player = await LoadFirst<Player>(p => p.AccountEmail == accountEmail);
+            await LoadLists(player);
+            return player;
         }
 
         public Task<List<Player>> PlayersThatEnlistedInCurrentSeason(int season)
