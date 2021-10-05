@@ -116,5 +116,10 @@ namespace FadingFlame.Playoffs
 
             return result;
         }
+
+        public void DeleteGameReport(ObjectId matchupId)
+        {
+            // todo track back
+        }
     }
 }

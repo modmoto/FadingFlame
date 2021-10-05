@@ -20,7 +20,7 @@ else
         VS
         <span class="cursor" @onclick="() => GoToPlayer(_player2)">@Player2Name</span>
     </h1>
-    if (CanEditMatch && !_matchup.IsFinished)
+    if (CanEditMatch && MatchWasRecordedLessThanADayAgo || _userState.UserIsAdmin)
     {
         if (_matchup.PlayersSelectedList)
         {
@@ -71,7 +71,14 @@ else
                 {
                     <span class="spinner-border spinner-border-sm mr-1"></span>
                 }
-                Report Game
+                @if (!_matchup.IsFinished)
+                {
+                    <span>Report Game</span>
+                }
+                else
+                {
+                    <span>Edit Result</span>
+                }
             </button>
             </EditForm>
         }
@@ -159,16 +166,6 @@ else
                     }
                 </div>
             </div>
-            if (_userState.UserIsAdmin && _league != null)
-            {
-                <button disabled="@_loadingDeleteResult" class="btn btn-danger mt-3" @onclick="() => DeleteGameResult()">
-                    @if (_loadingDeleteResult)
-                    {
-                        <span class="spinner-border spinner-border-sm mr-1"></span>
-                    }
-                    <span class="oi oi-shield" aria-hidden="true"></span> Delete game result
-                </button>
-            }
         }
         else
         {
@@ -239,7 +236,6 @@ else
     private string Player2Name => _matchup.Player2 == ObjectId.Empty ? "Freewin" : _player2?.DisplayName ?? "tbd";
     private int _selectedList;
     private bool _loading = true;
-    private bool _loadingDeleteResult;
     private bool _secondaryObjectivePlayer1;
     private bool _secondaryObjectivePlayer2;
     private string _selectedListAsString;
@@ -248,7 +244,8 @@ else
     private bool Player1LoggedIn => _model.Player1.Id == _userState.LoggedInPlayer.Id;
     private bool Player2LoggedIn =>_model.Player2?.Id == _userState.LoggedInPlayer.Id;
     private bool CanEditMatch => Player1LoggedIn || Player2LoggedIn;
-
+    public bool MatchWasRecordedLessThanADayAgo => DateTime.UtcNow.AddDays(-1) < _matchup.Result?.RecordedAt;
+    
     protected override void OnInitialized()
     {
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
@@ -341,6 +338,26 @@ else
     private async Task OnValidSubmit()
     {
         _loading = true;
+        var wasAllreadyReported = _matchup.IsFinished;
+        if (wasAllreadyReported)
+        {
+            _league?.DeleteGameReport(_matchup.Id);
+            _playoff?.DeleteGameReport(_matchup.Id);
+        }
+        
+        var result = await UpdateMatchWithResult();
+
+        if (!wasAllreadyReported)
+        {
+            await UpdateMmrs(result);    
+        }
+
+        _loading = false;
+        StateHasChanged();
+    }
+
+    private async Task<MatchResult> UpdateMatchWithResult()
+    {
         MatchResult result;
         if (_league != null)
         {
@@ -351,14 +368,11 @@ else
         else
         {
             _model.SecondaryObjective = ConvertToEnum();
-            result =_playoff.ReportGame(_model);
+            result = _playoff.ReportGame(_model);
             await _playoffRepository.Update(_playoff);
         }
 
-        await UpdateMmrs(result);
-
-        _loading = false;
-        StateHasChanged();
+        return result;
     }
 
     private async Task UpdateMmrs(MatchResult matchResult)
@@ -440,16 +454,4 @@ else
     {
         _navigation.NavigateTo($"player/{player?.Id}");
     }
-
-    private async Task DeleteGameResult()
-    {
-        _loadingDeleteResult = true;
-        if (_league != null)
-        {
-            _league.DeleteGameReport(_matchup.Id);
-            await _leagueRepository.Update(_league);
-        }
-        _loadingDeleteResult = false;
-    }
-
 }
