@@ -241,7 +241,7 @@ else
     private bool Player1LoggedIn => _model.Player1.Id == _userState.LoggedInPlayer.Id;
     private bool Player2LoggedIn =>_model.Player2?.Id == _userState.LoggedInPlayer.Id;
     private bool CanEditMatch => Player1LoggedIn || Player2LoggedIn;
-    public bool MatchWasRecordedLessThanADayAgo => DateTime.UtcNow.AddDays(-1) < _matchup.Result?.RecordedAt;
+    public bool MatchWasRecordedLessThanADayAgo => _matchup.Result == null || DateTime.UtcNow.AddDays(-1) < _matchup.Result.RecordedAt;
     
     protected override void OnInitialized()
     {
