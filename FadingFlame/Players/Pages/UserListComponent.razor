@@ -1,4 +1,4 @@
-@if (_openEditMask || ShowEdit)
+@if (_openEditMask || !IsListSubmissionOver && IsCurrentUser)
 {
     if (_openEditMask)
     {
@@ -40,7 +40,7 @@ else
     [Parameter]
     public bool IsCurrentUser { get; set; }
     [Parameter]
-    public bool ShowEdit { get; set; }
+    public bool IsListSubmissionOver { get; set; }
     [Parameter] 
     public EventCallback OnRequestListChange { get; set; }
     [Parameter] 
