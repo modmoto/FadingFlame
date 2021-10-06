@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using FadingFlame.Admin;
 using FadingFlame.Discord;
@@ -111,27 +112,21 @@ namespace FadingFlame
             var client = new MongoClient(mongoConnectionString);
             var mongoDatabase = client.GetDatabase(MongoDbRepositoryBase.DatabaseName);
             var mongoCollection = mongoDatabase.GetCollection<PlayerLegacy>(nameof(Player));
-            var players = mongoCollection.Find(p => true).ToListAsync().Result;
+            var list = new List<string> { "Ben Mitchell", "Theokrit", "Merlijn Dejonckheere", "Jeff K", "Rincd"};
+            var players = mongoCollection.Find(p => list.Contains(p.DisplayName)).ToListAsync().Result;
             foreach (var playerLegacy in players)
             {
-                if (playerLegacy.SubmittedLists)
+                var player = new Player
                 {
-                    var seasonArmy = Army.Create(2, playerLegacy.Army.List1, playerLegacy.Army.List2);
-                    listRepository.Insert(seasonArmy).Wait();
+                    DiscordTag = playerLegacy.DiscordTag,
+                    Location = playerLegacy.Location,
+                    Mmr = playerLegacy.Mmr,
+                    Id = playerLegacy.Id,
+                    AccountEmail = playerLegacy.AccountEmail,
+                    DisplayName = playerLegacy.DisplayName
+                };
 
-                    var player = new Player
-                    {
-                        DiscordTag = playerLegacy.DiscordTag,
-                        Location = playerLegacy.Location,
-                        Mmr = playerLegacy.Mmr,
-                        Id = playerLegacy.Id,
-                        ArmyIdCurrentSeason = seasonArmy.Id,
-                        AccountEmail = playerLegacy.AccountEmail,
-                        DisplayName = playerLegacy.DisplayName
-                    };
-
-                    playerRepository.Update(player).Wait();
-                }
+                playerRepository.Update(player).Wait();
             }
 
             // var buildServiceProvider = services.BuildServiceProvider();
