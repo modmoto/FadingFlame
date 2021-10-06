@@ -51,11 +51,13 @@ else
     {
         await OnRequestListChange.InvokeAsync();
         _openEditMask = false;
+        StateHasChanged();
     }
     
     private async void OnDelete()
     {
         await OnDeleteListChange.InvokeAsync();
         _openEditMask = false;
+        StateHasChanged();
     }
 }
