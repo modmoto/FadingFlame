@@ -77,7 +77,14 @@ else
                 }
                 else
                 {
-                    <span>Edit Result</span>
+                    if (_userState.UserIsAdmin)
+                    {
+                        <span>Edit Result</span>
+                    }
+                    else
+                    {
+                        <span>Edit Result (can still be edited for @((DateTime.UtcNow.AddDays(-1) - _matchup.Result.RecordedAt).ToString(@"hh\:mm"))h)</span>    
+                    }
                 }
             </button>
             </EditForm>
@@ -242,7 +249,7 @@ else
     private bool Player2LoggedIn =>_model.Player2?.Id == _userState.LoggedInPlayer.Id;
     private bool CanEditMatch => Player1LoggedIn || Player2LoggedIn;
     public bool MatchWasRecordedLessThanADayAgo => _matchup.Result == null || DateTime.UtcNow.AddDays(-1) < _matchup.Result.RecordedAt;
-    
+
     protected override void OnInitialized()
     {
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
