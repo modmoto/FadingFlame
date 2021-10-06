@@ -101,7 +101,7 @@
                 <span>@_editUserModel.DiscordTag</span>
             </div>
         }
-        @if (_player.SubmittedLists || _userState.UserIsAdmin)
+        @if (_player.SubmittedLists)
         {
             <h4>Lists this season</h4>
             <hr class="my-3">
@@ -111,7 +111,7 @@
                 <div class="col">
                     <UserListComponent 
                         List="@(_editListModel.List1)" 
-                        ShowEdit="@(!_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser || _userState.UserIsAdmin)" IsCurrentUser="_isTheRightUser"
+                        ShowEdit="@(!_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser)" IsCurrentUser="_isTheRightUser"
                         OnRequestListChange="RequestListChange1"
                         OnDeleteListChange="DeleteListChange1"
                         />
@@ -119,13 +119,13 @@
                 <div class="col">
                     <UserListComponent 
                         List="@(_editListModel.List2)" 
-                        ShowEdit="@(!_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser || _userState.UserIsAdmin)" IsCurrentUser="_isTheRightUser"
+                        ShowEdit="@(!_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser)" IsCurrentUser="_isTheRightUser"
                         OnRequestListChange="RequestListChange2"
                         OnDeleteListChange="DeleteListChange2"
                         />    
                 </div>
             </div>
-            @if (!_seasonState.CurrentSeason.ListSubmissionIsOver || _userState.UserIsAdmin)
+            @if (!_seasonState.CurrentSeason.ListSubmissionIsOver)
             {
                 <button disabled="@_loadingLists" class="btn btn-primary" @onclick="OnSubmitList">
                     @if (_loadingLists)
@@ -137,7 +137,7 @@
             }
             else
             {
-                if (!_isTheRightUser && !_userState.UserIsAdmin)
+                if (!_isTheRightUser)
                 {
                     <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()</div>
                 }       
