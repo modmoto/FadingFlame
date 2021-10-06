@@ -110,22 +110,22 @@
             <DataAnnotationsValidator/>
             <div class="row align-items-start">
                 <div class="col">
-                    <UserListComponent 
-                        List="@(_editListModel.List1)" 
+                    <ValidationMessage For="@(() => _editListModel.List1.List)"/>
+                    <UserListComponent
+                        List="@(_editListModel.List1)"
                         IsListSubmissionOver="_seasonState.CurrentSeason.ListSubmissionIsOver"
                         IsCurrentUser="_isTheRightUser"
                         OnRequestListChange="RequestListChange1"
-                        OnDeleteListChange="DeleteListChange1"
-                        />
+                        OnDeleteListChange="DeleteListChange1"/>
                 </div>
                 <div class="col">
-                    <UserListComponent 
-                        List="@(_editListModel.List2)" 
-                        IsListSubmissionOver="_seasonState.CurrentSeason.ListSubmissionIsOver" 
+                    <ValidationMessage For="@(() => _editListModel.List2.List)"/>
+                    <UserListComponent
+                        List="@(_editListModel.List2)"
+                        IsListSubmissionOver="_seasonState.CurrentSeason.ListSubmissionIsOver"
                         IsCurrentUser="_isTheRightUser"
                         OnRequestListChange="RequestListChange2"
-                        OnDeleteListChange="DeleteListChange2"
-                        />    
+                        OnDeleteListChange="DeleteListChange2"/>
                 </div>
             </div>
             @if (!_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser)
@@ -162,6 +162,7 @@
 @inject NavigationManager _navigation
 @inject IGeoLocationService _geoLocationService
 @inject IListAcceptAndRejectService _acceptAndRejectService
+@inject IListValidationService _listValidationService
 
 @code{
     private EditUserModel _editUserModel = new();
@@ -277,6 +278,9 @@
         if (_editListModel.List1.Faction == default) _messageStoreLists.Add(() => _editListModel.List1.Faction, Errors.FactionRequired);
         if (_editListModel.List2.Faction == default) _messageStoreLists.Add(() => _editListModel.List2.Faction, Errors.FactionRequired);
 
+        await AddListErrors(_editListModel.List1.List, FieldIdentifier.Create(() => _editListModel.List1.List));
+        await AddListErrors(_editListModel.List2.List, FieldIdentifier.Create(() => _editListModel.List2.List));
+
         if (!_editContextLists.Validate())
         {
             _loadingLists = false;
@@ -296,7 +300,19 @@
 
         _loadingLists = false;
     }
-    
+
+    private async Task AddListErrors(string list, FieldIdentifier errorField)
+    {
+        var validationErrors1 = await _listValidationService.Validate(list);
+        if (validationErrors1.Any())
+        {
+            foreach (var error in validationErrors1)
+            {
+                _messageStoreLists.Add(errorField, error);
+            }
+        }
+    }
+
     private async void OnSubmit()
     {
         _loading = true;
@@ -348,12 +364,29 @@
 
     private async Task RequestListChange1()
     {
+        _messageStoreLists.Clear();        
+        await AddListErrors(_editListModel.List1.List, FieldIdentifier.Create(() => _editListModel.List1.List));
+
+        if (!_editContextLists.Validate())
+        {
+            return;
+        }
+
         await _acceptAndRejectService.RequestList1(_player.ArmyCurrentSeason, _editListModel.List1.ProposedListChange);
         SetListEditModel();
     }
-    
+
+
     private async Task RequestListChange2()
     {
+        _messageStoreLists.Clear();
+        await AddListErrors(_editListModel.List2.List, FieldIdentifier.Create(() => _editListModel.List2.List));
+        
+        if (!_editContextLists.Validate())
+        {
+            return;
+        }
+        
         await _acceptAndRejectService.RequestList2(_player.ArmyCurrentSeason, _editListModel.List2.ProposedListChange);
         SetListEditModel();
     }

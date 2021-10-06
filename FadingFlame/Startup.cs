@@ -74,6 +74,11 @@ namespace FadingFlame
             {
                 c.BaseAddress = new Uri("http://www.geoplugin.net/json.gp");
             });
+            
+            services.AddHttpClient<IListValidationService, ListValidationService>(c =>
+            {
+                c.BaseAddress = new Uri("http://newrecruit.eu");
+            });
 
             services.AddAccessTokenManagement()
                 .ConfigureBackchannelHttpClient();
