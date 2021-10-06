@@ -104,31 +104,6 @@ namespace FadingFlame
             services.AddScoped<SeasonState>();
             services.AddHttpContextAccessor();
 
-            // migrate lists to own profile
-            var buildServiceProvider = services.BuildServiceProvider();
-            var playerRepository = buildServiceProvider.GetService<IPlayerRepository>();
-            var listRepository = buildServiceProvider.GetService<IListRepository>();
-            var mongoConnectionString = Environment.GetEnvironmentVariable("MONGO_DB_CONNECTION_STRING") ?? "mongodb://admin:vgwG9FRzS77tGGP4@65.21.139.246:1001";
-            var client = new MongoClient(mongoConnectionString);
-            var mongoDatabase = client.GetDatabase(MongoDbRepositoryBase.DatabaseName);
-            var mongoCollection = mongoDatabase.GetCollection<PlayerLegacy>(nameof(Player));
-            var list = new List<string> { "Ben Mitchell", "Theokrit", "Merlijn Dejonckheere", "Jeff K", "Rincd"};
-            var players = mongoCollection.Find(p => list.Contains(p.DisplayName)).ToListAsync().Result;
-            foreach (var playerLegacy in players)
-            {
-                var player = new Player
-                {
-                    DiscordTag = playerLegacy.DiscordTag,
-                    Location = playerLegacy.Location,
-                    Mmr = playerLegacy.Mmr,
-                    Id = playerLegacy.Id,
-                    AccountEmail = playerLegacy.AccountEmail,
-                    DisplayName = playerLegacy.DisplayName
-                };
-
-                playerRepository.Update(player).Wait();
-            }
-
             // var buildServiceProvider = services.BuildServiceProvider();
             // var playerRepository = buildServiceProvider.GetService<IPlayerRepository>();
             // for (int i = 0; i < 107; i++)

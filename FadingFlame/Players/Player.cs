@@ -5,7 +5,6 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace FadingFlame.Players
 {
-    [BsonIgnoreExtraElements]
     public class Player : IIdentifiable
     {
         [BsonId]
