@@ -101,7 +101,8 @@
                 <span>@_editUserModel.DiscordTag</span>
             </div>
         }
-        @if (_player.SubmittedLists || !_seasonState.CurrentSeason.ListSubmissionIsOver)
+        @if (_player.SubmittedLists && _seasonState.CurrentSeason.ListSubmissionIsOver 
+             || !_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser)
         {
             <h4>Lists this season</h4>
             <hr class="my-3">
@@ -137,16 +138,14 @@
                     Save lists
                 </button>
             }
-            else
-            {
-                if (!_isTheRightUser)
-                {
-                    <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()</div>
-                }       
-            }
             
             </EditForm>
         }
+        
+        @if (!_isTheRightUser && _player.SubmittedLists && !_seasonState.CurrentSeason.ListSubmissionIsOver)
+        {
+            <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()</div>
+        }       
 
         <h4 class="mt-4">Participated in Seasons</h4>
         @foreach (var league in _playerLeagues)
