@@ -393,13 +393,13 @@
 
     private async Task DeleteListChange1()
     {
-        await _acceptAndRejectService.RejectList1(_player.ArmyCurrentSeason);
+        await _acceptAndRejectService.RejectList1(_player.ArmyCurrentSeason, "", false);
         SetListEditModel();
     }
     
     private async Task DeleteListChange2()
     {
-        await _acceptAndRejectService.RejectList2(_player.ArmyCurrentSeason);
+        await _acceptAndRejectService.RejectList2(_player.ArmyCurrentSeason, "", false);
         SetListEditModel();
     }
 }

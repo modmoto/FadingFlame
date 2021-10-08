@@ -14,6 +14,7 @@ namespace FadingFlame.Discord
     {
         Task CreateLeagueChannelsAndTags(List<League> leagues);
         Task SendRequestListChangedToBotsChannel(int pendingChanges);
+        Task ConfirmationMessageToUser(string discordTag, bool wasAccepterd);
     }
 
     public class DiscordBot : IDiscordBot
@@ -32,6 +33,7 @@ namespace FadingFlame.Discord
                 Intents = DiscordIntents.GuildMembers
                         | DiscordIntents.GuildPresences
                         | DiscordIntents.Guilds
+                        | DiscordIntents.DirectMessages
             };
             
             _client = new DiscordClient(discordConfiguration);
@@ -104,6 +106,27 @@ namespace FadingFlame.Discord
                 }
             }
             catch (Exception)
+            {
+                // ignored, dont care
+            }
+        }
+
+        public async Task ConfirmationMessageToUser(string discordTag, bool wasAccepterd)
+        {
+            try
+            {
+                foreach (var guild in _client.Guilds)
+                {
+                    var members = await guild.Value.GetAllMembersAsync();
+                    var discordMember = members.FirstOrDefault(c => $"{c.Username}#{c.Discriminator}" == discordTag);
+                    if (discordMember is not null)
+                    {
+                        var resul = wasAccepterd ? "accepted, see you on the battlefield =)" : "rejected, reach out to the orga team if you do not approve";
+                        await discordMember.SendMessageAsync($"Your list change on fading-flame was {resul}");
+                    }
+                }
+            }
+            catch (Exception e)
             {
                 // ignored, dont care
             }

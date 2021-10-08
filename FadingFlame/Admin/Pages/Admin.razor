@@ -282,35 +282,40 @@
         await _leagueCreationService.SetDeployments();
     }
 
-    private async void ApproveList1(Army player)
+    private async void ApproveList1(Army army)
     {
         _loadingApproval = true;
-        await _acceptAndRejectService.ApproveList1(player);
+        await _acceptAndRejectService.ApproveList1(army, GetDiscordTag(army));
         _loadingApproval = false;
         StateHasChanged();
     }
 
-    private async void ApproveList2(Army player)
+    private async void ApproveList2(Army army)
     {
         _loadingApproval = true;
-        await _acceptAndRejectService.ApproveList2(player);
+        await _acceptAndRejectService.ApproveList2(army, GetDiscordTag(army));
         _loadingApproval = false;
         StateHasChanged();
     }
     
-    private async void RejectList1(Army player)
+    private async void RejectList1(Army army)
     {
         _loadingApproval = true;
-        await _acceptAndRejectService.RejectList1(player);
+        await _acceptAndRejectService.RejectList1(army, GetDiscordTag(army), true);
         _loadingApproval = false;
         StateHasChanged();
     }
 
-    private async void RejectList2(Army player)
+    private async void RejectList2(Army army)
     {
         _loadingApproval = true;
-        await _acceptAndRejectService.RejectList2(player);
+        await _acceptAndRejectService.RejectList2(army, GetDiscordTag(army), true);
         _loadingApproval = false;
         StateHasChanged();
+    }
+    
+    private string GetDiscordTag(Army player)
+    {
+        return _playersWithList.FirstOrDefault(p => p.ArmyIdCurrentSeason == player.Id)?.DiscordTag;
     }
 }
