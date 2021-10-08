@@ -86,10 +86,21 @@
         _seasonState.SeasonsChanged += LoadRest;
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadStuff();
+    }
+
     private async void LoadRest(object sender, EventArgs e)
     {
+        await LoadStuff();
+    }
+
+    private async Task LoadStuff()
+    {
         _leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
-        _enlistedPlayersOriginal = await _playerRepository.PlayersThatEnlistedInCurrentSeason(_seasonState.CurrentSeason.SeasonId);
+        _enlistedPlayersOriginal =
+            await _playerRepository.PlayersThatEnlistedInCurrentSeason(_seasonState.CurrentSeason.SeasonId);
         _enlistedPlayers = _enlistedPlayersOriginal;
         StateHasChanged();
     }

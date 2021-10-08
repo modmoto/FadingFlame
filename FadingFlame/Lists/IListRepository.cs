@@ -12,6 +12,7 @@ namespace FadingFlame.Lists
         Task Insert(Army army);
         Task Update(Army army);
         Task<List<Army>> LoadWithPendingChanges();
+        Task<List<Army>> Load(List<ObjectId> armyIds);
     }
 
     public class ListRepository : MongoDbRepositoryBase, IListRepository
@@ -39,6 +40,11 @@ namespace FadingFlame.Lists
         public Task<List<Army>> LoadWithPendingChanges()
         {
             return LoadAll<Army>(army => army.List1.ProposedListChange != default || army.List2.ProposedListChange != default);
+        }
+
+        public Task<List<Army>> Load(List<ObjectId> armyIds)
+        {
+            return LoadAll<Army>(army => armyIds.Contains(army.Id));
         }
     }
 }

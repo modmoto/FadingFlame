@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FadingFlame.Lists;
 using FadingFlame.Repositories;
@@ -85,21 +86,29 @@ namespace FadingFlame.Players
             return player;
         }
 
-        public Task<List<Player>> PlayersThatEnlistedInCurrentSeason(int season)
+        public async Task<List<Player>> PlayersThatEnlistedInCurrentSeason(int season)
         {
-            return LoadAll<Player>(p => p.ArmyIdCurrentSeason != default);
+            var players = await LoadAll<Player>(p => p.ArmyIdCurrentSeason != default);
+            await AddArmies(players);
+            return players;
         }
 
         public async Task<List<Player>> LoadForLeague(List<ObjectId> playerIds, int season)
         {
             var players = await LoadAll<Player>(p => playerIds.Contains(p.Id));
+            await AddArmies(players);
+            return players;
+        }
+
+        private async Task AddArmies(List<Player> players)
+        {
+            var armyIds = players.Select(p => p.ArmyIdCurrentSeason).ToList();
+            var armies = await _listRepository.Load(armyIds);
             foreach (var player in players)
             {
-                var list = await _listRepository.Load(player.ArmyIdCurrentSeason);
-                player.ArmyCurrentSeason = list;
+                var armyOfPlayer = armies.SingleOrDefault(a => a.Id == player.ArmyIdCurrentSeason);
+                player.ArmyCurrentSeason = armyOfPlayer;
             }
-
-            return players;
         }
 
         public Task<List<Player>> LoadAllWithoutList()
