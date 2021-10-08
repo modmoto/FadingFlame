@@ -1,49 +1,58 @@
 @using FadingFlame.Players
 @using FadingFlame.Lists
-<div class="card-body">
-    <div class="row align-items-start">
-        <div class="col">
-            <div class="form-group">
-                <label>Old List: </label>
-                <div><b>@List.Faction.ToCamelCaseString()</b></div>
-                <div><b>@List.Name</b></div>
-            </div>
-            <hr class="my-3">
-            <div class="form-group">
-                <div style="white-space:pre-wrap;">@List.List</div>
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row align-items-start">
+            <div class="form-group mb-3">
+                <div><b>Reques from @Player.DisplayName / @Player.DiscordTag</b></div> 
             </div>
         </div>
-        <div class="col">
-            <div class="form-group">
-                <label>New List: </label>
-                <div><b>@List.Faction.ToCamelCaseString()</b></div>
-                <div><b>@List.Name</b></div>
+        <div class="row align-items-start mb-3">
+            <div class="col">
+                <div class="form-group">
+                    <label>Old List: </label>
+                    <div><b>@List.Faction.ToCamelCaseString()</b></div>
+                    <div><b>@List.Name</b></div>
+                </div>
+                <hr class="my-3">
+                <div class="form-group">
+                    <div style="white-space:pre-wrap;">@List.List</div>
+                </div>
             </div>
-            <hr class="my-3">
-            <div class="form-group">
-                <div style="white-space:pre-wrap;">@List.ProposedListChange</div>
+            <div class="col">
+                <div class="form-group">
+                    <label>New List: </label>
+                    <div><b>@List.Faction.ToCamelCaseString()</b></div>
+                    <div><b>@List.Name</b></div>
+                </div>
+                <hr class="my-3">
+                <div class="form-group">
+                    <div style="white-space:pre-wrap;">@List.ProposedListChange</div>
+                </div>
             </div>
         </div>
+        <button disabled="@Loading" type="button" class="btn btn-success" @onclick="OnApproveListChange">
+            @if (Loading)
+            {
+                <span class="spinner-border spinner-border-sm mr-1"></span>
+            }
+            Approve
+        </button>
+        <button disabled="@Loading" type="button" class="btn btn-danger" @onclick="OnRejectListChange">
+            @if (Loading)
+            {
+                <span class="spinner-border spinner-border-sm mr-1"></span>
+            }
+            Reject
+        </button>
     </div>
-    <button disabled="@Loading" type="button" class="btn btn-success" @onclick="OnApproveListChange">
-        @if (Loading)
-        {
-            <span class="spinner-border spinner-border-sm mr-1"></span>
-        }
-        Approve
-    </button>
-    <button disabled="@Loading" type="button" class="btn btn-danger" @onclick="OnRejectListChange">
-        @if (Loading)
-        {
-            <span class="spinner-border spinner-border-sm mr-1"></span>
-        }
-        Reject
-    </button>
 </div>
 
 @code {
     [Parameter]
     public GameList List { get; set; }
+    [Parameter]
+    public Player Player { get; set; }
     [Parameter]
     public bool Loading { get; set; }
     [Parameter]

@@ -46,23 +46,25 @@
         <div class="tab-pane fade" id="nav-lists" role="tabpanel" aria-labelledby="nav-lists-tab">
             <h3 class="m-2">Pending requests of listchanges:</h3>
             <div class="container">
-                @foreach (var player in _pendingListChanges)
+                @foreach (var army in _pendingListChanges)
                 {
-                    @if (player.List1.ProposedListChange != null)
+                    @if (army.List1.ProposedListChange != null)
                     {
                         <ListApproveComponent
-                            List="player.List1"
+                            List="army.List1"
+                            Player="@GetPlayer(army)"
                             Loading="_loadingApproval"
-                            OnApproveListChange="() => ApproveList1(player)"
-                            OnRejectListChange="() => RejectList1(player)"/>
+                            OnApproveListChange="() => ApproveList1(army)"
+                            OnRejectListChange="() => RejectList1(army)"/>
                     }
-                    @if (player.List2.ProposedListChange != null)
+                    @if (army.List2.ProposedListChange != null)
                     {
                         <ListApproveComponent
-                            List="player.List2"
+                            List="army.List2"
+                            Player="@GetPlayer(army)"
                             Loading="_loadingApproval"
-                            OnApproveListChange="() => ApproveList2(player)"
-                            OnRejectListChange="() => RejectList2(player)"/>
+                            OnApproveListChange="() => ApproveList2(army)"
+                            OnRejectListChange="() => RejectList2(army)"/>
                     }
                 }
             </div>
@@ -285,7 +287,7 @@
     private async void ApproveList1(Army army)
     {
         _loadingApproval = true;
-        await _acceptAndRejectService.ApproveList1(army, GetDiscordTag(army));
+        await _acceptAndRejectService.ApproveList1(army, GetPlayer(army)?.DiscordTag);
         _loadingApproval = false;
         StateHasChanged();
     }
@@ -293,7 +295,7 @@
     private async void ApproveList2(Army army)
     {
         _loadingApproval = true;
-        await _acceptAndRejectService.ApproveList2(army, GetDiscordTag(army));
+        await _acceptAndRejectService.ApproveList2(army, GetPlayer(army)?.DiscordTag);
         _loadingApproval = false;
         StateHasChanged();
     }
@@ -301,7 +303,7 @@
     private async void RejectList1(Army army)
     {
         _loadingApproval = true;
-        await _acceptAndRejectService.RejectList1(army, GetDiscordTag(army), true);
+        await _acceptAndRejectService.RejectList1(army, GetPlayer(army)?.DiscordTag, true);
         _loadingApproval = false;
         StateHasChanged();
     }
@@ -309,13 +311,13 @@
     private async void RejectList2(Army army)
     {
         _loadingApproval = true;
-        await _acceptAndRejectService.RejectList2(army, GetDiscordTag(army), true);
+        await _acceptAndRejectService.RejectList2(army, GetPlayer(army)?.DiscordTag, true);
         _loadingApproval = false;
         StateHasChanged();
     }
     
-    private string GetDiscordTag(Army player)
+    private Player? GetPlayer(Army player)
     {
-        return _playersWithList.FirstOrDefault(p => p.ArmyIdCurrentSeason == player.Id)?.DiscordTag;
+        return _playersWithList.FirstOrDefault(p => p.ArmyIdCurrentSeason == player.Id);
     }
 }
