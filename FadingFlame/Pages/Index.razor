@@ -19,7 +19,7 @@
     @if(_upcomingGame != null)
     {
         <div class="pt-3 pb-3 alert alert-info text-center cursor" role="alert" @onclick="@(() => _navigation.NavigateTo($"match/{_upcomingGame.Id}?leagueId={_leagueIdForUpcomingDay}"))">
-            Your next game is against @_upcomingOpponenName, open it here
+            Upcoming game against @_upcomingOpponenName
         </div>
     }
 </div>
