@@ -118,7 +118,8 @@ namespace FadingFlame.Discord
                 foreach (var guild in _client.Guilds)
                 {
                     var members = await guild.Value.GetAllMembersAsync();
-                    var discordMember = members.FirstOrDefault(c => $"{c.Username}#{c.Discriminator}" == discordTag);
+                    var lower = discordTag.ToLower();
+                    var discordMember = members.FirstOrDefault(c => $"{c.Username.ToLower()}#{c.Discriminator}" == lower);
                     if (discordMember is not null)
                     {
                         var resul = wasAccepterd ? "accepted, see you on the battlefield =)" : "rejected, reach out to the orga team if you do not approve";
