@@ -10,30 +10,87 @@
     <h1>Match Overview</h1>
     <hr class="my-4">
 </div>
-<table class="table">
-    <thead>
-    <tr>
-        <th>League</th>
-        <th>Player 1</th>
-        <th>Player 2</th>
-        <th>Result</th>
-    </tr>
-    </thead>
-    <tbody class="league">
-    @foreach (var item in _selectedGameDays)
+@if (!_leagues.Any())
+{
+    <div>
+        Loading...
+    </div>
+}
+else 
+{
+    <ul class="nav nav-pills mb-3" id="gameday-overview-tab" role="tablist">
+    @foreach (var gameDay in _leagues.First().GameDays.Select((value, index) => new { value, index }))
     {
-        @foreach (var match in item.Matchups)
-        {
-            <tr @onclick="() => GoToMatch(match)" class="cursor">
-                <td>@GetLeague(match).DivisionId</td>
-                <td>@GetName(match.Player1) @ListName1(match)</td>
-                <td>@GetName(match.Player2) @ListName2(match)</td>
-                <td>@GetResult(match)</td>
-            </tr>
-        }
+        <li class="nav-item" role="presentation">
+            @if (_activeDay == gameDay.index)
+            {
+                <button
+                    class="nav-link active"
+                    id="@("game-day-" + gameDay.index + 1)"
+                    data-bs-toggle="tab"
+                    data-bs-target="@("#game-day-" + gameDay.index + 1)"
+                    type="button"
+                    role="tab"
+                    aria-controls="home"
+                    @onclick="() => SelectGameDay(gameDay.index)"
+                    aria-selected="true"
+                >
+                    @(gameDay.index + 1)
+                </button>
+            }
+            else
+            {
+                <button
+                    class="nav-link"
+                    id="@("game-day-" + gameDay.index + 1)"
+                    data-bs-toggle="tab"
+                    data-bs-target="@("#game-day-" + gameDay.index + 1)"
+                    type="button"
+                    role="tab"
+                    aria-controls="home"
+                    @onclick="() => SelectGameDay(gameDay.index)"
+                    aria-selected="true"
+                >
+                    @(gameDay.index + 1)
+                </button>
+            }
+        </li>
     }
-    </tbody>
-</table>    
+</ul>
+<div class="tab-content" id="gameday-overview-tab"> 
+    @foreach (var gameDay in _leagues.First().GameDays.Select((value, index) => new {value, index}))
+    {
+        <div class="@GetActiveOrNot(gameDay.index)" id="@("game-day-" + gameDay.index + 1)" role="tabpanel" aria-labelledby="@("#game-day-" + gameDay.index + 1)">
+            <div class="lead mb-3">@gameDay.value.StartDate.ToMyDate() - @gameDay.value.EndDate.ToMyDate() — @gameDay.value.Deployment.ToCamelCaseString() with @gameDay.value.SecondaryObjective.ToCamelCaseString()</div>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>League</th>
+                    <th>Player 1</th>
+                    <th>Player 2</th>
+                    <th>Result</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in _selectedGameDays[_activeDay])
+                {
+                    @foreach (var match in item.Matchups)
+                    {
+                        <tr @onclick="() => GoToMatch(match)" class="cursor">
+                            <td>@GetLeague(match).DivisionId</td>
+                            <td>@GetName(match.Player1) @ListName1(match)</td>
+                            <td>@GetName(match.Player2) @ListName2(match)</td>
+                            <td>@GetResult(match)</td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+}
+ 
 
 @inject ILeagueRepository _leagueRepository
 @inject IPlayerRepository _playerRepository
@@ -47,7 +104,7 @@
     
     private int _activeDay;
     private List<League> _leagues = new();
-    private List<GameDay> _selectedGameDays = new();
+    private List<List<GameDay>> _selectedGameDays = new();
     private List<Player> _playersInSeason = new();
 
     protected override void OnInitialized()
@@ -66,18 +123,20 @@
 
         if (_leagues.Any())
         {
+            var foundIndex = false;
             var league = _leagues.First();
             for (var i = 0; i < league.GameDays.Count; i++)
             {
-                if (now < league.GameDays[i].EndDate)
+                var gameDays = _leagues.Select(l => l.GameDays[i]).ToList();
+                _selectedGameDays.Add(gameDays);
+                if (!foundIndex && now < league.GameDays[i].EndDate)
                 {
                     _activeDay = i;
-                    SelectGameDay(_activeDay);
-                    StateHasChanged();
-
-                    break;
+                    foundIndex = true;
                 }
             }    
+            
+            StateHasChanged();
         }
     }
 
@@ -90,7 +149,6 @@
     private void SelectGameDay(int id)
     {
         _activeDay = id;
-        _selectedGameDays = _leagues.Select(l => l.GameDays[id]).ToList();
         StateHasChanged();
     }
 
@@ -140,4 +198,8 @@
         _navigation.NavigateTo($"match/{match.Id}?leagueId={league.Id}");
     }
 
+    private string GetActiveOrNot(int index)
+    {
+        return index == _activeDay ? "tab-pane fade show active" : "tab-pane fade";
+    }
 }
