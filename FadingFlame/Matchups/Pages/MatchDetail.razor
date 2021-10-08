@@ -20,7 +20,7 @@ else
         VS
         <span class="cursor" @onclick="() => GoToPlayer(_player2)">@Player2Name</span>
     </h1>
-    if (CanEditMatch && MatchWasRecordedLessThanADayAgo || _userState.UserIsAdmin)
+    if (CanEditMatch && MatchWasRecordedLessThanADayAgo || _loggedInUserState.UserIsAdmin)
     {
         if (_matchup.PlayersSelectedList)
         {
@@ -77,7 +77,7 @@ else
                 }
                 else
                 {
-                    if (_userState.UserIsAdmin)
+                    if (_loggedInUserState.UserIsAdmin)
                     {
                         <span>Edit Result</span>
                     }
@@ -224,7 +224,7 @@ else
 @inject ILeagueRepository _leagueRepository
 @inject IPlayerRepository _playerRepository
 @inject IPlayoffRepository _playoffRepository
-@inject UserState _userState
+@inject LoggedInUserState _loggedInUserState
 @inject MmrRepository _mmrRepository
 
 @code {
@@ -245,14 +245,14 @@ else
     private string _selectedListAsString;
     private bool _selectingList;
     private Playoff _playoff;
-    private bool Player1LoggedIn => _model.Player1.Id == _userState.LoggedInPlayer.Id;
-    private bool Player2LoggedIn =>_model.Player2?.Id == _userState.LoggedInPlayer.Id;
+    private bool Player1LoggedIn => _model.Player1.Id == _loggedInUserState.LoggedInPlayer.Id;
+    private bool Player2LoggedIn =>_model.Player2?.Id == _loggedInUserState.LoggedInPlayer.Id;
     private bool CanEditMatch => Player1LoggedIn || Player2LoggedIn;
     public bool MatchWasRecordedLessThanADayAgo => _matchup.Result == null || DateTime.UtcNow.AddDays(-1) < _matchup.Result.RecordedAt;
 
     protected override void OnInitialized()
     {
-        _userState.UserLoggedIn += (_, _) => StateHasChanged();
+        _loggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()

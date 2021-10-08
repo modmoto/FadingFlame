@@ -20,7 +20,7 @@
         @if (_editUserModel.TimeZone != Location.NotSelected && !_isTheRightUser)
         {
             <div class="form-group pb-3">
-                <label>Time difference to you: @(_geoLocationService.GetTimeDiff(_userState.CurrentUserTime, _editUserModel.TimeZone).Hours)h (@_editUserModel.TimeZone)</label>
+                <label>Time difference to you: @(_geoLocationService.GetTimeDiff(_loggedInUserState.CurrentUserTime, _editUserModel.TimeZone).Hours)h (@_editUserModel.TimeZone)</label>
             </div>
         }
         @if (UserParticipatesInCurrentSeason())
@@ -157,7 +157,7 @@
 
 @inject IPlayerRepository _playerRepository
 @inject ILeagueRepository _leagueRepository
-@inject UserState _userState
+@inject LoggedInUserState _loggedInUserState
 @inject SeasonState _seasonState
 @inject NavigationManager _navigation
 @inject IGeoLocationService _geoLocationService
@@ -197,8 +197,8 @@
         
         _editContextUser.OnValidationRequested += (_, _) => OnSubmit();
 
-        _userState.UserLoggedIn += (_, _) => StateHasChanged();
-        _userState.UserTimeSet += (_, _) => StateHasChanged();
+        _loggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
+        _loggedInUserState.UserTimeSet += (_, _) => StateHasChanged();
         _seasonState.SeasonsChanged += (_, _) => StateHasChanged();
     }
 
@@ -230,7 +230,7 @@
                 };
 
                 _regionCss = SetRegionCss();
-                _isTheRightUser = Id == _userState.LoggedInPlayer.Id.ToString();
+                _isTheRightUser = Id == _loggedInUserState.LoggedInPlayer.Id.ToString();
                 SetListEditModel();
                 
                 StateHasChanged();

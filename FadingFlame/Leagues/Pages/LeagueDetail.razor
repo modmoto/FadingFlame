@@ -7,7 +7,7 @@
 @using FadingFlame.Matchups
 
 @inject NavigationManager _navigation
-@inject UserState _userState
+@inject LoggedInUserState _loggedInUserState
 
 
 @if (_league == null)
@@ -42,7 +42,7 @@ else
                 <td>@item.value.BattlePoints</td>
                 <td>@item.value.VictoryPoints</td>
                 <td @onclick:stopPropagation="true">
-                    @if (_userState.UserIsAdmin)
+                    @if (_loggedInUserState.UserIsAdmin)
                     {
                         <div style="display: flex; flex-direction: row; max-width: 400px">
                             @if (item.value.Id == ObjectId.Empty)
@@ -207,7 +207,7 @@ else
 
     protected override void OnInitialized()
     {
-        _userState.UserLoggedIn += (_, _) => StateHasChanged();
+        _loggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
@@ -263,7 +263,7 @@ else
 
     private bool UserIsOneOfThePlayers(Matchup matchup)
     {
-        return _userState.LoggedInPlayer.Id == matchup.Player1 || _userState.LoggedInPlayer.Id == matchup.Player2;
+        return _loggedInUserState.LoggedInPlayer.Id == matchup.Player1 || _loggedInUserState.LoggedInPlayer.Id == matchup.Player2;
     }
 
     private string GetOriginalPointsString(MatchResult result)

@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Http;
 
 namespace FadingFlame.Players
 {
-    public class UserState
+    public class LoggedInUserState
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserState(IHttpContextAccessor httpContextAccessor)
+        public LoggedInUserState(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }

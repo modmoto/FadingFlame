@@ -16,6 +16,7 @@ namespace FadingFlame.Leagues
         Task DeleteForSeason(int season);
         Task Update(League league);
         Task<List<League>> LoadLeaguesForPlayer(ObjectId playerId);
+        Task<League> LoadLeagueForPlayerInSeason(ObjectId playerId, int season);
     }
 
     public class LeagueRepository : MongoDbRepositoryBase, ILeagueRepository
@@ -48,6 +49,15 @@ namespace FadingFlame.Leagues
         public async Task<League> Load(ObjectId id)
         {
             var league = await LoadFirst<League>(id);
+            await AddMatches(league);
+
+            return league;
+        }
+
+        private async Task AddMatches(League league)
+        {
+            if (league == null) return;
+            
             var matchIds = league.GameDays.SelectMany(g => g.MatchupIds);
             var matches = await _matchupRepository.LoadMatches(matchIds.ToList());
 
@@ -56,8 +66,6 @@ namespace FadingFlame.Leagues
                 var matchesInGameDay = matches.Where(m => gameDay.MatchupIds.Contains(m.Id)).ToList();
                 gameDay.Matchups = matchesInGameDay;
             }
-
-            return league;
         }
 
         public async Task Insert(List<League> newLeagues)
@@ -85,6 +93,13 @@ namespace FadingFlame.Leagues
         public Task<List<League>> LoadLeaguesForPlayer(ObjectId playerId)
         {
             return LoadAll<League>(l => l.Players.Any(r => r.Id == playerId));
+        }
+
+        public async Task<League> LoadLeagueForPlayerInSeason(ObjectId playerId, int season)
+        {
+            var league = await LoadFirst<League>(l => l.Players.Any(r => r.Id == playerId) && l.Season == season);
+            await AddMatches(league);
+            return league;
         }
     }
 }

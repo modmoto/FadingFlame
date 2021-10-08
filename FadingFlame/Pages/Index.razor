@@ -3,16 +3,23 @@
 @using FadingFlame.Players
 @using MongoDB.Bson
 @using FadingFlame.Admin
+@using FadingFlame.Matchups
 
 <div>
     <h1>Welcome to the Fading Flame League!</h1>
     <hr class="my-4">
     <p class="lead">The next season starts on @_seasonState.CurrentSeason.StartDate.ToMyDate() and list submission will end on the @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()!</p>
     <hr class="my-4">
-    @if(!_userState.LoadingPlayer && !_userState.LoggedInPlayer.SubmittedLists)
+    @if(!_loggedInUserState.LoadingPlayer && !_loggedInUserState.LoggedInPlayer.SubmittedLists)
     {
         <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
             You did not submit your lists yet, to participate in the next season make sure to do that in your profile!
+        </div>
+    }
+    @if(_upcomingGame != null)
+    {
+        <div class="pt-3 pb-3 alert alert-info text-center cursor" role="alert" @onclick="@(() => _navigation.NavigateTo($"match/{_upcomingGame.Id}?leagueId={_leagueIdForUpcomingDay}"))">
+            Your next game is against @_upcomingOpponenName, open it here
         </div>
     }
 </div>
@@ -47,18 +54,22 @@ else
 @inject ILeagueRepository _leagueRepository
 @inject NavigationManager _navigation
 @inject SeasonState _seasonState
-@inject UserState _userState
+@inject LoggedInUserState _loggedInUserState
+@inject IMatchupRepository _matchupRepository
 
 @code
 {
     private List<League> _leagues = new();
     private bool _loading;
     private List<Player> _playersInLeague = new();
+    private Matchup _upcomingGame;
+    private ObjectId _leagueIdForUpcomingDay;
+    private string _upcomingOpponenName;
 
     protected override void OnInitialized()
     {
         _seasonState.SeasonsChanged += LoadStuff;
-        _userState.UserLoggedIn += (_, _) => StateHasChanged();
+        _loggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
     }
 
     private async void LoadStuff(object sender, EventArgs e)
@@ -72,8 +83,38 @@ else
         _loading = true;
         _leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
         _playersInLeague = await _playerRepository.LoadForLeague(_leagues.SelectMany(l => l.Players).Select(p => p.Id).ToList(), _seasonState.CurrentSeason.SeasonId);
+        if (_loggedInUserState.UserIsLoggedIn)
+        {
+            var playerId = _loggedInUserState.LoggedInPlayer.Id;
+            var loadLeaguesForPlayer = await _leagueRepository.LoadLeagueForPlayerInSeason(playerId, _seasonState.CurrentSeason.SeasonId);
+            if (loadLeaguesForPlayer != null && _playersInLeague.Any())
+            {
+                _leagueIdForUpcomingDay = loadLeaguesForPlayer.Id;
+                _upcomingGame = loadLeaguesForPlayer.GameDays
+                    .Select(g => g.Matchups.First(m => m.Player1 == playerId || m.Player2 == playerId))
+                    .FirstOrDefault(m => !m.IsFinished);
+                if (_upcomingGame != null)
+                {
+                    _upcomingOpponenName = _upcomingGame.Player1 == playerId 
+                        ? GetNameAndDiscordPlayer2() 
+                        : GetNameAndDiscordPlayer1();
+                }
+            }
+        }
         _loading = false;
         StateHasChanged();
+    }
+
+    private string GetNameAndDiscordPlayer2()
+    {
+        var player = _playersInLeague.FirstOrDefault(p => p.Id == _upcomingGame.Player2);
+        return $"{player?.DisplayName} / {player?.DiscordTag}";
+    }
+    
+    private string GetNameAndDiscordPlayer1()
+    {
+        var player = _playersInLeague.FirstOrDefault(p => p.Id == _upcomingGame.Player1);
+        return $"{player?.DisplayName} / {player?.DiscordTag}";
     }
 
     private string GetName(ObjectId playerId)

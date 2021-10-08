@@ -16,7 +16,7 @@
             </NavLink>
             <AuthorizeView>
                 <Authorized>
-                    <span><a href="@($"/player/{_userState.LoggedInPlayer.Id}")">My profile</a></span>
+                    <span><a href="@($"/player/{_loggedInUserState.LoggedInPlayer.Id}")">My profile</a></span>
                     <a href="/Logout">
                         <span class="oi oi-account-logout" aria-hidden="true"></span>
                     </a>
@@ -39,7 +39,7 @@
 </div>
 
 @inject IPlayerRepository _playerRepository
-@inject UserState _userState
+@inject LoggedInUserState _loggedInUserState
 @inject SeasonState _seasonState
 @inject IHttpContextAccessor _httpContextAccessor
 @inject ISeasonRepository _seasonRepository
@@ -49,7 +49,7 @@
 {
     protected override void OnInitialized()
     {
-        _userState.UserLoggedIn += (_,_) => StateHasChanged();
+        _loggedInUserState.UserLoggedIn += (_,_) => StateHasChanged();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -57,7 +57,7 @@
         if (firstRender)
         {
             var loggedInUserTime = await _geoLocationService.GetLoggedInUserTime();
-            _userState.SetUserTime(loggedInUserTime);
+            _loggedInUserState.SetUserTime(loggedInUserTime);
             
             StateHasChanged();
         }
@@ -71,12 +71,12 @@
         {
             await httpContext.AuthenticateAsync("Cookies");
             
-            if (_userState.UserIsLoggedIn)
+            if (_loggedInUserState.UserIsLoggedIn)
             {
-                var player = await _playerRepository.LoadByEmail(_userState.AccountEmail);
+                var player = await _playerRepository.LoadByEmail(_loggedInUserState.AccountEmail);
                 if (player == null)
                 {
-                    player = Player.Create(_userState.UserName, _userState.AccountEmail);
+                    player = Player.Create(_loggedInUserState.UserName, _loggedInUserState.AccountEmail);
                     await _playerRepository.Insert(player);
                 }
                 
@@ -93,7 +93,7 @@
                     }
                 });
 
-                _userState.SetUserData(player);
+                _loggedInUserState.SetUserData(player);
             }
         }
         

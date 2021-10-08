@@ -95,7 +95,7 @@ else
 @inject ILeagueRepository _leagueRepository
 @inject IPlayerRepository _playerRepository
 @inject NavigationManager _navigation
-@inject UserState _userState
+@inject LoggedInUserState _loggedInUserState
 @inject SeasonState _seasonState
 
 @code {
@@ -109,7 +109,7 @@ else
 
     protected override void OnInitialized()
     {
-        _userState.UserLoggedIn += (_, _) => StateHasChanged();
+        _loggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
         _seasonState.SeasonsChanged += LoadStuff;
     }
 

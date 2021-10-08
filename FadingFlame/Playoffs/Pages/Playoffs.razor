@@ -7,7 +7,7 @@
 @inject IPlayoffRepository _playoffRepository
 @inject IPlayerRepository _playerRepository
 @inject NavigationManager _navigation
-@inject UserState _userState
+@inject LoggedInUserState _loggedInUserState
 @inject SeasonState _seasonState
 
 
@@ -89,7 +89,7 @@ else
 
     private bool UserIsOneOfThePlayers(Matchup matchup)
     {
-        return _userState.LoggedInPlayer.Id == matchup.Player1 || _userState.LoggedInPlayer.Id == matchup.Player2;
+        return _loggedInUserState.LoggedInPlayer.Id == matchup.Player1 || _loggedInUserState.LoggedInPlayer.Id == matchup.Player2;
     }
     
     private string GetName(ObjectId playerId)

@@ -5,7 +5,7 @@
 @using FadingFlame.Players
 @using FadingFlame.Playoffs
 
-@if (_userState.UserIsAdmin)
+@if (_loggedInUserState.UserIsAdmin)
 {
     <nav>
         <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -192,7 +192,7 @@
     </div>
 }
 
-@inject UserState _userState
+@inject LoggedInUserState _loggedInUserState
 @inject IPlayoffCommandHandler _playoffCommandHandler
 @inject IPlayerRepository _playerRepository
 @inject ILeagueRepository _leagueRepository
@@ -216,7 +216,7 @@
 
     protected override void OnInitialized()
     {
-        _userState.UserLoggedIn += (_, _) => StateHasChanged();
+        _loggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
