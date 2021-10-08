@@ -1,0 +1,143 @@
+﻿@page "/matches"
+@using MongoDB.Bson
+@using FadingFlame.Leagues
+@using FadingFlame.Players
+@using FadingFlame.Admin
+@using FadingFlame.Lists
+@using FadingFlame.Matchups
+
+<div>
+    <h1>Match Overview</h1>
+    <hr class="my-4">
+</div>
+<table class="table">
+    <thead>
+    <tr>
+        <th>League</th>
+        <th>Player 1</th>
+        <th>Player 2</th>
+        <th>Result</th>
+    </tr>
+    </thead>
+    <tbody class="league">
+    @foreach (var item in _selectedGameDays)
+    {
+        @foreach (var match in item.Matchups)
+        {
+            <tr @onclick="() => GoToMatch(match)" class="cursor">
+                <td>@GetLeague(match).DivisionId</td>
+                <td>@GetName(match.Player1) @ListName1(match)</td>
+                <td>@GetName(match.Player2) @ListName2(match)</td>
+                <td>@GetResult(match)</td>
+            </tr>
+        }
+    }
+    </tbody>
+</table>    
+
+@inject ILeagueRepository _leagueRepository
+@inject IPlayerRepository _playerRepository
+@inject NavigationManager _navigation
+@inject UserState _userState
+@inject SeasonState _seasonState
+
+@code {
+    [Parameter]
+    public string LeagueId { get; set; }
+    
+    private int _activeDay;
+    private List<League> _leagues = new();
+    private List<GameDay> _selectedGameDays = new();
+    private List<Player> _playersInSeason = new();
+
+    protected override void OnInitialized()
+    {
+        _userState.UserLoggedIn += (_, _) => StateHasChanged();
+        _seasonState.SeasonsChanged += LoadStuff;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
+        var playerIds = _leagues.SelectMany(l => l.Players.Select(p => p.Id)).ToList();
+        _playersInSeason = await _playerRepository.LoadForLeague(playerIds, _seasonState.CurrentSeason.SeasonId);
+        
+        var now = DateTime.UtcNow;
+
+        if (_leagues.Any())
+        {
+            var league = _leagues.First();
+            for (var i = 0; i < league.GameDays.Count; i++)
+            {
+                if (now < league.GameDays[i].EndDate)
+                {
+                    _activeDay = i;
+                    SelectGameDay(_activeDay);
+                    StateHasChanged();
+
+                    break;
+                }
+            }    
+        }
+    }
+
+    private async void LoadStuff(object sender, EventArgs eventArgs)
+    {
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
+
+    private void SelectGameDay(int id)
+    {
+        _activeDay = id;
+        _selectedGameDays = _leagues.Select(l => l.GameDays[id]).ToList();
+        StateHasChanged();
+    }
+
+    private string GetName(ObjectId playerId)
+    {
+        return _playersInSeason.FirstOrDefault(p => p.Id == playerId)?.DisplayName;
+    }
+    
+    private string ListName1(Matchup match)
+    {
+        return match.PlayersSelectedList ? $"({GetRace1(match)})" : "";
+    }
+    
+    private string ListName2(Matchup match)
+    {
+        return match.PlayersSelectedList ? $"({GetRace2(match)})" : "";
+    }
+
+    private string GetRace1(Matchup match)
+    {
+        var player = _playersInSeason.First(p => p.Id == match.Player1);
+        return match.Player1List == player.ArmyCurrentSeason.List1.Name ? player.ArmyCurrentSeason.List1.Faction.ToCamelCaseString() : player.ArmyCurrentSeason.List2.Faction.ToCamelCaseString();
+    }
+    
+    private string GetRace2(Matchup match)
+    {
+        var player = _playersInSeason.First(p => p.Id == match.Player2);
+        return match.Player2List == player.ArmyCurrentSeason.List1.Name ? player.ArmyCurrentSeason.List1.Faction.ToCamelCaseString() : player.ArmyCurrentSeason.List2.Faction.ToCamelCaseString();
+    }
+
+    private string GetResult(Matchup match)
+    {
+        var result = match.Result;
+        if (result == null) return "";
+
+        return $"{result.Player1.BattlePoints} : {result.Player2.BattlePoints}";
+    }
+
+    private League GetLeague(Matchup match)
+    {
+        return _leagues.First(l => l.GameDays.SelectMany(g => g.MatchupIds).Contains(match.Id));
+    }
+
+    private void GoToMatch(Matchup match)
+    {
+        var league = GetLeague(match);
+        _navigation.NavigateTo($"match/{match.Id}?leagueId={league.Id}");
+    }
+
+}

@@ -27,9 +27,22 @@ namespace FadingFlame.Leagues
             _matchupRepository = matchupRepository;
         }
 
-        public Task<List<League>> LoadForSeason(int season)
+        public async Task<List<League>> LoadForSeason(int season)
         {
-            return LoadAll<League>(l => l.Season == season);
+            var leagues = await LoadAll<League>(l => l.Season == season);
+            var matchIds = leagues.SelectMany(l => l.GameDays.SelectMany(g => g.MatchupIds));
+            var matches = await _matchupRepository.LoadMatches(matchIds.ToList());
+
+            foreach (var league in leagues)
+            {
+                foreach (var gameDay in league.GameDays)
+                {
+                    var matchesInGameDay = matches.Where(m => gameDay.MatchupIds.Contains(m.Id)).ToList();
+                    gameDay.Matchups = matchesInGameDay;
+                }
+            }
+            
+            return leagues;
         }
 
         public async Task<League> Load(ObjectId id)

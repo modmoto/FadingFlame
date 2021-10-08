@@ -57,11 +57,11 @@ else
 
     protected override void OnInitialized()
     {
-        _seasonState.SeasonsChanged += OnInitializedAsync;
+        _seasonState.SeasonsChanged += LoadStuff;
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
     }
 
-    private async void OnInitializedAsync(object sender, EventArgs e)
+    private async void LoadStuff(object sender, EventArgs e)
     {
         await OnInitializedAsync();
         StateHasChanged();
