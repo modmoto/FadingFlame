@@ -101,13 +101,12 @@ else
         </tbody>
     </table>    
     
-    
     <div>
         <h2>Gamedays</h2>
         <hr class="my-4">
     </div>
     
-    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <ul class="nav nav-pills mb-3" id="gameday-league-tab" role="tablist">
         @foreach (var gameDay in _league.GameDays.Select((value, index) => new { value, index }))
         {
             <li class="nav-item" role="presentation">
@@ -115,14 +114,14 @@ else
                 {
                     <button
                         class="nav-link active"
-                        id="pills-home-tab"
-                        data-bs-toggle="pill"
-                        data-bs-target="#pills-home"
+                        id="@("game-day-" + gameDay.index + 1)"
+                        data-bs-toggle="tab"
+                        data-bs-target="@("#game-day-" + gameDay.index + 1)"
                         type="button"
                         role="tab"
-                        aria-controls="pills-home"
-                        aria-selected="true"
+                        aria-controls="home"
                         @onclick="() => SelectGameDay(gameDay.index)"
+                        aria-selected="true"
                     >
                         @(gameDay.index + 1)
                     </button>
@@ -131,14 +130,14 @@ else
                 {
                     <button
                         class="nav-link"
-                        id="pills-home-tab"
-                        data-bs-toggle="pill"
-                        data-bs-target="#pills-home"
+                        id="@("game-day-" + gameDay.index + 1)"
+                        data-bs-toggle="tab"
+                        data-bs-target="@("#game-day-" + gameDay.index + 1)"
                         type="button"
                         role="tab"
-                        aria-controls="pills-home"
-                        aria-selected="true"
+                        aria-controls="home"
                         @onclick="() => SelectGameDay(gameDay.index)"
+                        aria-selected="true"
                     >
                         @(gameDay.index + 1)
                     </button>
@@ -146,6 +145,40 @@ else
             </li>
         }
     </ul>
+    <div class="tab-content" id="gameday-league-tabContent"> 
+        @foreach (var gameDay in _league.GameDays.Select((value, index) => new {value, index}))
+        {
+            <div class="@GetActiveOrNot(gameDay.index)" id="@("game-day-league-" + gameDay.index + 1)" role="tabpanel" aria-labelledby="@("#game-day-league-" + gameDay.index + 1)">
+                <div class="lead mb-3">@gameDay.value.StartDate.ToMyDate() - @gameDay.value.EndDate.ToMyDate()  —  @gameDay.value.Deployment.ToCamelCaseString() with @gameDay.value.SecondaryObjective.ToCamelCaseString()</div>
+                <div class="row row-cols-auto justify-content-around">
+                    @foreach (var matchup in gameDay.value.Matchups)
+                    {
+                        <div class="col pb-4">
+                            <div class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)" style="width: 24rem;">
+                                <div class="card-header">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">@(GetName(matchup.Player1)) vs @(GetName(matchup.Player2))</h5>
+                                        <small>@matchup.Result?.RecordedAt.ToMyDate()</small>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    @if (matchup.Result != null)
+                                    {
+                                        <p class="mb-1">@matchup.Result.Player1.BattlePoints : @matchup.Result.Player2.BattlePoints</p>
+                                        <small>@GetOriginalPointsString(matchup.Result)</small>
+                                    }
+                                    else
+                                    {
+                                        <p class="mb-1">not reported yet</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
     <div class="tab-content" id="pills-tabContent">
         @foreach (var gameDay in _league.GameDays.Select((value, index) => new {value, index}))
         {
@@ -228,6 +261,11 @@ else
                 }
             }
         }
+    }
+    
+    private string GetActiveOrNot(int index)
+    {
+        return index == _activeDay ? "tab-pane fade show active" : "tab-pane fade";
     }
 
     private void GoToPlayer(ObjectId playerId)

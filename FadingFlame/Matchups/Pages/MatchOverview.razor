@@ -57,7 +57,7 @@ else
         </li>
     }
 </ul>
-<div class="tab-content" id="gameday-overview-tab"> 
+<div class="tab-content" id="gameday-overview-tabContent"> 
     @foreach (var gameDay in _leagues.First().GameDays.Select((value, index) => new {value, index}))
     {
         <div class="@GetActiveOrNot(gameDay.index)" id="@("game-day-" + gameDay.index + 1)" role="tabpanel" aria-labelledby="@("#game-day-" + gameDay.index + 1)">
