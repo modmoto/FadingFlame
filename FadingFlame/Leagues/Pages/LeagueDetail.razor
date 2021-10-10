@@ -179,48 +179,6 @@ else
             </div>
         }
     </div>
-    <div class="tab-content" id="pills-tabContent">
-        @foreach (var gameDay in _league.GameDays.Select((value, index) => new {value, index}))
-        {
-            @if (_activeDay == gameDay.index)
-            {
-                <div class="lead mb-3">@gameDay.value.StartDate.ToMyDate() - @gameDay.value.EndDate.ToMyDate()  —  @gameDay.value.Deployment.ToCamelCaseString() with @gameDay.value.SecondaryObjective.ToCamelCaseString()</div>
-                <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                    <div class="row row-cols-auto justify-content-around">
-                        @foreach (var matchup in gameDay.value.Matchups)
-                        {
-                            <div class="col pb-4" >
-                                <div class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)" style="width: 24rem;">
-                                    <div class="card-header">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1">@(GetName(matchup.Player1)) vs @(GetName(matchup.Player2))</h5>
-                                            <small>@matchup.Result?.RecordedAt.ToMyDate()</small>
-                                        </div>
-                                    </div>
-                                    <div class="card-body">
-                                        @if (matchup.Result != null)
-                                        {
-                                            <p class="mb-1">@matchup.Result.Player1.BattlePoints : @matchup.Result.Player2.BattlePoints</p>
-                                            <small>@GetOriginalPointsString(matchup.Result)</small>
-                                        }
-                                        else
-                                        {
-                                            <p class="mb-1">not reported yet</p>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="tab-pane fade" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                </div>
-            }
-        }
-    </div>
 }
 
 @inject ILeagueRepository _leagueRepository
