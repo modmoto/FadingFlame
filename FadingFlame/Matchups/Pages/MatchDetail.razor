@@ -43,7 +43,7 @@ else
             <DataAnnotationsValidator/>
             <div class="row align-items-start mt-3">
                 <div class="col form-group">
-                    <label>Victory Points @Player1Name :</label>
+                    <label>Victory Points @Player1Name (0-5100):</label>
                     <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control my-3"/>
                     <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
                     <div class="form-check">
@@ -54,7 +54,7 @@ else
                     </div>
                 </div>
                 <div class="col form-group">
-                    <label>Victory Points @_player2?.DisplayName :</label>
+                    <label>Victory Points @_player2?.DisplayName (0-5100):</label>
                     <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control my-3"/>
                     <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
                     <div class="form-check">
