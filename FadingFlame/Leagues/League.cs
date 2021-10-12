@@ -175,9 +175,10 @@ namespace FadingFlame.Leagues
             match.DeleteResult();
         }
 
-        private void ReorderPlayers()
+        public void ReorderPlayers()
         {
-            Players = Players.OrderByDescending(p => p.BattlePoints + p.PenaltyPoints).ThenByDescending(p => p.VictoryPoints).ToList();
+            var comparer = new PlayerComparer(this);
+            Players = Players.OrderBy(c => c, comparer).ToList();
         }
 
         public void ReplaceDummyPlayer(ObjectId playerId)
@@ -191,6 +192,39 @@ namespace FadingFlame.Leagues
             {
                 GameDays[i].SetScenarioAndDeployments(secondaryObjectives[i], deployments[i]);
             }
+        }
+    }
+
+    public class PlayerComparer : IComparer<PlayerInLeague>
+    {
+        private readonly League _league;
+
+        public PlayerComparer(League league)
+        {
+            _league = league;
+        }
+
+        public int Compare(PlayerInLeague a, PlayerInLeague b)
+        {
+            if (a != null && b != null)
+            {
+                if (a.BattlePoints != b.BattlePoints)
+                {
+                    return b.BattlePoints - a.BattlePoints;
+                }
+
+                var gameBetweenPlayers = _league.GameDays
+                    .SelectMany(g => g.Matchups)
+                    .FirstOrDefault(m => m.Player1 == a.Id && m.Player2 == b.Id || m.Player2 == a.Id && m.Player1 == b.Id);
+                if (gameBetweenPlayers?.IsFinished == true)
+                {
+                    return gameBetweenPlayers.Result.Winner == a.Id ? -1 : 1;
+                }
+
+                return b.VictoryPoints - a.VictoryPoints;
+            }
+
+            return 0;
         }
     }
 }

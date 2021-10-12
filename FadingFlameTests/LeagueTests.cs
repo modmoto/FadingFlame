@@ -26,7 +26,6 @@ namespace FadingFlameTests
             league.Players.Should().Contain(p => p.Id == player.Id);
         }
 
-        [TestCase(0, 0, 10, 10)]
         [TestCase(1, 0, 10, 10)]
         [TestCase(225, 0, 10, 10)]
         [TestCase(226, 0, 11, 9)]
@@ -86,6 +85,8 @@ namespace FadingFlameTests
             league.Players[1].BattlePoints.Should().Be(expectedPoints2);
         }
 
+
+        [TestCase(0, 0, 10, 10)]
         [TestCase(0, 1, 10, 10)]
         [TestCase(0, 225, 10, 10)]
         [TestCase(0, 226, 9, 11)]
@@ -304,7 +305,86 @@ namespace FadingFlameTests
             league.Players[0].GamesCount.Should().Be(0);
             league.Players[1].GamesCount.Should().Be(0);
         }
-        
+
+        [Test]
+        public void ListComparerBattlePoints()
+        {
+            var league = CreateLeagueToOrder();
+
+            league.Players[1].BattlePoints = 7;
+
+            league.ReorderPlayers();
+
+            Assert.AreEqual(7, league.Players[0].BattlePoints);
+        }
+
+        [Test]
+        public void ListComparerVictoryPoints()
+        {
+            var league = CreateLeagueToOrder();
+
+            league.Players[1].VictoryPoints = 7;
+
+            league.ReorderPlayers();
+
+            Assert.AreEqual(7, league.Players[0].VictoryPoints);
+        }
+
+        [Test]
+        public void ListComparerDirectComComparison()
+        {
+            var league = CreateLeagueToOrder();
+
+            league.Players[0].BattlePoints = 20;
+            league.Players[1].BattlePoints = 0;
+
+            var id1 = league.Players[0].Id;
+            var id2 = league.Players[1].Id;
+            var result = new MatchResultDto
+            {
+                MatchId = league.GameDays[2].Matchups[0].Id,
+                SecondaryObjective = SecondaryObjectiveState.player2,
+                Player1 = new PlayerResultDto
+                {
+                    Id = id1,
+                    VictoryPoints = 0
+                },
+                Player2 = new PlayerResultDto
+                {
+                    Id = id2,
+                    VictoryPoints = 4000
+                }
+            };
+
+            league.ReportGame(result);
+
+            Assert.AreEqual(20, league.Players[0].BattlePoints);
+            Assert.AreEqual(20, league.Players[1].BattlePoints);
+            Assert.AreEqual(id2, league.Players[0].Id);
+            Assert.AreEqual(id1, league.Players[1].Id);
+        }
+
+        private static League CreateLeagueToOrder()
+        {
+            var league = new League();
+
+            var player1 = Player.Create("peter", "1");
+            player1.Id = ObjectId.GenerateNewId();
+            var player2 = Player.Create("wolf", "2");
+            player2.Id = ObjectId.GenerateNewId();
+            var player3 = Player.Create("dude", "3");
+            player3.Id = ObjectId.GenerateNewId();
+            var player4 = Player.Create("test", "4");
+            player4.Id = ObjectId.GenerateNewId();
+
+            league.AddPlayer(player4);
+            league.AddPlayer(player3);
+            league.AddPlayer(player2);
+            league.AddPlayer(player1);
+            league.CreateGameDays();
+            return league;
+        }
+
         [Test]
         public void AssertMethodTest_HappyPath()
         {
