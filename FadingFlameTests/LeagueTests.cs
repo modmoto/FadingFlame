@@ -26,6 +26,125 @@ namespace FadingFlameTests
             league.Players.Should().Contain(p => p.Id == player.Id);
         }
 
+        [TestCase(0, 0, 10, 10)]
+        [TestCase(1, 0, 10, 10)]
+        [TestCase(225, 0, 10, 10)]
+        [TestCase(226, 0, 11, 9)]
+        [TestCase(450, 0, 11, 9)]
+        [TestCase(451, 0, 12, 8)]
+        [TestCase(900, 0, 12, 8)]
+        [TestCase(901, 0, 13, 7)]
+        [TestCase(1350, 0, 13, 7)]
+        [TestCase(1351, 0, 14, 6)]
+        [TestCase(1800, 0, 14, 6)]
+        [TestCase(1801, 0, 15, 5)]
+        [TestCase(2250, 0, 15, 5)]
+        [TestCase(2251, 0, 16, 4)]
+        [TestCase(3150, 0, 16, 4)]
+        [TestCase(3151, 0, 17, 3)]
+        [TestCase(5100, 0, 17, 3)]
+        [TestCase(5101, 0, 17, 3)]
+        public void ShouldCalculateResult_DrawInSecondObjectiveOneWins(
+            int player1Points,
+            int player2Points,
+            int exectedoints1,
+            int expectedPoints2)
+        {
+            var league = new League();
+
+            var player1 = Player.Create("peter", "213");
+            player1.Id = ObjectId.GenerateNewId();
+            var player2 = Player.Create("wolf", "213");
+            player2.Id = ObjectId.GenerateNewId();
+
+            league.AddPlayer(player1);
+            league.AddPlayer(player2);
+            league.CreateGameDays();
+
+            var result = new MatchResultDto
+            {
+                MatchId = league.GameDays.First().Matchups.First().Id,
+                SecondaryObjective = SecondaryObjectiveState.draw,
+                Player1 = new PlayerResultDto
+                {
+                    Id = player1.Id,
+                    VictoryPoints = player1Points
+                },
+                Player2 = new PlayerResultDto
+                {
+                    Id = player2.Id,
+                    VictoryPoints = player2Points
+                }
+            };
+
+            league.ReportGame(result);
+
+            league.Players[0].Id.Should().Be(player1.Id);
+            league.Players[1].Id.Should().Be(player2.Id);
+
+            league.Players[0].BattlePoints.Should().Be(exectedoints1);
+            league.Players[1].BattlePoints.Should().Be(expectedPoints2);
+        }
+
+        [TestCase(0, 1, 10, 10)]
+        [TestCase(0, 225, 10, 10)]
+        [TestCase(0, 226, 9, 11)]
+        [TestCase(0, 450, 9, 11)]
+        [TestCase(0, 451, 8, 12)]
+        [TestCase(0, 900, 8, 12)]
+        [TestCase(0, 901, 7, 13)]
+        [TestCase(0, 1350, 7, 13)]
+        [TestCase(0, 1351, 6, 14)]
+        [TestCase(0, 1800, 6, 14)]
+        [TestCase(0, 1801, 5, 15)]
+        [TestCase(0, 2250, 5, 15)]
+        [TestCase(0, 2251, 4, 16)]
+        [TestCase(0, 3150, 4, 16)]
+        [TestCase(0, 3151, 3, 17)]
+        [TestCase(0, 5100, 3, 17)]
+        [TestCase(0, 5101, 3, 17)]
+        public void ShouldCalculateResult_DrawInSecondObjectiveTwoWins(
+            int player1Points,
+            int player2Points,
+            int exectedoints1,
+            int expectedPoints2)
+        {
+            var league = new League();
+
+            var player1 = Player.Create("peter", "213");
+            player1.Id = ObjectId.GenerateNewId();
+            var player2 = Player.Create("wolf", "213");
+            player2.Id = ObjectId.GenerateNewId();
+
+            league.AddPlayer(player1);
+            league.AddPlayer(player2);
+            league.CreateGameDays();
+
+            var result = new MatchResultDto
+            {
+                MatchId = league.GameDays.First().Matchups.First().Id,
+                SecondaryObjective = SecondaryObjectiveState.draw,
+                Player1 = new PlayerResultDto
+                {
+                    Id = player1.Id,
+                    VictoryPoints = player1Points
+                },
+                Player2 = new PlayerResultDto
+                {
+                    Id = player2.Id,
+                    VictoryPoints = player2Points
+                }
+            };
+
+            league.ReportGame(result);
+
+            league.Players[1].Id.Should().Be(player1.Id);
+            league.Players[0].Id.Should().Be(player2.Id);
+
+            league.Players[1].BattlePoints.Should().Be(exectedoints1);
+            league.Players[0].BattlePoints.Should().Be(expectedPoints2);
+        }
+
         [TestCase(1000, 1000, 13, 7)]
         [TestCase(1225, 1000, 13, 7)]
         [TestCase(1226, 1000, 14, 6)]
