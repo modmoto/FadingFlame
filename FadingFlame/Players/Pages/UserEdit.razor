@@ -350,10 +350,10 @@
 
     private int GetRank(League league)
     {
-        return league.Players
+        return (league.Players
             .Select((value, index) => new { value, index })
             .SingleOrDefault(x => x.value.Id == new ObjectId(Id))
-            ?.index ?? 0 + 1;
+            ?.index ?? 0) + 1;
     }
 
     private bool UserParticipatesInCurrentSeason()
