@@ -127,7 +127,7 @@ namespace FadingFlame.Discord
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // ignored, dont care
             }

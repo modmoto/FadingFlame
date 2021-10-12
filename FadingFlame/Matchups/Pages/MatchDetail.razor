@@ -20,7 +20,7 @@ else
         VS
         <span class="cursor" @onclick="() => GoToPlayer(_player2)">@Player2Name</span>
     </h1>
-    if (CanEditMatch && MatchWasRecordedLessThanADayAgo || _loggedInUserState.UserIsAdmin)
+    if (CanEditMatch && MatchWasRecordedLessThanADayAgo || _userState.UserIsAdmin)
     {
         if (_matchup.PlayersSelectedList)
         {
@@ -43,7 +43,7 @@ else
             <DataAnnotationsValidator/>
             <div class="row align-items-start mt-3">
                 <div class="col form-group">
-                    <label>Victory Points @Player1Name (0-5100):</label>
+                    <label>Victory Points @Player1Name :</label>
                     <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control my-3"/>
                     <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
                     <div class="form-check">
@@ -54,7 +54,7 @@ else
                     </div>
                 </div>
                 <div class="col form-group">
-                    <label>Victory Points @_player2?.DisplayName (0-5100):</label>
+                    <label>Victory Points @_player2?.DisplayName :</label>
                     <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control my-3"/>
                     <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
                     <div class="form-check">
@@ -77,14 +77,7 @@ else
                 }
                 else
                 {
-                    if (_loggedInUserState.UserIsAdmin)
-                    {
-                        <span>Edit Result</span>
-                    }
-                    else
-                    {
-                        <span>Edit Result (can still be edited for @((DateTime.UtcNow.AddDays(-1) - _matchup.Result.RecordedAt).ToString(@"hh\:mm"))h)</span>    
-                    }
+                    <span>Edit Result</span>
                 }
             </button>
             </EditForm>
@@ -224,7 +217,7 @@ else
 @inject ILeagueRepository _leagueRepository
 @inject IPlayerRepository _playerRepository
 @inject IPlayoffRepository _playoffRepository
-@inject LoggedInUserState _loggedInUserState
+@inject LoggedInUserState _userState
 @inject MmrRepository _mmrRepository
 
 @code {
@@ -245,14 +238,14 @@ else
     private string _selectedListAsString;
     private bool _selectingList;
     private Playoff _playoff;
-    private bool Player1LoggedIn => _model.Player1.Id == _loggedInUserState.LoggedInPlayer.Id;
-    private bool Player2LoggedIn =>_model.Player2?.Id == _loggedInUserState.LoggedInPlayer.Id;
+    private bool Player1LoggedIn => _model.Player1.Id == _userState.LoggedInPlayer.Id;
+    private bool Player2LoggedIn =>_model.Player2?.Id == _userState.LoggedInPlayer.Id;
     private bool CanEditMatch => Player1LoggedIn || Player2LoggedIn;
     public bool MatchWasRecordedLessThanADayAgo => _matchup.Result == null || DateTime.UtcNow.AddDays(-1) < _matchup.Result.RecordedAt;
-
+    
     protected override void OnInitialized()
     {
-        _loggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
+        _userState.UserLoggedIn += (_, _) => StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()

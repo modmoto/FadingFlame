@@ -316,7 +316,7 @@
         StateHasChanged();
     }
     
-    private Player? GetPlayer(Army player)
+    private Player GetPlayer(Army player)
     {
         return _playersWithList.FirstOrDefault(p => p.ArmyIdCurrentSeason == player.Id);
     }
