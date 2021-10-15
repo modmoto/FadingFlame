@@ -1,23 +1,26 @@
-@if (_openEditMask || !IsListSubmissionOver && IsCurrentUser)
+@if (IsCurrentUser)
 {
-    if (_openEditMask)
+    if (IsFreshListPossible)
     {
-        <button class="btn btn-primary mb-3" @onclick="OnSave">
-            Save request
-        </button>
-        <button class="btn btn-outline-danger mb-3" @onclick="OnDelete">
-            Delete request
-        </button>
-        <button class="btn btn-secondary mb-3" @onclick="() => _openEditMask = false">
-            Close
-        </button>    
+        <FreshListComponent List="List" />
     }
-    <EditListComponent List="List" EditProposedListChange="_openEditMask"/>
-}
-else
-{
-    @if (IsCurrentUser)
+    else
     {
+        if (_openEditMask)
+        {
+            <button class="btn btn-primary mb-3" @onclick="OnSaveRequest">
+                Save request
+            </button>
+            <button class="btn btn-outline-danger mb-3" @onclick="OnDeleteRequest">
+                Delete request
+            </button>
+            <button class="btn btn-secondary mb-3" @onclick="() => _openEditMask = false">
+                Close
+            </button>    
+            <EditListComponent List="List" />
+        }
+        else
+        {
             @if (List.ProposedListChange != null)
             {
                 <button class="btn btn-outline-warning mb-3" @onclick="() => _openEditMask = true">
@@ -30,7 +33,13 @@ else
                     <span>Request list change</span>
                 </button>
             }
+            
+            <ReadOnlyListView List="List"/>
+        }
     }
+}
+else
+{
     <ReadOnlyListView List="List"/>
 }
 
@@ -40,21 +49,21 @@ else
     [Parameter]
     public bool IsCurrentUser { get; set; }
     [Parameter]
-    public bool IsListSubmissionOver { get; set; }
+    public bool IsFreshListPossible { get; set; }
     [Parameter] 
     public EventCallback OnRequestListChange { get; set; }
     [Parameter] 
     public EventCallback OnDeleteListChange { get; set; }
     private bool _openEditMask;
 
-    private async void OnSave()
+    private async void OnSaveRequest()
     {
         await OnRequestListChange.InvokeAsync();
         _openEditMask = false;
         StateHasChanged();
     }
     
-    private async void OnDelete()
+    private async void OnDeleteRequest()
     {
         await OnDeleteListChange.InvokeAsync();
         _openEditMask = false;

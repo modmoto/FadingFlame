@@ -102,7 +102,8 @@
             </div>
         }
         @if (_player.SubmittedLists && _seasonState.CurrentSeason.ListSubmissionIsOver 
-             || !_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser)
+             || !_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser
+             || _isFreshListPossible)
         {
             <h4>Lists this season</h4>
             <hr class="my-3">
@@ -113,7 +114,7 @@
                     <ValidationMessage For="@(() => _editListModel.List1.List)"/>
                     <UserListComponent
                         List="@(_editListModel.List1)"
-                        IsListSubmissionOver="_seasonState.CurrentSeason.ListSubmissionIsOver"
+                        IsFreshListPossible="_isFreshListPossible"
                         IsCurrentUser="_isTheRightUser"
                         OnRequestListChange="RequestListChange1"
                         OnDeleteListChange="DeleteListChange1"/>
@@ -122,13 +123,13 @@
                     <ValidationMessage For="@(() => _editListModel.List2.List)"/>
                     <UserListComponent
                         List="@(_editListModel.List2)"
-                        IsListSubmissionOver="_seasonState.CurrentSeason.ListSubmissionIsOver"
+                        IsFreshListPossible="_isFreshListPossible"
                         IsCurrentUser="_isTheRightUser"
                         OnRequestListChange="RequestListChange2"
                         OnDeleteListChange="DeleteListChange2"/>
                 </div>
             </div>
-            @if (!_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser)
+            @if (_isFreshListPossible)
             {
                 <button disabled="@_loadingLists" class="btn btn-primary" @onclick="OnSubmitList">
                     @if (_loadingLists)
@@ -186,6 +187,7 @@
     private EditContext _editContextLists;
     private string _regionCss;
     private bool _isTheRightUser;
+    private bool _isFreshListPossible;
 
     protected override void OnInitialized()
     {
@@ -232,6 +234,10 @@
                 _regionCss = SetRegionCss();
                 _isTheRightUser = Id == _loggedInUserState.LoggedInPlayer.Id.ToString();
                 SetListEditModel();
+
+                var userIsLate = (_editListModel.List1.Name == null || _editListModel.List2.Name == null) 
+                                 && _seasonState.CurrentSeason.SeasonId == _playerLeagues.FirstOrDefault()?.Season;
+                _isFreshListPossible = _isTheRightUser && (!_seasonState.CurrentSeason.ListSubmissionIsOver || _seasonState.CurrentSeason.ListSubmissionIsOver && userIsLate);
                 
                 StateHasChanged();
             }
