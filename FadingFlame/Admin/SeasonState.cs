@@ -40,5 +40,15 @@ namespace FadingFlame.Admin
         {
             return time.ToString("dd.MM.");
         }
+        
+        public static string ToMyDateYear(this DateTime time)
+        {
+            return time.ToString("dd.MM.yyyy");
+        }
+        
+        public static string ToMyDateTime(this DateTime time)
+        {
+            return time.ToString("dd.MM. hh:mm");
+        }
     }
 }

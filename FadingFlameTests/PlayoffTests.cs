@@ -59,7 +59,7 @@ namespace FadingFlameTests
                     VictoryPoints = 1200
                 },
                 MatchId = matchup1.Id
-            });
+            }, null, null);
             playoffs.ReportGame(new MatchResultDto
             {
                 Player1 = new PlayerResultDto
@@ -73,7 +73,7 @@ namespace FadingFlameTests
                     VictoryPoints = 1000
                 },
                 MatchId = matchup2.Id
-            });
+            }, null, null);
 
             Assert.AreEqual(2, playoffs.Rounds[0].Matchups.Count);
             Assert.AreEqual(1, playoffs.Rounds[1].Matchups.Count);

@@ -6,6 +6,7 @@
 @using FadingFlame.Playoffs
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.WebUtilities
+@using FadingFlame.Admin
 
 @if (_loading)
 {
@@ -20,6 +21,10 @@ else
         VS
         <span class="cursor" @onclick="() => GoToPlayer(_player2)">@Player2Name</span>
     </h1>
+    @if (_matchup.IsFinished)
+    {
+        <div class="blockquote-footer mt-2">@_matchup.Result.RecordedAt.ToMyDateYear()</div>
+    }
     if (CanEditMatch && MatchWasRecordedLessThanADayAgo || _userState.UserIsAdmin)
     {
         if (_matchup.PlayersSelectedList)
@@ -77,7 +82,7 @@ else
                 }
                 else
                 {
-                    <span>Edit Result</span>
+                    <span>Edit Result (possible until @_matchup.Result.RecordedAt.AddDays(1).ToMyDateTime())</span>
                 }
             </button>
             </EditForm>
@@ -179,21 +184,21 @@ else
             <div class="col">
                 <div class="form-group">
                     <div>List: @_matchup.Player1List</div>
-                    <div><b>@(_player1.ArmyCurrentSeason.List1.Name == _matchup.Player1List ? _player1.ArmyCurrentSeason.List1.Faction.ToCamelCaseString() : _player1.ArmyCurrentSeason.List2.Faction.ToCamelCaseString())</b></div>
+                    <div><b>@(Player1List.Faction.ToCamelCaseString())</b></div>
                 </div>
                 <hr class="my-3">
                 <div class="form-group">
-                    <div style="white-space:pre-wrap;">@(_player1.ArmyCurrentSeason.List1.Name == _matchup.Player1List ? _player1.ArmyCurrentSeason.List1.List : _player1.ArmyCurrentSeason.List2.List)</div>
+                    <div style="white-space:pre-wrap;">@(Player1List.List)</div>
                 </div>
             </div>
             <div class="col">
                 <div class="form-group">
                     <div>List: @_matchup.Player2List</div>
-                    <div><b>@(_player2.ArmyCurrentSeason.List1.Name == _matchup.Player2List ? _player2.ArmyCurrentSeason.List1.Faction.ToCamelCaseString() : _player2.ArmyCurrentSeason.List2.Faction.ToCamelCaseString())</b></div>
+                    <div><b>@(Player2List.Faction.ToCamelCaseString())</b></div>
                 </div>
                 <hr class="my-3">
                 <div class="form-group">
-                    <div style="white-space:pre-wrap;">@(_player2.ArmyCurrentSeason.List1.Name == _matchup.Player2List ? _player2.ArmyCurrentSeason.List1.List : _player2.ArmyCurrentSeason.List2.List)</div>
+                    <div style="white-space:pre-wrap;">@(Player2List.List)</div>
                 </div>
             </div>
         </div>
@@ -241,8 +246,10 @@ else
     private bool Player1LoggedIn => _model.Player1.Id == _userState.LoggedInPlayer.Id;
     private bool Player2LoggedIn =>_model.Player2?.Id == _userState.LoggedInPlayer.Id;
     private bool CanEditMatch => Player1LoggedIn || Player2LoggedIn;
-    public bool MatchWasRecordedLessThanADayAgo => _matchup.Result == null || DateTime.UtcNow.AddDays(-1) < _matchup.Result.RecordedAt;
-    
+    private bool MatchWasRecordedLessThanADayAgo => _matchup.Result == null || DateTime.UtcNow.AddDays(-1) < _matchup.Result.RecordedAt;
+    private GameList Player1List => _matchup.Result?.Player1List ?? (_player1.ArmyCurrentSeason.List1.Name == _matchup.Player1List ? _player1.ArmyCurrentSeason.List1 : _player1.ArmyCurrentSeason.List2);
+    private GameList Player2List => _matchup.Result?.Player2List ?? (_player2.ArmyCurrentSeason.List1.Name == _matchup.Player2List ? _player2.ArmyCurrentSeason.List1 : _player2.ArmyCurrentSeason.List2);
+
     protected override void OnInitialized()
     {
         _userState.UserLoggedIn += (_, _) => StateHasChanged();
@@ -364,13 +371,13 @@ else
         if (_league != null)
         {
             _model.SecondaryObjective = ConvertToEnum();
-            result = _league.ReportGame(_model);
+            result = _league.ReportGame(_model, Player1List, Player2List);
             await _leagueRepository.Update(_league);
         }
         else
         {
             _model.SecondaryObjective = ConvertToEnum();
-            result = _playoff.ReportGame(_model);
+            result = _playoff.ReportGame(_model, Player1List, Player2List);
             await _playoffRepository.Update(_playoff);
         }
 

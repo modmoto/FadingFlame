@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using FadingFlame.Leagues;
+using FadingFlame.Lists;
 using MongoDB.Bson;
 
 namespace FadingFlame.Matchups
@@ -15,13 +16,16 @@ namespace FadingFlame.Matchups
         public SecondaryObjectiveState SecondaryObjective { get; set; }
         public int VictoryPointsDifference => Math.Abs((Player1?.VictoryPoints ?? 0) - (Player2?.VictoryPoints ?? 0));
         public DateTime RecordedAt { get; set; }
-
         public ObjectId Winner { get; set; }
+        public GameList Player1List { get; set; }
+        public GameList Player2List { get; set; }
 
         public static MatchResult Create(
             SecondaryObjectiveState secondaryObjective,
             PlayerResultDto player1Result,
-            PlayerResultDto player2Result)
+            PlayerResultDto player2Result,
+            GameList player1List, 
+            GameList player2List)
         {
             var points = CalculateWinPoints(player1Result.VictoryPoints, player2Result.VictoryPoints);
 
@@ -37,7 +41,9 @@ namespace FadingFlame.Matchups
                 SecondaryObjective = secondaryObjective,
                 Winner = GetWinnerId(player1Result, player2Result, pointsAfteObjective),
                 Player1 = PlayerResult.Create(player1Result.Id, player1Result.VictoryPoints, pointsAfteObjective.Player1),
-                Player2 = PlayerResult.Create(player2Result.Id, player2Result.VictoryPoints, pointsAfteObjective.Player2)
+                Player2 = PlayerResult.Create(player2Result.Id, player2Result.VictoryPoints, pointsAfteObjective.Player2),
+                Player1List = player1List,
+                Player2List = player2List
             };
         }
 

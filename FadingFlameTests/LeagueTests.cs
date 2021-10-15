@@ -76,7 +76,7 @@ namespace FadingFlameTests
                 }
             };
 
-            league.ReportGame(result);
+            league.ReportGame(result, null, null);
 
             league.Players[0].Id.Should().Be(player1.Id);
             league.Players[1].Id.Should().Be(player2.Id);
@@ -137,7 +137,7 @@ namespace FadingFlameTests
                 }
             };
 
-            league.ReportGame(result);
+            league.ReportGame(result, null, null);
 
             league.Players[1].Id.Should().Be(player1.Id);
             league.Players[0].Id.Should().Be(player2.Id);
@@ -193,7 +193,7 @@ namespace FadingFlameTests
                 }
             };
 
-            league.ReportGame(result);
+            league.ReportGame(result, null, null);
 
             league.Players[0].Id.Should().Be(player1.Id);
             league.Players[1].Id.Should().Be(player2.Id);
@@ -249,7 +249,7 @@ namespace FadingFlameTests
                 }
             };
 
-            league.ReportGame(result);
+            league.ReportGame(result, null, null);
 
             league.Players[0].Id.Should().Be(player2.Id);
             league.Players[1].Id.Should().Be(player1.Id);
@@ -288,7 +288,7 @@ namespace FadingFlameTests
                 }
             };
 
-            league.ReportGame(result);
+            league.ReportGame(result, null, null);
 
             league.Players[0].Id.Should().Be(player1.Id);
             league.Players[1].Id.Should().Be(player2.Id);
@@ -356,7 +356,7 @@ namespace FadingFlameTests
                 }
             };
 
-            league.ReportGame(result);
+            league.ReportGame(result, null, null);
 
             Assert.AreEqual(20, league.Players[0].BattlePoints);
             Assert.AreEqual(20, league.Players[1].BattlePoints);

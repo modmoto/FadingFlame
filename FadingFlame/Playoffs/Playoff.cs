@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FadingFlame.Leagues;
+using FadingFlame.Lists;
 using FadingFlame.Matchups;
 using FadingFlame.Repositories;
 using MongoDB.Bson;
@@ -76,13 +77,13 @@ namespace FadingFlame.Playoffs
                         VictoryPoints = 0
                     },
                     SecondaryObjective = SecondaryObjectiveState.player1
-                });
+                }, null, null);
             }
             
             return playoff;
         }
 
-        public MatchResult ReportGame(MatchResultDto matchResultDto)
+        public MatchResult ReportGame(MatchResultDto matchResultDto, GameList player1List, GameList player2List)
         {
             var roundIndex = Rounds.FindIndex(r => r.Matchups.Any(m => m.Id == matchResultDto.MatchId));
             var round = Rounds[roundIndex];
@@ -90,7 +91,7 @@ namespace FadingFlame.Playoffs
 
             var match = round.Matchups[matchIndex];
 
-            var result = MatchResult.Create(matchResultDto.SecondaryObjective, matchResultDto.Player1, matchResultDto.Player2);
+            var result = MatchResult.Create(matchResultDto.SecondaryObjective, matchResultDto.Player1, matchResultDto.Player2, player1List, player2List);
             match.RecordResult(result);
 
             var otherMatchIndex = matchIndex % 2 == 0 ? matchIndex + 1 : matchIndex - 1;
