@@ -82,7 +82,11 @@ namespace FadingFlame.Players
         public async Task<Player> LoadByEmail(string accountEmail)
         {
             var player = await LoadFirst<Player>(p => p.AccountEmail == accountEmail);
-            await LoadLists(player);
+            if (player != null)
+            {
+                await LoadLists(player);    
+            }
+            
             return player;
         }
 
