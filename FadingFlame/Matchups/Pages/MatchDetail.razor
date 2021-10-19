@@ -111,7 +111,7 @@ else
                 <div class="row align-items-start">
                     <div class="col">
                         <div class="form-group">
-                            <label>List: </label>
+                            <label class="mb-2">List: </label>
                             <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_selectedList">
                                 <option selected value="0">Select your list</option>
                                 <option value="1">@_listsOfLoggedInPlayer.List1.Name (@(GetListFacion(_listsOfLoggedInPlayer, _listsOfLoggedInPlayer.List1.Name)))</option>
@@ -127,7 +127,7 @@ else
                     }
                     Select list for match
                 </button>
-                <div>Selected lists will be hidden for everyone until both players have choosen a list</div>
+                <div class="mt-2">Selected lists will be hidden for everyone until both players have choosen a list</div>
                 <hr class="my-5">
             }
         }
