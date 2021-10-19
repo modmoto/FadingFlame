@@ -39,12 +39,15 @@ function GetTimezoneOffset() {
 
 <script>
     new MutationObserver((mutations, observer) => {
-        if (document.querySelector('#components-reconnect-modal h5 a')) {
-            async function attemptReload() {
-                const response = await fetch('');
-                if (response.ok) {
-                    location.reload();    
-                }
+        if (document.querySelector('#components-reconnect-modal')) {
+            function attemptReload() {
+                fetch('')
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    })
+                    .catch(() => console.error("server still disconnected, retrying"));
             }
             observer.disconnect();
             attemptReload();

@@ -4,6 +4,10 @@ html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+#components-reconnect-modal {
+    display: none !important;
+}
+
 a, .btn-link {
     color: #0366d6;
 }
