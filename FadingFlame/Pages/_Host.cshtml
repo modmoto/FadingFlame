@@ -31,12 +31,28 @@
     <a class="dismiss">🗙</a>
 </div>
 
-
 <script>
 function GetTimezoneOffset() {
     return new Date().getTimezoneOffset();
 }
 </script>
+
+<script>
+    new MutationObserver((mutations, observer) => {
+        if (document.querySelector('#components-reconnect-modal h5 a')) {
+            async function attemptReload() {
+                const response = await fetch('');
+                if (response.ok) {
+                    location.reload();    
+                }
+            }
+            observer.disconnect();
+            attemptReload();
+            setInterval(attemptReload, 5000);
+        }
+    }).observe(document.body, { childList: true, subtree: true });
+</script>
+
 <script src="_framework/blazor.server.js"></script>
 </body>
 </html>
