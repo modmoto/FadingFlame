@@ -95,23 +95,22 @@ else
                     You did not submit a list, submit a list on your profile!
                 </div>
             }
-            else if (!string.IsNullOrEmpty(_selectedListAsString))
-            {
-                <div class="row align-items-start mt-4">
-                    <div class="col">
-                        <div class="pt-3 pb-3 alert alert-success" role="alert" style="max-width: 25rem">
-                            Your list for the match: <b>@_selectedListAsString</b>
-                        </div>
-                        <div>Waiting for your opponent to select his list...</div>
-                    </div>
-                </div>
-            }
             else
             {
+                if (!string.IsNullOrEmpty(_selectedListAsString) && !_matchup.PlayersSelectedList)
+                {
+                    <div class="row align-items-start mt-4">
+                        <div class="col">
+                            <div class="pt-3 pb-3 alert alert-success" role="alert" style="max-width: 25rem">
+                                Your list for the match: <b>@_selectedListAsString</b>
+                            </div>
+                            <div class="pb-3">Waiting for your opponent to select his list...</div>
+                        </div>
+                    </div>
+                }
                 <div class="row align-items-start">
                     <div class="col">
                         <div class="form-group">
-                            <label class="mb-2">List: </label>
                             <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_selectedList">
                                 <option selected value="0">Select your list</option>
                                 <option value="1">@_listsOfLoggedInPlayer.List1.Name (@(GetListFacion(_listsOfLoggedInPlayer, _listsOfLoggedInPlayer.List1.Name)))</option>
