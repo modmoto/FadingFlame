@@ -325,7 +325,7 @@
         _messageStoreUser.Clear();
         var regex = new Regex("^.{3,32}#[0-9]{4}$");
         var isValid = true;
-        if (!regex.Match(_editUserModel.DiscordTag).Success)
+        if (!string.IsNullOrWhiteSpace(_editUserModel.DiscordTag) && !regex.Match(_editUserModel.DiscordTag).Success)
         {
             _messageStoreUser.Add(() => _editUserModel.DiscordTag, "Discord tag has to of the form example#1234");
             isValid = false;
