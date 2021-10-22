@@ -386,7 +386,7 @@ else
 
     private async Task UpdateMmrs(MatchResult matchResult)
     {
-        var player = _player1.Id == matchResult.Player1.Id ? 1 : 2;
+        var player = _player1.Id == matchResult.Winner ? 1 : 2;
         var mmrsOld = new List<Mmr> { _player1.Mmr ?? Mmr.Create(), _player2.Mmr ?? Mmr.Create()};
         var mmrsNew = await _mmrRepository.UpdateMmrs(UpdateMmrRequest.Create(mmrsOld, player));
         _player1.UpdateMmr(mmrsNew[0]);
