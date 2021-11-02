@@ -194,6 +194,20 @@ namespace FadingFlame.Leagues
                 GameDays[i].SetScenarioAndDeployments(secondaryObjectives[i], deployments[i]);
             }
         }
+
+        public void SetZeroToZero(ObjectId matchId)
+        {
+            var match = GetMatchup(matchId);
+            match.SetZeroToZero();
+            
+            var player1 = Players.First(p => p.Id == match.Player1);
+            var player2 = Players.First(p => p.Id == match.Player2);
+
+            player1.RecordResult(match.Result.Player1.BattlePoints, match.Result.Player1.VictoryPoints);
+            player2.RecordResult(match.Result.Player2.BattlePoints, match.Result.Player2.VictoryPoints);
+            
+            ReorderPlayers();
+        }
     }
 
     public class PlayerComparer : IComparer<PlayerInLeague>
@@ -217,7 +231,7 @@ namespace FadingFlame.Leagues
                 var gameBetweenPlayers = _league.GameDays
                     .SelectMany(g => g.Matchups)
                     .FirstOrDefault(m => m.Player1 == a.Id && m.Player2 == b.Id || m.Player2 == a.Id && m.Player1 == b.Id);
-                if (gameBetweenPlayers?.IsFinished == true)
+                if (gameBetweenPlayers?.IsFinished == true && gameBetweenPlayers.Result.IsDraw)
                 {
                     return gameBetweenPlayers.Result.Winner == a.Id ? -1 : 1;
                 }

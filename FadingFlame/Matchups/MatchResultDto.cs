@@ -19,6 +19,7 @@ namespace FadingFlame.Matchups
         public ObjectId Winner { get; set; }
         public GameList Player1List { get; set; }
         public GameList Player2List { get; set; }
+        public bool IsDraw => Winner == ObjectId.Empty;
 
         public static MatchResult Create(
             SecondaryObjectiveState secondaryObjective,
@@ -33,31 +34,24 @@ namespace FadingFlame.Matchups
                 secondaryObjective,
                 points.Player1,
                 points.Player2);
-            
+
+            var winner = pointsAfteObjective.Player1 == pointsAfteObjective.Player2 
+                ? ObjectId.Empty 
+                : pointsAfteObjective.Player1 > pointsAfteObjective.Player2 
+                    ? player1Result.Id 
+                    : player2Result.Id;
+
             return new MatchResult
             {
                 MatchId = ObjectId.GenerateNewId(),
                 RecordedAt = DateTime.UtcNow,
                 SecondaryObjective = secondaryObjective,
-                Winner = GetWinnerId(player1Result, player2Result, pointsAfteObjective),
+                Winner = winner,
                 Player1 = PlayerResult.Create(player1Result.Id, player1Result.VictoryPoints, pointsAfteObjective.Player1),
                 Player2 = PlayerResult.Create(player2Result.Id, player2Result.VictoryPoints, pointsAfteObjective.Player2),
                 Player1List = player1List,
                 Player2List = player2List
             };
-        }
-
-        private static ObjectId GetWinnerId(
-            PlayerResultDto player1Result,
-            PlayerResultDto player2Result,
-            PointTuple pointsAfteObjective)
-        {
-            if (pointsAfteObjective.Player1 == pointsAfteObjective.Player2)
-            {
-                return player1Result.VictoryPoints > player2Result.VictoryPoints ? player1Result.Id : player2Result.Id;
-            }
-
-            return pointsAfteObjective.Player1 > pointsAfteObjective.Player2 ? player1Result.Id : player2Result.Id;
         }
 
         private static PointTuple CalculateWinPoints(int player1, int player2)
@@ -99,6 +93,19 @@ namespace FadingFlame.Matchups
 
             return new PointTuple(points1, points2);
         }
+
+        public static MatchResult ZeroToZero(ObjectId objectId, ObjectId player1Id, ObjectId player2Id)
+        {
+            return new MatchResult
+            {
+                MatchId = objectId,
+                RecordedAt = DateTime.UtcNow,
+                Player1 = PlayerResult.ZeroToZero(player1Id),
+                Player2 = PlayerResult.ZeroToZero(player2Id),
+                Winner = ObjectId.Empty,
+                SecondaryObjective = SecondaryObjectiveState.draw
+            };
+        }
     }
     
     public class PlayerResult
@@ -123,6 +130,14 @@ namespace FadingFlame.Matchups
             {
                 VictoryPoints = battlePoints,
                 BattlePoints = winPoints,
+                Id = playerId
+            };
+        }
+
+        public static PlayerResult ZeroToZero(ObjectId playerId)
+        {
+            return new ()
+            {
                 Id = playerId
             };
         }

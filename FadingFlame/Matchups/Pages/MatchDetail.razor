@@ -45,51 +45,51 @@ else
             </div>
 
             <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
-            <DataAnnotationsValidator/>
-            <div class="row align-items-start mt-3">
-                <div class="col form-group">
-                    <label>Victory Points @Player1Name (0-5100):</label>
-                    <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control my-3"/>
-                    <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
-                    <div class="form-check">
-                        <InputCheckbox class="form-check-input" @onclick="() => Select2ndObjective(1)" @bind-Value="_secondaryObjectivePlayer1"/>
-                        <label class="form-check-label">
-                            Won secondary objective
-                        </label>
+                <DataAnnotationsValidator/>
+                <div class="row align-items-start mt-3">
+                    <div class="col form-group">
+                        <label>Victory Points @Player1Name (0-5100):</label>
+                        <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control my-3"/>
+                        <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" @onclick="() => Select2ndObjective(1)" @bind-Value="_secondaryObjectivePlayer1"/>
+                            <label class="form-check-label">
+                                Won secondary objective
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col form-group">
+                        <label>Victory Points @_player2?.DisplayName (0-5100):</label>
+                        <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control my-3"/>
+                        <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" @onclick="() => Select2ndObjective(2)" @bind-Value="_secondaryObjectivePlayer2"/>
+                            <label class="form-check-label">
+                                Won secondary objective
+                            </label>
+                        </div>
                     </div>
                 </div>
-                <div class="col form-group">
-                    <label>Victory Points @_player2?.DisplayName (0-5100):</label>
-                    <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control my-3"/>
-                    <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
-                    <div class="form-check">
-                        <InputCheckbox class="form-check-input" @onclick="() => Select2ndObjective(2)" @bind-Value="_secondaryObjectivePlayer2"/>
-                        <label class="form-check-label">
-                            Won secondary objective
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <hr class="my-3">
-            <button disabled="@_loading" class="btn btn-primary">
-                @if (_loading)
-                {
-                    <span class="spinner-border spinner-border-sm mr-1"></span>
-                }
-                @if (!_matchup.IsFinished)
-                {
-                    <span>Report Game</span>
-                }
-                else
-                {
-                    <span>Edit Result (possible until @_matchup.Result.RecordedAt.AddDays(1).ToMyDateTime())</span>
-                }
-            </button>
+                <hr class="my-3">
+                <button disabled="@_loading" class="btn btn-primary">
+                    @if (_loading)
+                    {
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                    }
+                    @if (!_matchup.IsFinished)
+                    {
+                        <span>Report Game</span>
+                    }
+                    else
+                    {
+                        <span>Edit Result (possible until @_matchup.Result.RecordedAt.AddDays(1).ToMyDateTime())</span>
+                    }
+                </button>
             </EditForm>
         }
         else
         {
-            if (_listsOfLoggedInPlayer == null)
+            if (_listsOfLoggedInPlayer == null && !_userState.UserIsAdmin)
             {
                 <div class="alert alert-danger" role="alert">
                     You did not submit a list, submit a list on your profile!
@@ -108,26 +108,31 @@ else
                         </div>
                     </div>
                 }
-                <div class="row align-items-start">
-                    <div class="col">
-                        <div class="form-group">
-                            <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_selectedList">
-                                <option selected value="0">Select your list</option>
-                                <option value="1">@_listsOfLoggedInPlayer.List1.Name (@(GetListFacion(_listsOfLoggedInPlayer, _listsOfLoggedInPlayer.List1.Name)))</option>
-                                <option value="2">@_listsOfLoggedInPlayer.List2.Name (@(GetListFacion(_listsOfLoggedInPlayer, _listsOfLoggedInPlayer.List2.Name)))</option>
-                            </select>
+
+                if (_listsOfLoggedInPlayer != null)
+                {
+                    <div class="row align-items-start">
+                        <div class="col">
+                            <div class="form-group">
+                                <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_selectedList">
+                                    <option selected value="0">Select your list</option>
+                                    <option value="1">@_listsOfLoggedInPlayer.List1.Name (@(GetListFacion(_listsOfLoggedInPlayer, _listsOfLoggedInPlayer.List1.Name)))</option>
+                                    <option value="2">@_listsOfLoggedInPlayer.List2.Name (@(GetListFacion(_listsOfLoggedInPlayer, _listsOfLoggedInPlayer.List2.Name)))</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <button disabled="@_selectingList" class="btn btn-primary" @onclick="() => SelectListForMatch()">
-                    @if (_selectingList)
-                    {
-                        <span class="spinner-border spinner-border-sm mr-1"></span>
-                    }
-                    Select list for match
-                </button>
-                <div class="mt-2">Selected lists will be hidden for everyone until both players have choosen a list</div>
-                <hr class="my-5">
+
+                    <button disabled="@_selectingList" class="btn btn-primary" @onclick="() => SelectListForMatch()">
+                        @if (_selectingList)
+                        {
+                            <span class="spinner-border spinner-border-sm mr-1"></span>
+                        }
+                        Select list for match
+                    </button>
+                    <div class="mt-2">Selected lists will be hidden for everyone until both players have choosen a list</div>
+                    <hr class="my-5">
+                }
             }
         }
     }
@@ -215,6 +220,17 @@ else
             <div class="col">Players are still selecting their lists...</div>
         }
         </div>
+    }
+
+    @if (_userState.UserIsAdmin && !_matchup.IsFinished)
+    {
+        <button @onclick="SetToZeroZero" disabled="@_loading" class="btn btn-danger mt-3">
+            @if (_loading)
+            {
+                <span class="spinner-border spinner-border-sm mr-1"></span>
+            }
+            <span class="oi oi-shield me-2" aria-hidden="true"></span>Set game to 0 : 0
+        </button>
     }
 }
 
@@ -305,6 +321,16 @@ else
         StateHasChanged();
     }
 
+
+
+    private async Task SetToZeroZero()
+    {
+        _loading = true;
+        _league.SetZeroToZero(_model.MatchId);
+        await _leagueRepository.Update(_league);
+        _loading = false;
+    }
+    
     private async Task ExtractMatch(Matchup match)
     {
         if (match == null)

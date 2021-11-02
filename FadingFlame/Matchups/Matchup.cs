@@ -59,5 +59,10 @@ namespace FadingFlame.Matchups
         {
             Result = null;
         }
+
+        public void SetZeroToZero()
+        {
+            Result = MatchResult.ZeroToZero(Id, Player1, Player2);
+        }
     }
 }
