@@ -412,14 +412,17 @@ else
 
     private async Task UpdateMmrs(MatchResult matchResult)
     {
-        var player = _player1.Id == matchResult.Winner ? 1 : 2;
-        var mmrsOld = new List<Mmr> { _player1.Mmr ?? Mmr.Create(), _player2.Mmr ?? Mmr.Create()};
-        var mmrsNew = await _mmrRepository.UpdateMmrs(UpdateMmrRequest.Create(mmrsOld, player));
-        _player1.UpdateMmr(mmrsNew[0]);
-        _player2.UpdateMmr(mmrsNew[1]);
+        if (!matchResult.IsDraw)
+        {
+            var player = _player1.Id == matchResult.Winner ? 1 : 2;
+            var mmrsOld = new List<Mmr> { _player1.Mmr ?? Mmr.Create(), _player2.Mmr ?? Mmr.Create()};
+            var mmrsNew = await _mmrRepository.UpdateMmrs(UpdateMmrRequest.Create(mmrsOld, player));
+            _player1.UpdateMmr(mmrsNew[0]);
+            _player2.UpdateMmr(mmrsNew[1]);
 
-        await _playerRepository.Update(_player1);
-        await _playerRepository.Update(_player2);
+            await _playerRepository.Update(_player1);
+            await _playerRepository.Update(_player2);    
+        } 
     }
 
     private SecondaryObjectiveState ConvertToEnum()
