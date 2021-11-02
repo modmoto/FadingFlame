@@ -106,6 +106,41 @@ namespace FadingFlame.Matchups
                 SecondaryObjective = SecondaryObjectiveState.draw
             };
         }
+
+        public static MatchResult CreateKoResult(
+            SecondaryObjectiveState secondaryObjective, 
+            PlayerResultDto player1Result, 
+            PlayerResultDto player2Result, 
+            GameList player1List, 
+            GameList player2List)
+        {
+            var points = CalculateWinPoints(player1Result.VictoryPoints, player2Result.VictoryPoints);
+
+            var pointsAfteObjective = CalculateSecondaryObjective(
+                secondaryObjective,
+                points.Player1,
+                points.Player2);
+
+            var winner = pointsAfteObjective.Player1 == pointsAfteObjective.Player2 
+                ? player1Result.VictoryPoints > player2Result.VictoryPoints 
+                    ? player1Result.Id
+                    : player2Result.Id
+                : pointsAfteObjective.Player1 > pointsAfteObjective.Player2 
+                    ? player1Result.Id 
+                    : player2Result.Id;
+
+            return new MatchResult
+            {
+                MatchId = ObjectId.GenerateNewId(),
+                RecordedAt = DateTime.UtcNow,
+                SecondaryObjective = secondaryObjective,
+                Winner = winner,
+                Player1 = PlayerResult.Create(player1Result.Id, player1Result.VictoryPoints, pointsAfteObjective.Player1),
+                Player2 = PlayerResult.Create(player2Result.Id, player2Result.VictoryPoints, pointsAfteObjective.Player2),
+                Player1List = player1List,
+                Player2List = player2List
+            };
+        }
     }
     
     public class PlayerResult

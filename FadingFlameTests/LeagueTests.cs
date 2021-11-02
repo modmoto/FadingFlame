@@ -25,9 +25,51 @@ namespace FadingFlameTests
 
             league.Players.Should().Contain(p => p.Id == player.Id);
         }
-
+        
         [TestCase(1, 0, 10, 10)]
         [TestCase(225, 0, 10, 10)]
+        public void ShouldCalculateResult_Draw(
+            int player1Points,
+            int player2Points,
+            int exectedoints1,
+            int expectedPoints2)
+        {
+            var league = new League();
+
+            var player1 = Player.Create("peter", "213");
+            player1.Id = ObjectId.GenerateNewId();
+            var player2 = Player.Create("wolf", "213");
+            player2.Id = ObjectId.GenerateNewId();
+
+            league.AddPlayer(player1);
+            league.AddPlayer(player2);
+            league.CreateGameDays();
+
+            var result = new MatchResultDto
+            {
+                MatchId = league.GameDays.First().Matchups.First().Id,
+                SecondaryObjective = SecondaryObjectiveState.draw,
+                Player1 = new PlayerResultDto
+                {
+                    Id = player1.Id,
+                    VictoryPoints = player1Points
+                },
+                Player2 = new PlayerResultDto
+                {
+                    Id = player2.Id,
+                    VictoryPoints = player2Points
+                }
+            };
+
+            league.ReportGame(result, null, null);
+
+            league.Players[1].Id.Should().Be(player1.Id);
+            league.Players[0].Id.Should().Be(player2.Id);
+
+            league.Players[1].BattlePoints.Should().Be(exectedoints1);
+            league.Players[0].BattlePoints.Should().Be(expectedPoints2);
+        }
+
         [TestCase(226, 0, 11, 9)]
         [TestCase(450, 0, 11, 9)]
         [TestCase(451, 0, 12, 8)]

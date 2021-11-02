@@ -79,8 +79,8 @@ namespace FadingFlameTests
             Assert.AreEqual(1, playoffs.Rounds[1].Matchups.Count);
 
             var finale = playoffs.Rounds[1].Matchups[0];
-            Assert.AreEqual(matchup1.Player2,  finale.Player1);
-            Assert.AreEqual(matchup2.Player1,  finale.Player2);
+            Assert.AreEqual(matchup1.Player2, finale.Player1);
+            Assert.AreEqual(matchup2.Player1, finale.Player2);
         }
 
         [Test]
