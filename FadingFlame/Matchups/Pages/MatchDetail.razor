@@ -23,7 +23,13 @@ else
     </h1>
     @if (_matchup.IsFinished)
     {
-        <div class="blockquote-footer mt-2">@_matchup.Result.RecordedAt.ToMyDateYear()</div>
+        <div class="blockquote-footer mt-2">
+            @_matchup.Result.RecordedAt.ToMyDateYear()
+            @if (_matchup.Result.WasDefLoss)
+            {
+                <span> (Loss by not responding/showing up)</span>
+            }
+        </div>
     }
     @if (!_matchup.IsFinished && _userState.UserIsAdmin)
     {
@@ -404,7 +410,7 @@ else
             _playoff?.DeleteGameReport(_matchup.Id);
         }
         
-        var result = await UpdateMatchWithResult();
+        var result = await UpdateMatchWithResult(_model);
 
         if (!wasAllreadyReported)
         {
@@ -415,19 +421,19 @@ else
         StateHasChanged();
     }
 
-    private async Task<MatchResult> UpdateMatchWithResult()
+    private async Task<MatchResult> UpdateMatchWithResult(MatchResultDto model)
     {
         MatchResult result;
         if (_league != null)
         {
-            _model.SecondaryObjective = ConvertToEnum();
-            result = _league.ReportGame(_model, Player1List, Player2List);
+            model.SecondaryObjective = ConvertToEnum();
+            result = _league.ReportGame(model, Player1List, Player2List);
             await _leagueRepository.Update(_league);
         }
         else
         {
-            _model.SecondaryObjective = ConvertToEnum();
-            result = _playoff.ReportGame(_model, Player1List, Player2List);
+            model.SecondaryObjective = ConvertToEnum();
+            result = _playoff.ReportGame(model, Player1List, Player2List);
             await _playoffRepository.Update(_playoff);
         }
 
@@ -549,7 +555,8 @@ else
         };
         _secondaryObjectivePlayer1 = _player2.Id == playerId;
         _secondaryObjectivePlayer2 = _player1.Id == playerId;
-        var result = await UpdateMatchWithResult();
+        _model.WasDefLoss = true;
+        var result = await UpdateMatchWithResult(_model);
         await UpdateMmrs(result);    
         _settingDefWin = false;
     }

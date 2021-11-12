@@ -12,6 +12,7 @@ namespace FadingFlame.Matchups
         public ObjectId MatchId  { get; set; }
         public PlayerResult Player1 { get; set; }
         public PlayerResult Player2 { get; set; }
+        public bool WasDefLoss { get; set; }
         public SecondaryObjectiveState SecondaryObjective { get; set; }
         public int VictoryPointsDifference => Math.Abs((Player1?.VictoryPoints ?? 0) - (Player2?.VictoryPoints ?? 0));
         public DateTime RecordedAt { get; set; }
@@ -25,7 +26,8 @@ namespace FadingFlame.Matchups
             PlayerResultDto player1Result,
             PlayerResultDto player2Result,
             GameList player1List, 
-            GameList player2List)
+            GameList player2List,
+            bool wasDefLoss)
         {
             var points = CalculateWinPoints(player1Result.VictoryPoints, player2Result.VictoryPoints);
 
@@ -46,6 +48,7 @@ namespace FadingFlame.Matchups
                 RecordedAt = DateTime.UtcNow,
                 SecondaryObjective = secondaryObjective,
                 Winner = winner,
+                WasDefLoss = wasDefLoss,
                 Player1 = PlayerResult.Create(player1Result.Id, player1Result.VictoryPoints, pointsAfteObjective.Player1),
                 Player2 = PlayerResult.Create(player2Result.Id, player2Result.VictoryPoints, pointsAfteObjective.Player2),
                 Player1List = player1List,
