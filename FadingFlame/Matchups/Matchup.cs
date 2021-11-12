@@ -1,4 +1,5 @@
 using FadingFlame.Leagues;
+using FadingFlame.Lists;
 using FadingFlame.Players;
 using FadingFlame.Repositories;
 using MongoDB.Bson;
@@ -52,6 +53,11 @@ namespace FadingFlame.Matchups
 
         public void RecordResult(MatchResult result)
         {
+            if (result.WasDefLoss)
+            {
+                Player1List = GameList.DeffLoss().Name;
+                Player2List = GameList.DeffLoss().Name;
+            }
             Result = result;
         }
 
@@ -62,6 +68,8 @@ namespace FadingFlame.Matchups
 
         public void SetZeroToZero()
         {
+            Player1List = GameList.DeffLoss().Name;
+            Player2List = GameList.DeffLoss().Name;
             Result = MatchResult.ZeroToZero(Id, Player1, Player2);
         }
     }

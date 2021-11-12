@@ -34,5 +34,10 @@ namespace FadingFlame.Lists
         public string ProposedListChange { get; set; }
 
         public string Name { get; set; }
+
+        public static GameList DeffLoss()
+        {
+            return Create("None picked", "", Faction.None);
+        }
     }
 }

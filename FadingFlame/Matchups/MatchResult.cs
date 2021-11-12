@@ -51,8 +51,8 @@ namespace FadingFlame.Matchups
                 WasDefLoss = wasDefLoss,
                 Player1 = PlayerResult.Create(player1Result.Id, player1Result.VictoryPoints, pointsAfteObjective.Player1),
                 Player2 = PlayerResult.Create(player2Result.Id, player2Result.VictoryPoints, pointsAfteObjective.Player2),
-                Player1List = player1List,
-                Player2List = player2List
+                Player1List = wasDefLoss ? GameList.DeffLoss() : player1List,
+                Player2List = wasDefLoss ? GameList.DeffLoss() : player2List,
             };
         }
 
@@ -105,7 +105,9 @@ namespace FadingFlame.Matchups
                 Player1 = PlayerResult.ZeroToZero(player1Id),
                 Player2 = PlayerResult.ZeroToZero(player2Id),
                 Winner = ObjectId.Empty,
-                SecondaryObjective = SecondaryObjectiveState.draw
+                SecondaryObjective = SecondaryObjectiveState.draw,
+                Player1List = GameList.DeffLoss(),
+                Player2List = GameList.DeffLoss()
             };
         }
 

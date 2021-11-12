@@ -5,6 +5,7 @@ namespace FadingFlame.Lists
 {
     public enum Faction
     {
+        None = 0,
         BeastHeards = 1,
         DaemonLegions = 2,
         DreadElves = 3,
