@@ -25,6 +25,29 @@ else
     {
         <div class="blockquote-footer mt-2">@_matchup.Result.RecordedAt.ToMyDateYear()</div>
     }
+    @if (!_matchup.IsFinished && _userState.UserIsAdmin)
+    {
+        <div class="row">
+            <div class="col">
+                <button disabled="@_settingDefWin" class="col btn btn-danger" @onclick="() => SetDefLoss(_player1.Id)">
+                    @if (_settingDefWin)
+                    {
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                    }
+                    <span class="oi oi-shield me-2"></span> 0:20 loss for @_player1.DisplayName
+                </button>
+            </div>
+            <div class="col">
+                <button disabled="@_settingDefWin" class="col btn btn-danger" @onclick="() => SetDefLoss(_player2.Id)">
+                    @if (_settingDefWin)
+                    {
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                    }
+                    <span class="oi oi-shield me-2"></span> 0:20 loss for @_player2.DisplayName
+                </button>
+            </div>
+        </div>
+    }
     if (CanEditMatch && MatchWasRecordedLessThanADayAgo || _userState.UserIsAdmin)
     {
         if (_matchup.PlayersSelectedList)
@@ -256,6 +279,7 @@ else
     private bool _loading = true;
     private bool _secondaryObjectivePlayer1;
     private bool _secondaryObjectivePlayer2;
+    private bool _settingDefWin;
     private string _selectedListAsString;
     private bool _selectingList;
     private Playoff _playoff;
@@ -491,5 +515,42 @@ else
     private void GoToPlayer(Player player)
     {
         _navigation.NavigateTo($"player/{player?.Id}");
+    }
+
+    private async Task SetDefLoss(ObjectId playerId)
+    {
+        _settingDefWin = true;
+        _model = playerId == _player1.Id ? new MatchResultDto
+        {
+            MatchId = _matchup.Id,
+            Player1 = new PlayerResultDto
+            {
+                Id = _player1.Id,
+                VictoryPoints = 0
+            },
+            Player2 = new PlayerResultDto
+            {
+                Id = _player2.Id,
+                VictoryPoints = 4500
+            }
+        } : new MatchResultDto
+        {
+            MatchId = _matchup.Id,
+            Player1 = new PlayerResultDto
+            {
+                Id = _player1.Id,
+                VictoryPoints = 4500
+            },
+            Player2 = new PlayerResultDto
+            {
+                Id = _player2.Id,
+                VictoryPoints = 0
+            }
+        };
+        _secondaryObjectivePlayer1 = _player2.Id == playerId;
+        _secondaryObjectivePlayer2 = _player1.Id == playerId;
+        var result = await UpdateMatchWithResult();
+        await UpdateMmrs(result);    
+        _settingDefWin = false;
     }
 }
