@@ -85,7 +85,7 @@ namespace FadingFlame
            
             services.AddSingleton(_ =>
             {
-                var mongoConnectionString = Environment.GetEnvironmentVariable("MONGO_DB_CONNECTION_STRING") ?? "mongodb://admin:vgwG9FRzS77tGGP4@65.21.139.246:1001";
+                var mongoConnectionString = Environment.GetEnvironmentVariable("MONGO_DB_CONNECTION_STRING");
                 return new MongoClient(mongoConnectionString);
             });
             
