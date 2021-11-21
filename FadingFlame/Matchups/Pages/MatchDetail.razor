@@ -230,16 +230,14 @@ else
 
     @if (_userState.UserIsAdmin && !_matchup.IsFinished)
     {
-        <div class="row">
-            <button @onclick="SetToZeroZero" disabled="@_loading" class="btn btn-danger mt-3">
-                @if (_loading)
-                {
-                    <span class="spinner-border spinner-border-sm mr-1"></span>
-                }
-                <span class="oi oi-shield me-2" aria-hidden="true"></span>Set game to 0 : 0
-            </button>
-        </div>
-        <div class="row">
+        <button @onclick="SetToZeroZero" disabled="@_loading" class="btn btn-danger mt-3">
+            @if (_loading)
+            {
+                <span class="spinner-border spinner-border-sm mr-1"></span>
+            }
+            <span class="oi oi-shield me-2" aria-hidden="true"></span>Set game to 0 : 0
+        </button>
+        <div class="row mt-3">
             <div class="col">
                 <button disabled="@_settingDefWin" class="col btn btn-danger" @onclick="() => SetDefLoss(_player1.Id)">
                     @if (_settingDefWin)
