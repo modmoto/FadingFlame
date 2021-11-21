@@ -33,7 +33,7 @@
 @inject NavigationManager _navigation
 
 @code {
-  private List<Player> _enlistedPlayersOriginal;
+  private List<Player> _enlistedPlayersOriginal = new();
   
   protected override async Task OnInitializedAsync()
   {
