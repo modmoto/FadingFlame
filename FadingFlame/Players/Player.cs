@@ -19,6 +19,7 @@ namespace FadingFlame.Players
 
         public int Wins { get; set; }
         public int Losses { get; set; }
+        public int Draws { get; set; }
         public int MatchCount => Wins + Losses;
         public string DisplayName { get; set; }
         public string AccountEmail { get; set; }
@@ -49,23 +50,31 @@ namespace FadingFlame.Players
             Wins++;
             Mmr = mmr;
         }
-        
+
         public void AddLoss(Mmr mmr)
         {
             Losses++;
             Mmr = mmr;
         }
         
-        public void RemoveWin(Mmr mmr)
+        public void RemoveWin()
         {
             Wins--;
-            Mmr = mmr;
         }
         
-        public void RemoveLoss(Mmr mmr)
+        public void RemoveLoss()
         {
             Losses--;
-            Mmr = mmr;
+        }
+
+        public void AddDraw()
+        {
+            Draws++;
+        }
+
+        public void RemoveDraw()
+        {
+            Draws--;
         }
 
         public void SubmitLists(GameList list1, GameList list2, int season)

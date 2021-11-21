@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using FadingFlame.Admin;
 using FadingFlame.Discord;
@@ -8,7 +7,6 @@ using FadingFlame.Lists;
 using FadingFlame.Matchups;
 using FadingFlame.Players;
 using FadingFlame.Playoffs;
-using FadingFlame.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
