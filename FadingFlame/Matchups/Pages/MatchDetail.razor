@@ -31,29 +31,6 @@ else
             }
         </div>
     }
-    @if (!_matchup.IsFinished && _userState.UserIsAdmin)
-    {
-        <div class="row">
-            <div class="col">
-                <button disabled="@_settingDefWin" class="col btn btn-danger" @onclick="() => SetDefLoss(_player1.Id)">
-                    @if (_settingDefWin)
-                    {
-                        <span class="spinner-border spinner-border-sm mr-1"></span>
-                    }
-                    <span class="oi oi-shield me-2"></span> 0:20 loss for @_player1.DisplayName
-                </button>
-            </div>
-            <div class="col">
-                <button disabled="@_settingDefWin" class="col btn btn-danger" @onclick="() => SetDefLoss(_player2.Id)">
-                    @if (_settingDefWin)
-                    {
-                        <span class="spinner-border spinner-border-sm mr-1"></span>
-                    }
-                    <span class="oi oi-shield me-2"></span> 0:20 loss for @_player2.DisplayName
-                </button>
-            </div>
-        </div>
-    }
     if (CanEditMatch && MatchWasRecordedLessThanADayAgo || _userState.UserIsAdmin)
     {
         if (_matchup.PlayersSelectedList)
@@ -253,13 +230,35 @@ else
 
     @if (_userState.UserIsAdmin && !_matchup.IsFinished)
     {
-        <button @onclick="SetToZeroZero" disabled="@_loading" class="btn btn-danger mt-3">
-            @if (_loading)
-            {
-                <span class="spinner-border spinner-border-sm mr-1"></span>
-            }
-            <span class="oi oi-shield me-2" aria-hidden="true"></span>Set game to 0 : 0
-        </button>
+        <div class="row">
+            <button @onclick="SetToZeroZero" disabled="@_loading" class="btn btn-danger mt-3">
+                @if (_loading)
+                {
+                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                }
+                <span class="oi oi-shield me-2" aria-hidden="true"></span>Set game to 0 : 0
+            </button>
+        </div>
+        <div class="row">
+            <div class="col">
+                <button disabled="@_settingDefWin" class="col btn btn-danger" @onclick="() => SetDefLoss(_player1.Id)">
+                    @if (_settingDefWin)
+                    {
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                    }
+                    <span class="oi oi-shield me-2"></span> 0:20 loss for @_player1.DisplayName
+                </button>
+            </div>
+            <div class="col">
+                <button disabled="@_settingDefWin" class="col btn btn-danger" @onclick="() => SetDefLoss(_player2.Id)">
+                    @if (_settingDefWin)
+                    {
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                    }
+                    <span class="oi oi-shield me-2"></span> 0:20 loss for @_player2.DisplayName
+                </button>
+            </div>
+        </div>
     }
 }
 
