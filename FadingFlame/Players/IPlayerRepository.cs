@@ -20,6 +20,7 @@ namespace FadingFlame.Players
         Task<List<Player>> LoadForLeague(List<ObjectId> playerIds, int season);
         Task<List<Player>> LoadAllWithoutList();
         Task<List<Player>> LoadAllWitList();
+        Task<List<Player>> LoadAllRanked();
     }
 
     public class PlayerRepository : MongoDbRepositoryBase, IPlayerRepository
@@ -123,6 +124,11 @@ namespace FadingFlame.Players
         public Task<List<Player>> LoadAllWitList()
         {
             return LoadAll<Player>(p => p.ArmyIdCurrentSeason != default);
+        }
+
+        public Task<List<Player>> LoadAllRanked()
+        {
+            return LoadAll<Player>(p => p.IsRanked);
         }
     }
 }

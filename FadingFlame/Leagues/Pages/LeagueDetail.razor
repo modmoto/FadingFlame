@@ -6,10 +6,6 @@
 @using FadingFlame.Lists
 @using FadingFlame.Matchups
 
-@inject NavigationManager _navigation
-@inject LoggedInUserState _loggedInUserState
-
-
 @if (_league == null)
 {
     <p>
@@ -183,6 +179,8 @@ else
 
 @inject ILeagueRepository _leagueRepository
 @inject IPlayerRepository _playerRepository
+@inject NavigationManager _navigation
+@inject LoggedInUserState _loggedInUserState
 
 @code {
     [Parameter]
