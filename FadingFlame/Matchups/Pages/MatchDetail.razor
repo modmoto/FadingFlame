@@ -412,7 +412,6 @@ else
         if (!wasAllreadyReported)
         {
             await UpdatePlayerWithMmr(result);
-            await UndoPlayerUpdate(result);
         }
 
         _loading = false;
@@ -446,51 +445,12 @@ else
             var player = _player1.Id == matchResult.Winner ? 1 : 2;
             var mmrsOld = new List<Mmr> { _player1.Mmr ?? Mmr.Create(), _player2.Mmr ?? Mmr.Create()};
             var mmrsNew = await _mmrRepository.UpdateMmrs(UpdateMmrRequest.Create(mmrsOld, player));
-
-            if (_player1.Id == matchResult.Winner)
-            {
-                _player1.AddWin(mmrsNew[0]);
-                _player2.AddLoss(mmrsNew[1]);
-            }
-            else
-            {
-                _player1.AddLoss(mmrsNew[0]);
-                _player2.AddWin(mmrsNew[1]);
-            }
+            _player1.UpdateMmr(mmrsNew[0]);
+            _player2.UpdateMmr(mmrsNew[1]);
+            
+            await _playerRepository.Update(_player1);
+            await _playerRepository.Update(_player2);
         }
-        else
-        {
-            _player1.AddDraw();
-            _player2.AddDraw();
-        }
-
-        await _playerRepository.Update(_player1);
-        await _playerRepository.Update(_player2);
-    }
-
-    private async Task UndoPlayerUpdate(MatchResult result)
-    {
-        if (!result.IsDraw)
-        {
-            if (_player1.Id == result.Winner)
-            {
-                _player1.RemoveWin();
-                _player2.RemoveLoss();
-            }
-            else
-            {
-                _player1.RemoveLoss();
-                _player2.RemoveWin();
-            }
-        }
-        else
-        {
-            _player1.RemoveDraw();
-            _player2.RemoveDraw();
-        }
-
-        await _playerRepository.Update(_player1);
-        await _playerRepository.Update(_player2);
     }
 
     private SecondaryObjectiveState ConvertToEnum()

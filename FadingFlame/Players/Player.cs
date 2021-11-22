@@ -7,20 +7,8 @@ namespace FadingFlame.Players
 {
     public class Player : IIdentifiable
     {
-        private bool _isRanked;
-
         [BsonId]
         public ObjectId Id { get; set; }
-        public bool IsRanked
-        {
-            get => MatchCount >= 3;
-            set => _isRanked = value;
-        }
-
-        public int Wins { get; set; }
-        public int Losses { get; set; }
-        public int Draws { get; set; }
-        public int MatchCount => Wins + Losses;
         public string DisplayName { get; set; }
         public string AccountEmail { get; set; }
         public string DiscordTag { get; set; }
@@ -45,36 +33,9 @@ namespace FadingFlame.Players
         }
 
 
-        public void AddWin(Mmr mmr)
+        public void UpdateMmr(Mmr mmr)
         {
-            Wins++;
             Mmr = mmr;
-        }
-
-        public void AddLoss(Mmr mmr)
-        {
-            Losses++;
-            Mmr = mmr;
-        }
-        
-        public void RemoveWin()
-        {
-            Wins--;
-        }
-        
-        public void RemoveLoss()
-        {
-            Losses--;
-        }
-
-        public void AddDraw()
-        {
-            Draws++;
-        }
-
-        public void RemoveDraw()
-        {
-            Draws--;
         }
 
         public void SubmitLists(GameList list1, GameList list2, int season)

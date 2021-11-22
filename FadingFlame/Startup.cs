@@ -2,6 +2,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using FadingFlame.Admin;
 using FadingFlame.Discord;
+using FadingFlame.GlobalLadder;
 using FadingFlame.Leagues;
 using FadingFlame.Lists;
 using FadingFlame.Matchups;
@@ -94,6 +95,7 @@ namespace FadingFlame
                 return discordBot;
             });
 
+            services.AddTransient<IRankingReadmodelRepository, RankingReadmodelRepository>();
             services.AddTransient<ILeagueRepository, LeagueRepository>();
             services.AddTransient<IPlayerRepository, PlayerRepository>();
             services.AddTransient<IPlayoffCommandHandler, PlayoffCommandHandler>();

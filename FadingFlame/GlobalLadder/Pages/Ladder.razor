@@ -1,5 +1,4 @@
 ﻿@page "/Ladder"
-@using FadingFlame.Players
 @using MongoDB.Bson
 
 <div>
@@ -12,6 +11,7 @@
           <th>Name</th>
           <th>Wins</th>
           <th>Losses</th>
+          <th>Draws</th>
           <th>Matches</th>
       </tr>
       </thead>
@@ -19,9 +19,10 @@
       @foreach (var item in _enlistedPlayersOriginal.Select((value, index) => new { value, index }))
       {
           <tr @onclick="() => GoToPlayer(item.value.Id)" class="cursor">
-              <td>@item.value.Id</td>
+              <td>@item.value.Name</td>
               <td>@item.value.Wins</td>
               <td>@item.value.Losses</td>
+              <td>@item.value.Draws</td>
               <td>@item.value.MatchCount</td>
           </tr>
       }
@@ -29,11 +30,11 @@
     </table> 
 </div>
 
-@inject IPlayerRepository _playerRepository
+@inject IRankingReadmodelRepository _playerRepository
 @inject NavigationManager _navigation
 
 @code {
-  private List<Player> _enlistedPlayersOriginal = new();
+  private List<PlayerRankingReadModel> _enlistedPlayersOriginal = new();
   
   protected override async Task OnInitializedAsync()
   {
