@@ -17,6 +17,7 @@ namespace FadingFlame.Matchups
         public bool PlayersSelectedList => !string.IsNullOrEmpty(Player1List) && !string.IsNullOrEmpty(Player2List);
         public string Player1List { get; set; }
         public string Player2List { get; set; }
+        public bool IsChallenge { get; set; }
         public bool IsFinished => Result != null;
 
         public static Matchup CreateForLeague(PlayerInLeague playerAtHome, PlayerInLeague playerAsGuest)
@@ -29,12 +30,13 @@ namespace FadingFlame.Matchups
             };
         }
         
-        public static Matchup CreateSoloGame(Player playerAtHome, Player playerAsGuest)
+        public static Matchup CreateChallengeGame(Player playerAtHome, Player playerAsGuest)
         {
             return new()
             {
                 Player1 = playerAtHome.Id,
-                Player2 = playerAsGuest.Id
+                Player2 = playerAsGuest.Id,
+                IsChallenge = true
             };
         }
         

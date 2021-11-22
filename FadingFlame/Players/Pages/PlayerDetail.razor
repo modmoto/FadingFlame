@@ -8,6 +8,7 @@
 @using System.Globalization
 @using FadingFlame.Discord
 @using FadingFlame.Lists
+@using FadingFlame.Matchups
 
 <div class="card">
     <h4 class="card-header">Profile @_player.DisplayName 
@@ -23,6 +24,24 @@
                 <label>Time difference to you: @(_geoLocationService.GetTimeDiff(_loggedInUserState.CurrentUserTime, _editUserModel.TimeZone).Hours)h (@_editUserModel.TimeZone)</label>
             </div>
         }
+        @if (!_isTheRightUser && _loggedInUserState.UserIsLoggedIn)
+        {
+            <div class="form-group pb-3">
+                <button class="btn btn-outline-success" disabled="@_loadingChallengingPlayer" @onclick="ChallengePlayer">
+                    @if (_loading)
+                    {
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                    }
+                    <span class="oi oi-fire me-2"></span>
+                    Challenge player to a game 
+                    @if (_loggedInUserState.LoggedInPlayer.HasChallengedPlayer)
+                    {
+                        <span> (and cancel current challenge)</span>
+                    }
+                </button>
+            </div>
+        }
+        
         @if (UserParticipatesInCurrentSeason())
         {
             <div class="pt-3 pb-3 alert alert-success" role="alert" style="max-width: 25rem">
@@ -157,6 +176,8 @@
 </div>
 
 @inject IPlayerRepository _playerRepository
+@inject IMatchupRepository _matchupRepository
+@inject IChallengeService _challengeService
 @inject ILeagueRepository _leagueRepository
 @inject LoggedInUserState _loggedInUserState
 @inject SeasonState _seasonState
@@ -188,6 +209,7 @@
     private string _regionCss;
     private bool _isTheRightUser;
     private bool _isFreshListPossible;
+    private bool _loadingChallengingPlayer;
 
     protected override void OnInitialized()
     {
@@ -407,5 +429,12 @@
     {
         await _acceptAndRejectService.RejectList2(_player.ArmyCurrentSeason, "", false);
         SetListEditModel();
+    }
+
+    private async Task ChallengePlayer()
+    {
+        _loadingChallengingPlayer = true;
+        await _challengeService.ChallengePlayer(_loggedInUserState.LoggedInPlayer, _player);
+        _loadingChallengingPlayer = true;
     }
 }

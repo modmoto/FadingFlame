@@ -10,11 +10,11 @@
     <thead>
       <th style="max-width: 3rem">Rank</th>
       <th>Name</th>
-      <th style="max-width: 8rem">Mmr</th>
-      <th style="max-width: 5rem">Wins</th>
-      <th style="max-width: 5rem">Losses</th>
-      <th style="max-width: 5rem">Draws</th>
-      <th style="max-width: 5rem">Matches</th>
+      <th>Mmr</th>
+      <th>Wins</th>
+      <th>Losses</th>
+      <th>Draws</th>
+      <th>Matches</th>
     </thead>
     <tbody>
     @foreach (var item in _enlistedPlayersOriginal.Select((value, index) => new {value, index}))

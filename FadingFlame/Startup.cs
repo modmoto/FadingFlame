@@ -96,6 +96,7 @@ namespace FadingFlame
                 return discordBot;
             });
 
+            services.AddTransient<IChallengeService, ChallengeService>();
             services.AddTransient<IVersionRepository, VersionRepository>();
             services.AddTransient<IRankingReadmodelRepository, RankingReadmodelRepository>();
             services.AddTransient<ILeagueRepository, LeagueRepository>();
