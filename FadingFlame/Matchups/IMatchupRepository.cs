@@ -57,7 +57,7 @@ namespace FadingFlame.Matchups
 
         public Task<List<Matchup>> LoadChallengesOfPlayer(Player player)
         {
-            return LoadAll<Matchup>(m => m.IsChallenge && (m.Player1 == player.Id || m.Player2 == player.Id));
+            return LoadAll<Matchup>(m => m.IsChallenge && m.Result == null && (m.Player1 == player.Id || m.Player2 == player.Id));
         }
     }
 }
