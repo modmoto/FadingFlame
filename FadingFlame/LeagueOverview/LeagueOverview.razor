@@ -1,27 +1,15 @@
 @page "/"
+@using FadingFlame.Admin
 @using FadingFlame.Leagues
+@using FadingFlame.Matchups
 @using FadingFlame.Players
 @using MongoDB.Bson
-@using FadingFlame.Admin
-@using FadingFlame.Matchups
 
 <div>
     <h1>Welcome to the Fading Flame League!</h1>
     <hr class="my-4">
     <p class="lead">The next season starts on @_seasonState.CurrentSeason.StartDate.ToMyDate() and list submission will end on the @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()!</p>
     <hr class="my-4">
-    @if(!_loggedInUserState.LoadingPlayer && !_loggedInUserState.LoggedInPlayer.SubmittedLists)
-    {
-        <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
-            You did not submit your lists yet, to participate in the next season make sure to do that in your profile!
-        </div>
-    }
-    @if(_upcomingGame != null)
-    {
-        <div class="pt-3 pb-3 alert alert-info text-center cursor" role="alert" @onclick="@(() => _navigation.NavigateTo($"match/{_upcomingGame.Id}?leagueId={_leagueIdForUpcomingDay}"))">
-            Upcoming game against @_upcomingOpponenName
-        </div>
-    }
 </div>
 
 @if (_loading)
@@ -32,21 +20,41 @@
 }
 else
 {
+    @if (!_loggedInUserState.LoadingPlayer && !_loggedInUserState.LoggedInPlayer.SubmittedLists)
+    {
+        <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
+            You did not submit your lists yet, to participate in the next season make sure to do that in your profile!
+        </div>
+    }
+    <div class="row">
+        @if (_upcomingGame != null)
+        {
+            <div class="col mx-2 pt-3 pb-3 alert alert-info text-center cursor" role="alert" @onclick="@(() => _navigation.NavigateTo($"match/{_upcomingGame.Id}?leagueId={_leagueIdForUpcomingDay}"))">
+                Upcoming game against @_upcomingOpponenName
+            </div>
+        }
+        @if (_loggedInUserState.LoggedInPlayer.HasChallengedPlayer && _upcomingChallengeName != null)
+        {
+            <div class="col mx-2 pt-3 pb-3 alert alert-info text-center cursor" role="alert" @onclick="@(() => _navigation.NavigateTo($"match/{_loggedInUserState.LoggedInPlayer.CurrentChallengeId}"))">
+                Challenge against @_upcomingChallengeName
+            </div>
+        }
+    </div>
     <div class="row row-cols-auto justify-content-around">
-         @foreach (var league in _leagues)
-         {
-             <div class="col mb-4 cursor" @onclick="() => GoToLeague(league.Id)">
-                 <div class="card" style="width: 18rem;">
-                     <div class="card-header">
-                         @league.DivisionId @league.Name
-                     </div>
-                     <div class="card-body">
-                         <span class="oi oi-star" aria-hidden="true"></span><span class="card-title mx-2">@GetName(league.Players.First().Id)</span>
-                     </div>
-                 </div>
-             </div>  
-         }
-     </div>
+        @foreach (var league in _leagues)
+        {
+            <div class="col mb-4 cursor" @onclick="() => GoToLeague(league.Id)">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-header">
+                        @league.DivisionId @league.Name
+                    </div>
+                    <div class="card-body">
+                        <span class="oi oi-star" aria-hidden="true"></span><span class="card-title mx-2">@GetName(league.Players.First().Id)</span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 }
 
 
@@ -65,6 +73,7 @@ else
     private Matchup _upcomingGame;
     private ObjectId _leagueIdForUpcomingDay;
     private string _upcomingOpponenName;
+    private string _upcomingChallengeName;
 
     protected override void OnInitialized()
     {
@@ -95,9 +104,14 @@ else
                     .FirstOrDefault(m => !m.IsFinished);
                 if (_upcomingGame != null)
                 {
-                    _upcomingOpponenName = _upcomingGame.Player1 == playerId 
-                        ? GetNameAndDiscordPlayer2() 
-                        : GetNameAndDiscordPlayer1();
+                    _upcomingOpponenName = await LoadOpponentName(_upcomingGame, playerId);
+                }
+
+                if (_loggedInUserState.LoggedInPlayer.HasChallengedPlayer)
+                {
+                    var challenges = await _matchupRepository.LoadChallengesOfPlayer(_loggedInUserState.LoggedInPlayer);
+                    var matchup = challenges.Single(m => m.Id == _loggedInUserState.LoggedInPlayer.CurrentChallengeId);
+                    _upcomingChallengeName = await LoadOpponentName(matchup, playerId);
                 }
             }
         }
@@ -105,16 +119,12 @@ else
         StateHasChanged();
     }
 
-    private string GetNameAndDiscordPlayer2()
+    private async Task<string> LoadOpponentName(Matchup matchup, ObjectId loggedInplayer)
     {
-        var player = _playersInLeague.FirstOrDefault(p => p.Id == _upcomingGame.Player2);
-        return $"{player?.DisplayName} / {player?.DiscordTag}";
-    }
-    
-    private string GetNameAndDiscordPlayer1()
-    {
-        var player = _playersInLeague.FirstOrDefault(p => p.Id == _upcomingGame.Player1);
-        return $"{player?.DisplayName} / {player?.DiscordTag}";
+        var layer = matchup.Player1 == loggedInplayer
+            ? await _playerRepository.Load(matchup.Player2)
+            : await _playerRepository.Load(matchup.Player1);
+        return $"{layer?.DisplayName} / {layer?.DiscordTag}";
     }
 
     private string GetName(ObjectId playerId)
