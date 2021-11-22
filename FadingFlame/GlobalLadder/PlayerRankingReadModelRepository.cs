@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FadingFlame.Repositories;
 using MongoDB.Driver;
@@ -17,9 +18,10 @@ namespace FadingFlame.GlobalLadder
         {
         }
         
-        public Task<List<PlayerRankingReadModel>> LoadAllRanked()
+        public async Task<List<PlayerRankingReadModel>> LoadAllRanked()
         {
-            return LoadAll<PlayerRankingReadModel>();
+            var loadAllRanked = await LoadAll<PlayerRankingReadModel>();
+            return loadAllRanked.OrderByDescending(i => i.Mmr).ToList();
         }
 
         public Task Upsert(List<PlayerRankingReadModel> rankingModels)

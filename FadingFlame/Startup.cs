@@ -8,6 +8,7 @@ using FadingFlame.Lists;
 using FadingFlame.Matchups;
 using FadingFlame.Players;
 using FadingFlame.Playoffs;
+using FadingFlame.ReadModelBase;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -95,6 +96,7 @@ namespace FadingFlame
                 return discordBot;
             });
 
+            services.AddTransient<IVersionRepository, VersionRepository>();
             services.AddTransient<IRankingReadmodelRepository, RankingReadmodelRepository>();
             services.AddTransient<ILeagueRepository, LeagueRepository>();
             services.AddTransient<IPlayerRepository, PlayerRepository>();
@@ -108,6 +110,7 @@ namespace FadingFlame
             services.AddScoped<LoggedInUserState>();
             services.AddScoped<SeasonState>();
             services.AddHttpContextAccessor();
+            services.AddReadModelService<PlayerRankingModelReadHandler>();
 
             // var buildServiceProvider = services.BuildServiceProvider();
             // var playerRepository = buildServiceProvider.GetService<IPlayerRepository>();
@@ -149,6 +152,16 @@ namespace FadingFlame
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
+        }
+    }
+    
+    public static class ReadModelExtensions
+    {
+        public static IServiceCollection AddReadModelService<TService>(this IServiceCollection services) where TService : class, IAsyncUpdatable
+        {
+            services.AddTransient<TService>();
+            services.AddSingleton<IHostedService, AsyncService<TService>>();
+            return services;
         }
     }
 }

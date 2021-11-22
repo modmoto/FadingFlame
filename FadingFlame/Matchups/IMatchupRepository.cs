@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FadingFlame.Players;
 using FadingFlame.Repositories;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -12,6 +14,8 @@ namespace FadingFlame.Matchups
         Task InsertMatches(List<Matchup> matchups);
         Task DeleteMatches(List<ObjectId> matchups);
         Task UpdateMatches(List<Matchup> matchups);
+        Task<List<Matchup>> LoadFinishedSince(DateTime currentVersionVersion);
+        Task<List<Matchup>> LoadMatchesOfPlayer(Player player);
     }
 
     public class MatchupRepository : MongoDbRepositoryBase, IMatchupRepository
@@ -38,6 +42,16 @@ namespace FadingFlame.Matchups
         public Task UpdateMatches(List<Matchup> matchups)
         {
             return UpsertMany(matchups);
+        }
+
+        public Task<List<Matchup>> LoadFinishedSince(DateTime currentVersionVersion)
+        {
+            return LoadAll<Matchup>(m => m.Result.RecordedAt > currentVersionVersion);
+        }
+
+        public Task<List<Matchup>> LoadMatchesOfPlayer(Player player)
+        {
+            return LoadAll<Matchup>(m => m.Result != null && (m.Player1 == player.Id || m.Player2 == player.Id));
         }
     }
 }

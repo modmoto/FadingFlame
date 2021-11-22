@@ -15,6 +15,8 @@ namespace FadingFlame.GlobalLadder
         public int Wins { get; set; }
         public int Losses { get; set; }
         public int Draws { get; set; }
+        public int Mmr { get; set; }
+        
         [BsonIgnore]
         public int MatchCount => Wins + Losses + Draws;
 
@@ -26,6 +28,7 @@ namespace FadingFlame.GlobalLadder
             {
                 Draws = playersMatches.Count(m => m.IsDraw),
                 Wins = wins,
+                Mmr = (int) player.Mmr.Rating,
                 Losses = losses,
                 Id = player.Id,
                 Name = player.DisplayName

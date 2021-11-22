@@ -8,6 +8,18 @@ html, body {
     display: none !important;
 }
 
+.won {
+    color: #4AD74AFF;
+}
+
+.lost {
+    color: #F66C42FF;    
+}
+
+.draw {
+    color: #BBAA1BFF;    
+}
+
 a, .btn-link {
     color: #0366d6;
 }
