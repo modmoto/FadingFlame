@@ -9,237 +9,241 @@
 @using System.Text.RegularExpressions
 
 <div class="card">
-  <h4 class="card-header">
+<div class="card-header">
+  <h4>
     Profile @_player.DisplayName
     @if (_editUserModel.Country != null)
     {
       <span class="@_regionCss"></span>
     }
   </h4>
-  <div class="card-body">
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">Profile</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="matches-tab" data-bs-toggle="tab" data-bs-target="#matches" type="button" role="tab" aria-controls="matches" aria-selected="false">Matches</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="lists-tab" data-bs-toggle="tab" data-bs-target="#lists" type="button" role="tab" aria-controls="lists" aria-selected="false">Lists</button>
-      </li>
-    </ul>
-    <div class="tab-content" id="myTabContent">
-      <div class="tab-pane fade show active pt-4" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-        @if (!_isTheRightUser && _loggedInUserState.UserIsLoggedIn)
+  <smal>@((int) (_player.Mmr?.Rating ?? 0)) ladder points</smal>
+</div>
+
+<div class="card-body">
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">Profile</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="matches-tab" data-bs-toggle="tab" data-bs-target="#matches" type="button" role="tab" aria-controls="matches" aria-selected="false">Matches</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="lists-tab" data-bs-toggle="tab" data-bs-target="#lists" type="button" role="tab" aria-controls="lists" aria-selected="false">Lists</button>
+  </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+<div class="tab-pane fade show active pt-4" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+  @if (!_isTheRightUser && _loggedInUserState.UserIsLoggedIn)
+  {
+    <div class="form-group pb-3">
+      <button class="btn btn-outline-success" disabled="@_loadingChallengingPlayer" @onclick="ChallengePlayer">
+        @if (_loading)
         {
-          <div class="form-group pb-3">
-            <button class="btn btn-outline-success" disabled="@_loadingChallengingPlayer" @onclick="ChallengePlayer">
-              @if (_loading)
-              {
-                <span class="spinner-border spinner-border-sm mr-1"></span>
-              }
-              <span class="oi oi-fire me-2"></span>
-              Challenge player to a game
-            </button>
-          </div>
+          <span class="spinner-border spinner-border-sm mr-1"></span>
         }
-        @if (UserParticipatesInCurrentSeason)
-        {
-          <div class="pt-3 pb-3 alert alert-success" role="alert" style="max-width: 30rem">
-            <div class="cursor" @onclick="() => NavigateToLeague(_playerLeagues[0].Id)">Current league: @_playerLeagues[0].DivisionId @_playerLeagues[0].Name</div>
-          </div>
-        }
-    
-        @if (_challenges.Any() && _isTheRightUser)
-        {
-          <h4 class="mb-3">Open challenges</h4>
-          @foreach (var challenge in _challenges)
-          {
-            <div class="pt-3 pb-3 alert alert-info d-flex justify-content-between" style="max-width: 30rem" role="alert">
-              <div class="cursor col d-flex align-items-center" @onclick="() => NavigateToMatch(challenge.Id)">
-                vs @GetOpponent(challenge)
-              </div>
-              <button class="btn btn-danger float-end col" style="max-width: 4rem" @onclick="() => DeleteChallenge(challenge)">
-                <span class="oi oi-trash"></span>
-              </button>
-            </div>
-          }
-        }
-    
-        @if (_isTheRightUser)
-        {
-          <EditForm OnSubmit="OnSubmit" EditContext="@_editContextUser">
-            <div class="form-group">
-              <div class="pb-2">Display name: </div>
-              <ValidationMessage For="@(() => _editUserModel.DisplayName)"/>
-              <InputText @bind-Value="_editUserModel.DisplayName" class="form-control mb-3"/>
-            </div>
-            <div class="form-group">
-              <div class="pb-2">Discord tag: </div>
-              <ValidationMessage For="@(() => _editUserModel.DiscordTag)"/>
-              <InputText @bind-Value="_editUserModel.DiscordTag" class="form-control mb-3"/>
-            </div>
-            <div class="row">
-              <div class="form-group col">
-                <div class="pb-2">Country: </div>
-                <div class="form-group">
-                  <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_editUserModel.Country">
-                    <option selected value="@Location.NotSelected">Dont show country</option>
-                    @foreach (var culture in _countries)
-                    {
-                      <option value="@culture.TwoLetterISORegionName">@culture.EnglishName</option>
-                    }
-                  </select>
-                </div>
-              </div>
-              <div class="form-group col">
-                <div class="pb-2">Timezone: </div>
-                <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_editUserModel.TimeZone">
-                  <option selected value="@Location.NotSelected">Dont show timezone</option>
-                  @foreach (var timeZone in _geoLocationService.GetTimeZones())
-                  {
-                    <option value="@timeZone.Id">@timeZone.Id @(timeZone.BaseUtcOffset)</option>
-                  }
-                </select>
-              </div>
-            </div>
-    
-            <button disabled="@_loading" class="btn btn-primary">
-              @if (_loading)
-              {
-                <span class="spinner-border spinner-border-sm mr-1"></span>
-              }
-              Save profile
-            </button>
-          </EditForm>
-    
-          <hr class="my-3">
-    
-          @if (!_seasonState.CurrentSeason.ListSubmissionIsOver)
-          {
-            @if (!_player.SubmittedLists)
-            {
-              <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
-                To participate in the next season, submit your lists here. The lists can not be changed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate() and are not visible to other players until then.
-              </div>
-            }
-            else
-            {
-              <div class="pt-3 pb-3 alert alert-success text-center" role="alert">
-                Lists submitted, you will participate in the next season. You can still change the lists until @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate() and they are not visible to other players until then.
-              </div>
-            }
-          }
-        }
-        else
-        {
-          @if (_editUserModel.TimeZone != Location.NotSelected && _loggedInUserState.UserIsLoggedIn)
-          {
-            <div class="form-group pb-3">
-              <label>Time difference to you: @(_geoLocationService.GetTimeDiff(_loggedInUserState.CurrentUserTime, _editUserModel.TimeZone).Hours)h (@_editUserModel.TimeZone)</label>
-            </div>
-          }
-          <div class="form-group pb-3">
-            <label>Discord Tag: </label>
-            <span>@_editUserModel.DiscordTag</span>
-          </div>
-        }
-        <h4 class="mt-4">Participated in Seasons</h4>
-        @foreach (var league in _playerLeagues)
-        {
-          <div class="cursor" @onclick="() => NavigateToLeague(league.Id)">Season @league.Season, Division @league.DivisionId, Rank @GetRank(league)</div>
-        }
-      </div>
-      <div class="tab-pane fade pt-4" id="matches" role="tabpanel" aria-labelledby="matches-tab">
-        <table class="table table-striped table-hover">
-            <thead>
-              <th>Opponent</th>
-              <th>Result</th>
-              <th>Points</th>
-              <th>Matchup</th>
-              <th>Type</th>
-              <th>Date</th>
-            </thead>
-            <tbody>
-            @foreach (var matchup in _matches)
-            {
-              <tr @onclick="() => NavigateToMatch(matchup.Id)" class="cursor">
-                <td>@GetOpponent(matchup)</td>
-                <td>
-                  @if (matchup.Result != null)
-                  {
-                    <p class="@($"mb-1 {WonMatch(matchup)}")">@GetBattlePointString(matchup.Result)</p>
-                    <small>@GetOriginalPointsString(matchup.Result)</small>
-                  }
-                  else
-                  {
-                    <p class="mb-1">not reported yet</p>
-                  }
-                </td>
-                <td>
-                  @if (matchup.Result != null)
-                  {
-                    <p class="@($"mb-1 {WonMatch(matchup)}")">@GetMmrDiff(matchup.Result)</p>
-                  }
-                </td>
-                <td>@GetRaceStrings(matchup.Result)</td>
-                <td>@(matchup.IsChallenge ? "Challenge" : "League")</td>
-                <td>@matchup.Result?.RecordedAt.ToMyDateYear()</td>
-              </tr>
-            }
-            </tbody>
-          </table>
-      </div>
-      <div class="tab-pane fade pt-4" id="lists" role="tabpanel" aria-labelledby="lists-tab">
-        @if (_player.SubmittedLists && _seasonState.CurrentSeason.ListSubmissionIsOver
-                 || !_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser
-                 || _isFreshListPossible)
-          {
-            <h4>Lists this season</h4>
-            <hr class="my-3">
-            <EditForm EditContext="@_editContextLists">
-              <DataAnnotationsValidator/>
-              <div class="row align-items-start">
-                <div class="col">
-                  <ValidationMessage For="@(() => _editListModel.List1.List)"/>
-                  <UserListComponent
-                    List="@(_editListModel.List1)"
-                    IsFreshListPossible="_isFreshListPossible"
-                    IsCurrentUser="_isTheRightUser"
-                    OnRequestListChange="RequestListChange1"
-                    OnDeleteListChange="DeleteListChange1"/>
-                </div>
-                <div class="col">
-                  <ValidationMessage For="@(() => _editListModel.List2.List)"/>
-                  <UserListComponent
-                    List="@(_editListModel.List2)"
-                    IsFreshListPossible="_isFreshListPossible"
-                    IsCurrentUser="_isTheRightUser"
-                    OnRequestListChange="RequestListChange2"
-                    OnDeleteListChange="DeleteListChange2"/>
-                </div>
-              </div>
-              @if (_isFreshListPossible)
-              {
-                <button disabled="@_loadingLists" class="btn btn-primary" @onclick="OnSubmitList">
-                  @if (_loadingLists)
-                  {
-                    <span class="spinner-border spinner-border-sm mr-1"></span>
-                  }
-                  Save lists
-                </button>
-              }
-      
-            </EditForm>
-          }
-      
-          @if (!_isTheRightUser && _player.SubmittedLists && !_seasonState.CurrentSeason.ListSubmissionIsOver)
-          {
-            <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()</div>
-          }
-      </div>
+        <span class="oi oi-fire me-2"></span>
+        Challenge player to a game
+      </button>
     </div>
-  </div>
+  }
+  @if (UserParticipatesInCurrentSeason)
+  {
+    <div class="pt-3 pb-3 alert alert-success" role="alert" style="max-width: 30rem">
+      <div class="cursor" @onclick="() => NavigateToLeague(_playerLeagues[0].Id)">Current league: @_playerLeagues[0].DivisionId @_playerLeagues[0].Name</div>
+    </div>
+  }
+
+  @if (_challenges.Any() && _isTheRightUser)
+  {
+    <h4 class="mb-3">Open challenges</h4>
+    @foreach (var challenge in _challenges)
+    {
+      <div class="pt-3 pb-3 alert alert-info d-flex justify-content-between" style="max-width: 30rem" role="alert">
+        <div class="cursor col d-flex align-items-center" @onclick="() => NavigateToMatch(challenge.Id)">
+          vs @GetOpponent(challenge)
+        </div>
+        <button class="btn btn-danger float-end col" style="max-width: 4rem" @onclick="() => DeleteChallenge(challenge)">
+          <span class="oi oi-trash"></span>
+        </button>
+      </div>
+    }
+  }
+
+  @if (_isTheRightUser)
+  {
+    <EditForm OnSubmit="OnSubmit" EditContext="@_editContextUser">
+      <div class="form-group">
+        <div class="pb-2">Display name: </div>
+        <ValidationMessage For="@(() => _editUserModel.DisplayName)"/>
+        <InputText @bind-Value="_editUserModel.DisplayName" class="form-control mb-3"/>
+      </div>
+      <div class="form-group">
+        <div class="pb-2">Discord tag: </div>
+        <ValidationMessage For="@(() => _editUserModel.DiscordTag)"/>
+        <InputText @bind-Value="_editUserModel.DiscordTag" class="form-control mb-3"/>
+      </div>
+      <div class="row">
+        <div class="form-group col">
+          <div class="pb-2">Country: </div>
+          <div class="form-group">
+            <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_editUserModel.Country">
+              <option selected value="@Location.NotSelected">Dont show country</option>
+              @foreach (var culture in _countries)
+              {
+                <option value="@culture.TwoLetterISORegionName">@culture.EnglishName</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="form-group col">
+          <div class="pb-2">Timezone: </div>
+          <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_editUserModel.TimeZone">
+            <option selected value="@Location.NotSelected">Dont show timezone</option>
+            @foreach (var timeZone in _geoLocationService.GetTimeZones())
+            {
+              <option value="@timeZone.Id">@timeZone.Id @(timeZone.BaseUtcOffset)</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <button disabled="@_loading" class="btn btn-primary">
+        @if (_loading)
+        {
+          <span class="spinner-border spinner-border-sm mr-1"></span>
+        }
+        Save profile
+      </button>
+    </EditForm>
+
+    <hr class="my-3">
+
+    @if (!_seasonState.CurrentSeason.ListSubmissionIsOver)
+    {
+      @if (!_player.SubmittedLists)
+      {
+        <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
+          To participate in the next season, submit your lists here. The lists can not be changed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate() and are not visible to other players until then.
+        </div>
+      }
+      else
+      {
+        <div class="pt-3 pb-3 alert alert-success text-center" role="alert">
+          Lists submitted, you will participate in the next season. You can still change the lists until @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate() and they are not visible to other players until then.
+        </div>
+      }
+    }
+  }
+  else
+  {
+    @if (_editUserModel.TimeZone != Location.NotSelected && _loggedInUserState.UserIsLoggedIn)
+    {
+      <div class="form-group pb-3">
+        <label>Time difference to you: @(_geoLocationService.GetTimeDiff(_loggedInUserState.CurrentUserTime, _editUserModel.TimeZone).Hours)h (@_editUserModel.TimeZone)</label>
+      </div>
+    }
+    <div class="form-group pb-3">
+      <label>Discord Tag: </label>
+      <span>@_editUserModel.DiscordTag</span>
+    </div>
+  }
+  <h4 class="mt-4">Participated in Seasons</h4>
+  @foreach (var league in _playerLeagues)
+  {
+    <div class="cursor" @onclick="() => NavigateToLeague(league.Id)">Season @league.Season, Division @league.DivisionId, Rank @GetRank(league)</div>
+  }
+</div>
+<div class="tab-pane fade pt-4" id="matches" role="tabpanel" aria-labelledby="matches-tab">
+  <table class="table table-striped table-hover">
+    <thead>
+    <th>Opponent</th>
+    <th>Result</th>
+    <th>Points</th>
+    <th>Matchup</th>
+    <th>Type</th>
+    <th>Date</th>
+    </thead>
+    <tbody>
+    @foreach (var matchup in _matches)
+    {
+      <tr @onclick="() => NavigateToMatch(matchup.Id)" class="cursor">
+        <td>@GetOpponent(matchup)</td>
+        <td>
+          @if (matchup.Result != null)
+          {
+            <p class="@($"mb-1 {WonMatch(matchup)}")">@GetBattlePointString(matchup.Result)</p>
+            <small>@GetOriginalPointsString(matchup.Result)</small>
+          }
+          else
+          {
+            <p class="mb-1">not reported yet</p>
+          }
+        </td>
+        <td>
+          @if (matchup.Result != null)
+          {
+            <p class="@($"mb-1 {WonMatch(matchup)}")">@GetMmrDiff(matchup.Result)</p>
+          }
+        </td>
+        <td>@GetRaceStrings(matchup.Result)</td>
+        <td>@(matchup.IsChallenge ? "Challenge" : "League")</td>
+        <td>@matchup.Result?.RecordedAt.ToMyDateYear()</td>
+      </tr>
+    }
+    </tbody>
+  </table>
+</div>
+<div class="tab-pane fade pt-4" id="lists" role="tabpanel" aria-labelledby="lists-tab">
+  @if (_player.SubmittedLists && _seasonState.CurrentSeason.ListSubmissionIsOver
+       || !_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser
+       || _isFreshListPossible)
+  {
+    <h4>Lists this season</h4>
+    <hr class="my-3">
+    <EditForm EditContext="@_editContextLists">
+      <DataAnnotationsValidator/>
+      <div class="row align-items-start">
+        <div class="col">
+          <ValidationMessage For="@(() => _editListModel.List1.List)"/>
+          <UserListComponent
+            List="@(_editListModel.List1)"
+            IsFreshListPossible="_isFreshListPossible"
+            IsCurrentUser="_isTheRightUser"
+            OnRequestListChange="RequestListChange1"
+            OnDeleteListChange="DeleteListChange1"/>
+        </div>
+        <div class="col">
+          <ValidationMessage For="@(() => _editListModel.List2.List)"/>
+          <UserListComponent
+            List="@(_editListModel.List2)"
+            IsFreshListPossible="_isFreshListPossible"
+            IsCurrentUser="_isTheRightUser"
+            OnRequestListChange="RequestListChange2"
+            OnDeleteListChange="DeleteListChange2"/>
+        </div>
+      </div>
+      @if (_isFreshListPossible)
+      {
+        <button disabled="@_loadingLists" class="btn btn-primary" @onclick="OnSubmitList">
+          @if (_loadingLists)
+          {
+            <span class="spinner-border spinner-border-sm mr-1"></span>
+          }
+          Save lists
+        </button>
+      }
+
+    </EditForm>
+  }
+
+  @if (!_isTheRightUser && _player.SubmittedLists && !_seasonState.CurrentSeason.ListSubmissionIsOver)
+  {
+    <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()</div>
+  }
+</div>
+</div>
+</div>
 </div>
 
 @inject IPlayerRepository _playerRepository
