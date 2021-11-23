@@ -37,7 +37,7 @@ namespace FadingFlame.GlobalLadder
             foreach (var match in newMatches)
             {
                 var player1 = await _playerRepository.Load(match.Player1);
-                var player2 = await _playerRepository.Load(match.Player1);
+                var player2 = await _playerRepository.Load(match.Player2);
 
                 var matchesPlayer1 = await _matchupRepository.LoadFinishedMatchesOfPlayer(player1);
                 var matchesPlayer2 = await _matchupRepository.LoadFinishedMatchesOfPlayer(player2);
