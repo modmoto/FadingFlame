@@ -8,6 +8,7 @@ using FadingFlame.Matchups;
 using FadingFlame.Players;
 using FluentAssertions;
 using MongoDB.Bson;
+using Moq;
 using NUnit.Framework;
 
 namespace FadingFlameTests
@@ -61,7 +62,7 @@ namespace FadingFlameTests
                 }
             };
 
-            league.ReportGame(result, null, null);
+            league.ReportGame(MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
 
             league.Players[1].Id.Should().Be(player1.Id);
             league.Players[0].Id.Should().Be(player2.Id);
@@ -118,7 +119,7 @@ namespace FadingFlameTests
                 }
             };
 
-            league.ReportGame(result, null, null);
+            league.ReportGame(MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
 
             league.Players[0].Id.Should().Be(player1.Id);
             league.Players[1].Id.Should().Be(player2.Id);
@@ -179,7 +180,7 @@ namespace FadingFlameTests
                 }
             };
 
-            league.ReportGame(result, null, null);
+            league.ReportGame(MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
 
             league.Players[1].Id.Should().Be(player1.Id);
             league.Players[0].Id.Should().Be(player2.Id);
@@ -235,7 +236,7 @@ namespace FadingFlameTests
                 }
             };
 
-            league.ReportGame(result, null, null);
+            league.ReportGame(MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
 
             league.Players[0].Id.Should().Be(player1.Id);
             league.Players[1].Id.Should().Be(player2.Id);
@@ -291,7 +292,7 @@ namespace FadingFlameTests
                 }
             };
 
-            league.ReportGame(result, null, null);
+            league.ReportGame(MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
 
             league.Players[0].Id.Should().Be(player2.Id);
             league.Players[1].Id.Should().Be(player1.Id);
@@ -330,7 +331,7 @@ namespace FadingFlameTests
                 }
             };
 
-            league.ReportGame(result, null, null);
+            league.ReportGame(MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
 
             league.Players[0].Id.Should().Be(player1.Id);
             league.Players[1].Id.Should().Be(player2.Id);
@@ -398,12 +399,23 @@ namespace FadingFlameTests
                 }
             };
 
-            league.ReportGame(result, null, null);
+            league.ReportGame(MmrRepositoryMock(), result, Mmr.Create(), Mmr.Create(), null, null);
 
             Assert.AreEqual(20, league.Players[0].BattlePoints);
             Assert.AreEqual(20, league.Players[1].BattlePoints);
             Assert.AreEqual(id2, league.Players[0].Id);
             Assert.AreEqual(id1, league.Players[1].Id);
+        }
+        
+        private static IMmrRepository MmrRepositoryMock()
+        {
+            var mock = new Mock<IMmrRepository>();
+            mock.Setup(m => m.UpdateMmrs(It.IsAny<UpdateMmrRequest>())).ReturnsAsync(new List<Mmr>
+            {
+                Mmr.Create(),
+                Mmr.Create()
+            });
+            return mock.Object;
         }
 
         private static League CreateLeagueToOrder()

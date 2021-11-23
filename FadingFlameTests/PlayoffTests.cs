@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FadingFlame.Admin;
 using FadingFlame.Leagues;
 using FadingFlame.Matchups;
+using FadingFlame.Players;
 using FadingFlame.Playoffs;
 using MongoDB.Bson;
 using Moq;
@@ -23,7 +24,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient), new SeasonState());
+                new PlayoffRepository(MongoClient), new SeasonState(), MmrRepositoryMock());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
 
@@ -40,14 +41,16 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient), new SeasonState());
+                new PlayoffRepository(MongoClient), new SeasonState(), MmrRepositoryMock());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
 
             var matchup1 = playoffs.Rounds[0].Matchups[0];
             var matchup2 = playoffs.Rounds[0].Matchups[1];
-            playoffs.ReportGame(new MatchResultDto
+            await playoffs.ReportGame(MmrRepositoryMock(),
+                new MatchResultDto
             {
+                
                 Player1 = new PlayerResultDto
                 {
                     Id = matchup1.Player1,
@@ -59,8 +62,8 @@ namespace FadingFlameTests
                     VictoryPoints = 1200
                 },
                 MatchId = matchup1.Id
-            }, null, null);
-            playoffs.ReportGame(new MatchResultDto
+            }, Mmr.Create(), Mmr.Create(), null, null);
+            await playoffs.ReportGame(MmrRepositoryMock(), new MatchResultDto
             {
                 Player1 = new PlayerResultDto
                 {
@@ -73,7 +76,7 @@ namespace FadingFlameTests
                     VictoryPoints = 1000
                 },
                 MatchId = matchup2.Id
-            }, null, null);
+            }, Mmr.Create(), Mmr.Create(), null, null);
 
             Assert.AreEqual(2, playoffs.Rounds[0].Matchups.Count);
             Assert.AreEqual(1, playoffs.Rounds[1].Matchups.Count);
@@ -81,6 +84,17 @@ namespace FadingFlameTests
             var finale = playoffs.Rounds[1].Matchups[0];
             Assert.AreEqual(matchup1.Player2, finale.Player1);
             Assert.AreEqual(matchup2.Player1, finale.Player2);
+        }
+
+        private static IMmrRepository MmrRepositoryMock()
+        {
+            var mock = new Mock<IMmrRepository>();
+            mock.Setup(m => m.UpdateMmrs(It.IsAny<UpdateMmrRequest>())).ReturnsAsync(new List<Mmr>
+            {
+                Mmr.Create(),
+                Mmr.Create()
+            });
+            return mock.Object;
         }
 
         [Test]
@@ -92,7 +106,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient), new SeasonState());
+                new PlayoffRepository(MongoClient), new SeasonState(), MmrRepositoryMock());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
             
@@ -117,7 +131,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient), new SeasonState());
+                new PlayoffRepository(MongoClient), new SeasonState(), MmrRepositoryMock());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
             

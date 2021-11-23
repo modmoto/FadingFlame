@@ -22,7 +22,10 @@ namespace FadingFlame.Playoffs
 
         public List<Round> Rounds { get; set; }
 
-        public static async Task<Playoff> Create(int season, List<PlayerInLeague> firstPlaces)
+        public static async Task<Playoff> Create(
+            IMmrRepository mmrRepository, 
+            int season,
+            List<PlayerInLeague> firstPlaces)
         {
             var playersWithFreeWins = new List<PlayerInLeague>();
             var remainingRounds = NormalRounds.Where(r => r < firstPlaces.Count).ToList();
@@ -65,7 +68,7 @@ namespace FadingFlame.Playoffs
             var freeWins = round.Matchups.Where(m => m.Player2 == ObjectId.Empty);
             foreach (var freeWin in freeWins)
             {
-                await playoff.ReportGame(null, new MatchResultDto
+                await playoff.ReportGame(mmrRepository, new MatchResultDto
                 {
                     MatchId = freeWin.Id,
                     Player1 = new PlayerResultDto
@@ -79,8 +82,7 @@ namespace FadingFlame.Playoffs
                         VictoryPoints = 0
                     },
                     SecondaryObjective = SecondaryObjectiveState.player1
-                }, null, null, null, null);
-                //todo hier mmr rein!!!
+                }, Mmr.Create(), Mmr.Create(), null, null);
             }
             
             return playoff;

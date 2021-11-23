@@ -4,12 +4,6 @@
 @using FadingFlame.Players
 @using FadingFlame.Admin
 @using FadingFlame.Matchups
-@inject IPlayoffRepository _playoffRepository
-@inject IPlayerRepository _playerRepository
-@inject NavigationManager _navigation
-@inject LoggedInUserState _loggedInUserState
-@inject SeasonState _seasonState
-
 
 <div>
     <h1>Playoffs Season @_seasonState.CurrentSeason.SeasonId</h1>
@@ -49,6 +43,13 @@ else
     </div>
 }
 
+@inject IPlayoffRepository _playoffRepository
+@inject IPlayerRepository _playerRepository
+@inject NavigationManager _navigation
+@inject LoggedInUserState _loggedInUserState
+@inject SeasonState _seasonState
+@inject IMmrRepository _mmrRepository
+
 @code
 {
     private bool _loading = true;
@@ -65,7 +66,7 @@ else
             {
                 playerInLeagues.Add(PlayerInLeague.Create(ObjectId.GenerateNewId()));
             }
-            _playoffs = await Playoff.Create(0, playerInLeagues);
+            _playoffs = await Playoff.Create(_mmrRepository, 0, playerInLeagues);
         }
         var listOfPlayerInPlayoffs = _playoffs.Rounds.First().Matchups.SelectMany(m => new List<ObjectId> { m.Player1, m.Player2 }).ToList();
         _playersInPlayoffs = await _playerRepository.LoadForLeague(listOfPlayerInPlayoffs, _seasonState.CurrentSeason.SeasonId);

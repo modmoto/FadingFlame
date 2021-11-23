@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FadingFlame.Admin;
 using FadingFlame.Leagues;
+using FadingFlame.Players;
 
 namespace FadingFlame.Playoffs
 {
@@ -15,16 +16,19 @@ namespace FadingFlame.Playoffs
     {
         private readonly ILeagueRepository _leagueRepository;
         private readonly IPlayoffRepository _playoffRepository;
+        private readonly IMmrRepository _mmrRepository;
         private readonly SeasonState _seasonState;
 
         public PlayoffCommandHandler(
             ILeagueRepository leagueRepository,
             IPlayoffRepository playoffRepository,
-            SeasonState seasonState)
+            SeasonState seasonState, 
+            IMmrRepository mmrRepository)
         {
             _leagueRepository = leagueRepository;
             _playoffRepository = playoffRepository;
             _seasonState = seasonState;
+            _mmrRepository = mmrRepository;
         }
 
         public async Task<Playoff> CreatePlayoffs()
@@ -43,7 +47,7 @@ namespace FadingFlame.Playoffs
                 sortedFirstPlaces.Add(player2);
             }
 
-            var playoffs = await Playoff.Create(_seasonState.CurrentSeason.SeasonId, sortedFirstPlaces);
+            var playoffs = await Playoff.Create(_mmrRepository, _seasonState.CurrentSeason.SeasonId, sortedFirstPlaces);
 
             await _playoffRepository.Insert(playoffs);
 
