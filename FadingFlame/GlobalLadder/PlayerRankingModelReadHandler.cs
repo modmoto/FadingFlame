@@ -39,8 +39,8 @@ namespace FadingFlame.GlobalLadder
                 var player1 = await _playerRepository.Load(match.Player1);
                 var player2 = await _playerRepository.Load(match.Player1);
 
-                var matchesPlayer1 = await _matchupRepository.LoadOpenMatchesOfPlayer(player1);
-                var matchesPlayer2 = await _matchupRepository.LoadOpenMatchesOfPlayer(player2);
+                var matchesPlayer1 = await _matchupRepository.LoadMatchesOfPlayer(player1);
+                var matchesPlayer2 = await _matchupRepository.LoadMatchesOfPlayer(player2);
 
                 var model1 = PlayerRankingReadModel.Create(player1, matchesPlayer1.Select(m => m.Result).ToList());
                 var model2 = PlayerRankingReadModel.Create(player2, matchesPlayer2.Select(m => m.Result).ToList());

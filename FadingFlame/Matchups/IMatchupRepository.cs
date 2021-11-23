@@ -17,7 +17,6 @@ namespace FadingFlame.Matchups
         Task DeleteMatches(List<ObjectId> matchups);
         Task UpdateMatches(List<Matchup> matchups);
         Task<List<Matchup>> LoadFinishedSince(DateTime currentVersionVersion);
-        Task<List<Matchup>> LoadOpenMatchesOfPlayer(Player player);
         Task<List<Matchup>> LoadMatchesOfPlayer(Player player);
         Task<List<Matchup>> LoadChallengesOfPlayer(Player player);
         Task<Matchup> LoadMatch(ObjectId objectId);
@@ -51,14 +50,10 @@ namespace FadingFlame.Matchups
             return UpsertMany(matchups);
         }
 
-        public Task<List<Matchup>> LoadFinishedSince(DateTime currentVersionVersion)
+        public async Task<List<Matchup>> LoadFinishedSince(DateTime currentVersionVersion)
         {
-            return LoadAll<Matchup>(m => m.Result.RecordedAt > currentVersionVersion);
-        }
-
-        public Task<List<Matchup>> LoadOpenMatchesOfPlayer(Player player)
-        {
-            return LoadMatchesWithPlayerNames(m => m.Result != null && (m.Player1 == player.Id || m.Player2 == player.Id));
+            var loadFinishedSince = await LoadAll<Matchup>(m => m.Result.RecordedAt > currentVersionVersion);
+            return loadFinishedSince.OrderBy(m => m.Result.RecordedAt).ToList();
         }
 
         public async Task<List<Matchup>> LoadMatchesOfPlayer(Player player)
