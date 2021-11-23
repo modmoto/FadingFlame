@@ -133,7 +133,7 @@
         }
         else
         {
-          @if (_editUserModel.TimeZone != Location.NotSelected)
+          @if (_editUserModel.TimeZone != Location.NotSelected && _loggedInUserState.UserIsLoggedIn)
           {
             <div class="form-group pb-3">
               <label>Time difference to you: @(_geoLocationService.GetTimeDiff(_loggedInUserState.CurrentUserTime, _editUserModel.TimeZone).Hours)h (@_editUserModel.TimeZone)</label>
