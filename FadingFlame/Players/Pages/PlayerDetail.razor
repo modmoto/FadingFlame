@@ -43,7 +43,7 @@
         }
         @if (UserParticipatesInCurrentSeason)
         {
-            <div class="pt-3 pb-3 alert alert-success" role="alert" style="max-width: 25rem">
+            <div class="pt-3 pb-3 alert alert-success" role="alert" style="max-width: 30rem">
                 <div class="cursor" @onclick="() => NavigateToLeague(_playerLeagues[0].Id)">Current league: @_playerLeagues[0].DivisionId @_playerLeagues[0].Name</div>
             </div>
         }
@@ -53,9 +53,9 @@
             <h4 class="mb-2">Open challenges</h4>
             @foreach (var challenge in _challenges)
             {
-                <div class="ms-2 pt-3 pb-3 alert alert-info w-50 row justify-content-between" role="alert">
+                <div class="pt-3 pb-3 alert alert-info d-flex justify-content-between" style="max-width: 30rem" role="alert">
                     <div class="cursor col d-flex align-items-center" @onclick="() => NavigateToMatch(challenge.Item1.Id)">
-                        Challenge against @(challenge.Item2)
+                        VS @(challenge.Item2)
                     </div>
                     <button class="btn btn-danger float-end col" style="max-width: 4rem" @onclick="() => DeleteChallenge(challenge)">
                         <span class="oi oi-trash"></span>
