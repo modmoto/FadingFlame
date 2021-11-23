@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FadingFlame.Players;
 using FadingFlame.Repositories;
@@ -15,6 +16,7 @@ namespace FadingFlame.Matchups
         Task DeleteMatches(List<ObjectId> matchups);
         Task UpdateMatches(List<Matchup> matchups);
         Task<List<Matchup>> LoadFinishedSince(DateTime currentVersionVersion);
+        Task<List<Matchup>> LoadOpenMatchesOfPlayer(Player player);
         Task<List<Matchup>> LoadMatchesOfPlayer(Player player);
         Task<List<Matchup>> LoadChallengesOfPlayer(Player player);
         Task<Matchup> LoadMatch(ObjectId objectId);
@@ -53,9 +55,15 @@ namespace FadingFlame.Matchups
             return LoadAll<Matchup>(m => m.Result.RecordedAt > currentVersionVersion);
         }
 
-        public Task<List<Matchup>> LoadMatchesOfPlayer(Player player)
+        public Task<List<Matchup>> LoadOpenMatchesOfPlayer(Player player)
         {
             return LoadAll<Matchup>(m => m.Result != null && (m.Player1 == player.Id || m.Player2 == player.Id));
+        }
+
+        public async Task<List<Matchup>> LoadMatchesOfPlayer(Player player)
+        {
+            var loadMatchesOfPlayer = await LoadAll<Matchup>(m => m.Player1 == player.Id || m.Player2 == player.Id);
+            return loadMatchesOfPlayer.OrderByDescending(l => l.Id).ToList();
         }
 
         public Task<List<Matchup>> LoadChallengesOfPlayer(Player player)

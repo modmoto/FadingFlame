@@ -1,190 +1,234 @@
 ﻿@page "/player/{Id}"
-@using Microsoft.AspNetCore.Components
-@using FadingFlame.Players
-@using MongoDB.Bson
-@using FadingFlame.Leagues
-@using System.Text.RegularExpressions
 @using FadingFlame.Admin
-@using System.Globalization
 @using FadingFlame.Discord
+@using FadingFlame.Leagues
 @using FadingFlame.Lists
 @using FadingFlame.Matchups
+@using System.Globalization
+@using MongoDB.Bson
+@using System.Text.RegularExpressions
 
 <div class="card">
-    <h4 class="card-header">Profile @_player.DisplayName 
-        @if (_editUserModel.Country != null)
-        {
-            <span class="@_regionCss"></span>
-        }
-    </h4>
-    <div class="card-body">
-        @if (_editUserModel.TimeZone != Location.NotSelected && !_isTheRightUser)
-        {
-            <div class="form-group pb-3">
-                <label>Time difference to you: @(_geoLocationService.GetTimeDiff(_loggedInUserState.CurrentUserTime, _editUserModel.TimeZone).Hours)h (@_editUserModel.TimeZone)</label>
-            </div>
-        }
+  <h4 class="card-header">
+    Profile @_player.DisplayName
+    @if (_editUserModel.Country != null)
+    {
+      <span class="@_regionCss"></span>
+    }
+  </h4>
+  <div class="card-body">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">Profile</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="matches-tab" data-bs-toggle="tab" data-bs-target="#matches" type="button" role="tab" aria-controls="matches" aria-selected="false">Matches</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="lists-tab" data-bs-toggle="tab" data-bs-target="#lists" type="button" role="tab" aria-controls="lists" aria-selected="false">Lists</button>
+      </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane fade show active pt-4" id="profile" role="tabpanel" aria-labelledby="profile-tab">
         @if (!_isTheRightUser && _loggedInUserState.UserIsLoggedIn)
         {
-            <div class="form-group pb-3">
-                <button class="btn btn-outline-success" disabled="@_loadingChallengingPlayer" @onclick="ChallengePlayer">
-                    @if (_loading)
-                    {
-                        <span class="spinner-border spinner-border-sm mr-1"></span>
-                    }
-                    <span class="oi oi-fire me-2"></span>
-                    Challenge player to a game 
-                </button>
-            </div>
+          <div class="form-group pb-3">
+            <button class="btn btn-outline-success" disabled="@_loadingChallengingPlayer" @onclick="ChallengePlayer">
+              @if (_loading)
+              {
+                <span class="spinner-border spinner-border-sm mr-1"></span>
+              }
+              <span class="oi oi-fire me-2"></span>
+              Challenge player to a game
+            </button>
+          </div>
         }
         @if (UserParticipatesInCurrentSeason)
         {
-            <div class="pt-3 pb-3 alert alert-success" role="alert" style="max-width: 30rem">
-                <div class="cursor" @onclick="() => NavigateToLeague(_playerLeagues[0].Id)">Current league: @_playerLeagues[0].DivisionId @_playerLeagues[0].Name</div>
-            </div>
+          <div class="pt-3 pb-3 alert alert-success" role="alert" style="max-width: 30rem">
+            <div class="cursor" @onclick="() => NavigateToLeague(_playerLeagues[0].Id)">Current league: @_playerLeagues[0].DivisionId @_playerLeagues[0].Name</div>
+          </div>
         }
-
+    
         @if (_challenges.Any() && _isTheRightUser)
         {
-            <h4 class="mb-3">Open challenges</h4>
-            @foreach (var challenge in _challenges)
-            {
-                <div class="pt-3 pb-3 alert alert-info d-flex justify-content-between" style="max-width: 30rem" role="alert">
-                    <div class="cursor col d-flex align-items-center" @onclick="() => NavigateToMatch(challenge.Item1.Id)">
-                        vs @(challenge.Item2)
-                    </div>
-                    <button class="btn btn-danger float-end col" style="max-width: 4rem" @onclick="() => DeleteChallenge(challenge)">
-                        <span class="oi oi-trash"></span>
-                    </button>
-                </div>
-            }
+          <h4 class="mb-3">Open challenges</h4>
+          @foreach (var challenge in _challenges)
+          {
+            <div class="pt-3 pb-3 alert alert-info d-flex justify-content-between" style="max-width: 30rem" role="alert">
+              <div class="cursor col d-flex align-items-center" @onclick="() => NavigateToMatch(challenge.Item1.Id)">
+                vs @(challenge.Item2)
+              </div>
+              <button class="btn btn-danger float-end col" style="max-width: 4rem" @onclick="() => DeleteChallenge(challenge)">
+                <span class="oi oi-trash"></span>
+              </button>
+            </div>
+          }
         }
-
+    
         @if (_isTheRightUser)
         {
-            <EditForm OnSubmit="OnSubmit" EditContext="@_editContextUser">
+          <EditForm OnSubmit="OnSubmit" EditContext="@_editContextUser">
+            <div class="form-group">
+              <div class="pb-2">Display name: </div>
+              <ValidationMessage For="@(() => _editUserModel.DisplayName)"/>
+              <InputText @bind-Value="_editUserModel.DisplayName" class="form-control mb-3"/>
+            </div>
+            <div class="form-group">
+              <div class="pb-2">Discord tag: </div>
+              <ValidationMessage For="@(() => _editUserModel.DiscordTag)"/>
+              <InputText @bind-Value="_editUserModel.DiscordTag" class="form-control mb-3"/>
+            </div>
+            <div class="row">
+              <div class="form-group col">
+                <div class="pb-2">Country: </div>
                 <div class="form-group">
-                    <div class="pb-2">Display name: </div>
-                    <ValidationMessage For="@(() => _editUserModel.DisplayName)"/>
-                    <InputText @bind-Value="_editUserModel.DisplayName" class="form-control mb-3"/>
-                </div>
-                <div class="form-group">
-                    <div class="pb-2">Discord tag: </div>
-                    <ValidationMessage For="@(() => _editUserModel.DiscordTag)"/>
-                    <InputText @bind-Value="_editUserModel.DiscordTag" class="form-control mb-3"/>
-                </div>
-                <div class="row">
-                    <div class="form-group col">
-                        <div class="pb-2">Country: </div>
-                        <div class="form-group">
-                            <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_editUserModel.Country">
-                                <option selected value="@Location.NotSelected">Dont show country</option>
-                                @foreach (var culture in _countries)
-                                {
-                                    <option value="@culture.TwoLetterISORegionName">@culture.EnglishName</option>
-                                }
-                            </select>
-                        </div>
-                    </div>    
-                    <div class="form-group col">
-                        <div class="pb-2">Timezone: </div>
-                        <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_editUserModel.TimeZone">
-                            <option selected value="@Location.NotSelected">Dont show timezone</option>
-                            @foreach (var timeZone in _geoLocationService.GetTimeZones())
-                            {
-                                <option value="@timeZone.Id">@timeZone.Id @(timeZone.BaseUtcOffset)</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-                
-                <button disabled="@_loading" class="btn btn-primary">
-                    @if (_loading)
+                  <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_editUserModel.Country">
+                    <option selected value="@Location.NotSelected">Dont show country</option>
+                    @foreach (var culture in _countries)
                     {
-                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                      <option value="@culture.TwoLetterISORegionName">@culture.EnglishName</option>
                     }
-                    Save profile
-                </button>
-            </EditForm>
-
-            <hr class="my-3">
-
-            @if (!_seasonState.CurrentSeason.ListSubmissionIsOver)
+                  </select>
+                </div>
+              </div>
+              <div class="form-group col">
+                <div class="pb-2">Timezone: </div>
+                <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_editUserModel.TimeZone">
+                  <option selected value="@Location.NotSelected">Dont show timezone</option>
+                  @foreach (var timeZone in _geoLocationService.GetTimeZones())
+                  {
+                    <option value="@timeZone.Id">@timeZone.Id @(timeZone.BaseUtcOffset)</option>
+                  }
+                </select>
+              </div>
+            </div>
+    
+            <button disabled="@_loading" class="btn btn-primary">
+              @if (_loading)
+              {
+                <span class="spinner-border spinner-border-sm mr-1"></span>
+              }
+              Save profile
+            </button>
+          </EditForm>
+    
+          <hr class="my-3">
+    
+          @if (!_seasonState.CurrentSeason.ListSubmissionIsOver)
+          {
+            @if (!_player.SubmittedLists)
             {
-                @if (!_player.SubmittedLists)
-                {
-                    <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
-                        To participate in the next season, submit your lists here. The lists can not be changed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate() and are not visible to other players until then.
-                    </div>
-                }
-                else
-                {
-                    <div class="pt-3 pb-3 alert alert-success text-center" role="alert">
-                        Lists submitted, you will participate in the next season. You can still change the lists until @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate() and they are not visible to other players until then.
-                    </div>
-                }
+              <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
+                To participate in the next season, submit your lists here. The lists can not be changed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate() and are not visible to other players until then.
+              </div>
             }
+            else
+            {
+              <div class="pt-3 pb-3 alert alert-success text-center" role="alert">
+                Lists submitted, you will participate in the next season. You can still change the lists until @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate() and they are not visible to other players until then.
+              </div>
+            }
+          }
         }
         else
         {
+          @if (_editUserModel.TimeZone != Location.NotSelected)
+          {
             <div class="form-group pb-3">
-                <label>Discord Tag: </label>
-                <span>@_editUserModel.DiscordTag</span>
+              <label>Time difference to you: @(_geoLocationService.GetTimeDiff(_loggedInUserState.CurrentUserTime, _editUserModel.TimeZone).Hours)h (@_editUserModel.TimeZone)</label>
             </div>
+          }
+          <div class="form-group pb-3">
+            <label>Discord Tag: </label>
+            <span>@_editUserModel.DiscordTag</span>
+          </div>
         }
-        @if (_player.SubmittedLists && _seasonState.CurrentSeason.ListSubmissionIsOver 
-             || !_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser
-             || _isFreshListPossible)
-        {
-            <h4>Lists this season</h4>
-            <hr class="my-3">
-            <EditForm EditContext="@_editContextLists">
-            <DataAnnotationsValidator/>
-            <div class="row align-items-start">
-                <div class="col">
-                    <ValidationMessage For="@(() => _editListModel.List1.List)"/>
-                    <UserListComponent
-                        List="@(_editListModel.List1)"
-                        IsFreshListPossible="_isFreshListPossible"
-                        IsCurrentUser="_isTheRightUser"
-                        OnRequestListChange="RequestListChange1"
-                        OnDeleteListChange="DeleteListChange1"/>
-                </div>
-                <div class="col">
-                    <ValidationMessage For="@(() => _editListModel.List2.List)"/>
-                    <UserListComponent
-                        List="@(_editListModel.List2)"
-                        IsFreshListPossible="_isFreshListPossible"
-                        IsCurrentUser="_isTheRightUser"
-                        OnRequestListChange="RequestListChange2"
-                        OnDeleteListChange="DeleteListChange2"/>
-                </div>
-            </div>
-            @if (_isFreshListPossible)
-            {
-                <button disabled="@_loadingLists" class="btn btn-primary" @onclick="OnSubmitList">
-                    @if (_loadingLists)
-                    {
-                        <span class="spinner-border spinner-border-sm mr-1"></span>
-                    }
-                    Save lists
-                </button>
-            }
-            
-            </EditForm>
-        }
-        
-        @if (!_isTheRightUser && _player.SubmittedLists && !_seasonState.CurrentSeason.ListSubmissionIsOver)
-        {
-            <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()</div>
-        }       
-
         <h4 class="mt-4">Participated in Seasons</h4>
         @foreach (var league in _playerLeagues)
         {
-            <div class="cursor" @onclick="() => NavigateToLeague(league.Id)">Season @league.Season, Division @league.DivisionId, Rank @GetRank(league)</div>
+          <div class="cursor" @onclick="() => NavigateToLeague(league.Id)">Season @league.Season, Division @league.DivisionId, Rank @GetRank(league)</div>
         }
+      </div>
+      <div class="tab-pane fade pt-4" id="matches" role="tabpanel" aria-labelledby="matches-tab">
+        <table class="table table-striped table-hover">
+            <thead>
+              <th>Opponent</th>
+              <th>Result</th>
+              <th>Date</th>
+            </thead>
+            <tbody>
+            @foreach (var matchup in _matches)
+            {
+              <tr @onclick="() => NavigateToMatch(matchup.Item1.Id)" class="cursor">
+                <td>@matchup.Item2</td>
+                <td>
+                  @if (matchup.Item1.Result != null)
+                  {
+                    <p class="@($"mb-1 {WonMatch(matchup.Item1)}")">@GetBattlePointString(matchup.Item1.Result)</p>
+                    <small>@GetOriginalPointsString(matchup.Item1.Result)</small>
+                  }
+                  else
+                  {
+                    <p class="mb-1">not reported yet</p>
+                  }
+                </td>
+                <td>@matchup.Item1.Result?.RecordedAt.ToMyDateYear()</td>
+              </tr>
+            }
+            </tbody>
+          </table>
+      </div>
+      <div class="tab-pane fade pt-4" id="lists" role="tabpanel" aria-labelledby="lists-tab">
+        @if (_player.SubmittedLists && _seasonState.CurrentSeason.ListSubmissionIsOver
+                 || !_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser
+                 || _isFreshListPossible)
+          {
+            <h4>Lists this season</h4>
+            <hr class="my-3">
+            <EditForm EditContext="@_editContextLists">
+              <DataAnnotationsValidator/>
+              <div class="row align-items-start">
+                <div class="col">
+                  <ValidationMessage For="@(() => _editListModel.List1.List)"/>
+                  <UserListComponent
+                    List="@(_editListModel.List1)"
+                    IsFreshListPossible="_isFreshListPossible"
+                    IsCurrentUser="_isTheRightUser"
+                    OnRequestListChange="RequestListChange1"
+                    OnDeleteListChange="DeleteListChange1"/>
+                </div>
+                <div class="col">
+                  <ValidationMessage For="@(() => _editListModel.List2.List)"/>
+                  <UserListComponent
+                    List="@(_editListModel.List2)"
+                    IsFreshListPossible="_isFreshListPossible"
+                    IsCurrentUser="_isTheRightUser"
+                    OnRequestListChange="RequestListChange2"
+                    OnDeleteListChange="DeleteListChange2"/>
+                </div>
+              </div>
+              @if (_isFreshListPossible)
+              {
+                <button disabled="@_loadingLists" class="btn btn-primary" @onclick="OnSubmitList">
+                  @if (_loadingLists)
+                  {
+                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                  }
+                  Save lists
+                </button>
+              }
+      
+            </EditForm>
+          }
+      
+          @if (!_isTheRightUser && _player.SubmittedLists && !_seasonState.CurrentSeason.ListSubmissionIsOver)
+          {
+            <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()</div>
+          }
+      </div>
     </div>
+  </div>
 </div>
 
 @inject IPlayerRepository _playerRepository
@@ -199,289 +243,334 @@
 @inject IListValidationService _listValidationService
 
 @code{
-    private EditUserModel _editUserModel = new();
-    private EditListsModel _editListModel = new()
+  private EditUserModel _editUserModel = new();
+
+  private EditListsModel _editListModel = new()
+  {
+    List1 = new GameListEditModel(),
+    List2 = new GameListEditModel()
+  };
+
+  private List<League> _playerLeagues = new();
+  private List<RegionInfo> _countries = new();
+  private List<Tuple<Matchup, string>> _matches = new();
+  private List<Tuple<Matchup, string>> _challenges = new();
+
+  private Player _player = new();
+  private bool _loading;
+  private bool _loadingLists;
+
+  [Parameter]
+  public string Id { get; set; }
+
+  private ValidationMessageStore _messageStoreUser;
+  private ValidationMessageStore _messageStoreLists;
+  private EditContext _editContextUser;
+  private EditContext _editContextLists;
+  private string _regionCss;
+  private bool _isTheRightUser;
+  private bool _isFreshListPossible;
+  private bool _loadingChallengingPlayer;
+
+  protected override void OnInitialized()
+  {
+    _countries = _geoLocationService.GetCountries();
+    _editContextUser = new EditContext(_editUserModel);
+    _messageStoreUser = new ValidationMessageStore(_editContextUser);
+    _editContextLists = new EditContext(_editListModel);
+    _messageStoreLists = new ValidationMessageStore(_editContextLists);
+
+    _editContextUser.OnValidationRequested += (_, _) => OnSubmit();
+
+    _loggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
+    _loggedInUserState.UserTimeSet += (_, _) => StateHasChanged();
+    _seasonState.SeasonsChanged += (_, _) => StateHasChanged();
+  }
+
+  public override async Task SetParametersAsync(ParameterView parameters)
+  {
+    await base.SetParametersAsync(parameters);
+    await OnInitializedAsync();
+  }
+
+  protected override async Task OnInitializedAsync()
+  {
+    if (ObjectId.TryParse(Id, out var realId))
     {
-        List1 = new(),
-        List2 = new()
-    };
-    private List<League> _playerLeagues = new();
-    private List<RegionInfo> _countries = new();
-    private List<Tuple<Matchup, string>> _challenges = new();
+      _player = await _playerRepository.Load(realId);
+      if (_player == null)
+      {
+        _navigation.NavigateTo("notfound");
+      }
+      else
+      {
+        _playerLeagues = (await _leagueRepository.LoadLeaguesForPlayer(_player.Id))
+          .OrderByDescending(r => r.Season).ToList();
 
-    private Player _player = new();
-    private bool _loading;
-    private bool _loadingLists;
-
-    [Parameter]
-    public string Id { get; set; }
-
-    private ValidationMessageStore _messageStoreUser;
-    private ValidationMessageStore _messageStoreLists;
-    private EditContext _editContextUser;
-    private EditContext _editContextLists;
-    private string _regionCss;
-    private bool _isTheRightUser;
-    private bool _isFreshListPossible;
-    private bool _loadingChallengingPlayer;
-
-    protected override void OnInitialized()
-    {
-        _countries = _geoLocationService.GetCountries();
-        _editContextUser = new EditContext(_editUserModel);
-        _messageStoreUser = new ValidationMessageStore(_editContextUser);
-        _editContextLists = new EditContext(_editListModel);
-        _messageStoreLists = new ValidationMessageStore(_editContextLists);
+        var challenges = await _matchupRepository.LoadChallengesOfPlayer(_player);
+        var tempList = new List<Tuple<Matchup, string>>();
+        foreach (var challenge in challenges)
+        {
+          var opponentName = await LoadOpponentName(challenge);
+          tempList.Add(new Tuple<Matchup, string>(challenge, opponentName));
+        }
+        _challenges = tempList;
         
-        _editContextUser.OnValidationRequested += (_, _) => OnSubmit();
-
-        _loggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
-        _loggedInUserState.UserTimeSet += (_, _) => StateHasChanged();
-        _seasonState.SeasonsChanged += (_, _) => StateHasChanged();
-    }
-
-    public override async Task SetParametersAsync(ParameterView parameters)
-    {
-        await base.SetParametersAsync(parameters);
-        await OnInitializedAsync();
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (ObjectId.TryParse(Id, out var realId))
+        var matches = await _matchupRepository.LoadMatchesOfPlayer(_player);
+        var tempListMatches = new List<Tuple<Matchup, string>>();
+        foreach (var matchup in matches)
         {
-            _player = await _playerRepository.Load(realId);
-            if (_player == null)
-            {
-                _navigation.NavigateTo("notfound");
-            }
-            else
-            {
-                _playerLeagues = (await _leagueRepository.LoadLeaguesForPlayer(_player.Id))
-                    .OrderByDescending(r => r.Season).ToList();
-
-                var challenges = await _matchupRepository.LoadChallengesOfPlayer(_player);
-                var tempList = new List<Tuple<Matchup, string>>();
-                foreach (var challenge in challenges)
-                {
-                    var opponentName = await LoadOpponentName(challenge);
-                    tempList.Add(new Tuple<Matchup, string>(challenge, opponentName));
-                }
-
-                _challenges = tempList;
-
-                _editUserModel = new EditUserModel
-                {
-                    DiscordTag = _player.DiscordTag,
-                    DisplayName = _player.DisplayName,
-                    Country = _player.Location?.Country?.TwoLetterISORegionName ?? Location.NotSelected,
-                    TimeZone = _player.Location?.TimezoneRaw ?? Location.NotSelected
-                };
-
-                _regionCss = SetRegionCss();
-                _isTheRightUser = Id == _loggedInUserState.LoggedInPlayer.Id.ToString();
-                SetListEditModel();
-
-                var userIsLate = (_editListModel.List1.Name == null || _editListModel.List2.Name == null) 
-                                 && _seasonState.CurrentSeason.SeasonId == _playerLeagues.FirstOrDefault()?.Season;
-                _isFreshListPossible = _isTheRightUser && (!_seasonState.CurrentSeason.ListSubmissionIsOver || _seasonState.CurrentSeason.ListSubmissionIsOver && userIsLate);
-                
-                StateHasChanged();
-            }
+          var opponentName = await LoadOpponentName(matchup);
+          tempListMatches.Add(new Tuple<Matchup, string>(matchup, opponentName));
         }
-        else
-        {
-            _navigation.NavigateTo("notfound");
-        }
-    }
+        _matches = tempListMatches;
 
-    private void SetListEditModel()
-    {
-        _editListModel = new EditListsModel
+        _editUserModel = new EditUserModel
         {
-            List1 = ToModel(_player.ArmyCurrentSeason?.List1),
-            List2 = ToModel(_player.ArmyCurrentSeason?.List2)
+          DiscordTag = _player.DiscordTag,
+          DisplayName = _player.DisplayName,
+          Country = _player.Location?.Country?.TwoLetterISORegionName ?? Location.NotSelected,
+          TimeZone = _player.Location?.TimezoneRaw ?? Location.NotSelected
         };
-    }
 
-    private static GameListEditModel ToModel(GameList list)
-    {
-        return new GameListEditModel
-        {
-            Faction = list?.Faction ?? 0,
-            List = list?.List,
-            ProposedListChange = list?.ProposedListChange,
-            Name = list?.Name,
-        };
-    }
+        _regionCss = SetRegionCss();
+        _isTheRightUser = Id == _loggedInUserState.LoggedInPlayer.Id.ToString();
+        SetListEditModel();
 
-    private string SetRegionCss()
-    {
-        return $"ms-2 flag-container flag-icon flag-icon-{_editUserModel.Country?.ToLower()}";
-    }
+        var userIsLate = (_editListModel.List1.Name == null || _editListModel.List2.Name == null)
+                         && _seasonState.CurrentSeason.SeasonId == _playerLeagues.FirstOrDefault()?.Season;
+        _isFreshListPossible = _isTheRightUser && (!_seasonState.CurrentSeason.ListSubmissionIsOver || _seasonState.CurrentSeason.ListSubmissionIsOver && userIsLate);
 
-    private async Task OnSubmitList()
-    {
-        _loadingLists = true;
-        _messageStoreLists.Clear();
-        if (string.IsNullOrEmpty(_editListModel.List1.Name)) _messageStoreLists.Add(() => _editListModel.List1.Name, Errors.FieldRequired);
-        if (string.IsNullOrEmpty(_editListModel.List2.Name)) _messageStoreLists.Add(() => _editListModel.List2.Name, Errors.FieldRequired);
-        if (string.IsNullOrEmpty(_editListModel.List1.List)) _messageStoreLists.Add(() => _editListModel.List1.List, Errors.FieldRequired);
-        if (string.IsNullOrEmpty(_editListModel.List2.List)) _messageStoreLists.Add(() => _editListModel.List2.List, Errors.FieldRequired);
-        if (_editListModel.List1.Faction == default) _messageStoreLists.Add(() => _editListModel.List1.Faction, Errors.FactionRequired);
-        if (_editListModel.List2.Faction == default) _messageStoreLists.Add(() => _editListModel.List2.Faction, Errors.FactionRequired);
-
-        await AddListErrors(_editListModel.List1.List, FieldIdentifier.Create(() => _editListModel.List1.List));
-        await AddListErrors(_editListModel.List2.List, FieldIdentifier.Create(() => _editListModel.List2.List));
-
-        if (!_editContextLists.Validate())
-        {
-            _loadingLists = false;
-            return;
-        }
-
-        if (_editListModel.List1.Name == _editListModel.List2.Name)
-        {
-            _editListModel.List1.Name += "_1";
-            _editListModel.List2.Name += "_2";
-        }
-
-        var list1 = GameList.Create(_editListModel.List1.Name, _editListModel.List1.List, _editListModel.List1.Faction);
-        var list2 = GameList.Create(_editListModel.List2.Name, _editListModel.List2.List, _editListModel.List2.Faction);
-        _player.SubmitLists(list1, list2, _seasonState.CurrentSeason.SeasonId);
-        await _playerRepository.UpdateWithLists(_player, _seasonState.CurrentSeason.SeasonId);
-
-        _loadingLists = false;
-    }
-
-    private async Task AddListErrors(string list, FieldIdentifier errorField)
-    {
-        var validationErrors1 = await _listValidationService.Validate(list);
-        if (validationErrors1.Any())
-        {
-            foreach (var error in validationErrors1)
-            {
-                _messageStoreLists.Add(errorField, error);
-            }
-        }
-    }
-
-    private async void OnSubmit()
-    {
-        _loading = true;
-        _messageStoreUser.Clear();
-        var regex = new Regex("^.{3,32}#[0-9]{4}$");
-        var isValid = true;
-        if (!string.IsNullOrWhiteSpace(_editUserModel.DiscordTag) && !regex.Match(_editUserModel.DiscordTag).Success)
-        {
-            _messageStoreUser.Add(() => _editUserModel.DiscordTag, "Discord tag has to of the form example#1234");
-            isValid = false;
-        }
-        
-        if (_editUserModel.DisplayName.Length < 3 || _editUserModel.DisplayName.Length > 30)
-        {
-            _messageStoreUser.Add(() => _editUserModel.DisplayName, "Displayname hast to be between 3 and 30 characters");
-            isValid = false;
-        }
-
-        if (!isValid)
-        {
-            _loading = false;
-            return;
-        }
-        _player.Update(_editUserModel);
-        SetRegionCss();
-        await _playerRepository.Update(_player);
-        _loading = false;
         StateHasChanged();
+      }
     }
-
-    private void NavigateToLeague(ObjectId leagueId)
+    else
     {
-        _navigation.NavigateTo($"league/{leagueId}");
+      _navigation.NavigateTo("notfound");
     }
+  }
 
-    private int GetRank(League league)
+  private void SetListEditModel()
+  {
+    _editListModel = new EditListsModel
     {
-        return (league.Players
-            .Select((value, index) => new { value, index })
-            .SingleOrDefault(x => x.value.Id == new ObjectId(Id))
-            ?.index ?? 0) + 1;
-    }
+      List1 = ToModel(_player.ArmyCurrentSeason?.List1),
+      List2 = ToModel(_player.ArmyCurrentSeason?.List2)
+    };
+  }
+  
+  private string GetOriginalPointsString(MatchResult result)
+  {
+    return result.Player1.Id == _player.Id 
+      ? $"{result.Player1.VictoryPoints} {GetSecondaryStringForPlayer1(result.SecondaryObjective)} : {result.Player2.VictoryPoints} {GetSecondaryStringForPlayer2(result.SecondaryObjective)}" 
+      : $"{result.Player2.VictoryPoints} {GetSecondaryStringForPlayer2(result.SecondaryObjective)} : {result.Player1.VictoryPoints} {GetSecondaryStringForPlayer1(result.SecondaryObjective)}";
+  }
+  
+  private string GetSecondaryStringForPlayer1(SecondaryObjectiveState resultSecondaryObjective)
+  {
+    return resultSecondaryObjective == SecondaryObjectiveState.player1 ? "(+2nd obj.)" : "";
+  }
+  
+  private string GetSecondaryStringForPlayer2(SecondaryObjectiveState resultSecondaryObjective)
+  {
+    return resultSecondaryObjective == SecondaryObjectiveState.player2 ? "(+2nd obj.)" : "";
+  }
 
-    private bool UserParticipatesInCurrentSeason
+  private static GameListEditModel ToModel(GameList list)
+  {
+    return new GameListEditModel
     {
-        get
-        {
-            if (!_playerLeagues.Any()) return false;
-            return _playerLeagues[0].Season == _seasonState.CurrentSeason.SeasonId;
-        }
-    }
+      Faction = list?.Faction ?? 0,
+      List = list?.List,
+      ProposedListChange = list?.ProposedListChange,
+      Name = list?.Name
+    };
+  }
 
-    private async Task RequestListChange1()
+  private string SetRegionCss()
+  {
+    return $"ms-2 flag-container flag-icon flag-icon-{_editUserModel.Country?.ToLower()}";
+  }
+
+  private async Task OnSubmitList()
+  {
+    _loadingLists = true;
+    _messageStoreLists.Clear();
+    if (string.IsNullOrEmpty(_editListModel.List1.Name)) _messageStoreLists.Add(() => _editListModel.List1.Name, Errors.FieldRequired);
+    if (string.IsNullOrEmpty(_editListModel.List2.Name)) _messageStoreLists.Add(() => _editListModel.List2.Name, Errors.FieldRequired);
+    if (string.IsNullOrEmpty(_editListModel.List1.List)) _messageStoreLists.Add(() => _editListModel.List1.List, Errors.FieldRequired);
+    if (string.IsNullOrEmpty(_editListModel.List2.List)) _messageStoreLists.Add(() => _editListModel.List2.List, Errors.FieldRequired);
+    if (_editListModel.List1.Faction == default) _messageStoreLists.Add(() => _editListModel.List1.Faction, Errors.FactionRequired);
+    if (_editListModel.List2.Faction == default) _messageStoreLists.Add(() => _editListModel.List2.Faction, Errors.FactionRequired);
+
+    await AddListErrors(_editListModel.List1.List, FieldIdentifier.Create(() => _editListModel.List1.List));
+    await AddListErrors(_editListModel.List2.List, FieldIdentifier.Create(() => _editListModel.List2.List));
+
+    if (!_editContextLists.Validate())
     {
-        _messageStoreLists.Clear();        
-        await AddListErrors(_editListModel.List1.List, FieldIdentifier.Create(() => _editListModel.List1.List));
-
-        if (!_editContextLists.Validate())
-        {
-            return;
-        }
-
-        await _acceptAndRejectService.RequestList1(_player.ArmyCurrentSeason, _editListModel.List1.ProposedListChange);
-        SetListEditModel();
+      _loadingLists = false;
+      return;
     }
 
-
-    private async Task RequestListChange2()
+    if (_editListModel.List1.Name == _editListModel.List2.Name)
     {
-        _messageStoreLists.Clear();
-        await AddListErrors(_editListModel.List2.List, FieldIdentifier.Create(() => _editListModel.List2.List));
-        
-        if (!_editContextLists.Validate())
-        {
-            return;
-        }
-        
-        await _acceptAndRejectService.RequestList2(_player.ArmyCurrentSeason, _editListModel.List2.ProposedListChange);
-        SetListEditModel();
+      _editListModel.List1.Name += "_1";
+      _editListModel.List2.Name += "_2";
     }
 
-    private async Task DeleteListChange1()
+    var list1 = GameList.Create(_editListModel.List1.Name, _editListModel.List1.List, _editListModel.List1.Faction);
+    var list2 = GameList.Create(_editListModel.List2.Name, _editListModel.List2.List, _editListModel.List2.Faction);
+    _player.SubmitLists(list1, list2, _seasonState.CurrentSeason.SeasonId);
+    await _playerRepository.UpdateWithLists(_player, _seasonState.CurrentSeason.SeasonId);
+
+    _loadingLists = false;
+  }
+
+  private async Task AddListErrors(string list, FieldIdentifier errorField)
+  {
+    var validationErrors1 = await _listValidationService.Validate(list);
+    if (validationErrors1.Any())
     {
-        await _acceptAndRejectService.RejectList1(_player.ArmyCurrentSeason, "", false);
-        SetListEditModel();
+      foreach (var error in validationErrors1)
+      {
+        _messageStoreLists.Add(errorField, error);
+      }
     }
-    
-    private async Task DeleteListChange2()
+  }
+
+  private async void OnSubmit()
+  {
+    _loading = true;
+    _messageStoreUser.Clear();
+    var regex = new Regex("^.{3,32}#[0-9]{4}$");
+    var isValid = true;
+    if (!string.IsNullOrWhiteSpace(_editUserModel.DiscordTag) && !regex.Match(_editUserModel.DiscordTag).Success)
     {
-        await _acceptAndRejectService.RejectList2(_player.ArmyCurrentSeason, "", false);
-        SetListEditModel();
+      _messageStoreUser.Add(() => _editUserModel.DiscordTag, "Discord tag has to of the form example#1234");
+      isValid = false;
     }
 
-    private async Task ChallengePlayer()
+    if (_editUserModel.DisplayName.Length < 3 || _editUserModel.DisplayName.Length > 30)
     {
-        _loadingChallengingPlayer = true;
-        await _challengeService.ChallengePlayer(_loggedInUserState.LoggedInPlayer, _player);
-        _loadingChallengingPlayer = false;
+      _messageStoreUser.Add(() => _editUserModel.DisplayName, "Displayname hast to be between 3 and 30 characters");
+      isValid = false;
     }
 
-    private async Task<string> LoadOpponentName(Matchup matchup)
+    if (!isValid)
     {
-        var layer = matchup.Player1 == _loggedInUserState.LoggedInPlayer.Id
-            ? await _playerRepository.Load(matchup.Player2)
-            : await _playerRepository.Load(matchup.Player1);
-        return $"{layer?.DisplayName} / {layer?.DiscordTag}";
+      _loading = false;
+      return;
+    }
+    _player.Update(_editUserModel);
+    SetRegionCss();
+    await _playerRepository.Update(_player);
+    _loading = false;
+    StateHasChanged();
+  }
+
+  private void NavigateToLeague(ObjectId leagueId)
+  {
+    _navigation.NavigateTo($"league/{leagueId}");
+  }
+
+  private int GetRank(League league)
+  {
+    return (league.Players
+      .Select((value, index) => new {value, index})
+      .SingleOrDefault(x => x.value.Id == new ObjectId(Id))
+      ?.index ?? 0) + 1;
+  }
+
+  private bool UserParticipatesInCurrentSeason
+  {
+    get
+    {
+      if (!_playerLeagues.Any()) return false;
+      return _playerLeagues[0].Season == _seasonState.CurrentSeason.SeasonId;
+    }
+  }
+
+  private async Task RequestListChange1()
+  {
+    _messageStoreLists.Clear();
+    await AddListErrors(_editListModel.List1.List, FieldIdentifier.Create(() => _editListModel.List1.List));
+
+    if (!_editContextLists.Validate())
+    {
+      return;
     }
 
-    private void NavigateToMatch(ObjectId challengeId)
+    await _acceptAndRejectService.RequestList1(_player.ArmyCurrentSeason, _editListModel.List1.ProposedListChange);
+    SetListEditModel();
+  }
+
+
+  private async Task RequestListChange2()
+  {
+    _messageStoreLists.Clear();
+    await AddListErrors(_editListModel.List2.List, FieldIdentifier.Create(() => _editListModel.List2.List));
+
+    if (!_editContextLists.Validate())
     {
-        _navigation.NavigateTo($"match/{challengeId}");
+      return;
     }
 
-    private async Task DeleteChallenge(Tuple<Matchup, string> challenge)
+    await _acceptAndRejectService.RequestList2(_player.ArmyCurrentSeason, _editListModel.List2.ProposedListChange);
+    SetListEditModel();
+  }
+
+  private async Task DeleteListChange1()
+  {
+    await _acceptAndRejectService.RejectList1(_player.ArmyCurrentSeason, "", false);
+    SetListEditModel();
+  }
+
+  private async Task DeleteListChange2()
+  {
+    await _acceptAndRejectService.RejectList2(_player.ArmyCurrentSeason, "", false);
+    SetListEditModel();
+  }
+
+  private async Task ChallengePlayer()
+  {
+    _loadingChallengingPlayer = true;
+    await _challengeService.ChallengePlayer(_loggedInUserState.LoggedInPlayer, _player);
+    _loadingChallengingPlayer = false;
+  }
+
+  private async Task<string> LoadOpponentName(Matchup matchup)
+  {
+    var layer = matchup.Player1 == _loggedInUserState.LoggedInPlayer.Id
+      ? await _playerRepository.Load(matchup.Player2)
+      : await _playerRepository.Load(matchup.Player1);
+    return $"{layer?.DisplayName} / {layer?.DiscordTag}";
+  }
+
+  private void NavigateToMatch(ObjectId challengeId)
+  {
+    _navigation.NavigateTo($"match/{challengeId}");
+  }
+
+  private async Task DeleteChallenge(Tuple<Matchup, string> challenge)
+  {
+    await _challengeService.RevokeChallenge(challenge.Item1);
+    _challenges.Remove(challenge);
+  }
+
+  private string WonMatch(Matchup matchup)
+  {
+    if (matchup.Result.IsDraw)
     {
-        await _challengeService.RevokeChallenge(challenge.Item1);
-        _challenges.Remove(challenge);
+      return "draw";
     }
+
+    return matchup.Result.Winner == _player.Id ? "won" : "lost";
+  }
+
+  private string GetBattlePointString(MatchResult result)
+  {
+    return result.Player1.Id == _player.Id
+      ? $"{result.Player1.BattlePoints} : {result.Player2.BattlePoints}"
+      : $"{result.Player2.BattlePoints} : {result.Player1.BattlePoints}";
+  }
 }
