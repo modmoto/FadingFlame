@@ -18,7 +18,8 @@ namespace FadingFlame.Matchups
         Task UpdateMatches(List<Matchup> matchups);
         Task<List<Matchup>> LoadFinishedSince(DateTime currentVersionVersion);
         Task<List<Matchup>> LoadMatchesOfPlayer(Player player);
-        Task<List<Matchup>> LoadChallengesOfPlayer(Player player);
+        Task<List<Matchup>> LoadFinishedMatchesOfPlayer(Player player);
+        Task<List<Matchup>> LoadOpenChallengesOfPlayer(Player player);
         Task<Matchup> LoadMatch(ObjectId objectId);
         Task<Matchup> LoadChallengeOfPlayers(Player loggedInPlayer, Player player);
         Task UpdateMatch(Matchup matchup);
@@ -61,8 +62,14 @@ namespace FadingFlame.Matchups
             var loadMatchesOfPlayer = await LoadMatchesWithPlayerNames(m => m.Player1 == player.Id || m.Player2 == player.Id);
             return loadMatchesOfPlayer.OrderByDescending(l => l.Id).ToList();
         }
-        
-        public Task<List<Matchup>> LoadChallengesOfPlayer(Player player)
+
+        public Task<List<Matchup>> LoadFinishedMatchesOfPlayer(Player player)
+        {
+
+            return LoadAll<Matchup>(m => m.Result != null && (m.Player1 == player.Id || m.Player2 == player.Id));
+        }
+
+        public Task<List<Matchup>> LoadOpenChallengesOfPlayer(Player player)
         {
             return LoadMatchesWithPlayerNames(m => m.IsChallenge && m.Result == null && (m.Player1 == player.Id || m.Player2 == player.Id));
         }

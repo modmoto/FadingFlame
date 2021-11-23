@@ -108,7 +108,7 @@ else
                     _upcomingOpponenName = await LoadOpponentName(_upcomingGame, playerId);
                 }
 
-                var challenges = await _matchupRepository.LoadChallengesOfPlayer(_loggedInUserState.LoggedInPlayer);
+                var challenges = await _matchupRepository.LoadOpenChallengesOfPlayer(_loggedInUserState.LoggedInPlayer);
                 _upcomingChallenge = challenges.FirstOrDefault();
                 if (_upcomingChallenge != null)
                 {

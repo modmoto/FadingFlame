@@ -322,7 +322,7 @@
         _playerLeagues = (await _leagueRepository.LoadLeaguesForPlayer(_player.Id))
           .OrderByDescending(r => r.Season).ToList();
 
-        _challenges = await _matchupRepository.LoadChallengesOfPlayer(_player);
+        _challenges = await _matchupRepository.LoadOpenChallengesOfPlayer(_player);
         _matches = await _matchupRepository.LoadMatchesOfPlayer(_player);
 
         _editUserModel = new EditUserModel
