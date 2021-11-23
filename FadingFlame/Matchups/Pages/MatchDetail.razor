@@ -60,6 +60,7 @@ else
                         <div>Your opponent entered a list and is waiting for you</div>
                     }
                 }
+                
                 <h4 class="my-3">Enter your list for the match</h4>
                 <EditForm EditContext="@_editContextLists">
                     <DataAnnotationsValidator/>
@@ -83,7 +84,7 @@ else
             }
         }
 
-        if (MatchIsEditable && _matchup.PlayersSelectedList || _userState.UserIsAdmin)
+        if (CanEditMatch && MatchIsEditable && _matchup.PlayersSelectedList || _userState.UserIsAdmin)
         {
             <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
                 <DataAnnotationsValidator/>
@@ -576,7 +577,7 @@ else
         if (_matchup.IsChallenge)
         {
             var gameList1 = GameList.Create(_listEditModelPlayer1.Name, _listEditModelPlayer1.List, _listEditModelPlayer1.Faction);
-            var gameList2 = GameList.Create(_listEditModelPlayer1.Name, _listEditModelPlayer1.List, _listEditModelPlayer1.Faction);
+            var gameList2 = GameList.Create(_listEditModelPlayer2.Name, _listEditModelPlayer2.List, _listEditModelPlayer2.Faction);
             result = MatchResult.Create(model.SecondaryObjective, model.Player1, model.Player2, gameList1, gameList2, false);
             _matchup.RecordResult(result);
             await _matchupRepository.UpdateMatch(_matchup);
