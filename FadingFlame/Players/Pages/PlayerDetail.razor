@@ -155,6 +155,7 @@
             <thead>
               <th>Opponent</th>
               <th>Result</th>
+              <th>Matchup</th>
               <th>Type</th>
               <th>Date</th>
             </thead>
@@ -174,6 +175,7 @@
                     <p class="mb-1">not reported yet</p>
                   }
                 </td>
+                <td>@GetRaceStrings(matchup.Item1.Result)</td>
                 <td>@(matchup.Item1.IsChallenge ? "Challenge" : "League")</td>
                 <td>@matchup.Item1.Result?.RecordedAt.ToMyDateYear()</td>
               </tr>
@@ -574,5 +576,13 @@
     return result.Player1.Id == _player.Id
       ? $"{result.Player1.BattlePoints} : {result.Player2.BattlePoints}"
       : $"{result.Player2.BattlePoints} : {result.Player1.BattlePoints}";
+  }
+
+  private object GetRaceStrings(MatchResult result)
+  {
+    if (result?.Player1List == null) return null;
+    return result.Player1.Id == _player.Id
+      ? $"{result.Player1List.Faction.ToCamelCaseString()} vs {result.Player2List.Faction.ToCamelCaseString()}"
+      : $"{result.Player2List.Faction.ToCamelCaseString()} vs {result.Player1List.Faction.ToCamelCaseString()}";
   }
 }
