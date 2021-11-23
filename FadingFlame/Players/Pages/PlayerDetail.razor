@@ -60,7 +60,7 @@
     @foreach (var challenge in _challenges)
     {
       <div class="pt-3 pb-3 alert alert-info d-flex justify-content-between" style="max-width: 30rem" role="alert">
-        <div class="cursor col d-flex align-items-center" @onclick="() => NavigateToMatch(challenge.Id)">
+        <div class="cursor col d-flex align-items-center" @onclick="() => NavigateToMatch(challenge)">
           vs @GetOpponent(challenge)
         </div>
         <button class="btn btn-danger float-end col" style="max-width: 4rem" @onclick="() => DeleteChallenge(challenge)">
@@ -167,7 +167,7 @@
     <tbody>
     @foreach (var matchup in _matches)
     {
-      <tr @onclick="() => NavigateToMatch(matchup.Id)" class="cursor">
+      <tr @onclick="() => NavigateToMatch(matchup)" class="cursor">
         <td>@GetOpponent(matchup)</td>
         <td>
           @if (matchup.Result != null)
@@ -539,9 +539,17 @@
     _loadingChallengingPlayer = false;
   }
 
-  private void NavigateToMatch(ObjectId challengeId)
+  private void NavigateToMatch(Matchup match)
   {
-    _navigation.NavigateTo($"match/{challengeId}");
+    if (match.IsChallenge)
+    {
+      _navigation.NavigateTo($"match/{match.Id}");
+    }
+    else
+    {
+      var leagueOfMatch = _playerLeagues.First(l => l.GameDays.SelectMany(p => p.MatchupIds).Contains(match.Id));
+      _navigation.NavigateTo($"match/{match.Id}?leagueId={leagueOfMatch.Id}");
+    }
   }
 
   private async Task DeleteChallenge(Matchup challenge)
