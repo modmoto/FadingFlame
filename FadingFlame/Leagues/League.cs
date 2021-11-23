@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FadingFlame.Admin;
 using FadingFlame.Lists;
 using FadingFlame.Matchups;
@@ -55,7 +56,13 @@ namespace FadingFlame.Leagues
             return GameDays.SelectMany(g => g.Matchups).Single(m => m.Id == matchId);
         }
 
-        public MatchResult ReportGame(MatchResultDto matchResultDto, GameList player1List, GameList player2List)
+        public async Task<MatchResult> ReportGame(
+            IMmrRepository mmrRepository, 
+            MatchResultDto matchResultDto, 
+            Mmr player1Mmr,
+            Mmr player2Mmr,
+            GameList player1List, 
+            GameList player2List)
         {
             var player1Result = matchResultDto.Player1;
             var player2Result = matchResultDto.Player2;
@@ -65,7 +72,7 @@ namespace FadingFlame.Leagues
 
             var match = GetMatchup(matchResultDto.MatchId);
             
-            var result = MatchResult.Create(matchResultDto.SecondaryObjective, player1Result, player2Result, player1List, player2List, matchResultDto.WasDefLoss);
+            var result = await MatchResult.Create(mmrRepository, matchResultDto.SecondaryObjective, player1Mmr, player2Mmr, player1Result, player2Result, player1List, player2List, matchResultDto.WasDefLoss);
             match.RecordResult(result);
             
             player1.RecordResult(result.Player1.BattlePoints, result.Player1.VictoryPoints);

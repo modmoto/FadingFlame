@@ -43,7 +43,7 @@ namespace FadingFlame.Playoffs
                 sortedFirstPlaces.Add(player2);
             }
 
-            var playoffs = Playoff.Create(_seasonState.CurrentSeason.SeasonId, sortedFirstPlaces);
+            var playoffs = await Playoff.Create(_seasonState.CurrentSeason.SeasonId, sortedFirstPlaces);
 
             await _playoffRepository.Insert(playoffs);
 

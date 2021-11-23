@@ -155,6 +155,7 @@
             <thead>
               <th>Opponent</th>
               <th>Result</th>
+              <th>Mmr change</th>
               <th>Matchup</th>
               <th>Type</th>
               <th>Date</th>
@@ -173,6 +174,12 @@
                   else
                   {
                     <p class="mb-1">not reported yet</p>
+                  }
+                </td>
+                <td>
+                  @if (matchup.Result != null)
+                  {
+                    <p class="@($"mb-1 {WonMatch(matchup)}")">@GetMmrDiff(matchup.Result)</p>
                   }
                 </td>
                 <td>@GetRaceStrings(matchup.Result)</td>
@@ -527,14 +534,6 @@
     _loadingChallengingPlayer = false;
   }
 
-  private async Task<string> LoadOpponentName(Matchup matchup)
-  {
-    var layer = matchup.Player1 == _player.Id
-      ? await _playerRepository.Load(matchup.Player2)
-      : await _playerRepository.Load(matchup.Player1);
-    return $"{layer?.DisplayName} / {layer?.DiscordTag}";
-  }
-
   private void NavigateToMatch(ObjectId challengeId)
   {
     _navigation.NavigateTo($"match/{challengeId}");
@@ -561,6 +560,13 @@
     return result.Player1.Id == _player.Id
       ? $"{result.Player1.BattlePoints} : {result.Player2.BattlePoints}"
       : $"{result.Player2.BattlePoints} : {result.Player1.BattlePoints}";
+  }
+  
+  private int GetMmrDiff(MatchResult result)
+  {
+    return result.Player1.Id == _player.Id
+      ? (int) ((result.Player1.NewMmr?.Rating ?? 0) - (result.Player1.OldMmr?.Rating ?? 0))
+      : (int) ((result.Player2.NewMmr?.Rating ?? 0) - (result.Player2.OldMmr?.Rating ?? 0));
   }
 
   private string GetRaceStrings(MatchResult result)

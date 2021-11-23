@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FadingFlame.Leagues;
 using FadingFlame.Lists;
 using FadingFlame.Matchups;
+using FadingFlame.Players;
 using FadingFlame.Repositories;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -20,7 +22,7 @@ namespace FadingFlame.Playoffs
 
         public List<Round> Rounds { get; set; }
 
-        public static Playoff Create(int season, List<PlayerInLeague> firstPlaces)
+        public static async Task<Playoff> Create(int season, List<PlayerInLeague> firstPlaces)
         {
             var playersWithFreeWins = new List<PlayerInLeague>();
             var remainingRounds = NormalRounds.Where(r => r < firstPlaces.Count).ToList();
@@ -63,7 +65,7 @@ namespace FadingFlame.Playoffs
             var freeWins = round.Matchups.Where(m => m.Player2 == ObjectId.Empty);
             foreach (var freeWin in freeWins)
             {
-                playoff.ReportGame(new MatchResultDto
+                await playoff.ReportGame(null, new MatchResultDto
                 {
                     MatchId = freeWin.Id,
                     Player1 = new PlayerResultDto
@@ -77,13 +79,20 @@ namespace FadingFlame.Playoffs
                         VictoryPoints = 0
                     },
                     SecondaryObjective = SecondaryObjectiveState.player1
-                }, null, null);
+                }, null, null, null, null);
+                //todo hier mmr rein!!!
             }
             
             return playoff;
         }
 
-        public MatchResult ReportGame(MatchResultDto matchResultDto, GameList player1List, GameList player2List)
+        public async Task<MatchResult> ReportGame(
+            IMmrRepository mmrRepository, 
+            MatchResultDto matchResultDto, 
+            Mmr player1Mmr, 
+            Mmr player2Mmr, 
+            GameList player1List, 
+            GameList player2List)
         {
             var roundIndex = Rounds.FindIndex(r => r.Matchups.Any(m => m.Id == matchResultDto.MatchId));
             var round = Rounds[roundIndex];
@@ -91,8 +100,11 @@ namespace FadingFlame.Playoffs
 
             var match = round.Matchups[matchIndex];
 
-            var result = MatchResult.CreateKoResult(
+            var result = await MatchResult.CreateKoResult(
+                mmrRepository,
                 matchResultDto.SecondaryObjective, 
+                player1Mmr,
+                player2Mmr,
                 matchResultDto.Player1, 
                 matchResultDto.Player2, 
                 player1List, 

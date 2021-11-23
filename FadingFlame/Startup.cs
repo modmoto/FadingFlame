@@ -64,7 +64,7 @@ namespace FadingFlame
                     options.SaveTokens = true;
                 });
 
-            services.AddHttpClient<MmrRepository>(c =>
+            services.AddHttpClient<IMmrRepository, MmrRepository>(c =>
             {
                 var mmrUri = Environment.GetEnvironmentVariable("MMR_SERVICE_URI") ?? "https://mmr-service.w3champions.com";
                 c.BaseAddress = new Uri(mmrUri);

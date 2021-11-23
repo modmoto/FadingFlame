@@ -370,7 +370,7 @@ else
 @inject IChallengeService _challengeService
 @inject IPlayoffRepository _playoffRepository
 @inject LoggedInUserState _userState
-@inject MmrRepository _mmrRepository
+@inject IMmrRepository _mmrRepository
 
 @code {
     [Parameter]
@@ -555,20 +555,20 @@ else
         {
             _league?.DeleteGameReport(_matchup.Id);
             _playoff?.DeleteGameReport(_matchup.Id);
+            if (_matchup.Result.Player1.OldMmr != null && _matchup.Result.Player1.OldMmr != null)
+            {
+                _player1.UpdateMmr(_matchup.Result.Player1.OldMmr);
+                _player2.UpdateMmr(_matchup.Result.Player2.OldMmr);
+            }
         }
 
-        var result = await UpdateMatchWithResult(_model);
-
-        if (!wasAllreadyReported)
-        {
-            await UpdatePlayerWithMmr(result);
-        }
+        await UpdateMatchWithResult(_model);
 
         _loading = false;
         StateHasChanged();
     }
 
-    private async Task<MatchResult> UpdateMatchWithResult(MatchResultDto model)
+    private async Task UpdateMatchWithResult(MatchResultDto model)
     {
         MatchResult result;
 
@@ -578,37 +578,26 @@ else
         {
             var gameList1 = GameList.Create(_listEditModelPlayer1.Name, _listEditModelPlayer1.List, _listEditModelPlayer1.Faction);
             var gameList2 = GameList.Create(_listEditModelPlayer2.Name, _listEditModelPlayer2.List, _listEditModelPlayer2.Faction);
-            result = MatchResult.Create(model.SecondaryObjective, model.Player1, model.Player2, gameList1, gameList2, false);
+            result = await MatchResult.Create(_mmrRepository, model.SecondaryObjective, _player1.Mmr, _player2.Mmr, model.Player1, model.Player2, gameList1, gameList2, false);
             _matchup.RecordResult(result);
             await _matchupRepository.UpdateMatch(_matchup);
         }
         else if (_league != null)
         {
-            result = _league.ReportGame(model, Player1List, Player2List);
+            result = await _league.ReportGame(_mmrRepository, model, _player1.Mmr, _player2.Mmr, Player1List, Player2List);
             await _leagueRepository.Update(_league);
         }
         else
         {
-            result = _playoff.ReportGame(model, Player1List, Player2List);
+            result = await _playoff.ReportGame(_mmrRepository, model, _player1.Mmr, _player2.Mmr, Player1List, Player2List);
             await _playoffRepository.Update(_playoff);
         }
+        
+        _player1.UpdateMmr(result.Player1.NewMmr);
+        _player2.UpdateMmr(result.Player2.NewMmr);
 
-        return result;
-    }
-
-    private async Task UpdatePlayerWithMmr(MatchResult matchResult)
-    {
-        if (!matchResult.IsDraw)
-        {
-            var player = _player1.Id == matchResult.Winner ? 1 : 2;
-            var mmrsOld = new List<Mmr> { _player1.Mmr ?? Mmr.Create(), _player2.Mmr ?? Mmr.Create()};
-            var mmrsNew = await _mmrRepository.UpdateMmrs(UpdateMmrRequest.Create(mmrsOld, player));
-            _player1.UpdateMmr(mmrsNew[0]);
-            _player2.UpdateMmr(mmrsNew[1]);
-            
-            await _playerRepository.Update(_player1);
-            await _playerRepository.Update(_player2);
-        }
+        await _playerRepository.Update(_player1);
+        await _playerRepository.Update(_player2);
     }
 
     private SecondaryObjectiveState ConvertToEnum()
@@ -712,8 +701,7 @@ else
         _secondaryObjectivePlayer1 = _player2.Id == playerId;
         _secondaryObjectivePlayer2 = _player1.Id == playerId;
         _model.WasDefLoss = true;
-        var result = await UpdateMatchWithResult(_model);
-        await UpdatePlayerWithMmr(result);
+        await UpdateMatchWithResult(_model);
         _settingDefWin = false;
     }
 

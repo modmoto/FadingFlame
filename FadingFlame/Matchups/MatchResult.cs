@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FadingFlame.Leagues;
 using FadingFlame.Lists;
+using FadingFlame.Players;
 using MongoDB.Bson;
 
 namespace FadingFlame.Matchups
@@ -21,8 +23,11 @@ namespace FadingFlame.Matchups
         public GameList Player2List { get; set; }
         public bool IsDraw => Winner == ObjectId.Empty;
 
-        public static MatchResult Create(
+        public static async Task<MatchResult> Create(
+            IMmrRepository mmrRepository,
             SecondaryObjectiveState secondaryObjective,
+            Mmr player1Mmr,
+            Mmr player2Mmr,
             PlayerResultDto player1Result,
             PlayerResultDto player2Result,
             GameList player1List, 
@@ -42,6 +47,8 @@ namespace FadingFlame.Matchups
                     ? player1Result.Id 
                     : player2Result.Id;
 
+            var newMmrs = await CreateNewMmr(mmrRepository, player1Mmr, player2Mmr, player1Result, winner);
+
             return new MatchResult
             {
                 MatchId = ObjectId.GenerateNewId(),
@@ -49,11 +56,37 @@ namespace FadingFlame.Matchups
                 SecondaryObjective = secondaryObjective,
                 Winner = winner,
                 WasDefLoss = wasDefLoss,
-                Player1 = PlayerResult.Create(player1Result.Id, player1Result.VictoryPoints, pointsAfteObjective.Player1),
-                Player2 = PlayerResult.Create(player2Result.Id, player2Result.VictoryPoints, pointsAfteObjective.Player2),
+                Player1 = PlayerResult.Create(player1Result.Id, player1Result.VictoryPoints, pointsAfteObjective.Player1, player1Mmr, newMmrs.Item1),
+                Player2 = PlayerResult.Create(player2Result.Id, player2Result.VictoryPoints, pointsAfteObjective.Player2, player2Mmr, newMmrs.Item2),
                 Player1List = wasDefLoss ? GameList.DeffLoss() : player1List,
                 Player2List = wasDefLoss ? GameList.DeffLoss() : player2List,
             };
+        }
+
+        private static async Task<Tuple<Mmr, Mmr>> CreateNewMmr(
+            IMmrRepository mmrRepository, 
+            Mmr player1Mmr, 
+            Mmr player2Mmr,
+            PlayerResultDto player1Result, 
+            ObjectId winner)
+        {
+            Mmr player1NewMmr;
+            Mmr player2NewMmr;
+            if (winner != ObjectId.Empty)
+            {
+                var player = player1Result.Id == winner ? 1 : 2;
+                var mmrsOld = new List<Mmr> {player1Mmr, player2Mmr};
+                var mmrsNew = await mmrRepository.UpdateMmrs(UpdateMmrRequest.Create(mmrsOld, player));
+                player1NewMmr = mmrsNew[0];
+                player2NewMmr = mmrsNew[1];
+            }
+            else
+            {
+                player1NewMmr = player1Mmr;
+                player2NewMmr = player2Mmr;
+            }
+
+            return new Tuple<Mmr, Mmr>(player1NewMmr, player2NewMmr);
         }
 
         private static PointTuple CalculateWinPoints(int player1, int player2)
@@ -111,8 +144,11 @@ namespace FadingFlame.Matchups
             };
         }
 
-        public static MatchResult CreateKoResult(
+        public static async Task<MatchResult> CreateKoResult(
+            IMmrRepository mmrRepository,
             SecondaryObjectiveState secondaryObjective, 
+            Mmr player1Mmr, 
+            Mmr player2Mmr, 
             PlayerResultDto player1Result, 
             PlayerResultDto player2Result, 
             GameList player1List, 
@@ -133,14 +169,16 @@ namespace FadingFlame.Matchups
                     ? player1Result.Id 
                     : player2Result.Id;
 
+            var newMmrs = await CreateNewMmr(mmrRepository, player1Mmr, player2Mmr, player1Result, winner);
+            
             return new MatchResult
             {
                 MatchId = ObjectId.GenerateNewId(),
                 RecordedAt = DateTime.UtcNow,
                 SecondaryObjective = secondaryObjective,
                 Winner = winner,
-                Player1 = PlayerResult.Create(player1Result.Id, player1Result.VictoryPoints, pointsAfteObjective.Player1),
-                Player2 = PlayerResult.Create(player2Result.Id, player2Result.VictoryPoints, pointsAfteObjective.Player2),
+                Player1 = PlayerResult.Create(player1Result.Id, player1Result.VictoryPoints, pointsAfteObjective.Player1, player1Mmr, newMmrs.Item1),
+                Player2 = PlayerResult.Create(player2Result.Id, player2Result.VictoryPoints, pointsAfteObjective.Player2, player2Mmr, newMmrs.Item2),
                 Player1List = player1List,
                 Player2List = player2List
             };

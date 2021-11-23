@@ -65,7 +65,7 @@ else
             {
                 playerInLeagues.Add(PlayerInLeague.Create(ObjectId.GenerateNewId()));
             }
-            _playoffs = Playoff.Create(0, playerInLeagues);
+            _playoffs = await Playoff.Create(0, playerInLeagues);
         }
         var listOfPlayerInPlayoffs = _playoffs.Rounds.First().Matchups.SelectMany(m => new List<ObjectId> { m.Player1, m.Player2 }).ToList();
         _playersInPlayoffs = await _playerRepository.LoadForLeague(listOfPlayerInPlayoffs, _seasonState.CurrentSeason.SeasonId);

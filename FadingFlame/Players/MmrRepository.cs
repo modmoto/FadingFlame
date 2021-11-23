@@ -7,7 +7,12 @@ using System.Threading.Tasks;
 
 namespace FadingFlame.Players
 {
-    public class MmrRepository
+    public interface IMmrRepository
+    {
+        Task<List<Mmr>> UpdateMmrs(UpdateMmrRequest updateMmrRequest);
+    }
+    
+    public class MmrRepository : IMmrRepository
     {
         private readonly HttpClient _httpClient;
 

@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using FadingFlame.Players;
+using MongoDB.Bson;
 
 namespace FadingFlame.Matchups
 {
@@ -15,16 +16,23 @@ namespace FadingFlame.Matchups
         /// the points you get for secondary objective and victory points difference
         /// </summary>
         public int BattlePoints { get; set; }
-
-        public static PlayerResult Create(ObjectId playerId,
+        public Mmr OldMmr { get; set; }
+        public Mmr NewMmr { get; set; }
+        
+        public static PlayerResult Create(
+            ObjectId playerId,
             int battlePoints,
-            int winPoints)
+            int winPoints,
+            Mmr oldMmr,
+            Mmr newMmr)
         {
             return new()
             {
                 VictoryPoints = battlePoints,
                 BattlePoints = winPoints,
-                Id = playerId
+                Id = playerId,
+                OldMmr = oldMmr,
+                NewMmr = newMmr
             };
         }
 
