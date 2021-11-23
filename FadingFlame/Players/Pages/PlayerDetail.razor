@@ -155,7 +155,7 @@
             <thead>
               <th>Opponent</th>
               <th>Result</th>
-              <th>Mmr change</th>
+              <th>Points</th>
               <th>Matchup</th>
               <th>Type</th>
               <th>Date</th>
@@ -554,6 +554,16 @@
 
     return matchup.Result.Winner == _player.Id ? "won" : "lost";
   }
+  
+  private string PositiveMmrChange(Matchup matchup)
+  {
+    if (matchup.Result.IsDraw)
+    {
+      return string.Empty;
+    }
+
+    return matchup.Result.Winner == _player.Id ? "+" : string.Empty;
+  }
 
   private string GetBattlePointString(MatchResult result)
   {
@@ -562,11 +572,17 @@
       : $"{result.Player2.BattlePoints} : {result.Player1.BattlePoints}";
   }
   
-  private int GetMmrDiff(MatchResult result)
+  private string GetMmrDiff(MatchResult result)
   {
-    return result.Player1.Id == _player.Id
-      ? (int) ((result.Player1.NewMmr?.Rating ?? 0) - (result.Player1.OldMmr?.Rating ?? 0))
-      : (int) ((result.Player2.NewMmr?.Rating ?? 0) - (result.Player2.OldMmr?.Rating ?? 0));
+    if (result.Player1.OldMmr == null) return "na";
+    var newMmrRating = result.Player1.Id == _player.Id
+      ? (int) (result.Player1.NewMmr.Rating - result.Player1.OldMmr.Rating)
+      : (int) (result.Player2.NewMmr.Rating - result.Player2.OldMmr.Rating);
+    if (newMmrRating > 0)
+    {
+      return $"+{newMmrRating}";
+    }
+    return $"{newMmrRating}";
   }
 
   private string GetRaceStrings(MatchResult result)
