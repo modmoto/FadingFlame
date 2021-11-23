@@ -33,10 +33,10 @@ else
                 Upcoming game against @_upcomingOpponenName
             </div>
         }
-        @if (_loggedInUserState.LoggedInPlayer.HasChallengedPlayer && _upcomingChallengeName != null)
+        @if (_upcomingChallenge != null)
         {
-            <div class="col mx-2 pt-3 pb-3 alert alert-info text-center cursor" role="alert" @onclick="@(() => _navigation.NavigateTo($"match/{_loggedInUserState.LoggedInPlayer.CurrentChallengeId}"))">
-                Challenge against @_upcomingChallengeName
+            <div class="col mx-2 pt-3 pb-3 alert alert-info text-center cursor" role="alert" @onclick="@(() => _navigation.NavigateTo($"match/{_upcomingChallenge.Id}"))">
+                Upcoming challenge against @_upcomingChallengeName
             </div>
         }
     </div>
@@ -71,6 +71,7 @@ else
     private bool _loading;
     private List<Player> _playersInLeague = new();
     private Matchup _upcomingGame;
+    private Matchup _upcomingChallenge;
     private ObjectId _leagueIdForUpcomingDay;
     private string _upcomingOpponenName;
     private string _upcomingChallengeName;
@@ -107,11 +108,11 @@ else
                     _upcomingOpponenName = await LoadOpponentName(_upcomingGame, playerId);
                 }
 
-                if (_loggedInUserState.LoggedInPlayer.HasChallengedPlayer)
+                var challenges = await _matchupRepository.LoadChallengesOfPlayer(_loggedInUserState.LoggedInPlayer);
+                _upcomingChallenge = challenges.FirstOrDefault();
+                if (_upcomingChallenge != null)
                 {
-                    var challenges = await _matchupRepository.LoadChallengesOfPlayer(_loggedInUserState.LoggedInPlayer);
-                    var matchup = challenges.Single(m => m.Id == _loggedInUserState.LoggedInPlayer.CurrentChallengeId);
-                    _upcomingChallengeName = await LoadOpponentName(matchup, playerId);
+                    _upcomingChallengeName = await LoadOpponentName(_upcomingChallenge, playerId);    
                 }
             }
         }
@@ -121,10 +122,10 @@ else
 
     private async Task<string> LoadOpponentName(Matchup matchup, ObjectId loggedInplayer)
     {
-        var layer = matchup.Player1 == loggedInplayer
+        var player = matchup.Player1 == loggedInplayer
             ? await _playerRepository.Load(matchup.Player2)
             : await _playerRepository.Load(matchup.Player1);
-        return $"{layer?.DisplayName} / {layer?.DiscordTag}";
+        return $"{player?.DisplayName} / {player?.DiscordTag}";
     }
 
     private string GetName(ObjectId playerId)

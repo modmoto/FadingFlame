@@ -656,7 +656,7 @@ else
     private async Task DenyChallenge()
     {
         _loadingAccepting = true;
-        await _challengeService.RevokeChallenge(_player1);
+        await _challengeService.RevokeChallenge(_matchup);
         _navigation.NavigateTo($"player/{_player2.Id}");
         _loadingAccepting = false;
     }

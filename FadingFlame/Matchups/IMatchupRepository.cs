@@ -18,6 +18,7 @@ namespace FadingFlame.Matchups
         Task<List<Matchup>> LoadMatchesOfPlayer(Player player);
         Task<List<Matchup>> LoadChallengesOfPlayer(Player player);
         Task<Matchup> LoadMatch(ObjectId objectId);
+        Task<Matchup> LoadChallengeOfPlayers(Player loggedInPlayer, Player player);
     }
 
     public class MatchupRepository : MongoDbRepositoryBase, IMatchupRepository
@@ -64,6 +65,11 @@ namespace FadingFlame.Matchups
         public Task<Matchup> LoadMatch(ObjectId objectId)
         {
             return LoadFirst<Matchup>(objectId);
+        }
+
+        public Task<Matchup> LoadChallengeOfPlayers(Player loggedInPlayer, Player player)
+        {
+            return LoadFirst<Matchup>(m => m.IsChallenge && m.Result == null && m.Player1 == loggedInPlayer.Id && m.Player2 == player.Id);
         }
     }
 }

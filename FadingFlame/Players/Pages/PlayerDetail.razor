@@ -34,10 +34,6 @@
                     }
                     <span class="oi oi-fire me-2"></span>
                     Challenge player to a game 
-                    @if (_loggedInUserState.LoggedInPlayer.HasChallengedPlayer)
-                    {
-                        <span> (and cancel current challenge)</span>
-                    }
                 </button>
             </div>
         }
@@ -50,12 +46,12 @@
 
         @if (_challenges.Any() && _isTheRightUser)
         {
-            <h4 class="mb-2">Open challenges</h4>
+            <h4 class="mb-3">Open challenges</h4>
             @foreach (var challenge in _challenges)
             {
                 <div class="pt-3 pb-3 alert alert-info d-flex justify-content-between" style="max-width: 30rem" role="alert">
                     <div class="cursor col d-flex align-items-center" @onclick="() => NavigateToMatch(challenge.Item1.Id)">
-                        VS @(challenge.Item2)
+                        vs @(challenge.Item2)
                     </div>
                     <button class="btn btn-danger float-end col" style="max-width: 4rem" @onclick="() => DeleteChallenge(challenge)">
                         <span class="oi oi-trash"></span>
@@ -264,15 +260,15 @@
                 _playerLeagues = (await _leagueRepository.LoadLeaguesForPlayer(_player.Id))
                     .OrderByDescending(r => r.Season).ToList();
 
-                if (!_challenges.Any())
+                var challenges = await _matchupRepository.LoadChallengesOfPlayer(_player);
+                var tempList = new List<Tuple<Matchup, string>>();
+                foreach (var challenge in challenges)
                 {
-                    var challenges = await _matchupRepository.LoadChallengesOfPlayer(_player);
-                    foreach (var challenge in challenges)
-                    {
-                        var opponentName = await LoadOpponentName(challenge);
-                        _challenges.Add(new Tuple<Matchup, string>(challenge, opponentName));
-                    }
+                    var opponentName = await LoadOpponentName(challenge);
+                    tempList.Add(new Tuple<Matchup, string>(challenge, opponentName));
                 }
+
+                _challenges = tempList;
 
                 _editUserModel = new EditUserModel
                 {
@@ -485,19 +481,7 @@
 
     private async Task DeleteChallenge(Tuple<Matchup, string> challenge)
     {
-        if (challenge.Item1.Id == _loggedInUserState.LoggedInPlayer.CurrentChallengeId)
-        {
-            await _challengeService.RevokeChallenge(_loggedInUserState.LoggedInPlayer);
-        }
-        else
-        {
-            var player = challenge.Item1.Player1 == _loggedInUserState.LoggedInPlayer.Id
-                ? await _playerRepository.Load(challenge.Item1.Player2)
-                : await _playerRepository.Load(challenge.Item1.Player1);
-            await _challengeService.RevokeChallenge(player);
-        }
-
+        await _challengeService.RevokeChallenge(challenge.Item1);
         _challenges.Remove(challenge);
     }
-
 }

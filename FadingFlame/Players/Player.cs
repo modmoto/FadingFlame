@@ -1,5 +1,4 @@
 using FadingFlame.Lists;
-using FadingFlame.Matchups;
 using FadingFlame.Repositories;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -17,8 +16,6 @@ namespace FadingFlame.Players
         public Army ArmyCurrentSeason  { get; set; }
         [BsonIgnore]
         public Army ArmyNextSeason  { get; set; }
-        public ObjectId CurrentChallengeId { get; set; }
-        public bool HasChallengedPlayer => CurrentChallengeId != ObjectId.Empty;
         public ObjectId ArmyIdCurrentSeason  { get; set; }
         public ObjectId ArmyIdNextSeason  { get; set; }
         public Mmr Mmr  { get; set; }
@@ -62,19 +59,6 @@ namespace FadingFlame.Players
         public void SetLocalInformation(Location location)
         {
             Location = location;
-        }
-
-        public void Challenge(Matchup challenge)
-        {
-            if (!HasChallengedPlayer)
-            {
-                CurrentChallengeId = challenge.Id;
-            }
-        }
-
-        public void CancelChallenge()
-        {
-            CurrentChallengeId = ObjectId.Empty;
         }
     }
 }

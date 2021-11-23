@@ -8,46 +8,31 @@ namespace FadingFlame.Players
     public interface IChallengeService
     {
         Task ChallengePlayer(Player loggedInPlayer, Player player);
-        Task RevokeChallenge(Player loggedInPlayer);
+        Task RevokeChallenge(Matchup challengeId);
     }
 
     public class ChallengeService : IChallengeService
     {
         private readonly IMatchupRepository _matchupRepository;
-        private readonly IPlayerRepository _playerRepository;
 
-        public ChallengeService(IMatchupRepository matchupRepository, IPlayerRepository playerRepository)
+        public ChallengeService(IMatchupRepository matchupRepository)
         {
             _matchupRepository = matchupRepository;
-            _playerRepository = playerRepository;
         }
         
         public async Task ChallengePlayer(Player loggedInPlayer, Player player)
         {
-            if (!loggedInPlayer.HasChallengedPlayer)
+            var matchesOfPlayer = await _matchupRepository.LoadChallengeOfPlayers(loggedInPlayer, player);
+            if (matchesOfPlayer == null)
             {
-                await Challenge(loggedInPlayer, player);
-            }
-            else
-            {
-                await RevokeChallenge(loggedInPlayer);
-                await Challenge(loggedInPlayer, player);
+                var challenge = Matchup.CreateChallengeGame(loggedInPlayer, player);
+                await _matchupRepository.InsertMatches(new List<Matchup> {challenge});
             }
         }
 
-        public async Task RevokeChallenge(Player loggedInPlayer)
+        public async Task RevokeChallenge(Matchup challengeId)
         {
-            await _matchupRepository.DeleteMatches(new List<ObjectId> { loggedInPlayer.CurrentChallengeId });
-            loggedInPlayer.CancelChallenge();
-            await _playerRepository.Update(loggedInPlayer);
-        }
-
-        private async Task Challenge(Player loggedInPlayer, Player player)
-        {
-            var challenge = Matchup.CreateChallengeGame(loggedInPlayer, player);
-            await _matchupRepository.InsertMatches(new List<Matchup> {challenge});
-            loggedInPlayer.Challenge(challenge);
-            await _playerRepository.Update(loggedInPlayer);
+            await _matchupRepository.DeleteMatches(new List<ObjectId> { challengeId.Id });
         }
     }
 }
