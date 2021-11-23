@@ -200,11 +200,11 @@
        || _isFreshListPossible)
   {
     <h4>Lists this season</h4>
-    <hr class="my-3">
     <EditForm EditContext="@_editContextLists">
       <DataAnnotationsValidator/>
       <div class="row align-items-start">
-        <div class="col">
+        <div class="col-xs-12 col-md-12 col-lg-6">
+          <hr class="my-3">
           <ValidationMessage For="@(() => _editListModel.List1.List)"/>
           <UserListComponent
             List="@(_editListModel.List1)"
@@ -213,7 +213,8 @@
             OnRequestListChange="RequestListChange1"
             OnDeleteListChange="DeleteListChange1"/>
         </div>
-        <div class="col">
+        <div class="col-xs-12 col-md-12 col-lg-6">
+          <hr class="my-3">
           <ValidationMessage For="@(() => _editListModel.List2.List)"/>
           <UserListComponent
             List="@(_editListModel.List2)"
