@@ -56,8 +56,8 @@
           @foreach (var challenge in _challenges)
           {
             <div class="pt-3 pb-3 alert alert-info d-flex justify-content-between" style="max-width: 30rem" role="alert">
-              <div class="cursor col d-flex align-items-center" @onclick="() => NavigateToMatch(challenge.Item1.Id)">
-                vs @(challenge.Item2)
+              <div class="cursor col d-flex align-items-center" @onclick="() => NavigateToMatch(challenge.Id)">
+                vs @GetOpponent(challenge)
               </div>
               <button class="btn btn-danger float-end col" style="max-width: 4rem" @onclick="() => DeleteChallenge(challenge)">
                 <span class="oi oi-trash"></span>
@@ -162,22 +162,22 @@
             <tbody>
             @foreach (var matchup in _matches)
             {
-              <tr @onclick="() => NavigateToMatch(matchup.Item1.Id)" class="cursor">
-                <td>@matchup.Item2</td>
+              <tr @onclick="() => NavigateToMatch(matchup.Id)" class="cursor">
+                <td>@GetOpponent(matchup)</td>
                 <td>
-                  @if (matchup.Item1.Result != null)
+                  @if (matchup.Result != null)
                   {
-                    <p class="@($"mb-1 {WonMatch(matchup.Item1)}")">@GetBattlePointString(matchup.Item1.Result)</p>
-                    <small>@GetOriginalPointsString(matchup.Item1.Result)</small>
+                    <p class="@($"mb-1 {WonMatch(matchup)}")">@GetBattlePointString(matchup.Result)</p>
+                    <small>@GetOriginalPointsString(matchup.Result)</small>
                   }
                   else
                   {
                     <p class="mb-1">not reported yet</p>
                   }
                 </td>
-                <td>@GetRaceStrings(matchup.Item1.Result)</td>
-                <td>@(matchup.Item1.IsChallenge ? "Challenge" : "League")</td>
-                <td>@matchup.Item1.Result?.RecordedAt.ToMyDateYear()</td>
+                <td>@GetRaceStrings(matchup.Result)</td>
+                <td>@(matchup.IsChallenge ? "Challenge" : "League")</td>
+                <td>@matchup.Result?.RecordedAt.ToMyDateYear()</td>
               </tr>
             }
             </tbody>
@@ -257,8 +257,8 @@
 
   private List<League> _playerLeagues = new();
   private List<RegionInfo> _countries = new();
-  private List<Tuple<Matchup, string>> _matches = new();
-  private List<Tuple<Matchup, string>> _challenges = new();
+  private List<Matchup> _matches = new();
+  private List<Matchup> _challenges = new();
 
   private Player _player = new();
   private bool _loading;
@@ -311,23 +311,8 @@
         _playerLeagues = (await _leagueRepository.LoadLeaguesForPlayer(_player.Id))
           .OrderByDescending(r => r.Season).ToList();
 
-        var challenges = await _matchupRepository.LoadChallengesOfPlayer(_player);
-        var tempList = new List<Tuple<Matchup, string>>();
-        foreach (var challenge in challenges)
-        {
-          var opponentName = await LoadOpponentName(challenge);
-          tempList.Add(new Tuple<Matchup, string>(challenge, opponentName));
-        }
-        _challenges = tempList;
-        
-        var matches = await _matchupRepository.LoadMatchesOfPlayer(_player);
-        var tempListMatches = new List<Tuple<Matchup, string>>();
-        foreach (var matchup in matches)
-        {
-          var opponentName = await LoadOpponentName(matchup);
-          tempListMatches.Add(new Tuple<Matchup, string>(matchup, opponentName));
-        }
-        _matches = tempListMatches;
+        _challenges = await _matchupRepository.LoadChallengesOfPlayer(_player);
+        _matches = await _matchupRepository.LoadMatchesOfPlayer(_player);
 
         _editUserModel = new EditUserModel
         {
@@ -555,9 +540,9 @@
     _navigation.NavigateTo($"match/{challengeId}");
   }
 
-  private async Task DeleteChallenge(Tuple<Matchup, string> challenge)
+  private async Task DeleteChallenge(Matchup challenge)
   {
-    await _challengeService.RevokeChallenge(challenge.Item1);
+    await _challengeService.RevokeChallenge(challenge);
     _challenges.Remove(challenge);
   }
 
@@ -585,4 +570,12 @@
       ? $"{result.Player1List.Faction.ToCamelCaseString()} vs {result.Player2List.Faction.ToCamelCaseString()}"
       : $"{result.Player2List.Faction.ToCamelCaseString()} vs {result.Player1List.Faction.ToCamelCaseString()}";
   }
+
+  private string GetOpponent(Matchup matchup)
+  {
+    return matchup.Player1 == _player.Id
+      ? $"{matchup.Player2Name} / {matchup.Player2DiscordTag}"
+      : $"{matchup.Player1Name} / {matchup.Player1DiscordTag}";
+  }
+
 }

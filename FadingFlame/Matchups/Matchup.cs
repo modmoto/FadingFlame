@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FadingFlame.Leagues;
 using FadingFlame.Lists;
 using FadingFlame.Players;
@@ -13,6 +14,19 @@ namespace FadingFlame.Matchups
         public ObjectId Id { get; set; }
         public ObjectId Player1 { get; set; }
         public ObjectId Player2 { get; set; }
+        [BsonIgnoreIfNull]
+        public List<Player> OriginalPlayer1 { get; set; }
+        [BsonIgnoreIfNull]
+        public List<Player> OriginalPlayer2 { get; set; }
+
+        [BsonIgnore] 
+        public string Player1Name => OriginalPlayer1[0].DisplayName;
+        [BsonIgnore]
+        public string Player2Name => OriginalPlayer2[0].DisplayName;
+        [BsonIgnore]
+        public string Player1DiscordTag => OriginalPlayer1[0].DiscordTag;
+        [BsonIgnore]
+        public string Player2DiscordTag => OriginalPlayer2[0].DiscordTag;
         public MatchResult Result { get; set; }
         public GameList ChallengePlayer1List { get; set; }
         public GameList ChallengePlayer2List { get; set; }

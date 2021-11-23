@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FadingFlame.Players;
 using FadingFlame.Repositories;
@@ -57,18 +58,31 @@ namespace FadingFlame.Matchups
 
         public Task<List<Matchup>> LoadOpenMatchesOfPlayer(Player player)
         {
-            return LoadAll<Matchup>(m => m.Result != null && (m.Player1 == player.Id || m.Player2 == player.Id));
+            return LoadMatchesWithPlayerNames(m => m.Result != null && (m.Player1 == player.Id || m.Player2 == player.Id));
         }
 
         public async Task<List<Matchup>> LoadMatchesOfPlayer(Player player)
         {
-            var loadMatchesOfPlayer = await LoadAll<Matchup>(m => m.Player1 == player.Id || m.Player2 == player.Id);
+            var loadMatchesOfPlayer = await LoadMatchesWithPlayerNames(m => m.Player1 == player.Id || m.Player2 == player.Id);
             return loadMatchesOfPlayer.OrderByDescending(l => l.Id).ToList();
         }
-
+        
         public Task<List<Matchup>> LoadChallengesOfPlayer(Player player)
         {
-            return LoadAll<Matchup>(m => m.IsChallenge && m.Result == null && (m.Player1 == player.Id || m.Player2 == player.Id));
+            return LoadMatchesWithPlayerNames(m => m.IsChallenge && m.Result == null && (m.Player1 == player.Id || m.Player2 == player.Id));
+        }
+
+        private async Task<List<Matchup>> LoadMatchesWithPlayerNames(Expression<Func<Matchup, bool>> expression)
+        {
+            var matchupCollection = CreateCollection<Matchup>();
+            var loadMatchesOfPlayer = await matchupCollection
+                .Aggregate()
+                .Match(expression)
+                .Lookup("Player", "Player1", "_id", "OriginalPlayer1")
+                .Lookup("Player", "Player2", "_id", "OriginalPlayer2")
+                .As<Matchup>()
+                .ToListAsync();
+            return loadMatchesOfPlayer;
         }
 
         public Task<Matchup> LoadMatch(ObjectId objectId)
