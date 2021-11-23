@@ -8,7 +8,7 @@ namespace FadingFlame.Players
     public interface IChallengeService
     {
         Task ChallengePlayer(Player loggedInPlayer, Player player);
-        Task DeleteChalenge(Player loggedInPlayer);
+        Task RevokeChallenge(Player loggedInPlayer);
     }
 
     public class ChallengeService : IChallengeService
@@ -30,12 +30,12 @@ namespace FadingFlame.Players
             }
             else
             {
-                await DeleteChalenge(loggedInPlayer);
+                await RevokeChallenge(loggedInPlayer);
                 await Challenge(loggedInPlayer, player);
             }
         }
 
-        public async Task DeleteChalenge(Player loggedInPlayer)
+        public async Task RevokeChallenge(Player loggedInPlayer)
         {
             await _matchupRepository.DeleteMatches(new List<ObjectId> { loggedInPlayer.CurrentChallengeId });
             loggedInPlayer.CancelChallenge();
