@@ -579,7 +579,7 @@ else
             var gameList2 = GameList.Create(_listEditModelPlayer1.Name, _listEditModelPlayer1.List, _listEditModelPlayer1.Faction);
             result = MatchResult.Create(model.SecondaryObjective, model.Player1, model.Player2, gameList1, gameList2, false);
             _matchup.RecordResult(result);
-            await _matchupRepository.UpdateMatches(new List<Matchup> { _matchup });
+            await _matchupRepository.UpdateMatch(_matchup);
         }
         else if (_league != null)
         {
