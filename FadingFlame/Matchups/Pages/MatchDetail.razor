@@ -84,7 +84,7 @@ else
             }
         }
 
-        if (CanEditMatch && MatchIsEditable && _matchup.PlayersSelectedList || _userState.UserIsAdmin)
+        if (CanEditMatch && MatchIsEditable && _matchup.PlayersSelectedList || (_matchup.PlayersSelectedList && _userState.UserIsAdmin))
         {
             <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
                 <DataAnnotationsValidator/>
