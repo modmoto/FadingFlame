@@ -558,16 +558,6 @@
 
     return matchup.Result.Winner == _player.Id ? "won" : "lost";
   }
-  
-  private string PositiveMmrChange(Matchup matchup)
-  {
-    if (matchup.Result.IsDraw)
-    {
-      return string.Empty;
-    }
-
-    return matchup.Result.Winner == _player.Id ? "+" : string.Empty;
-  }
 
   private string GetBattlePointString(MatchResult result)
   {
