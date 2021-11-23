@@ -553,13 +553,14 @@ else
         var wasAllreadyReported = _matchup.IsFinished;
         if (wasAllreadyReported)
         {
-            _league?.DeleteGameReport(_matchup.Id);
-            _playoff?.DeleteGameReport(_matchup.Id);
-            if (_matchup.Result.Player1.OldMmr != null && _matchup.Result.Player1.OldMmr != null)
+            if (_matchup.Result.Player1.OldMmr != null && _matchup.Result.Player2.OldMmr != null)
             {
                 _player1.UpdateMmr(_matchup.Result.Player1.OldMmr);
                 _player2.UpdateMmr(_matchup.Result.Player2.OldMmr);
             }
+
+            _league?.DeleteGameReport(_matchup.Id);
+            _playoff?.DeleteGameReport(_matchup.Id);
         }
 
         await UpdateMatchWithResult(_model);
