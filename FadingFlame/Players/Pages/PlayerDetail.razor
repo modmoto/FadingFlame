@@ -600,8 +600,8 @@
   private string GetOpponent(Matchup matchup)
   {
     return matchup.Player1 == _player.Id
-      ? $"{matchup.Player2Name} / {matchup.Player2DiscordTag}"
-      : $"{matchup.Player1Name} / {matchup.Player1DiscordTag}";
+      ? $"{matchup.Player2Name}"
+      : $"{matchup.Player1Name}";
   }
 
 }
