@@ -544,7 +544,7 @@
 
   private async Task<string> LoadOpponentName(Matchup matchup)
   {
-    var layer = matchup.Player1 == _loggedInUserState.LoggedInPlayer.Id
+    var layer = matchup.Player1 == _player.Id
       ? await _playerRepository.Load(matchup.Player2)
       : await _playerRepository.Load(matchup.Player1);
     return $"{layer?.DisplayName} / {layer?.DiscordTag}";
@@ -578,7 +578,7 @@
       : $"{result.Player2.BattlePoints} : {result.Player1.BattlePoints}";
   }
 
-  private object GetRaceStrings(MatchResult result)
+  private string GetRaceStrings(MatchResult result)
   {
     if (result?.Player1List == null) return null;
     return result.Player1.Id == _player.Id
