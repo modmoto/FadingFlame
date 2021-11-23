@@ -7,6 +7,7 @@
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.WebUtilities
 @using FadingFlame.Admin
+@using FadingFlame.Players.Pages
 
 @if (_loading)
 {
@@ -35,33 +36,54 @@ else
     {
         if (!_matchup.IsFinished)
         {
-            if (Player2LoggedIn && !_matchup.ChallengeAccepted)
+            if (!_matchup.PlayersSelectedList)
             {
-                <h4>You where challenged to a game by @_player1.DisplayName</h4>
-                <div class="row">
-                    <button disabled="@_loadingAccepting" class="btn btn-success col m-2" @onclick="AccepChallenge">
-                        @if (_loadingAccepting)
+                @if (Player1LoggedIn)
+                {
+                    if (string.IsNullOrEmpty(_listEditModelPlayer2.List))
+                    {
+                        <div>Your opponent did not enter his list yet</div>
+                    }
+                    else
+                    {
+                        <div>Your opponent entered a list and is waiting for you</div>
+                    }
+                }
+                @if (Player2LoggedIn)
+                {
+                    if (string.IsNullOrEmpty(_listEditModelPlayer1.List))
+                    {
+                        <div>Your opponent did not enter his list yet</div>
+                    }
+                    else
+                    {
+                        <div>Your opponent entered a list and is waiting for you</div>
+                    }
+                }
+                <h4 class="my-3">Enter your list for the match</h4>
+                <EditForm EditContext="@_editContextLists">
+                    <DataAnnotationsValidator/>
+                    @if (Player1LoggedIn)
+                    {
+                        <FreshListComponent List="@(_listEditModelPlayer1)" HideName/>
+                    }
+                    
+                    @if (Player2LoggedIn)
+                    {
+                        <FreshListComponent List="@(_listEditModelPlayer2)" HideName/>
+                    }
+                    <button disabled="@_loadingChallengeListEdit" class="btn btn-primary" @onclick="OnSubmitList">
+                        @if (_loadingChallengeListEdit)
                         {
                             <span class="spinner-border spinner-border-sm mr-1"></span>
                         }
-                        Accept
+                        Save list
                     </button>
-                    <button disabled="@_loadingAccepting" class="btn btn-danger col m-2"  @onclick="DenyChallenge">
-                        @if (_loadingAccepting)
-                        {
-                            <span class="spinner-border spinner-border-sm mr-1"></span>
-                        }
-                        Deny
-                    </button>
-                </div>
-            }
-            else
-            {
-                <h4>Challenge was not accepted by @_player2.DisplayName yet</h4>
+                </EditForm>
             }
         }
 
-        if (_matchup.ChallengeAccepted && MatchIsEditable || _userState.UserIsAdmin)
+        if (MatchIsEditable && _matchup.PlayersSelectedList || _userState.UserIsAdmin)
         {
             <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
                 <DataAnnotationsValidator/>
@@ -268,47 +290,44 @@ else
         </div>
     }
 
-    if (!_matchup.IsChallenge)
+    if (_matchup.PlayersSelectedList)
     {
-        if (_matchup.PlayersSelectedList)
-        {
-            <hr class="my-3">
-            <div class="row align-items-start my-2">
-                <div class="col">
-                    <div class="form-group">
-                        <div>List: @_matchup.Player1List</div>
-                        <div><b>@(Player1List.Faction.ToCamelCaseString())</b></div>
-                    </div>
-                    <hr class="my-3">
-                    <div class="form-group">
-                        <div style="white-space:pre-wrap;">@(Player1List.List)</div>
-                    </div>
+        <hr class="my-3">
+        <div class="row align-items-start my-2">
+            <div class="col">
+                <div class="form-group">
+                    <div>List: @_matchup.Player1List</div>
+                    <div><b>@(Player1List.Faction.ToCamelCaseString())</b></div>
                 </div>
-                <div class="col">
-                    <div class="form-group">
-                        <div>List: @_matchup.Player2List</div>
-                        <div><b>@(Player2List.Faction.ToCamelCaseString())</b></div>
-                    </div>
-                    <hr class="my-3">
-                    <div class="form-group">
-                        <div style="white-space:pre-wrap;">@(Player2List.List)</div>
-                    </div>
+                <hr class="my-3">
+                <div class="form-group">
+                    <div style="white-space:pre-wrap;">@(Player1List.List)</div>
                 </div>
             </div>
-        }
-        else
-        {
-            <div class="row align-items-start my-2">
-                @if (_matchup.Player2 == ObjectId.Empty)
-                {
-                    <div class="col">This game was a freewin for @Player1Name</div>
-                }
-                else
-                {
-                    <div class="col">Players are still selecting their lists...</div>
-                }
+            <div class="col">
+                <div class="form-group">
+                    <div>List: @_matchup.Player2List</div>
+                    <div><b>@(Player2List.Faction.ToCamelCaseString())</b></div>
+                </div>
+                <hr class="my-3">
+                <div class="form-group">
+                    <div style="white-space:pre-wrap;">@(Player2List.List)</div>
+                </div>
             </div>
-        }
+        </div>
+    }
+    else
+    {
+        <div class="row align-items-start my-2">
+            @if (_matchup.Player2 == ObjectId.Empty)
+            {
+                <div class="col">This game was a freewin for @Player1Name</div>
+            }
+            else
+            {
+                <div class="col">Players are still selecting their lists...</div>
+            }
+        </div>
     }
 
     @if (_userState.UserIsAdmin && !_matchup.IsFinished)
@@ -368,16 +387,42 @@ else
     private bool _secondaryObjectivePlayer1;
     private bool _secondaryObjectivePlayer2;
     private bool _settingDefWin;
-    private bool _loadingAccepting;
     private string _selectedListAsString;
     private bool _selectingList;
+    private bool _loadingChallengeListEdit;
+    private EditContext _editContextLists;
     private Playoff _playoff;
+    private GameListEditModel _listEditModelPlayer1 = new();
+    private GameListEditModel _listEditModelPlayer2 = new();
     private bool Player1LoggedIn => _model.Player1.Id == _userState.LoggedInPlayer.Id;
     private bool Player2LoggedIn =>_model.Player2?.Id == _userState.LoggedInPlayer.Id;
     private bool CanEditMatch => Player1LoggedIn || Player2LoggedIn;
     private bool MatchIsEditable => _matchup.Result == null || DateTime.UtcNow.AddDays(-1) < _matchup.Result.RecordedAt;
-    private GameList Player1List => _matchup.Result?.Player1List ?? (_player1.ArmyCurrentSeason.List1.Name == _matchup.Player1List ? _player1.ArmyCurrentSeason.List1 : _player1.ArmyCurrentSeason.List2);
-    private GameList Player2List => _matchup.Result?.Player2List ?? (_player2.ArmyCurrentSeason.List1.Name == _matchup.Player2List ? _player2.ArmyCurrentSeason.List1 : _player2.ArmyCurrentSeason.List2);
+    private GameList Player1List
+    {
+        get
+        {
+            if (_matchup.IsChallenge && !_matchup.IsFinished)
+            {
+                return _matchup.ChallengePlayer1List;
+            }
+            var resultPlayer1List = _matchup.Result?.Player1List;
+            return resultPlayer1List ?? (_player1.ArmyCurrentSeason.List1.Name == _matchup.Player1List ? _player1.ArmyCurrentSeason.List1 : _player1.ArmyCurrentSeason.List2);
+        }
+    }
+
+    private GameList Player2List
+    {
+        get
+        {
+            if (_matchup.IsChallenge && !_matchup.IsFinished)
+            {
+                return _matchup.ChallengePlayer2List;
+            }
+            var resultPlayer2List = _matchup.Result?.Player2List;
+            return resultPlayer2List ?? (_player2.ArmyCurrentSeason.List1.Name == _matchup.Player2List ? _player2.ArmyCurrentSeason.List1 : _player2.ArmyCurrentSeason.List2);
+        }
+    }
 
     protected override void OnInitialized()
     {
@@ -466,17 +511,33 @@ else
         _secondaryObjectivePlayer2 = match.Result?.SecondaryObjective == SecondaryObjectiveState.player2; 
         _model.MatchId = match.Id;
         
+        
+        _listEditModelPlayer1 = ExtractListModel(match.ChallengePlayer1List);
+        _listEditModelPlayer2 = ExtractListModel(match.ChallengePlayer2List);
+        
         if (Player1LoggedIn)
         {
             _listsOfLoggedInPlayer = _player1.ArmyCurrentSeason;
             _selectedListAsString = $"{match.Player1List}";
+            _editContextLists = new EditContext(_listEditModelPlayer1);
         }
 
         if (Player2LoggedIn)
         {
             _listsOfLoggedInPlayer = _player2.ArmyCurrentSeason;
             _selectedListAsString = $"{match.Player2List}";
+            _editContextLists = new EditContext(_listEditModelPlayer2);
         }
+    }
+
+    private GameListEditModel ExtractListModel(GameList gameList)
+    {
+        return new GameListEditModel
+        {
+            Faction = gameList?.Faction ?? Faction.None,
+            List = gameList?.List,
+            Name = gameList?.Name
+        };
     }
 
     private string GetListFacion(Army army, string listName)
@@ -514,7 +575,9 @@ else
 
         if (_matchup.IsChallenge)
         {
-            result = MatchResult.Create(model.SecondaryObjective, model.Player1, model.Player2, null, null, false);
+            var gameList1 = GameList.Create(_listEditModelPlayer1.Name, _listEditModelPlayer1.List, _listEditModelPlayer1.Faction);
+            var gameList2 = GameList.Create(_listEditModelPlayer1.Name, _listEditModelPlayer1.List, _listEditModelPlayer1.Faction);
+            result = MatchResult.Create(model.SecondaryObjective, model.Player1, model.Player2, gameList1, gameList2, false);
             _matchup.RecordResult(result);
             await _matchupRepository.UpdateMatches(new List<Matchup> { _matchup });
         }
@@ -653,19 +716,23 @@ else
         _settingDefWin = false;
     }
 
-    private async Task DenyChallenge()
+    private async Task OnSubmitList()
     {
-        _loadingAccepting = true;
-        await _challengeService.RevokeChallenge(_matchup);
-        _navigation.NavigateTo($"player/{_player2.Id}");
-        _loadingAccepting = false;
+        _loadingChallengeListEdit = true;
+        if (Player1LoggedIn)
+        {
+            var gameList = GameList.Create(_listEditModelPlayer1.Name, _listEditModelPlayer1.List, _listEditModelPlayer1.Faction);
+            _matchup.ChallengePlayer1List = gameList;
+            await _matchupRepository.UpdateMatch(_matchup);
+        }
+        
+        if (Player2LoggedIn)
+        {
+            var gameList = GameList.Create(_listEditModelPlayer2.Name, _listEditModelPlayer2.List, _listEditModelPlayer2.Faction);
+            _matchup.ChallengePlayer2List = gameList;
+            await _matchupRepository.UpdateMatch(_matchup);
+        }
+        _loadingChallengeListEdit = false;
     }
 
-    private async Task AccepChallenge()
-    {
-        _loadingAccepting = true;
-        _matchup.AcceptChallenge();
-        await _matchupRepository.UpdateMatches(new List<Matchup> { _matchup });
-        _loadingAccepting = false;
-    }
 }

@@ -13,16 +13,23 @@ namespace FadingFlame.Matchups
         public ObjectId Id { get; set; }
         public ObjectId Player1 { get; set; }
         public ObjectId Player2 { get; set; }
-        [BsonIgnore]
-        public ObjectId Challenger => Player1;
-        [BsonIgnore]
-        public ObjectId PlayerThatGotChallenged => Player2;
         public MatchResult Result { get; set; }
-        public bool PlayersSelectedList => !string.IsNullOrEmpty(Player1List) && !string.IsNullOrEmpty(Player2List);
+        public GameList ChallengePlayer1List { get; set; }
+        public GameList ChallengePlayer2List { get; set; }
+        public bool PlayersSelectedList
+        {
+            get
+            {
+                if (IsChallenge)
+                    return !string.IsNullOrEmpty(ChallengePlayer1List?.List) &&
+                           !string.IsNullOrEmpty(ChallengePlayer2List?.List);
+                return !string.IsNullOrEmpty(Player1List) && !string.IsNullOrEmpty(Player2List);
+            }
+        }
+
         public string Player1List { get; set; }
         public string Player2List { get; set; }
         public bool IsChallenge { get; set; }
-        public bool ChallengeAccepted { get; set; }
         public bool IsFinished => Result != null;
 
         public static Matchup CreateForLeague(PlayerInLeague playerAtHome, PlayerInLeague playerAsGuest)
@@ -33,11 +40,6 @@ namespace FadingFlame.Matchups
                 Player2 = playerAsGuest.Id,
                 Id = ObjectId.GenerateNewId()
             };
-        }
-
-        public void AcceptChallenge()
-        {
-            ChallengeAccepted = true;
         }
 
         public static Matchup CreateChallengeGame(Player challenger, Player playerThatGetsChallenged)
