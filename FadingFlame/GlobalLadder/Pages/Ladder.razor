@@ -27,7 +27,7 @@
         <td class="won">@item.value.Wins</td>
         <td class="lost">@item.value.Losses</td>
         <td class="draw">@item.value.Draws</td>
-        <td>@(item.value.WinRate.ToString("F2"))</td>
+        <td>@((int) item.value.WinRate)%</td>
         <td>@item.value.MatchCount</td>
       </tr>
     }
