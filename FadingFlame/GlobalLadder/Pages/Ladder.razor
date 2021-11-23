@@ -14,6 +14,7 @@
       <th>Wins</th>
       <th>Losses</th>
       <th>Draws</th>
+      <th>Winrate</th>
       <th>Matches</th>
     </thead>
     <tbody>
@@ -26,6 +27,7 @@
         <td class="won">@item.value.Wins</td>
         <td class="lost">@item.value.Losses</td>
         <td class="draw">@item.value.Draws</td>
+        <td>@(item.value.WinRate.ToString("F2"))</td>
         <td>@item.value.MatchCount</td>
       </tr>
     }
