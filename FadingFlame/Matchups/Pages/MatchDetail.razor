@@ -555,8 +555,8 @@ else
         {
             if (_matchup.Result.Player1.OldMmr != null && _matchup.Result.Player2.OldMmr != null)
             {
-                _player1.UpdateMmr(_matchup.Result.Player1.OldMmr);
-                _player2.UpdateMmr(_matchup.Result.Player2.OldMmr);
+                _player1.TrackBackMmr(_matchup.Result.Player1.MmrDifference);
+                _player2.TrackBackMmr(_matchup.Result.Player2.MmrDifference);
             }
 
             _league?.DeleteGameReport(_matchup.Id);

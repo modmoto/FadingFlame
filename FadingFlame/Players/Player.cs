@@ -60,5 +60,14 @@ namespace FadingFlame.Players
         {
             Location = location;
         }
+
+        public void TrackBackMmr(Mmr mmrDifference)
+        {
+            Mmr = new Mmr
+            {
+                Rating = Mmr.Rating - mmrDifference.Rating,
+                RatingDeviation = Mmr.RatingDeviation - mmrDifference.RatingDeviation,
+            };
+        }
     }
 }

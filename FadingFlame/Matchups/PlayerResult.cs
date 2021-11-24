@@ -1,5 +1,6 @@
 ﻿using FadingFlame.Players;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace FadingFlame.Matchups
 {
@@ -18,7 +19,14 @@ namespace FadingFlame.Matchups
         public int BattlePoints { get; set; }
         public Mmr OldMmr { get; set; }
         public Mmr NewMmr { get; set; }
-        
+
+        [BsonIgnore]
+        public Mmr MmrDifference => new()
+        {
+            Rating = NewMmr.Rating - OldMmr.Rating,
+            RatingDeviation = NewMmr.RatingDeviation - OldMmr.RatingDeviation
+        };
+
         public static PlayerResult Create(
             ObjectId playerId,
             int battlePoints,
