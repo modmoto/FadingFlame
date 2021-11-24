@@ -55,6 +55,18 @@ else
     private bool _loading = true;
     private Playoff _playoffs;
     private List<Player> _playersInPlayoffs = new();
+    private readonly string _unknownPlayer = "tbd";
+
+    protected override void OnInitialized()
+    {
+        _seasonState.SeasonsChanged += LoadStuff;
+    }
+
+    private async void LoadStuff(object sender, EventArgs e)
+    {
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -75,17 +87,29 @@ else
 
     public void GoToMatch(Matchup matchup)
     {
-        _navigation.NavigateTo($"match/{matchup.Id}?playoffSeason={_playoffs.Season}");
+        if (GameHasAllPlayers(matchup))
+        {
+            _navigation.NavigateTo($"match/{matchup.Id}?playoffSeason={_playoffs.Season}");
+        }
     }
     
     private string GetClasses(Matchup matchup)
     {
-        var classes = UserIsOneOfThePlayers(matchup) ? "bg-light cursor card mx-4 my-2" : "cursor card mx-4 my-2";
+        var classes = UserIsOneOfThePlayers(matchup) ? "bg-light card mx-4 my-1" : "card mx-4 my-1";
         if (matchup.Player2 == ObjectId.Empty)
         {
             classes += " invisible";
         }
+        if (GameHasAllPlayers(matchup))
+        {
+            classes += " cursor";
+        }
         return classes;
+    }
+
+    private bool GameHasAllPlayers(Matchup matchup)
+    {
+        return !(GetName(matchup.Player1) == _unknownPlayer || GetName(matchup.Player2) == _unknownPlayer);
     }
 
     private bool UserIsOneOfThePlayers(Matchup matchup)
@@ -97,6 +121,6 @@ else
     {
         if (playerId == ObjectId.Empty) return "Freewin";
 
-        return _playersInPlayoffs.FirstOrDefault(p => p.Id == playerId)?.DisplayName ?? "tbd";
+        return _playersInPlayoffs.FirstOrDefault(p => p.Id == playerId)?.DisplayName ?? _unknownPlayer;
     }
 }
