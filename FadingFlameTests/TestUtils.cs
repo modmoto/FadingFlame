@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
 using MongoDB.Bson;
+using Moq;
 
 namespace FadingFlameTests
 {
@@ -19,6 +21,17 @@ namespace FadingFlameTests
             }
 
             return league;
+        }
+
+        public static IMmrRepository MmrRepositoryMock()
+        {
+            var mock = new Mock<IMmrRepository>();
+            mock.Setup(m => m.UpdateMmrs(It.IsAny<UpdateMmrRequest>())).ReturnsAsync(new List<Mmr>
+            {
+                Mmr.Create(),
+                Mmr.Create()
+            });
+            return mock.Object;
         }
     }
 }

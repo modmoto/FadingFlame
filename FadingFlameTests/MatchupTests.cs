@@ -26,7 +26,7 @@ namespace FadingFlameTests
             await playerRepository.Insert(player2);
 
             var challengeGame = Matchup.CreateChallengeGame(player1, player2);
-            await matchupRepository.InsertMatches(new List<Matchup> {challengeGame});
+            await matchupRepository.InsertMatch(challengeGame);
 
             var loadedMatches = await matchupRepository.LoadMatchesOfPlayer(player1);
 

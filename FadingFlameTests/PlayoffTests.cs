@@ -24,7 +24,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient), new SeasonState(), MmrRepositoryMock());
+                new PlayoffRepository(MongoClient), new SeasonState(), TestUtils.MmrRepositoryMock());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
 
@@ -41,13 +41,13 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient), new SeasonState(), MmrRepositoryMock());
+                new PlayoffRepository(MongoClient), new SeasonState(), TestUtils.MmrRepositoryMock());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
 
             var matchup1 = playoffs.Rounds[0].Matchups[0];
             var matchup2 = playoffs.Rounds[0].Matchups[1];
-            await playoffs.ReportGame(MmrRepositoryMock(),
+            await playoffs.ReportGame(TestUtils.MmrRepositoryMock(),
                 new MatchResultDto
             {
                 
@@ -63,7 +63,7 @@ namespace FadingFlameTests
                 },
                 MatchId = matchup1.Id
             }, Mmr.Create(), Mmr.Create(), null, null);
-            await playoffs.ReportGame(MmrRepositoryMock(), new MatchResultDto
+            await playoffs.ReportGame(TestUtils.MmrRepositoryMock(), new MatchResultDto
             {
                 Player1 = new PlayerResultDto
                 {
@@ -86,17 +86,6 @@ namespace FadingFlameTests
             Assert.AreEqual(matchup2.Player1, finale.Player2);
         }
 
-        private static IMmrRepository MmrRepositoryMock()
-        {
-            var mock = new Mock<IMmrRepository>();
-            mock.Setup(m => m.UpdateMmrs(It.IsAny<UpdateMmrRequest>())).ReturnsAsync(new List<Mmr>
-            {
-                Mmr.Create(),
-                Mmr.Create()
-            });
-            return mock.Object;
-        }
-
         [Test]
         public async Task PlayoffsTwoTooMany()
         {
@@ -106,7 +95,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient), new SeasonState(), MmrRepositoryMock());
+                new PlayoffRepository(MongoClient), new SeasonState(), TestUtils.MmrRepositoryMock());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
             
@@ -131,7 +120,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient), new SeasonState(), MmrRepositoryMock());
+                new PlayoffRepository(MongoClient), new SeasonState(), TestUtils.MmrRepositoryMock());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
             

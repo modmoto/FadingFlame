@@ -23,6 +23,7 @@ namespace FadingFlame.Matchups
         Task<Matchup> LoadMatch(ObjectId objectId);
         Task<Matchup> LoadChallengeOfPlayers(Player loggedInPlayer, Player player);
         Task UpdateMatch(Matchup matchup);
+        Task InsertMatch(Matchup matchup);
     }
 
     public class MatchupRepository : MongoDbRepositoryBase, IMatchupRepository
@@ -100,6 +101,11 @@ namespace FadingFlame.Matchups
         public Task UpdateMatch(Matchup matchup)
         {
             return Upsert(matchup);
+        }
+
+        public Task InsertMatch(Matchup challengeGame)
+        {
+            return Upsert(challengeGame);
         }
     }
 }
