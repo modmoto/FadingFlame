@@ -16,17 +16,14 @@ namespace FadingFlame.Leagues
     {
         private readonly ISeasonRepository _seasonRepository;
         private readonly ILeagueRepository _leagueRepository;
-        private readonly IPlayerRepository _playerRepository;
         private Random rng = new();
         
         public LeagueCreationService(
             ISeasonRepository seasonRepository, 
-            ILeagueRepository leagueRepository, 
-            IPlayerRepository playerRepository)
+            ILeagueRepository leagueRepository)
         {
             _seasonRepository = seasonRepository;
             _leagueRepository = leagueRepository;
-            _playerRepository = playerRepository;
         }
         
         public async Task CreateNewLeagues()
@@ -50,14 +47,11 @@ namespace FadingFlame.Leagues
             
             var currentLeagues = await _leagueRepository.LoadForSeason(currentSeason.SeasonId);
             
-            // var secondaryObjectives = Enum.GetValues<SecondaryObjective>();
-            // Shuffle(secondaryObjectives);
-            // var deployments = Enum.GetValues<Deployment>();
-            // Shuffle(deployments);
+            var secondaryObjectives = Enum.GetValues<SecondaryObjective>();
+            Shuffle(secondaryObjectives);
+            var deployments = Enum.GetValues<Deployment>();
+            Shuffle(deployments);
             
-            var secondaryObjectives = new [] { SecondaryObjective.Breakthrough,  SecondaryObjective.CaptureTheFlags, SecondaryObjective.KingOfTheHill, SecondaryObjective.SpoilsOfWar, SecondaryObjective.SecureTarget };
-            var deployments = new [] { Deployment.Encircle, Deployment.FrontlineClash, Deployment.RefusedFlank, Deployment.Counterthrust, Deployment.FrontlineClash };
-
             foreach (var currentLeague in currentLeagues)
             {
                 var league = await _leagueRepository.Load(currentLeague.Id);

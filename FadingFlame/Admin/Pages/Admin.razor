@@ -77,24 +77,14 @@
             <div class="container">
                 <div class="row">
                     <div class="m-2 col">
-                        <button disabled="@_loadingDiscord" type="button" class="btn btn-primary" @onclick="CreateSecondObjectives">
-                            @if (_loadingDiscord)
+                        <button disabled="@_loadingSecObjective" type="button" class="btn btn-primary" @onclick="CreateSecondObjectives">
+                            @if (_loadingSecObjective)
                             {
                                 <span class="spinner-border spinner-border-sm mr-1"></span>
                             }
-                            Create Secondary objectives
+                            Create new Deployments and secondary objectives for live season
                         </button>
                     </div>
-                    @* <div class="m-2 col"> *@
-                    @*     <button disabled="@_loadingDiscord" type="button" class="btn btn-primary" @onclick="SyncDiscord"> *@
-                    @*         @if (_loadingDiscord) *@
-                    @*         { *@
-                    @*             <span class="spinner-border spinner-border-sm mr-1"></span> *@
-                    @*         } *@
-                    @*         Sync Discord Tags *@
-                    @*     </button> *@
-                    @* </div> *@
-               
                     <div class="m-2 col">
                         <button disabled="@_loadingPlayoffs" type="button" class="btn btn-primary" @onclick="CreatePlayoffs">
                             @if (_loadingPlayoffs)
@@ -208,7 +198,7 @@
 
 @code {
     private bool _loadingPlayoffs;
-    private bool _loadingDiscord;
+    private bool _loadingSecObjective;
     private bool _loadingSeasons;
     private bool _loadingEndingSeason;
     private bool _loadingApproval;
@@ -227,14 +217,6 @@
         _playersWithOutList = (await _playerRepository.LoadAllWithoutList()).Where(u => !u.DisplayName.StartsWith("MISSING")).ToList();
         _playersWithList = await _playerRepository.LoadAllWitList();
         _pendingListChanges = await _listRepository.LoadWithPendingChanges();
-    }
-    
-    private async Task SyncDiscord()
-    {
-        _loadingDiscord = true;
-        var leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
-        await _discordBot.CreateLeagueChannelsAndTags(leagues);
-        _loadingDiscord = false;
     }
     
     private async Task CreatePlayoffs()
