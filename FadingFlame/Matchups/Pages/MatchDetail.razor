@@ -134,7 +134,7 @@ else
     {
         if (CanEditMatch && MatchIsEditable || _userState.UserIsAdmin)
         {
-            if (_matchup.PlayersSelectedList)
+            if (_matchup.PlayersSelectedList || _userState.UserIsAdmin)
             {
                 <div class="row align-items-start my-2">
                     <div class="col">

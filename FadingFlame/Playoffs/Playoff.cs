@@ -139,7 +139,26 @@ namespace FadingFlame.Playoffs
 
         public void DeleteGameReport(ObjectId matchupId)
         {
-            // todo track back
+            var roundIndex = Rounds.FindIndex(r => r.Matchups.Any(m => m.Id == matchupId));
+            var round = Rounds[roundIndex];
+            var matchIndex = round.Matchups.FindIndex(m => m.Id == matchupId);
+            if (Rounds.Count == roundIndex - 1) return;
+
+            var nextRound = Rounds[roundIndex + 1];
+            var nextMatch = nextRound.Matchups[matchIndex / 2];
+            var match = round.Matchups[matchIndex];
+
+            if (match.Result.Winner == nextMatch.Player1)
+            {
+                nextMatch.Player1 = ObjectId.GenerateNewId();
+            }
+
+            if (match.Result.Winner == nextMatch.Player2)
+            {
+                nextMatch.Player2 = ObjectId.GenerateNewId();
+            }
+
+            match.DeleteResult();
         }
     }
 }
