@@ -78,7 +78,7 @@
             <div class="container">
                 <div class="row">
                     <div class="m-2 col">
-                        <button disabled="@_loadingMoveLeagueOver && !_unfinishedRelegations.Any()" type="button" class="btn btn-primary" @onclick="MoveLeagueOver">
+                        <button disabled="@(_loadingMoveLeagueOver && _unfinishedRelegations.Any())" type="button" class="btn btn-primary" @onclick="MoveLeagueOver">
                             @if (_loadingMoveLeagueOver)
                             {
                                 <span class="spinner-border spinner-border-sm mr-1"></span>
