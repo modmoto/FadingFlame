@@ -6,6 +6,7 @@ using FadingFlame.Leagues;
 using FadingFlame.Lists;
 using FadingFlame.Players;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace FadingFlame.Matchups
 {
@@ -19,6 +20,8 @@ namespace FadingFlame.Matchups
         public int VictoryPointsDifference => Math.Abs((Player1?.VictoryPoints ?? 0) - (Player2?.VictoryPoints ?? 0));
         public DateTime RecordedAt { get; set; }
         public ObjectId Winner { get; set; }
+        [BsonIgnore] 
+        public ObjectId Looser => IsDraw ? ObjectId.Empty : Winner == Player1.Id ? Player1.Id : Player2.Id; 
         public GameList Player1List { get; set; }
         public GameList Player2List { get; set; }
         public bool IsDraw => Winner == ObjectId.Empty;

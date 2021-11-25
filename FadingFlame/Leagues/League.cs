@@ -22,6 +22,17 @@ namespace FadingFlame.Leagues
         public List<PlayerInLeague> Players { get; set; } = new();
         public string DivisionId { get; set; }
         public List<GameDay> GameDays { get; set; } = new();
+        
+        [BsonIgnore]
+        public List<Matchup> RelegationMatches => GameDays.Count == MaxPlayerCount 
+            ? GameDays.Last().Matchups 
+            : new List<Matchup>();
+
+        [BsonIgnore]
+        public Matchup RelegationMatchOverOneLeague => RelegationMatches.LastOrDefault();
+        [BsonIgnore]
+        public Matchup RelegationMatchOverTwoLeagues => RelegationMatches.SkipLast(1).LastOrDefault();
+
         public DateTime StartDate { get; set; }
 
         public void RemoveFromLeague(ObjectId playerId)
@@ -222,14 +233,15 @@ namespace FadingFlame.Leagues
             if (GameDays.Count == MaxPlayerCount - 1)
             {
                 var relegationMatches = new List<Matchup>();
-                if (oneLeagueBelow != null)
-                {
-                    relegationMatches.Add(Matchup.CreateRelegationGame(Players[4].Id, oneLeagueBelow.Players[1].Id));
-                }
-
+                
                 if (twoLeagueBelow != null)
                 {
                     relegationMatches.Add(Matchup.CreateRelegationGame(Players[3].Id, twoLeagueBelow.Players[0].Id));
+                }
+                
+                if (oneLeagueBelow != null)
+                {
+                    relegationMatches.Add(Matchup.CreateRelegationGame(Players[4].Id, oneLeagueBelow.Players[1].Id));
                 }
 
                 GameDays.Add(GameDay.Create(GameDays.Last().StartDate.AddDays(14), relegationMatches));
@@ -237,17 +249,17 @@ namespace FadingFlame.Leagues
             {
                 var relegationMatches = new List<Matchup>();
 
-                if (oneLeagueBelow != null)
-                {
-                    var relegationGame = Matchup.CreateRelegationGame(Players[4].Id, oneLeagueBelow.Players[1].Id);
-                    relegationGame.Id = GameDays[MaxPlayerCount - 1].Matchups[0].Id;
-                    relegationMatches.Add(relegationGame);
-                }
-
                 if (twoLeagueBelow != null)
                 {
                     var relegationGame = Matchup.CreateRelegationGame(Players[3].Id, twoLeagueBelow.Players[0].Id);
                     relegationGame.Id = GameDays[MaxPlayerCount - 1].Matchups[1].Id;
+                    relegationMatches.Add(relegationGame);
+                }
+                
+                if (oneLeagueBelow != null)
+                {
+                    var relegationGame = Matchup.CreateRelegationGame(Players[4].Id, oneLeagueBelow.Players[1].Id);
+                    relegationGame.Id = GameDays[MaxPlayerCount - 1].Matchups[0].Id;
                     relegationMatches.Add(relegationGame);
                 }
 

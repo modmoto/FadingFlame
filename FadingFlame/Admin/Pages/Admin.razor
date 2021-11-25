@@ -4,6 +4,7 @@
 @using FadingFlame.Lists
 @using FadingFlame.Players
 @using FadingFlame.Playoffs
+@using MongoDB.Bson
 
 @if (_loggedInUserState.UserIsAdmin)
 {
@@ -77,13 +78,26 @@
             <div class="container">
                 <div class="row">
                     <div class="m-2 col">
-                        <button disabled="@_loadingMoveLeagueOver" type="button" class="btn btn-primary" @onclick="MoveLeagueOver">
+                        <button disabled="@_loadingMoveLeagueOver && !_unfinishedRelegations.Any()" type="button" class="btn btn-primary" @onclick="MoveLeagueOver">
                             @if (_loadingMoveLeagueOver)
                             {
                                 <span class="spinner-border spinner-border-sm mr-1"></span>
                             }
-                            Create new Deployments and secondary objectives for live season
+                            Make promotions and demotions
                         </button>
+                        @if (_unfinishedRelegations.Any())
+                        {
+                            <div>
+                                <b>Those relegation matches are unfinished (@_unfinishedRelegations.Count):</b>    
+                            </div>
+                            @foreach (var relegation in _unfinishedRelegations)
+                            {
+                                <div class="row m-2 cursor" @onclick="() => NavigateToMatch(relegation)">
+                                    @relegation
+                                </div>
+                            }
+                            
+                        }
                     </div>
                     <div class="m-2 col">
                         <button disabled="@_loadingRelegationMatches" type="button" class="btn btn-primary" @onclick="CreateRelegatonMatches">
@@ -215,6 +229,7 @@
     private List<Player> _playersWithList = new();
     private List<Player> _playersWithOutList = new();
     private List<Army> _pendingListChanges = new();
+    private List<ObjectId> _unfinishedRelegations = new();
 
     protected override void OnInitialized()
     {
@@ -227,6 +242,9 @@
         _playersWithOutList = (await _playerRepository.LoadAllWithoutList()).Where(u => !u.DisplayName.StartsWith("MISSING")).ToList();
         _playersWithList = await _playerRepository.LoadAllWitList();
         _pendingListChanges = await _listRepository.LoadWithPendingChanges();
+        var seasons = await _seasonRepository.LoadSeasons();
+        var currentLeagues = await _leagueRepository.LoadForSeason(seasons[1].SeasonId);
+        _unfinishedRelegations = currentLeagues.SelectMany(c => c.RelegationMatches).Where(r => !r.IsFinished).Select(r => r.Id).ToList();
     }
     
     private async Task CreatePlayoffs()
@@ -311,7 +329,7 @@
     private async void MoveLeagueOver()
     {
         _loadingMoveLeagueOver = true;
-        await _leagueCreationService.CreateNewLeagues();
+        await _leagueCreationService.MakePromotionsAndDemotions();
         _loadingMoveLeagueOver = false;
         StateHasChanged();
     }
@@ -322,6 +340,11 @@
         await _leagueCreationService.CreateRelegations();
         _loadingRelegationMatches = false;
         StateHasChanged();
+    }
+
+    private void NavigateToMatch(ObjectId relegation)
+    {
+        _navigation.NavigateTo($"match/{relegation}");
     }
 
 }

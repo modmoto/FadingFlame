@@ -16,10 +16,11 @@ namespace FadingFlame.Players
         Task Update(Player player);
         Task Insert(Player player);
         Task<Player> LoadByEmail(string accountEmail);
-        Task<List<Player>> PlayersThatEnlistedInCurrentSeason(int season);
+        Task<List<Player>> PlayersThatEnlistedInNextSeason();
         Task<List<Player>> LoadForLeague(List<ObjectId> playerIds, int season);
         Task<List<Player>> LoadAllWithoutList();
         Task<List<Player>> LoadAllWitList();
+        Task<List<Player>> PlayersWithListInCurrentSeason();
     }
 
     public class PlayerRepository : MongoDbRepositoryBase, IPlayerRepository
@@ -90,11 +91,9 @@ namespace FadingFlame.Players
             return player;
         }
 
-        public async Task<List<Player>> PlayersThatEnlistedInCurrentSeason(int season)
+        public Task<List<Player>> PlayersThatEnlistedInNextSeason()
         {
-            var players = await LoadAll<Player>(p => p.ArmyIdCurrentSeason != default);
-            await AddArmies(players);
-            return players;
+            return LoadAll<Player>(p => p.ArmyIdNextSeason != default);
         }
 
         public async Task<List<Player>> LoadForLeague(List<ObjectId> playerIds, int season)
@@ -123,6 +122,13 @@ namespace FadingFlame.Players
         public Task<List<Player>> LoadAllWitList()
         {
             return LoadAll<Player>(p => p.ArmyIdCurrentSeason != default);
+        }
+
+        public async Task<List<Player>> PlayersWithListInCurrentSeason()
+        {
+            var players = await LoadAll<Player>(p => p.ArmyIdCurrentSeason != default);
+            await AddArmies(players);
+            return players;
         }
     }
 }

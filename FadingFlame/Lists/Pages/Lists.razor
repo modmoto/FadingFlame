@@ -99,8 +99,7 @@
     private async Task LoadStuff()
     {
         _leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
-        _enlistedPlayersOriginal =
-            await _playerRepository.PlayersThatEnlistedInCurrentSeason(_seasonState.CurrentSeason.SeasonId);
+        _enlistedPlayersOriginal = await _playerRepository.PlayersWithListInCurrentSeason();
         _enlistedPlayers = _enlistedPlayersOriginal;
         StateHasChanged();
     }
