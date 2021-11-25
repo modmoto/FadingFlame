@@ -77,12 +77,21 @@
             <div class="container">
                 <div class="row">
                     <div class="m-2 col">
-                        <button disabled="@_loadingSecObjective" type="button" class="btn btn-primary" @onclick="CreateSecondObjectives">
-                            @if (_loadingSecObjective)
+                        <button disabled="@_loadingMoveLeagueOver" type="button" class="btn btn-primary" @onclick="MoveLeagueOver">
+                            @if (_loadingMoveLeagueOver)
                             {
                                 <span class="spinner-border spinner-border-sm mr-1"></span>
                             }
                             Create new Deployments and secondary objectives for live season
+                        </button>
+                    </div>
+                    <div class="m-2 col">
+                        <button disabled="@_loadingRelegationMatches" type="button" class="btn btn-primary" @onclick="CreateRelegatonMatches">
+                            @if (_loadingRelegationMatches)
+                            {
+                                <span class="spinner-border spinner-border-sm mr-1"></span>
+                            }
+                            Recreate Relegation matches (will delete current results)
                         </button>
                     </div>
                     <div class="m-2 col">
@@ -198,10 +207,11 @@
 
 @code {
     private bool _loadingPlayoffs;
-    private bool _loadingSecObjective;
     private bool _loadingSeasons;
     private bool _loadingEndingSeason;
     private bool _loadingApproval;
+    private bool _loadingMoveLeagueOver;
+    private bool _loadingRelegationMatches;
     private List<Player> _playersWithList = new();
     private List<Player> _playersWithOutList = new();
     private List<Army> _pendingListChanges = new();
@@ -261,11 +271,6 @@
         _loadingEndingSeason = false;
     }
 
-    private async Task CreateSecondObjectives()
-    {
-        await _leagueCreationService.SetDeployments();
-    }
-
     private async void ApproveList1(Army army)
     {
         _loadingApproval = true;
@@ -302,4 +307,21 @@
     {
         return _playersWithList.FirstOrDefault(p => p.ArmyIdCurrentSeason == player.Id);
     }
+
+    private async void MoveLeagueOver()
+    {
+        _loadingMoveLeagueOver = true;
+        await _leagueCreationService.CreateNewLeagues();
+        _loadingMoveLeagueOver = false;
+        StateHasChanged();
+    }
+
+    private async void CreateRelegatonMatches()
+    {
+        _loadingRelegationMatches = true;
+        await _leagueCreationService.CreateRelegations();
+        _loadingRelegationMatches = false;
+        StateHasChanged();
+    }
+
 }

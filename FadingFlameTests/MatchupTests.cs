@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using FadingFlame.GlobalLadder;
 using FadingFlame.Lists;
 using FadingFlame.Matchups;
 using FadingFlame.Players;
-using MongoDB.Bson;
 using NUnit.Framework;
 
 namespace FadingFlameTests
@@ -25,7 +22,7 @@ namespace FadingFlameTests
             await playerRepository.Insert(player1);
             await playerRepository.Insert(player2);
 
-            var challengeGame = Matchup.CreateChallengeGame(player1, player2);
+            var challengeGame = Matchup.CreateChallengeGame(player1.Id, player2.Id);
             await matchupRepository.InsertMatch(challengeGame);
 
             var loadedMatches = await matchupRepository.LoadMatchesOfPlayer(player1);

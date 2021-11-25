@@ -60,7 +60,7 @@ namespace FadingFlameTests
             var playerRepository = new PlayerRepository(MongoClient, new ListRepository(MongoClient));
             await playerRepository.Insert(player1);
             await playerRepository.Insert(player2);
-            var challengeGame = Matchup.CreateChallengeGame(player1, player2);
+            var challengeGame = Matchup.CreateChallengeGame(player1.Id, player2.Id);
             var matchupRepository = new MatchupRepository(MongoClient);
             await matchupRepository.InsertMatch(challengeGame);
 

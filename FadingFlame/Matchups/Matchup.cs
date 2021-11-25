@@ -35,7 +35,7 @@ namespace FadingFlame.Matchups
         {
             get
             {
-                if (IsChallenge)
+                if (IsChallengeOrRelegation)
                     return !string.IsNullOrEmpty(ChallengePlayer1List?.List) && !string.IsNullOrEmpty(ChallengePlayer2List?.List) 
                         || Result?.Player1List != null && Result?.Player2List != null;
                 return !string.IsNullOrEmpty(Player1List) && !string.IsNullOrEmpty(Player2List);
@@ -44,7 +44,10 @@ namespace FadingFlame.Matchups
 
         public string Player1List { get; set; }
         public string Player2List { get; set; }
+        [BsonIgnore]
+        public bool IsChallengeOrRelegation => IsChallenge || IsRelegation;
         public bool IsChallenge { get; set; }
+        public bool IsRelegation { get; set; }
         public bool IsFinished => Result != null;
 
         public static Matchup CreateForLeague(PlayerInLeague playerAtHome, PlayerInLeague playerAsGuest)
@@ -57,13 +60,24 @@ namespace FadingFlame.Matchups
             };
         }
 
-        public static Matchup CreateChallengeGame(Player challenger, Player playerThatGetsChallenged)
+        public static Matchup CreateChallengeGame(ObjectId challenger, ObjectId playerThatGetsChallenged)
         {
             return new()
             {
-                Player1 = challenger.Id,
-                Player2 = playerThatGetsChallenged.Id,
+                Player1 = challenger,
+                Player2 = playerThatGetsChallenged,
                 IsChallenge = true
+            };
+        }
+
+        public static Matchup CreateRelegationGame(ObjectId challenger, ObjectId playerThatGetsChallenged)
+        {
+            return new()
+            {
+                Player1 = challenger,
+                Player2 = playerThatGetsChallenged,
+                Id = ObjectId.GenerateNewId(),
+                IsRelegation = true
             };
         }
         

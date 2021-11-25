@@ -14,6 +14,7 @@ namespace FadingFlame.Leagues
 {
     public class League : IIdentifiable
     {
+        public const int MaxPlayerCount = 6;
         public string Name { get; set; }
         public int Season { get; set; }
         [BsonId]
@@ -85,13 +86,13 @@ namespace FadingFlame.Leagues
 
         public void AddPlayer(Player player)
         {
-            if (Players.Count == 6) return;
+            if (Players.Count == MaxPlayerCount) return;
             
             Players = Players.Where(p => p.Id != player.Id).ToList();
             var playerInLeague = PlayerInLeague.Create(player.Id);
             Players.Add(playerInLeague);
 
-            if (Players.Count == 6)
+            if (Players.Count == MaxPlayerCount)
             {
                 CreateGameDays();
             }
@@ -185,7 +186,7 @@ namespace FadingFlame.Leagues
 
         public void ReorderPlayers()
         {
-            var comparer = new PlayerComparer(this);
+            var comparer = new PlayerPlacementComparer(this);
             Players = Players.OrderBy(c => c, comparer).ToList();
         }
 
@@ -215,13 +216,54 @@ namespace FadingFlame.Leagues
             
             ReorderPlayers();
         }
+
+        public void CreatRelegations(League oneLeagueBelow, League twoLeagueBelow)
+        {
+
+            if (GameDays.Count == MaxPlayerCount - 1)
+            {
+                var relegationMatches = new List<Matchup>();
+                if (oneLeagueBelow != null)
+                {
+                    relegationMatches.Add(Matchup.CreateRelegationGame(Players[4].Id, oneLeagueBelow.Players[1].Id));
+                }
+
+                if (twoLeagueBelow != null)
+                {
+                    relegationMatches.Add(Matchup.CreateRelegationGame(Players[3].Id, twoLeagueBelow.Players[0].Id));
+                }
+
+                GameDays[MaxPlayerCount - 1] = GameDay.Create(GameDays.Last().StartDate, relegationMatches);
+            }
+
+            if (GameDays.Count == MaxPlayerCount)
+            {
+                var relegationMatches = new List<Matchup>();
+
+                if (oneLeagueBelow != null)
+                {
+                    var relegationGame = Matchup.CreateRelegationGame(Players[4].Id, oneLeagueBelow.Players[1].Id);
+                    relegationGame.Id = GameDays[MaxPlayerCount - 1].Matchups[0].Id;
+                    relegationMatches.Add(relegationGame);
+                }
+
+                if (twoLeagueBelow != null)
+                {
+                    var relegationGame = Matchup.CreateRelegationGame(Players[3].Id, twoLeagueBelow.Players[0].Id);
+                    relegationGame.Id = GameDays[MaxPlayerCount - 1].Matchups[1].Id;
+                    relegationMatches.Add(relegationGame);
+                }
+
+                GameDays.Add(GameDay.Create(GameDays.Last().StartDate.AddDays(14), relegationMatches));
+            }
+        }
     }
 
-    public class PlayerComparer : IComparer<PlayerInLeague>
+    public class PlayerPlacementComparer : IComparer<PlayerInLeague>
     {
         private readonly League _league;
 
-        public PlayerComparer(League league)
+        public PlayerPlacementComparer(League league)
         {
             _league = league;
         }

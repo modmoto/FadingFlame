@@ -2,6 +2,7 @@ namespace FadingFlame.Admin
 {
     public enum SecondaryObjective
     {
+        RandomObjective = 0,
         HoldTheGround = 1,
         Breakthrough = 2,
         SpoilsOfWar = 3,

@@ -25,7 +25,7 @@ namespace FadingFlame.Players
             var matchesOfPlayer = await _matchupRepository.LoadChallengeOfPlayers(loggedInPlayer, player);
             if (matchesOfPlayer == null)
             {
-                var challenge = Matchup.CreateChallengeGame(loggedInPlayer, player);
+                var challenge = Matchup.CreateChallengeGame(loggedInPlayer.Id, player.Id);
                 await _matchupRepository.InsertMatch(challenge);
             }
         }

@@ -32,7 +32,7 @@ else
             }
         </div>
     }
-    if (_matchup.IsChallenge)
+    if (_matchup.IsChallengeOrRelegation)
     {
         if (!_matchup.IsFinished)
         {
@@ -60,31 +60,34 @@ else
                         <div>Your opponent entered a list and is waiting for you</div>
                     }
                 }
-                
-                <h4 class="my-3">Enter your list for the match</h4>
-                <EditForm EditContext="@_editContextLists">
-                    <DataAnnotationsValidator/>
-                    @if (Player1LoggedIn)
-                    {
-                        <FreshListComponent List="@(_listEditModelPlayer1)" HideName/>
-                    }
-                    
-                    @if (Player2LoggedIn)
-                    {
-                        <FreshListComponent List="@(_listEditModelPlayer2)" HideName/>
-                    }
-                    <button disabled="@_loadingChallengeListEdit" class="btn btn-primary" @onclick="OnSubmitList">
-                        @if (_loadingChallengeListEdit)
+
+                @if (Player1LoggedIn || Player2LoggedIn)
+                {
+                    <h4 class="my-3">Enter your list for the match</h4>
+                    <EditForm EditContext="@_editContextLists">
+                        <DataAnnotationsValidator/>
+                        @if (Player1LoggedIn)
                         {
-                            <span class="spinner-border spinner-border-sm mr-1"></span>
+                            <FreshListComponent List="@(_listEditModelPlayer1)" HideName/>
                         }
-                        Save list
-                    </button>
-                </EditForm>
+
+                        @if (Player2LoggedIn)
+                        {
+                            <FreshListComponent List="@(_listEditModelPlayer2)" HideName/>
+                        }
+                        <button disabled="@_loadingChallengeListEdit" class="btn btn-primary" @onclick="OnSubmitList">
+                            @if (_loadingChallengeListEdit)
+                            {
+                                <span class="spinner-border spinner-border-sm mr-1"></span>
+                            }
+                            Save list
+                        </button>
+                    </EditForm>
+                }
             }
         }
 
-        if (CanEditMatch && MatchIsEditable && _matchup.PlayersSelectedList || (_matchup.PlayersSelectedList && _userState.UserIsAdmin))
+        if (CanEditMatch && MatchIsEditable && _matchup.PlayersSelectedList || _matchup.PlayersSelectedList && _userState.UserIsAdmin)
         {
             <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
                 <DataAnnotationsValidator/>
@@ -403,7 +406,7 @@ else
     {
         get
         {
-            if (_matchup.IsChallenge && !_matchup.IsFinished)
+            if (_matchup.IsChallengeOrRelegation && !_matchup.IsFinished)
             {
                 return _matchup.ChallengePlayer1List;
             }
@@ -416,7 +419,7 @@ else
     {
         get
         {
-            if (_matchup.IsChallenge && !_matchup.IsFinished)
+            if (_matchup.IsChallengeOrRelegation && !_matchup.IsFinished)
             {
                 return _matchup.ChallengePlayer2List;
             }
@@ -438,25 +441,23 @@ else
             if (ObjectId.TryParse(leagueId, out var realLeagueId))
             {
                 var league = await _leagueRepository.Load(realLeagueId);
-                if (league == null)
+                var match = league.GameDays
+                    .SelectMany(g => g.Matchups)
+                    .SingleOrDefault(m => m.Id.ToString() ==  MatchId);
+                if (match == null)
                 {
-                    _navigation.NavigateTo("notfound");
-                }
-                else
-                {
-                    var match = league.GameDays
-                        .SelectMany(g => g.Matchups)
-                        .SingleOrDefault(m => m.Id.ToString() ==  MatchId);
-                    if (match == null)
+                    var matchup = await _matchupRepository.LoadMatch(new ObjectId(MatchId));
+                    if (matchup == null)
                     {
                         _navigation.NavigateTo("notfound");
                     }
-                    else
-                    {
-                        _league = league;
+                    await ExtractMatch(matchup);
+                }
+                else
+                {
+                    _league = league;
 
-                        await ExtractMatch(match);
-                    }
+                    await ExtractMatch(match);
                 }
             }
             else
@@ -575,7 +576,7 @@ else
 
         model.SecondaryObjective = ConvertToEnum();
 
-        if (_matchup.IsChallenge)
+        if (_matchup.IsChallengeOrRelegation)
         {
             var gameList1 = GameList.Create(_listEditModelPlayer1.Name, _listEditModelPlayer1.List, _listEditModelPlayer1.Faction);
             var gameList2 = GameList.Create(_listEditModelPlayer2.Name, _listEditModelPlayer2.List, _listEditModelPlayer2.Faction);

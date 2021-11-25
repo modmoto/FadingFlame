@@ -8,7 +8,6 @@ using FadingFlame.Matchups;
 using FadingFlame.Players;
 using FluentAssertions;
 using MongoDB.Bson;
-using Moq;
 using NUnit.Framework;
 
 namespace FadingFlameTests
