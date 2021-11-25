@@ -219,7 +219,6 @@ namespace FadingFlame.Leagues
 
         public void CreatRelegations(League oneLeagueBelow, League twoLeagueBelow)
         {
-
             if (GameDays.Count == MaxPlayerCount - 1)
             {
                 var relegationMatches = new List<Matchup>();
@@ -233,10 +232,8 @@ namespace FadingFlame.Leagues
                     relegationMatches.Add(Matchup.CreateRelegationGame(Players[3].Id, twoLeagueBelow.Players[0].Id));
                 }
 
-                GameDays[MaxPlayerCount - 1] = GameDay.Create(GameDays.Last().StartDate, relegationMatches);
-            }
-
-            if (GameDays.Count == MaxPlayerCount)
+                GameDays.Add(GameDay.Create(GameDays.Last().StartDate.AddDays(14), relegationMatches));
+            } else if (GameDays.Count == MaxPlayerCount)
             {
                 var relegationMatches = new List<Matchup>();
 
@@ -254,7 +251,7 @@ namespace FadingFlame.Leagues
                     relegationMatches.Add(relegationGame);
                 }
 
-                GameDays.Add(GameDay.Create(GameDays.Last().StartDate.AddDays(14), relegationMatches));
+                GameDays[MaxPlayerCount - 1] = GameDay.Create(GameDays.Last().StartDate, relegationMatches);
             }
         }
     }

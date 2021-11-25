@@ -20,6 +20,7 @@ namespace FadingFlame.Leagues
         public void Penalty(int penalty)
         {
             PenaltyPoints = penalty;
+            BattlePoints += penalty;
         }
         
         public void RecordResult(int points, int victoryPoints)
