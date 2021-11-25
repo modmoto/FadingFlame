@@ -48,7 +48,7 @@ namespace FadingFlame.Leagues
                 leagues.Add(new List<Player>());
             }
             
-            for (int i = 0; i < 100; i += 2)
+            for (int i = 0; i < 98; i += 2)
             {
                 var newPlayerRanks = new List<Player>();
                 var currentLeagueA = currentLeagues[i];
