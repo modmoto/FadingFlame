@@ -1,4 +1,5 @@
-﻿using FadingFlame.Players;
+﻿using System.Text.Json.Serialization;
+using FadingFlame.Players;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -20,6 +21,7 @@ namespace FadingFlame.Matchups
         public Mmr OldMmr { get; set; }
         public Mmr NewMmr { get; set; }
 
+        [JsonIgnore]
         [BsonIgnore]
         public Mmr MmrDifference => new()
         {

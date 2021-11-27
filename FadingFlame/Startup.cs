@@ -32,6 +32,7 @@ namespace FadingFlame
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddControllers();
             
             JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 
@@ -151,6 +152,7 @@ namespace FadingFlame
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub();
+                endpoints.MapControllers();
                 endpoints.MapFallbackToPage("/_Host");
             });
         }

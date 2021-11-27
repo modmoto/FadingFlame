@@ -13,6 +13,7 @@ services:
       - IDENTITY_BASE_URI=${IDENTITY_BASE_URI}
       - SIGNOUT_URI=${SIGNOUT_URI}
       - MMR_SERVICE_URI=http://mmr-service
+      - API_SECRET=${API_SECRET}
 
   mmr-service:
     image: modmoto/w3champions-mmr-service:5671

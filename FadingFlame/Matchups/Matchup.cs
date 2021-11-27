@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using FadingFlame.Leagues;
 using FadingFlame.Lists;
 using FadingFlame.Players;
@@ -15,18 +16,24 @@ namespace FadingFlame.Matchups
         public ObjectId Id { get; set; }
         public ObjectId Player1 { get; set; }
         public ObjectId Player2 { get; set; }
+        [JsonIgnore]
         [BsonIgnoreIfNull]
         public List<Player> OriginalPlayer1 { get; set; }
+        [JsonIgnore]
         [BsonIgnoreIfNull]
         public List<Player> OriginalPlayer2 { get; set; }
 
         [BsonIgnore] 
+        [JsonIgnore]
         public string Player1Name => OriginalPlayer1.First().DisplayName;
         [BsonIgnore]
+        [JsonIgnore]
         public string Player2Name => OriginalPlayer2.First().DisplayName;
         [BsonIgnore]
+        [JsonIgnore]
         public string Player1DiscordTag => OriginalPlayer1.First().DiscordTag;
         [BsonIgnore]
+        [JsonIgnore]
         public string Player2DiscordTag => OriginalPlayer2.First().DiscordTag;
         public MatchResult Result { get; set; }
         public GameList ChallengePlayer1List { get; set; }
@@ -42,7 +49,9 @@ namespace FadingFlame.Matchups
             }
         }
 
+        [JsonIgnore]
         public string Player1List { get; set; }
+        [JsonIgnore]
         public string Player2List { get; set; }
         [BsonIgnore]
         public bool IsChallengeOrRelegation => IsChallenge || IsRelegation;
