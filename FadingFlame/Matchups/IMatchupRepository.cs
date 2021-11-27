@@ -24,6 +24,7 @@ namespace FadingFlame.Matchups
         Task<Matchup> LoadChallengeOfPlayers(Player loggedInPlayer, Player player);
         Task UpdateMatch(Matchup matchup);
         Task InsertMatch(Matchup matchup);
+        Task<List<Matchup>> LoadRealFinishedSince(DateTime sinceDate);
     }
 
     public class MatchupRepository : MongoDbRepositoryBase, IMatchupRepository
@@ -106,6 +107,15 @@ namespace FadingFlame.Matchups
         public Task InsertMatch(Matchup challengeGame)
         {
             return Insert(challengeGame);
+        }
+
+        public async Task<List<Matchup>> LoadRealFinishedSince(DateTime sinceDate)
+        {
+            var loadFinishedSince = await LoadAll<Matchup>(m => 
+                m.Result.RecordedAt > sinceDate 
+                && !m.Result.WasDefLoss 
+                && !(m.Result.Player1.BattlePoints == 0 && m.Result.Player2.BattlePoints == 0));
+            return loadFinishedSince.OrderBy(m => m.Result.RecordedAt).ToList();
         }
     }
 }
