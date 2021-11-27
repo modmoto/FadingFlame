@@ -21,7 +21,7 @@ namespace FadingFlame.Matchups
         public DateTime RecordedAt { get; set; }
         public ObjectId Winner { get; set; }
         [BsonIgnore] 
-        public ObjectId Looser => IsDraw ? ObjectId.Empty : Winner == Player1.Id ? Player1.Id : Player2.Id; 
+        public ObjectId Looser => IsDraw ? ObjectId.Empty : Winner == Player1.Id ? Player2.Id : Player1.Id; 
         public GameList Player1List { get; set; }
         public GameList Player2List { get; set; }
         public bool IsDraw => Winner == ObjectId.Empty;
