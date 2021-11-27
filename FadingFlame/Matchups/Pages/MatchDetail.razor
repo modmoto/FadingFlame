@@ -83,6 +83,13 @@ else
                             Save list
                         </button>
                     </EditForm>
+                    <button disabled="@_deletingChallenge" class="btn btn-outline-danger mt-3" @onclick="DeleteChallenge">
+                        @if (_deletingChallenge)
+                        {
+                            <span class="spinner-border spinner-border-sm mr-1"></span>
+                        }
+                        Cancel challenge
+                    </button>
                 }
             }
         }
@@ -394,6 +401,7 @@ else
     private string _selectedListAsString;
     private bool _selectingList;
     private bool _loadingChallengeListEdit;
+    private bool _deletingChallenge;
     private EditContext _editContextLists;
     private Playoff _playoff;
     private GameListEditModel _listEditModelPlayer1 = new();
@@ -726,4 +734,11 @@ else
         _loadingChallengeListEdit = false;
     }
 
+    private async Task DeleteChallenge()
+    {
+        _deletingChallenge = true;
+        await _challengeService.RevokeChallenge(_matchup);
+        _navigation.NavigateTo($"/player/{_userState.LoggedInPlayer.Id}");
+        _deletingChallenge = false;
+    }
 }

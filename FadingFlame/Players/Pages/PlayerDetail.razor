@@ -37,19 +37,29 @@
   @if (!_isTheRightUser && _loggedInUserState.UserIsLoggedIn)
   {
     <div class="form-group pb-3">
-      <button class="btn btn-outline-success" disabled="@_loadingChallengingPlayer" @onclick="ChallengePlayer">
-        @if (_loading)
-        {
-          <span class="spinner-border spinner-border-sm mr-1"></span>
-        }
-        <span class="oi oi-fire me-2"></span>
-        Challenge player to a game
-      </button>
+      @if (_challengeIdFromLoggedInUser != ObjectId.Empty)
+      {
+        <button class="btn btn-outline-success" @onclick="GoToChallenge">
+          <span class="oi oi-fire me-2"></span>
+          Go to active challenge against @_player.DisplayName
+        </button>  
+      }
+      else
+      {
+        <button class="btn btn-outline-success" disabled="@_loadingChallengingPlayer" @onclick="ChallengePlayer">
+          @if (_loading)
+          {
+            <span class="spinner-border spinner-border-sm mr-1"></span>
+          }
+          <span class="oi oi-fire me-2"></span>
+          Challenge player to a game
+        </button>
+      }
     </div>
   }
   @if (UserParticipatesInCurrentSeason)
   {
-    <div class="pt-3 pb-3 alert alert-success" role="alert" style="max-width: 30rem">
+    <div class="pt-3 pb-3 alert alert-success" role="alert" style="max-width: 25rem">
       <div class="cursor" @onclick="() => NavigateToLeague(_playerLeagues[0].Id)">Current league: @_playerLeagues[0].DivisionId @_playerLeagues[0].Name</div>
     </div>
   }
@@ -59,13 +69,10 @@
     <h4 class="mb-3">Open challenges</h4>
     @foreach (var challenge in _challenges)
     {
-      <div class="pt-3 pb-3 alert alert-info d-flex justify-content-between" style="max-width: 30rem" role="alert">
+      <div class="pt-3 pb-3 alert alert-info d-flex justify-content-between" style="max-width: 25rem" role="alert">
         <div class="cursor col d-flex align-items-center" @onclick="() => NavigateToMatch(challenge)">
           vs @GetOpponent(challenge)
         </div>
-        <button class="btn btn-danger float-end col" style="max-width: 4rem" @onclick="() => DeleteChallenge(challenge)">
-          <span class="oi oi-trash"></span>
-        </button>
       </div>
     }
   }
@@ -279,6 +286,8 @@
   [Parameter]
   public string Id { get; set; }
 
+  private ObjectId _challengeIdFromLoggedInUser;
+
   private ValidationMessageStore _messageStoreUser;
   private ValidationMessageStore _messageStoreLists;
   private EditContext _editContextUser;
@@ -320,12 +329,14 @@
       }
       else
       {
+        
         _playerLeagues = (await _leagueRepository.LoadLeaguesForPlayer(_player.Id))
           .OrderByDescending(r => r.Season).ToList();
 
         _challenges = await _matchupRepository.LoadOpenChallengesOfPlayer(_player);
         _matches = await _matchupRepository.LoadMatchesOfPlayer(_player);
 
+        _challengeIdFromLoggedInUser = (await _matchupRepository.LoadChallengeOfPlayers(_loggedInUserState.LoggedInPlayer, _player))?.Id ?? ObjectId.Empty;
         _editUserModel = new EditUserModel
         {
           DiscordTag = _player.DiscordTag,
@@ -535,7 +546,8 @@
   private async Task ChallengePlayer()
   {
     _loadingChallengingPlayer = true;
-    await _challengeService.ChallengePlayer(_loggedInUserState.LoggedInPlayer, _player);
+    var newId = await _challengeService.ChallengePlayer(_loggedInUserState.LoggedInPlayer, _player);
+    _navigation.NavigateTo($"/match/{newId}");
     _loadingChallengingPlayer = false;
   }
 
@@ -550,12 +562,6 @@
       var leagueOfMatch = _playerLeagues.FirstOrDefault(l => l.GameDays.SelectMany(p => p.MatchupIds).Contains(match.Id));
       _navigation.NavigateTo($"match/{match.Id}?leagueId={leagueOfMatch?.Id}");
     }
-  }
-
-  private async Task DeleteChallenge(Matchup challenge)
-  {
-    await _challengeService.RevokeChallenge(challenge);
-    _challenges.Remove(challenge);
   }
 
   private string WonMatch(Matchup matchup)
@@ -603,4 +609,8 @@
       : $"{matchup.Player1Name}";
   }
 
+  private void GoToChallenge()
+  {
+    _navigation.NavigateTo($"match/{_challengeIdFromLoggedInUser}");
+  }
 }

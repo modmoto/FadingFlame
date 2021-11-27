@@ -7,7 +7,7 @@ namespace FadingFlame.Players
 {
     public interface IChallengeService
     {
-        Task ChallengePlayer(Player loggedInPlayer, Player player);
+        Task<ObjectId> ChallengePlayer(Player loggedInPlayer, Player player);
         Task RevokeChallenge(Matchup challengeId);
     }
 
@@ -20,14 +20,17 @@ namespace FadingFlame.Players
             _matchupRepository = matchupRepository;
         }
         
-        public async Task ChallengePlayer(Player loggedInPlayer, Player player)
+        public async Task<ObjectId> ChallengePlayer(Player loggedInPlayer, Player player)
         {
             var matchesOfPlayer = await _matchupRepository.LoadChallengeOfPlayers(loggedInPlayer, player);
             if (matchesOfPlayer == null)
             {
                 var challenge = Matchup.CreateChallengeGame(loggedInPlayer.Id, player.Id);
                 await _matchupRepository.InsertMatch(challenge);
+                return challenge.Id;
             }
+
+            return matchesOfPlayer.Id;
         }
 
         public async Task RevokeChallenge(Matchup challengeId)
