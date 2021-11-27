@@ -32,7 +32,12 @@ namespace FadingFlame
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                    {
+                        options.JsonSerializerOptions.Converters.Add(new ObjectIdConverter());
+                    }
+                );
             
             JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 
