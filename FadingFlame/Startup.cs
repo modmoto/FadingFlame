@@ -118,14 +118,6 @@ namespace FadingFlame
             services.AddScoped<SeasonState>();
             services.AddHttpContextAccessor();
             services.AddReadModelService<PlayerRankingModelReadHandler>();
-
-            // var buildServiceProvider = services.BuildServiceProvider();
-            // var playerRepository = buildServiceProvider.GetService<IPlayerRepository>();
-            // for (int i = 0; i < 107; i++)
-            // {
-            //     var player = Player.Create($"testuser{i}@lel.de", $"testuser{i}@lel.de");
-            //     playerRepository.Insert(player).Wait();
-            // }
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
