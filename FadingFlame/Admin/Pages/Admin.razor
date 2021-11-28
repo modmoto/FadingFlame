@@ -78,12 +78,19 @@
             <div class="container">
                 <div class="row">
                     <div class="m-2 col">
-                        <button disabled="@(_loadingMoveLeagueOver && _unfinishedRelegations.Any())" type="button" class="btn btn-primary" @onclick="MoveLeagueOver">
+                        <button disabled="@(_loadingMoveLeagueOver || _unfinishedRelegations.Any() || _relegationMatchesNotCreatedEverywhere)" type="button" class="btn btn-primary" @onclick="MakePromotionsAndDemotionsOver">
                             @if (_loadingMoveLeagueOver)
                             {
                                 <span class="spinner-border spinner-border-sm mr-1"></span>
                             }
-                            Make promotions and demotions
+                            @if (_relegationMatchesNotCreatedEverywhere)
+                            {
+                                <span>Relegation matches not created</span>
+                            }
+                            else
+                            {
+                                <span>Make promotions and demotions</span>    
+                            }
                         </button>
                         @if (_unfinishedRelegations.Any())
                         {
@@ -96,7 +103,6 @@
                                     @relegation
                                 </div>
                             }
-                            
                         }
                     </div>
                     <div class="m-2 col">
@@ -230,6 +236,7 @@
     private List<Player> _playersWithOutList = new();
     private List<Army> _pendingListChanges = new();
     private List<ObjectId> _unfinishedRelegations = new();
+    private bool _relegationMatchesNotCreatedEverywhere;
 
     protected override void OnInitialized()
     {
@@ -244,6 +251,7 @@
         _pendingListChanges = await _listRepository.LoadWithPendingChanges();
         var seasons = await _seasonRepository.LoadSeasons();
         var currentLeagues = await _leagueRepository.LoadForSeason(seasons[1].SeasonId);
+        _relegationMatchesNotCreatedEverywhere = currentLeagues.Any(c => c.RelegationMatches.Count == 0);
         _unfinishedRelegations = currentLeagues.SelectMany(c => c.RelegationMatches).Where(r => !r.IsFinished).Select(r => r.Id).ToList();
     }
     
@@ -326,7 +334,7 @@
         return _playersWithList.FirstOrDefault(p => p.ArmyIdCurrentSeason == player.Id);
     }
 
-    private async void MoveLeagueOver()
+    private async void MakePromotionsAndDemotionsOver()
     {
         _loadingMoveLeagueOver = true;
         await _leagueCreationService.MakePromotionsAndDemotions();
