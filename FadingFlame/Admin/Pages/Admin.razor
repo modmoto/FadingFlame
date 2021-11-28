@@ -2,6 +2,7 @@
 @using FadingFlame.Leagues
 @using FadingFlame.Discord
 @using FadingFlame.Lists
+@using FadingFlame.Matchups
 @using FadingFlame.Players
 @using FadingFlame.Playoffs
 @using MongoDB.Bson
@@ -94,13 +95,20 @@
                         </button>
                         @if (_unfinishedRelegations.Any())
                         {
+                            <button disabled="@_loadingTempFinishMatches" class="btn btn-outline-danger mt-2" @onclick="FinishRelegationMatches">
+                                @if (_loadingTempFinishMatches)
+                                {
+                                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                                }
+                                Finish relegation matches (ONLY TO TEST)
+                            </button>
                             <div>
                                 <b>Those relegation matches are unfinished (@_unfinishedRelegations.Count):</b>    
                             </div>
                             @foreach (var relegation in _unfinishedRelegations)
                             {
                                 <div class="row m-2 cursor" @onclick="() => NavigateToMatch(relegation)">
-                                    @relegation
+                                    @relegation.Id
                                 </div>
                             }
                         }
@@ -224,6 +232,8 @@
 @inject ILeagueCreationService _leagueCreationService
 @inject IListAcceptAndRejectService _acceptAndRejectService
 @inject IListRepository _listRepository
+@inject IMmrRepository _mmrRepository
+@inject IMatchupRepository _matchupRepository
 
 @code {
     private bool _loadingPlayoffs;
@@ -232,10 +242,11 @@
     private bool _loadingApproval;
     private bool _loadingMoveLeagueOver;
     private bool _loadingRelegationMatches;
+    private bool _loadingTempFinishMatches;
     private List<Player> _playersWithList = new();
     private List<Player> _playersWithOutList = new();
     private List<Army> _pendingListChanges = new();
-    private List<ObjectId> _unfinishedRelegations = new();
+    private List<Matchup> _unfinishedRelegations = new();
     private bool _relegationMatchesNotCreatedEverywhere;
 
     protected override void OnInitialized()
@@ -251,8 +262,8 @@
         _pendingListChanges = await _listRepository.LoadWithPendingChanges();
         var seasons = await _seasonRepository.LoadSeasons();
         var currentLeagues = await _leagueRepository.LoadForSeason(seasons[1].SeasonId);
-        _relegationMatchesNotCreatedEverywhere = currentLeagues.Any(c => c.RelegationMatches.Count == 0);
-        _unfinishedRelegations = currentLeagues.SelectMany(c => c.RelegationMatches).Where(r => !r.IsFinished).Select(r => r.Id).ToList();
+        _relegationMatchesNotCreatedEverywhere = currentLeagues[0].RelegationMatches.Count == 0;
+        _unfinishedRelegations = currentLeagues.SelectMany(c => c.RelegationMatches).Where(r => !r.IsFinished).ToList();
     }
     
     private async Task CreatePlayoffs()
@@ -350,9 +361,28 @@
         StateHasChanged();
     }
 
-    private void NavigateToMatch(ObjectId relegation)
+    private void NavigateToMatch(Matchup relegation)
     {
-        _navigation.NavigateTo($"match/{relegation}");
+        _navigation.NavigateTo($"match/{relegation.Id}");
     }
 
+    private async Task FinishRelegationMatches()
+    {
+        _loadingTempFinishMatches = true;
+        foreach (var relegation in _unfinishedRelegations)
+        {
+            var result = await MatchResult.Create(_mmrRepository, SecondaryObjectiveState.draw, Mmr.Create(), Mmr.Create(), new PlayerResultDto
+            {
+                Id = relegation.Player1,
+                VictoryPoints = 3600
+            }, new PlayerResultDto
+            {
+                Id = relegation.Player2,
+                VictoryPoints = 1300
+            }, GameList.DeffLoss(), GameList.DeffLoss(), false);
+            relegation.RecordResult(result);
+            await _matchupRepository.UpdateMatch(relegation);
+        }
+        _loadingTempFinishMatches = false;
+    }
 }
