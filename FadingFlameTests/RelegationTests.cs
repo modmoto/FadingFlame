@@ -65,8 +65,6 @@ namespace FadingFlameTests
             var leaguesInSeason = await _leagueRepository.LoadForSeason(_nextSeason);
 
             Assert.IsNotEmpty(leaguesInSeason);
-            var leagues = leaguesInSeason.Where(l => l.Players.Count != 6).ToList();
-            Console.WriteLine(leagues.Count);
             foreach (var league in leaguesInSeason)
             {
                 Assert.AreEqual(6, league.Players.Count);
