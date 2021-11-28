@@ -98,7 +98,7 @@ namespace FadingFlame.Leagues
             }
 
             var newLeagues = new List<League>();
-            for (int i = 0; i < leagues.Count; i++)
+            for (int i = 0; i < leagues.Count; i += 2)
             {
                 var players = leagues[i];
                 players.Shuffle();
