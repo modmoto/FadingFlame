@@ -14,7 +14,7 @@
             <button class="nav-link active" id="nav-players-tab" data-bs-toggle="tab" data-bs-target="#nav-players" type="button" role="tab" aria-controls="nav-players" aria-selected="true">Players</button>
             <button class="nav-link" id="nav-lists-tab" data-bs-toggle="tab" data-bs-target="#nav-lists" type="button" role="tab" aria-controls="nav-lists" aria-selected="false">Proposed list changes (@_pendingListChanges.Count)</button>
             <button class="nav-link" id="nav-management-tab" data-bs-toggle="tab" data-bs-target="#nav-management" type="button" role="tab" aria-controls="nav-management" aria-selected="false">Season Management</button>
-            <button class="nav-link" id="nav-management-tab" data-bs-toggle="tab" data-bs-target="#nav-next-management" type="button" role="tab" aria-controls="nav-management" aria-selected="false">Next Season Games</button>
+            <button class="nav-link" id="nav-next-season-tab" data-bs-toggle="tab" data-bs-target="#nav-next-season" type="button" role="tab" aria-controls="nav-next-season" aria-selected="false">Next Season Games</button>
         </div>
     </nav>
     <div class="tab-content" id="nav-tabContent">
@@ -219,9 +219,43 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="nav-management" role="tabpanel" aria-labelledby="nav-next-management">
+        <div class="tab-pane fade" id="nav-next-season" role="tabpanel" aria-labelledby="nav-next-season-tab">
             <div class="container">
                 <div class="row">
+                    <div class="col">
+                        <h3 class="m-2">This season:</h3>
+                        @foreach (var league in _leaguesThisSeason)
+                        {
+                            <div class="card mt-2">
+                                <div class="card-header">
+                                    @league.DivisionId @league.Name
+                                </div>
+                                <div class="card-body">
+                                    @foreach (var player in league.Players.Select((value, index) => new {value, index}))
+                                    {
+                                        <div>@(player.index + 1). @GetPlayer(player.value.Id)?.DisplayName</div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="col">
+                        <h3 class="m-2">Next season:</h3>
+                        @foreach (var league in _leaguesNextSeason)
+                        {
+                            <div class="card mt-2">
+                                <div class="card-header">
+                                    @league.DivisionId @league.Name
+                                </div>
+                                <div class="card-body">
+                                    @foreach (var player in league.Players.Select((value, index) => new {value, index}))
+                                    {
+                                        <div>@(player.index + 1). @GetPlayer(player.value.Id)?.DisplayName</div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
@@ -253,6 +287,8 @@
     private List<Player> _playersWithList = new();
     private List<Player> _playersWithOutList = new();
     private List<Army> _pendingListChanges = new();
+    private List<League> _leaguesThisSeason = new();
+    private List<League> _leaguesNextSeason = new();
     private List<Matchup> _unfinishedRelegations = new();
     private bool _relegationMatchesNotCreatedEverywhere;
 
@@ -268,9 +304,10 @@
         _playersWithList = await _playerRepository.LoadAllWitList();
         _pendingListChanges = await _listRepository.LoadWithPendingChanges();
         var seasons = await _seasonRepository.LoadSeasons();
-        var currentLeagues = await _leagueRepository.LoadForSeason(seasons[1].SeasonId);
-        _relegationMatchesNotCreatedEverywhere = currentLeagues[0].RelegationMatches.Count == 0;
-        _unfinishedRelegations = currentLeagues.SelectMany(c => c.RelegationMatches).Where(r => !r.IsFinished).ToList();
+        _leaguesNextSeason = await _leagueRepository.LoadForSeason(seasons[0].SeasonId);
+        _leaguesThisSeason = await _leagueRepository.LoadForSeason(seasons[1].SeasonId);
+        _relegationMatchesNotCreatedEverywhere = _leaguesThisSeason[0].RelegationMatches.Count == 0;
+        _unfinishedRelegations = _leaguesThisSeason.SelectMany(c => c.RelegationMatches).Where(r => !r.IsFinished).ToList();
     }
     
     private async Task CreatePlayoffs()
@@ -278,6 +315,11 @@
         _loadingPlayoffs = true;
         await _playoffCommandHandler.CreatePlayoffs();
         _loadingPlayoffs = false;
+    }
+    
+    private Player GetPlayer(ObjectId playerId)
+    {
+        return _playersWithList.FirstOrDefault(p => p.Id == playerId);
     }
 
     private void GoToPlayer(Player player)
