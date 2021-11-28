@@ -49,7 +49,8 @@ namespace FadingFlame.Leagues
 
             for (int i = 0; i < currentLeagues.Count; i += 2)
             {
-                var newPlayerRanks = leagues[i / 2];
+                var index = i / 2;
+                var newPlayerRanks = leagues[index];
                 var currentLeagueA = currentLeagues[i];
                 var currentLeagueB = currentLeagues[i + 1];
                 var oneLeagueDownA = currentLeagues.Count > i + 2 ? currentLeagues[i + 2] : null;
@@ -77,25 +78,19 @@ namespace FadingFlame.Leagues
                 {
                     var oneLeagueDown = (i + 2) / 2;
                     var newPlayerRanksOneLeagueDown = leagues[oneLeagueDown];
-                    var twoLeaguesDown = (i + 4) / 2;
-                    var newPlayerRanksTwoLeagueDown = leagues.Count > twoLeaguesDown ? leagues[twoLeaguesDown] : null;
+
+                    if (i == 2)
+                    {
+                        MoveFirstPlayerOfOneDownUp(newPlayerRanks, playersEnrolled, oneLeagueDownA, oneLeagueDownB);
+                    }
                     
                     SwitchRelegationsOneLeagueDown(newPlayerRanks, playersEnrolled, newPlayerRanksOneLeagueDown, currentLeagueA, currentLeagueB);
-                    if (newPlayerRanksTwoLeagueDown != null)
+                    if (newPlayerRanksOneLeagueDown != null)
                     {
-                        SwitchRelegationsTwoLeagueasdDown(newPlayerRanks, playersEnrolled, newPlayerRanksTwoLeagueDown, currentLeagueA, currentLeagueB);    
+                        SwitchRelegationsTwoLeagueasdDown(newPlayerRanks, playersEnrolled, newPlayerRanksOneLeagueDown, currentLeagueA, currentLeagueB);    
                     }
                     
                     MoveLastPlayerDown(newPlayerRanksOneLeagueDown, playersEnrolled, currentLeagueA, currentLeagueB);
-                    
-                    AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueA.RelegationMatchOverOneLeague.Result.Winner);
-                    AddIfEnrolled(newPlayerRanksOneLeagueDown, playersEnrolled, currentLeagueA.RelegationMatchOverOneLeague.Result.Looser);
-
-                    if (currentLeagueB != null)
-                    {
-                        AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Winner);
-                        AddIfEnrolled(newPlayerRanksOneLeagueDown, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Looser);    
-                    }
                 }
             }
 
@@ -157,14 +152,14 @@ namespace FadingFlame.Leagues
         {
             if (currentLeagueA != null)
             {
-                AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueA.RelegationMatchOverOneLeague.Result.Winner);
-                AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueA.RelegationMatchOverOneLeague.Result.Looser);    
+                AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueA.RelegationMatchOverTwoLeagues?.Result.Winner ?? ObjectId.Empty);
+                AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueA.RelegationMatchOverTwoLeagues?.Result.Looser ?? ObjectId.Empty);    
             }
 
             if (currentLeagueB != null)
             {
-                AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Winner);
-                AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Looser);    
+                AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.RelegationMatchOverTwoLeagues?.Result.Winner ?? ObjectId.Empty);
+                AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.RelegationMatchOverTwoLeagues?.Result.Looser ?? ObjectId.Empty);    
             }
         }
 
