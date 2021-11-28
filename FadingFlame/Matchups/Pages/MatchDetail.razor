@@ -150,13 +150,13 @@ else
                     <div class="col">
                         <div class="form-group">
                             <label>List of @Player1Name : </label>
-                            <div><b>@_matchup.Player1List</b></div>
+                            <div><b>@(_matchup.Player1List ?? "no list selected yet (admin view)")</b></div>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-group">
                             <label>List of @Player2Name : </label>
-                            <div><b>@_matchup.Player2List</b></div>
+                            <div><b>@(_matchup.Player2List ?? "no list selected yet (admin view)")</b></div>
                         </div>
                     </div>
                 </div>
