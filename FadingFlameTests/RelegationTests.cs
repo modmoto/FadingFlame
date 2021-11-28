@@ -47,8 +47,8 @@ namespace FadingFlameTests
                 Assert.IsNotEmpty(league.RelegationMatches);
             }
 
-            Assert.IsEmpty(leaguesForSeason[leaguesForSeason.Count - 2].RelegationMatches);
-            Assert.IsEmpty(leaguesForSeason[leaguesForSeason.Count - 1].RelegationMatches);
+            Assert.IsEmpty(leaguesForSeason[^1].RelegationMatches);
+            Assert.IsEmpty(leaguesForSeason[^2].RelegationMatches);
         }
 
         [Test]
