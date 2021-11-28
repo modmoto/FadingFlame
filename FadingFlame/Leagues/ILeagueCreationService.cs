@@ -19,7 +19,6 @@ namespace FadingFlame.Leagues
         private readonly ISeasonRepository _seasonRepository;
         private readonly ILeagueRepository _leagueRepository;
         private readonly IPlayerRepository _playerRepository;
-        private Random rng = new();
         
         public LeagueCreationService(
             ISeasonRepository seasonRepository, 
@@ -99,8 +98,29 @@ namespace FadingFlame.Leagues
                 }
             }
 
-            Console.WriteLine(leagues.Count);
-            // await SetDeployments();
+            var newLeagues = new List<League>();
+            for (int i = 0; i < leagues.Count; i++)
+            {
+                var players = leagues[i];
+                var shuffled = players.Shuffle();
+                var leagueA = League.Create(seasons[0].SeasonId, seasons[0].StartDate, LeagueConstants.Ids[i], LeagueConstants.Names[i]);
+                foreach (var player in shuffled.Take(6))
+                {
+                    leagueA.AddPlayer(player);
+                }
+
+                var leagueB = League.Create(seasons[0].SeasonId, seasons[0].StartDate, LeagueConstants.Ids[i + 1], LeagueConstants.Names[i + 1]);
+                foreach (var player in shuffled.Skip(6))
+                {
+                    leagueB.AddPlayer(player);
+                }
+
+                newLeagues.Add(leagueA);
+                newLeagues.Add(leagueB);
+            }
+
+            await _leagueRepository.Insert(newLeagues);
+            await SetDeploymentsForNextSeason();
         }
 
         private void MoveFirstPlayerOfOneDownUp(List<Player> newPlayerRanks, List<Player> playersEnrolled, League oneLeagueDownA, League oneLeagueDownB)
@@ -180,33 +200,21 @@ namespace FadingFlame.Leagues
             }
         }
 
-        private async Task SetDeployments()
+        private async Task SetDeploymentsForNextSeason()
         {
             var seasons = await _seasonRepository.LoadSeasons();
             var currentSeason = seasons[0];
 
             var currentLeagues = await _leagueRepository.LoadForSeason(currentSeason.SeasonId);
 
-            var secondaryObjectives = Enum.GetValues<SecondaryObjective>();
-            Shuffle(secondaryObjectives);
-            var deployments = Enum.GetValues<Deployment>();
-            Shuffle(deployments);
+            var secondaryObjectives = Enum.GetValues<SecondaryObjective>().Shuffle();
+            var deployments = Enum.GetValues<Deployment>().Shuffle();
 
             foreach (var currentLeague in currentLeagues)
             {
                 var league = await _leagueRepository.Load(currentLeague.Id);
                 league.SetScenarioAndDeployments(secondaryObjectives, deployments);
                 await _leagueRepository.Update(league);
-            }
-        }
-
-        private void Shuffle<T>(IList<T> list)
-        {
-            var n = list.Count;
-            while (n > 1) {
-                n--;
-                var k = rng.Next(n + 1);
-                (list[k], list[n]) = (list[n], list[k]);
             }
         }
 

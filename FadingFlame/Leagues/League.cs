@@ -206,7 +206,7 @@ namespace FadingFlame.Leagues
             SwapPlayer(ObjectId.Empty, playerId);
         }
 
-        public void SetScenarioAndDeployments(SecondaryObjective[] secondaryObjectives, Deployment[] deployments)
+        public void SetScenarioAndDeployments(List<SecondaryObjective> secondaryObjectives, List<Deployment> deployments)
         {
             for (int i = 0; i < GameDays.Count; i++)
             {
