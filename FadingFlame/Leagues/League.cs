@@ -245,7 +245,8 @@ namespace FadingFlame.Leagues
                 }
 
                 GameDays.Add(GameDay.Create(GameDays.Last().StartDate.AddDays(14), relegationMatches));
-            } else if (GameDays.Count == MaxPlayerCount)
+            }
+            else if (GameDays.Count == MaxPlayerCount)
             {
                 var relegationMatches = new List<Matchup>();
 
