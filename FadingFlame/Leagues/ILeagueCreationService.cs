@@ -56,12 +56,12 @@ namespace FadingFlame.Leagues
                 var oneLeagueDownA = currentLeagues.Count > i + 2 ? currentLeagues[i + 2] : null;
                 var oneLeagueDownB = currentLeagues.Count > i + 3 ? currentLeagues[i + 3] : null;
 
-                if (leagueIndex == 8)
+                if (leagueIndex == leagues.Count - 2)
                 {
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 3);
                 }
                     
-                if (leagueIndex == 9)
+                if (leagueIndex == leagues.Count - 1)
                 {
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 3);
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 4);

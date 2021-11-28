@@ -38,7 +38,7 @@ namespace FadingFlameTests
         {
             var leagueCreationService = CreateLeagueService();
 
-            await CreateDefaultLeaguesAndPlayers();
+            await CreateDefaultLeaguesAndPlayers(20);
             await leagueCreationService.CreateRelegations();
             var leaguesForSeason = await _leagueRepository.LoadForSeason(_currentSeason);
 
@@ -52,11 +52,36 @@ namespace FadingFlameTests
         }
 
         [Test]
+        public async Task CreateUpAndDown_UnevenLeagues()
+        {
+            var leagueCreationService = CreateLeagueService();
+
+            await CreateDefaultLeaguesAndPlayers(19);
+            await leagueCreationService.CreateRelegations();
+            await FinishRelegations();
+
+            await leagueCreationService.MakePromotionsAndDemotions();
+
+            var leaguesInSeason = await _leagueRepository.LoadForSeason(_nextSeason);
+
+            Assert.IsNotEmpty(leaguesInSeason);
+            foreach (var league in leaguesInSeason)
+            {
+                Assert.AreEqual(6, league.Players.Count);
+                Assert.AreEqual(5, league.GameDays.Count);
+                foreach (var gameDay in league.GameDays)
+                {
+                    Assert.AreEqual(3, gameDay.Matchups.Count);
+                }
+            }
+        }
+
+        [Test]
         public async Task CreateUpAndDown()
         {
             var leagueCreationService = CreateLeagueService();
 
-            await CreateDefaultLeaguesAndPlayers();
+            await CreateDefaultLeaguesAndPlayers(20);
             await leagueCreationService.CreateRelegations();
             await FinishRelegations();
 
@@ -100,12 +125,12 @@ namespace FadingFlameTests
             }
         }
 
-        private async Task CreateDefaultLeaguesAndPlayers()
+        private async Task CreateDefaultLeaguesAndPlayers(int until)
         {
             await _seasonRepository.Update(new Season { SeasonId = _currentSeason, StartDate = DateTime.Now });
             await _seasonRepository.Update(new Season { SeasonId = _nextSeason, StartDate = DateTime.Now });
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < until; i++)
             {
                 var league = League.Create(_currentSeason, DateTime.Now, LeagueConstants.Ids[i], LeagueConstants.Names[i]);
                 for (int j = 0; j < 6; j++)
