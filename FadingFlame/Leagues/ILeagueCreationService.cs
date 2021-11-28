@@ -101,7 +101,7 @@ namespace FadingFlame.Leagues
                 leagues[i / 2] = newPlayerRanks;
             }
 
-            await SetDeployments();
+            // await SetDeployments();
         }
 
         private void MoveFirstPlayerOfOneDownUp(List<Player> newPlayerRanks, List<Player> playersEnrolled, League oneLeagueDownA, League oneLeagueDownB)
