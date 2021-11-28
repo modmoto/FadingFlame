@@ -1,0 +1,109 @@
+﻿@* @using MongoDB.Bson *@
+@* @using Microsoft.AspNetCore.Components *@
+@* @using FadingFlame.Players *@
+@* @using FadingFlame.Matchups *@
+@* <div> *@
+@*     <h1>@League.DivisionId @League.Name</h1> *@
+@*     <hr class="my-4"> *@
+@* </div> *@
+@* <table class="table"> *@
+@*     <thead> *@
+@*     <tr> *@
+@*         <th>Name</th> *@
+@*         <th>Faction</th> *@
+@*         <th>Battle Points</th> *@
+@*         <th>Victory Points</th> *@
+@*         <th>Penalty Points</th> *@
+@*         <th>Matches</th> *@
+@*     </tr> *@
+@*     </thead> *@
+@*     <tbody class="league table table-hover"> *@
+@*     @foreach (var item in League.Players.Select((value, index) => new { value, index })) *@
+@*     { *@
+@*         <tr @onclick="() => GoToPlayer(item.value.Id)" class="cursor"> *@
+@*             <td>@GetName(item.value.Id)</td> *@
+@*             <td>@GetRace(item.value.Id)</td> *@
+@*             <td>@item.value.BattlePoints</td> *@
+@*             <td>@item.value.VictoryPoints</td> *@
+@*             <td @onclick:stopPropagation="true"> *@
+@*                 @if (_loggedInUserState.UserIsAdmin) *@
+@*                 { *@
+@*                     <div style="display: flex; flex-direction: row; max-width: 400px"> *@
+@*                         @if (item.value.Id == ObjectId.Empty) *@
+@*                         { *@
+@*                             <select class="form-select" @bind="_selectedNewPlayerIdRaw" style="max-width: 200px"> *@
+@*                                 <option selected value="@ObjectId.Empty.ToString()">Select player</option> *@
+@*                                 @foreach (var player in _playersNotInLeagues) *@
+@*                                 { *@
+@*                                     <option value="@player.Id.ToString()">@player.DisplayName / @player.DiscordTag</option> *@
+@*                                 } *@
+@*                             </select> *@
+@*                             <button @onclick="() => AddToLeague(_selectedNewPlayerIdRaw)" disabled="@_loadingAdmin" class="btn btn-danger ms-1"> *@
+@*                                 @if (_loadingAdmin) *@
+@*                                 { *@
+@*                                     <span class="spinner-border spinner-border-sm mr-1"></span> *@
+@*                                 } *@
+@*                                 <span class="oi oi-shield me-2" aria-hidden="true"></span>Add *@
+@*                             </button> *@
+@*                         } *@
+@*                         else *@
+@*                         { *@
+@*                             <EditForm OnSubmit="() => OnSubmitPenalty(_penalties[item.index])" Model="@_penalties[item.index]"> *@
+@*                                 <DataAnnotationsValidator/> *@
+@*                                 <div style="display: flex; flex-direction: row;"> *@
+@*                                     <div class="form-group" style="max-width: 5rem; margin-bottom: 0!important;"> *@
+@*                                         <InputNumber @bind-Value="_penalties[item.index].PenaltyPoints" class="form-control"/> *@
+@*                                         <ValidationMessage For="@(() => _penalties[item.index].PenaltyPoints)"/> *@
+@*                                     </div> *@
+@*                                     <button @onclick:stopPropagation="false" disabled="@_loadingAdmin" class="btn btn-danger ms-1"> *@
+@*                                         @if (_loadingAdmin) *@
+@*                                         { *@
+@*                                             <span class="spinner-border spinner-border-sm mr-1"></span> *@
+@*                                         } *@
+@*                                         <span class="oi oi-shield me-2" aria-hidden="true"></span>Save *@
+@*                                     </button> *@
+@*                                 </div> *@
+@*                             </EditForm> *@
+@*                             <button @onclick="() => RemoveFromLeague(item.value.Id)" disabled="@_loadingAdmin" class="btn btn-danger ms-1"> *@
+@*                                 @if (_loadingAdmin) *@
+@*                                 { *@
+@*                                     <span class="spinner-border spinner-border-sm mr-1"></span> *@
+@*                                 } *@
+@*                                 <span class="oi oi-shield me-2" aria-hidden="true"></span>Remove *@
+@*                             </button> *@
+@*                         } *@
+@*                     </div> *@
+@*                 } *@
+@*                 else *@
+@*                 { *@
+@*                     @(_penalties[item.index].PenaltyPoints) *@
+@*                 } *@
+@*             </td> *@
+@*             <td>@item.value.GamesCount</td> *@
+@*         </tr> *@
+@*     } *@
+@*     </tbody> *@
+@* </table> *@
+@* *@
+@* @inject LoggedInUserState _loggedInUserState *@
+@* @inject NavigationManager _navigation *@
+@* *@
+@* @code { *@
+@*     [Parameter] *@
+@*     League League { get; set; } *@
+@*    *@
+@*     private void GoToPlayer(ObjectId playerId) *@
+@*     { *@
+@*         _navigation.NavigateTo($"player/{playerId}"); *@
+@*     } *@
+@* *@
+@*     private void GoToMatch(Matchup matchup) *@
+@*     { *@
+@*         _navigation.NavigateTo($"match/{matchup.Id}?leagueId={League.Id}"); *@
+@*     } *@
+@*      *@
+@*     private string GetName(ObjectId playerId) *@
+@*     { *@
+@*         return _playersInLeague.FirstOrDefault(p => p.Id == playerId)?.DisplayName; *@
+@*     } *@
+@* } *@
