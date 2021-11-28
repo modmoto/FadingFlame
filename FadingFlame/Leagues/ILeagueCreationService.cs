@@ -43,19 +43,21 @@ namespace FadingFlame.Leagues
             var currentLeagues = await _leagueRepository.LoadForSeason(currentSeason.SeasonId);
 
             var leagues = new List<List<Player>>();
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < (currentLeagues.Count + 1) / 2; i++)
             {
                 leagues.Add(new List<Player>());
             }
-            
-            for (int i = 0; i < 98; i += 2)
+
+            for (int i = 0; i < currentLeagues.Count; i += 2)
             {
                 var newPlayerRanks = new List<Player>();
                 var currentLeagueA = currentLeagues[i];
                 var currentLeagueB = currentLeagues[i + 1];
-                var oneLeagueDownA = currentLeagues[i + 2];
-                var oneLeagueDownB = currentLeagues[i + 3];
+                var oneLeagueDownA = currentLeagues.Count > i + 2 ? currentLeagues[i + 2] : null;
+                var oneLeagueDownB = currentLeagues.Count > i + 3 ? currentLeagues[i + 3] : null;
 
+                if (oneLeagueDownB == null) break;
+                
                 LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 2);
 
                 if (i == 0)
@@ -76,20 +78,27 @@ namespace FadingFlame.Leagues
                 if (i >= 2)
                 {
                     var newPlayerRanksOneLeaguDown = leagues[i / 2];
+                    var newPlayerRanksTwoLeaguDown = leagues.Count > (i + 2) / 2 ? leagues[(i + 2) / 2] : null;
                     
                     SwitchRelegationsOneLeagueDown(newPlayerRanks, playersEnrolled, newPlayerRanksOneLeaguDown, currentLeagueA, currentLeagueB);
-                    SwitchRelegationsTwoLeagueasdDown(newPlayerRanks, playersEnrolled, newPlayerRanksOneLeaguDown, currentLeagueA, currentLeagueB);
+                    if (newPlayerRanksTwoLeaguDown != null)
+                    {
+                        SwitchRelegationsTwoLeagueasdDown(newPlayerRanks, playersEnrolled, newPlayerRanksTwoLeaguDown, currentLeagueA, currentLeagueB);    
+                    }
                     
-                    MoveLastPlayerDown(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueA, currentLeagueB);
+                    MoveLastPlayerDown(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB);
                     
                     AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueA.RelegationMatchOverOneLeague.Result.Winner);
                     AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueA.RelegationMatchOverOneLeague.Result.Looser);
-                    
-                    AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Winner);
-                    AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Looser);
+
+                    if (currentLeagueB != null)
+                    {
+                        AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Winner);
+                        AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Looser);    
+                    }
                 }
-                
-                leagues[i / 2] = newPlayerRanks.Any() ? newPlayerRanks : null;
+
+                leagues[i / 2] = newPlayerRanks;
             }
 
             await SetDeployments();
@@ -110,8 +119,11 @@ namespace FadingFlame.Leagues
             AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueA.RelegationMatchOverOneLeague.Result.Winner);
             AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueA.RelegationMatchOverOneLeague.Result.Looser);
 
-            AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Winner);
-            AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Looser);
+            if (currentLeagueB != null)
+            {
+                AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Winner);
+                AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Looser);    
+            }
         }
         
         private void SwitchRelegationsTwoLeagueasdDown(
@@ -121,11 +133,17 @@ namespace FadingFlame.Leagues
             League currentLeagueA,
             League currentLeagueB)
         {
-            AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueA.RelegationMatchOverOneLeague.Result.Winner);
-            AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueA.RelegationMatchOverOneLeague.Result.Looser);
-            
-            AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Winner);
-            AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Looser);
+            if (currentLeagueA != null)
+            {
+                AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueA.RelegationMatchOverOneLeague.Result.Winner);
+                AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueA.RelegationMatchOverOneLeague.Result.Looser);    
+            }
+
+            if (currentLeagueB != null)
+            {
+                AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Winner);
+                AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Looser);    
+            }
         }
 
         private static bool WinnerWasInCurrentLeague(League currentLeagueA)
@@ -156,7 +174,7 @@ namespace FadingFlame.Leagues
             var enrolledPlayer = playersEnrolled.FirstOrDefault(p => p.Id == playerId);
             if (enrolledPlayer != null)
             {
-                if (!newPlayerRanks.Any(p => p.Id == enrolledPlayer.Id))
+                if (newPlayerRanks.All(p => p.Id != enrolledPlayer.Id))
                 {
                     newPlayerRanks.Add(enrolledPlayer);
                 }
