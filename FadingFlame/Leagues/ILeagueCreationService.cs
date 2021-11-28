@@ -66,9 +66,8 @@ namespace FadingFlame.Leagues
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 0);
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 1);
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 3);
-                    
-                    MoveFirstPlayerOfOneDownUp(newPlayerRanks, playersEnrolled, oneLeagueDownA, oneLeagueDownB);
 
+                    MoveFirstPlayerOfOneDownUp(newPlayerRanks, playersEnrolled, oneLeagueDownA, oneLeagueDownB);
                     MoveLastPlayerDown(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueA, currentLeagueB);
 
                     SwitchRelegationsOneLeagueDown(newPlayerRanks, playersEnrolled, newPlayerRanksOneLeaguDown, currentLeagueA, currentLeagueB);
@@ -102,16 +101,16 @@ namespace FadingFlame.Leagues
             for (int i = 0; i < leagues.Count; i++)
             {
                 var players = leagues[i];
-                var shuffled = players.Shuffle();
+                players.Shuffle();
                 var leagueA = League.Create(seasons[0].SeasonId, seasons[0].StartDate, LeagueConstants.Ids[i], LeagueConstants.Names[i]);
-                var first6 = shuffled.Take(6);
+                var first6 = players.Take(6).ToList();
                 foreach (var player in first6)
                 {
                     leagueA.AddPlayer(player);
                 }
 
                 var leagueB = League.Create(seasons[0].SeasonId, seasons[0].StartDate, LeagueConstants.Ids[i + 1], LeagueConstants.Names[i + 1]);
-                var last6 = shuffled.Skip(6);
+                var last6 = players.Skip(6).ToList();
                 foreach (var player in last6)
                 {
                     leagueB.AddPlayer(player);
@@ -209,8 +208,10 @@ namespace FadingFlame.Leagues
 
             var currentLeagues = await _leagueRepository.LoadForSeason(currentSeason.SeasonId);
 
-            var secondaryObjectives = Enum.GetValues<SecondaryObjective>().Shuffle();
-            var deployments = Enum.GetValues<Deployment>().Shuffle();
+            var secondaryObjectives = Enum.GetValues<SecondaryObjective>().ToList();
+            var deployments = Enum.GetValues<Deployment>().ToList();
+            secondaryObjectives.Shuffle();
+            deployments.Shuffle();
 
             foreach (var currentLeague in currentLeagues)
             {

@@ -7,22 +7,23 @@ namespace FadingFlame.Leagues
     {
         private static Random rng = new();
 
-        public static List<T> Shuffle<T>(this IList<T> list)
+        public static void Shuffle<T>(this IList<T> list)
         {
             var shuffledList = new List<T>();
-            foreach (var t in list)
+            var listCount = list.Count;
+
+            for (int i = 0; i < listCount; i++)
             {
-                shuffledList.Add(t);
+                var maxValue = list.Count - 1;
+                var randomIndex = rng.Next(maxValue);
+                shuffledList.Add(list[randomIndex]);
+                list.Remove(shuffledList[i]);
             }
 
-            var n = list.Count;
-            while (n > 1) {
-                n--;
-                var k = rng.Next(n + 1);
-                (shuffledList[k], shuffledList[n]) = (list[n], list[k]);
+            foreach (var item in shuffledList)
+            {
+                list.Add(item);
             }
-
-            return shuffledList;
         }
     }
 }
