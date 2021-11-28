@@ -65,6 +65,15 @@ namespace FadingFlameTests
             var leaguesInSeason = await _leagueRepository.LoadForSeason(_nextSeason);
 
             Assert.IsNotEmpty(leaguesInSeason);
+            foreach (var league in leaguesInSeason)
+            {
+                Assert.AreEqual(6, league.Players.Count);
+                Assert.AreEqual(5, league.GameDays.Count);
+                foreach (var gameDay in league.GameDays)
+                {
+                    Assert.AreEqual(3, gameDay.Matchups.Count);
+                }
+            }
         }
 
         private async Task FinishRelegations()
