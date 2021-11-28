@@ -49,18 +49,30 @@ namespace FadingFlame.Leagues
 
             for (int i = 0; i < currentLeagues.Count; i += 2)
             {
-                var index = i / 2;
-                var newPlayerRanks = leagues[index];
+                var leagueIndex = i / 2;
+                var newPlayerRanks = leagues[leagueIndex];
                 var currentLeagueA = currentLeagues[i];
                 var currentLeagueB = currentLeagues[i + 1];
                 var oneLeagueDownA = currentLeagues.Count > i + 2 ? currentLeagues[i + 2] : null;
                 var oneLeagueDownB = currentLeagues.Count > i + 3 ? currentLeagues[i + 3] : null;
 
-                if (oneLeagueDownB == null) break;
+                if (leagueIndex == 8)
+                {
+                    LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 3);
+                }
+                    
+                if (leagueIndex == 9)
+                {
+                    LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 3);
+                    LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 4);
+                    LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 5);
+                }
                 
                 LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 2);
-
-                if (i == 0)
+                
+                if (oneLeagueDownB == null) break;
+               
+                if (leagueIndex == 0)
                 {
                     var newPlayerRanksOneLeaguDown = leagues[1];
                     
@@ -74,12 +86,12 @@ namespace FadingFlame.Leagues
                     SwitchRelegationsOneLeagueDown(newPlayerRanks, playersEnrolled, newPlayerRanksOneLeaguDown, currentLeagueA, currentLeagueB);
                 }
                 
-                if (i >= 2)
+                if (leagueIndex >= 1)
                 {
                     var oneLeagueDown = (i + 2) / 2;
                     var newPlayerRanksOneLeagueDown = leagues[oneLeagueDown];
 
-                    if (i == 2)
+                    if (leagueIndex == 1)
                     {
                         MoveFirstPlayerOfOneDownUp(newPlayerRanks, playersEnrolled, oneLeagueDownA, oneLeagueDownB);
                     }
