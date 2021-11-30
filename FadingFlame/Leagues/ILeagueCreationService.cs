@@ -60,9 +60,10 @@ namespace FadingFlame.Leagues
 
                 if (leagueIndex == leagues.Count - 2)
                 {
-                    if (isUneven && oneLeagueDownA != null)
+                    if (isUneven && oneLeagueDownA != null && currentLeagueB != null)
                     {
                         AddIfEnrolled(newPlayerRanks, playersEnrolled, oneLeagueDownA.Players[1].Id);
+                        AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.Players[2].Id);
                     }
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 3);
                 }
