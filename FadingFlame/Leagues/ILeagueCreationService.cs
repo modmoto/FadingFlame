@@ -36,8 +36,7 @@ namespace FadingFlame.Leagues
             var nextSeason = seasons[0];
             var currentSeason = seasons[1];
             await _leagueRepository.DeleteForSeason(nextSeason.SeasonId);
-            var playersEnrolled = await _playerRepository.LoadAll();
-            // var playersEnrolled = await _playerRepository.PlayersThatEnlistedInNextSeason();
+            var playersEnrolled = await _playerRepository.PlayersThatEnlistedInNextSeason();
 
             var currentLeagues = await _leagueRepository.LoadForSeason(currentSeason.SeasonId);
 

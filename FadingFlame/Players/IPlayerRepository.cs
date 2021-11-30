@@ -66,6 +66,19 @@ namespace FadingFlame.Players
                     await _listRepository.Update(player.ArmyCurrentSeason);
                 }
             }
+            
+            if (player.ArmyNextSeason != null)
+            {
+                if (player.ArmyIdNextSeason == default)
+                {
+                    await _listRepository.Insert(player.ArmyNextSeason);
+                    player.ArmyIdNextSeason = player.ArmyNextSeason.Id;
+                }
+                else
+                {
+                    await _listRepository.Update(player.ArmyNextSeason);
+                }
+            }
 
             await Upsert(player);
         }
