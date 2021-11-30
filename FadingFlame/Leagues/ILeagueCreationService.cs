@@ -47,6 +47,8 @@ namespace FadingFlame.Leagues
                 leagues.Add(new List<Player>());
             }
 
+            var isUneven = currentLeagues.Count % 2 != 0;
+
             for (int i = 0; i < currentLeagues.Count; i += 2)
             {
                 var leagueIndex = i / 2;
@@ -58,12 +60,16 @@ namespace FadingFlame.Leagues
 
                 if (leagueIndex == leagues.Count - 2)
                 {
+                    if (isUneven && oneLeagueDownA != null)
+                    {
+                        AddIfEnrolled(newPlayerRanks, playersEnrolled, oneLeagueDownA.Players[1].Id);
+                    }
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 3);
                 }
                     
                 if (leagueIndex == leagues.Count - 1)
                 {
-                    if (currentLeagueB == null)
+                    if (isUneven)
                     {
                         currentLeagueB = currentLeagueA;
                     }
@@ -139,7 +145,7 @@ namespace FadingFlame.Leagues
                 }
 
                 newLeagues.Add(leagueA);
-                if (leagueA.Players[0].Id != leagueB.Players[0].Id)
+                if (last6.Count != 0)
                 {
                     newLeagues.Add(leagueB);
                 }
@@ -262,12 +268,13 @@ namespace FadingFlame.Leagues
 
             var currentLeagues = await _leagueRepository.LoadForSeason(currentSeason.SeasonId);
 
-            for (var index = 0; index < currentLeagues.Count; index++)
+            var leaguesCount = currentLeagues.Count;
+            for (var index = 0; index < leaguesCount; index++)
             {
-                var oneLeagueBelow = index + 2 < currentLeagues.Count ? currentLeagues[index + 2] : null;
-                var twoLeagueBelow = index + 4 < currentLeagues.Count ? currentLeagues[index + 4] : null;
+                var oneLeagueBelow = index + 2 < leaguesCount ? currentLeagues[index + 2] : null;
+                var twoLeagueBelow = index + 4 < leaguesCount ? currentLeagues[index + 4] : null;
                 var currentLeague = currentLeagues[index];
-                currentLeague.CreatRelegations(oneLeagueBelow, twoLeagueBelow);
+                currentLeague.CreateRelegations(oneLeagueBelow, twoLeagueBelow, leaguesCount % 2 != 0);
                 await _leagueRepository.Update(currentLeague);
             }
         }
