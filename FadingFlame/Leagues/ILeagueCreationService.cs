@@ -166,8 +166,15 @@ namespace FadingFlame.Leagues
 
             if (currentLeagueB != null)
             {
-                AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague?.Result.Winner ?? ObjectId.Empty);
-                AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague?.Result.Looser ?? ObjectId.Empty);    
+                if (currentLeagueB.RelegationMatchOverOneLeague == null)
+                {
+                    AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.Players[4].Id);
+                }
+                else
+                {
+                    AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Winner);
+                    AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.RelegationMatchOverOneLeague.Result.Looser);   
+                } 
             }
         }
         
@@ -186,8 +193,15 @@ namespace FadingFlame.Leagues
 
             if (currentLeagueB != null)
             {
-                AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.RelegationMatchOverTwoLeagues?.Result.Winner ?? ObjectId.Empty);
-                AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.RelegationMatchOverTwoLeagues?.Result.Looser ?? ObjectId.Empty);    
+                if (currentLeagueB.RelegationMatchOverTwoLeagues == null)
+                {
+                    AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.Players[3].Id);
+                }
+                else
+                {
+                    AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.RelegationMatchOverTwoLeagues.Result.Winner);
+                    AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.RelegationMatchOverTwoLeagues.Result.Looser);    
+                }
             }
         }
 
