@@ -41,23 +41,24 @@ namespace FadingFlame.Leagues
 
             var currentLeagues = await _leagueRepository.LoadForSeason(currentSeason.SeasonId);
 
-            var divisions = new List<List<Player>>();
+            var divisionsTemp = new List<List<Player>>();
             var divisionCount = (currentLeagues.Count + 1) / 2;
             for (int i = 0; i < divisionCount; i++)
             {
-                divisions.Add(new List<Player>());
+                divisionsTemp.Add(new List<Player>());
             }
 
             for (int division = 0; division < divisionCount; division ++)
             {
-                var newPlayerRanks = divisions[division];
+                divisionsTemp.Add(new List<Player>());
+                var newPlayerRanks = divisionsTemp[division];
                 var leagueIndex = division * 2;
                 var currentLeagueA = currentLeagues[leagueIndex];
                 var currentLeagueB = currentLeagues.Count > leagueIndex + 1 ? currentLeagues[leagueIndex + 1] : null;
                 var oneLeagueDownA = currentLeagues.Count > leagueIndex + 2 ? currentLeagues[leagueIndex + 2] : null;
                 var oneLeagueDownB = currentLeagues.Count > leagueIndex + 3 ? currentLeagues[leagueIndex + 3] : null;
 
-                if (division == divisions.Count - 2)
+                if (division == divisionsTemp.Count - 2)
                 {
                     var isUneven = currentLeagues.Count % 2 != 0;
                     if (isUneven && oneLeagueDownA != null && currentLeagueB != null)
@@ -68,7 +69,7 @@ namespace FadingFlame.Leagues
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 3);
                 }
                     
-                if (division == divisions.Count - 1)
+                if (division == divisionsTemp.Count - 1)
                 {
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 3);
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 4);
@@ -84,7 +85,7 @@ namespace FadingFlame.Leagues
                 
                 if (division == 0)
                 {
-                    var newPlayerRanksOneLeaguDown = divisions[1];
+                    var newPlayerRanksOneLeaguDown = divisionsTemp[1];
                     
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 0);
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 1);
@@ -98,7 +99,7 @@ namespace FadingFlame.Leagues
                 
                 if (division >= 1)
                 {
-                    var newPlayerRanksOneLeagueDown = divisions[division + 1];
+                    var newPlayerRanksOneLeagueDown = divisionsTemp[division + 1];
 
                     if (division == 1)
                     {
@@ -116,9 +117,9 @@ namespace FadingFlame.Leagues
             }
 
             var newLeagues = new List<League>();
-            for (int division = 0; division < divisions.Count; division++)
+            for (int division = 0; division < divisionsTemp.Count; division++)
             {
-                var players = divisions[division];
+                var players = divisionsTemp[division];
                 players.Shuffle();
                 var leagueIndex = division * 2;
                 var leagueA = League.Create(seasons[0].SeasonId, seasons[0].StartDate, LeagueConstants.Ids[leagueIndex], LeagueConstants.Names[leagueIndex]);
