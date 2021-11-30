@@ -70,11 +70,6 @@ namespace FadingFlame.Leagues
                     
                 if (leagueIndex == leagues.Count - 1)
                 {
-                    if (isUneven)
-                    {
-                        currentLeagueB = currentLeagueA;
-                    }
-
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 3);
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 4);
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 5);
@@ -85,11 +80,6 @@ namespace FadingFlame.Leagues
                 if (oneLeagueDownB == null && oneLeagueDownA == null)
                 {
                     break;
-                }
-                
-                if (oneLeagueDownB == null)
-                {
-                    oneLeagueDownB = oneLeagueDownA;
                 }
                 
                 if (leagueIndex == 0)
