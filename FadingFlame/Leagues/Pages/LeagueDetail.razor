@@ -268,9 +268,9 @@ else
     private string GetName(ObjectId playerId)
     {
         var player = _playersInLeague.FirstOrDefault(p => p.Id == playerId)
-                     ?? _playersNotInLeagues.Single(p => p.Id == playerId);
+                     ?? _playersNotInLeagues.SingleOrDefault(p => p.Id == playerId);
 
-        return player.DisplayName;
+        return player?.DisplayName;
     }
     
     private string GetRace(ObjectId playerId)
