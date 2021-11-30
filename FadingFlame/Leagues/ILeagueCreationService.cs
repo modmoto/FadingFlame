@@ -41,25 +41,25 @@ namespace FadingFlame.Leagues
 
             var currentLeagues = await _leagueRepository.LoadForSeason(currentSeason.SeasonId);
 
-            var leagues = new List<List<Player>>();
-            for (int i = 0; i < (currentLeagues.Count + 1) / 2; i++)
+            var divisions = new List<List<Player>>();
+            var divisionCount = (currentLeagues.Count + 1) / 2;
+            for (int i = 0; i < divisionCount; i++)
             {
-                leagues.Add(new List<Player>());
+                divisions.Add(new List<Player>());
             }
 
-            var isUneven = currentLeagues.Count % 2 != 0;
-
-            for (int i = 0; i < currentLeagues.Count; i += 2)
+            for (int division = 0; division < divisionCount; division ++)
             {
-                var leagueIndex = i / 2;
-                var newPlayerRanks = leagues[leagueIndex];
-                var currentLeagueA = currentLeagues[i];
-                var currentLeagueB = currentLeagues.Count > i + 1 ? currentLeagues[i + 1] : null;
-                var oneLeagueDownA = currentLeagues.Count > i + 2 ? currentLeagues[i + 2] : null;
-                var oneLeagueDownB = currentLeagues.Count > i + 3 ? currentLeagues[i + 3] : null;
+                var newPlayerRanks = divisions[division];
+                var leagueIndex = division * 2;
+                var currentLeagueA = currentLeagues[leagueIndex];
+                var currentLeagueB = currentLeagues.Count > leagueIndex + 1 ? currentLeagues[leagueIndex + 1] : null;
+                var oneLeagueDownA = currentLeagues.Count > leagueIndex + 2 ? currentLeagues[leagueIndex + 2] : null;
+                var oneLeagueDownB = currentLeagues.Count > leagueIndex + 3 ? currentLeagues[leagueIndex + 3] : null;
 
-                if (leagueIndex == leagues.Count - 2)
+                if (division == divisions.Count - 2)
                 {
+                    var isUneven = currentLeagues.Count % 2 != 0;
                     if (isUneven && oneLeagueDownA != null && currentLeagueB != null)
                     {
                         AddIfEnrolled(newPlayerRanks, playersEnrolled, oneLeagueDownA.Players[1].Id);
@@ -68,7 +68,7 @@ namespace FadingFlame.Leagues
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 3);
                 }
                     
-                if (leagueIndex == leagues.Count - 1)
+                if (division == divisions.Count - 1)
                 {
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 3);
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 4);
@@ -82,9 +82,9 @@ namespace FadingFlame.Leagues
                     break;
                 }
                 
-                if (leagueIndex == 0)
+                if (division == 0)
                 {
-                    var newPlayerRanksOneLeaguDown = leagues[1];
+                    var newPlayerRanksOneLeaguDown = divisions[1];
                     
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 0);
                     LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 1);
@@ -96,12 +96,11 @@ namespace FadingFlame.Leagues
                     SwitchRelegationsOneLeagueDown(newPlayerRanks, playersEnrolled, newPlayerRanksOneLeaguDown, currentLeagueA, currentLeagueB);
                 }
                 
-                if (leagueIndex >= 1)
+                if (division >= 1)
                 {
-                    var oneLeagueDown = (i + 2) / 2;
-                    var newPlayerRanksOneLeagueDown = leagues[oneLeagueDown];
+                    var newPlayerRanksOneLeagueDown = divisions[division + 1];
 
-                    if (leagueIndex == 1)
+                    if (division == 1)
                     {
                         MoveFirstPlayerOfOneDownUp(newPlayerRanks, playersEnrolled, oneLeagueDownA, oneLeagueDownB);
                     }
@@ -117,18 +116,19 @@ namespace FadingFlame.Leagues
             }
 
             var newLeagues = new List<League>();
-            for (int i = 0; i < leagues.Count; i++)
+            for (int division = 0; division < divisionCount; division++)
             {
-                var players = leagues[i];
+                var players = divisions[division];
                 players.Shuffle();
-                var leagueA = League.Create(seasons[0].SeasonId, seasons[0].StartDate, LeagueConstants.Ids[i * 2], LeagueConstants.Names[i * 2]);
+                var leagueIndex = division * 2;
+                var leagueA = League.Create(seasons[0].SeasonId, seasons[0].StartDate, LeagueConstants.Ids[leagueIndex], LeagueConstants.Names[leagueIndex]);
                 var first6 = players.Take(6).ToList();
                 foreach (var player in first6)
                 {
                     leagueA.AddPlayer(player);
                 }
 
-                var leagueB = League.Create(seasons[0].SeasonId, seasons[0].StartDate, LeagueConstants.Ids[i * 2 + 1], LeagueConstants.Names[i * 2 + 1]);
+                var leagueB = League.Create(seasons[0].SeasonId, seasons[0].StartDate, LeagueConstants.Ids[leagueIndex + 1], LeagueConstants.Names[leagueIndex + 1]);
                 var last6 = players.Skip(6).ToList();
                 foreach (var player in last6)
                 {
