@@ -175,6 +175,7 @@ namespace FadingFlame.Leagues
                 if (currentLeagueB.RelegationMatchOverOneLeague == null)
                 {
                     AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.Players[4].Id);
+                    AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.Players[5].Id);
                 }
                 else
                 {
