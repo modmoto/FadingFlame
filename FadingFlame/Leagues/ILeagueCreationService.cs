@@ -50,7 +50,6 @@ namespace FadingFlame.Leagues
 
             for (int division = 0; division < divisionCount; division ++)
             {
-                divisionsTemp.Add(new List<Player>());
                 var newPlayerRanks = divisionsTemp[division];
                 var leagueIndex = division * 2;
                 var currentLeagueA = currentLeagues[leagueIndex];
