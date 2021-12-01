@@ -121,14 +121,14 @@ namespace FadingFlame.Leagues
                 players.Shuffle();
                 var leagueIndex = division * 2;
                 var leagueA = League.Create(seasons[0].SeasonId, seasons[0].StartDate, LeagueConstants.Ids[leagueIndex], LeagueConstants.Names[leagueIndex]);
-                var first6 = players.Take(6).ToList();
+                var first6 = players.Take(League.MaxPlayerCount).ToList();
                 foreach (var player in first6)
                 {
                     leagueA.AddPlayer(player);
                 }
 
                 var leagueB = League.Create(seasons[0].SeasonId, seasons[0].StartDate, LeagueConstants.Ids[leagueIndex + 1], LeagueConstants.Names[leagueIndex + 1]);
-                var last6 = players.Skip(6).ToList();
+                var last6 = players.Skip(League.MaxPlayerCount).ToList();
                 foreach (var player in last6)
                 {
                     leagueB.AddPlayer(player);
