@@ -130,7 +130,7 @@ namespace FadingFlame.Matchups
         {
             Player1List = GameList.DeffLoss().Name;
             Player2List = GameList.DeffLoss().Name;
-            Result = MatchResult.ZeroToZero(Id, Player1, Player2);
+            Result = MatchResult.ZeroToZero(Player1, Player2);
         }
     }
 }

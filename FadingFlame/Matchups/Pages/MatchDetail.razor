@@ -592,7 +592,7 @@ else
         {
             var gameList1 = GameList.Create(_listEditModelPlayer1.Name, _listEditModelPlayer1.List, _listEditModelPlayer1.Faction);
             var gameList2 = GameList.Create(_listEditModelPlayer2.Name, _listEditModelPlayer2.List, _listEditModelPlayer2.Faction);
-            result = await MatchResult.Create(_mmrRepository, model.SecondaryObjective, _player1.Mmr, _player2.Mmr, model.Player1, model.Player2, gameList1, gameList2, false, _matchup.Id);
+            result = await MatchResult.Create(_mmrRepository, model.SecondaryObjective, _player1.Mmr, _player2.Mmr, model.Player1, model.Player2, gameList1, gameList2, false);
             _matchup.RecordResult(result);
             await _matchupRepository.UpdateMatch(_matchup);
         }
@@ -604,7 +604,7 @@ else
         else
         {
             result = await _playoff.ReportGame(_mmrRepository, model, _player1.Mmr, _player2.Mmr, Player1List, Player2List);
-            var matchup = _playoff.Rounds.SelectMany(r => r.Matchups).Single(m => m.Id == result.MatchId);
+            var matchup = _playoff.Rounds.SelectMany(r => r.Matchups).Single(m => m.Id == _matchup.Id);
             await _playoffRepository.Update(_playoff);
             await _matchupRepository.UpdateMatch(matchup);
         }

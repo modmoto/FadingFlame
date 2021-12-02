@@ -10,9 +10,10 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace FadingFlame.Matchups
 {
+    [BsonIgnoreExtraElements]
+    // old MatchId is still in DB
     public class MatchResult
     {
-        public ObjectId MatchId  { get; set; }
         public PlayerResult Player1 { get; set; }
         public PlayerResult Player2 { get; set; }
         public bool WasDefLoss { get; set; }
@@ -26,17 +27,15 @@ namespace FadingFlame.Matchups
         public GameList Player2List { get; set; }
         public bool IsDraw => Winner == ObjectId.Empty;
 
-        public static async Task<MatchResult> Create(
-            IMmrRepository mmrRepository,
+        public static async Task<MatchResult> Create(IMmrRepository mmrRepository,
             SecondaryObjectiveState secondaryObjective,
             Mmr player1Mmr,
             Mmr player2Mmr,
             PlayerResultDto player1Result,
             PlayerResultDto player2Result,
-            GameList player1List, 
+            GameList player1List,
             GameList player2List,
-            bool wasDefLoss,
-            ObjectId matchId)
+            bool wasDefLoss)
         {
             var points = CalculateWinPoints(player1Result.VictoryPoints, player2Result.VictoryPoints);
 
@@ -55,7 +54,6 @@ namespace FadingFlame.Matchups
 
             return new MatchResult
             {
-                MatchId = matchId,
                 RecordedAt = DateTime.UtcNow,
                 SecondaryObjective = secondaryObjective,
                 Winner = winner,
@@ -133,11 +131,10 @@ namespace FadingFlame.Matchups
             return new PointTuple(points1, points2);
         }
 
-        public static MatchResult ZeroToZero(ObjectId objectId, ObjectId player1Id, ObjectId player2Id)
+        public static MatchResult ZeroToZero(ObjectId player1Id, ObjectId player2Id)
         {
             return new MatchResult
             {
-                MatchId = objectId,
                 RecordedAt = DateTime.UtcNow,
                 Player1 = PlayerResult.ZeroToZero(player1Id),
                 Player2 = PlayerResult.ZeroToZero(player2Id),
@@ -155,8 +152,7 @@ namespace FadingFlame.Matchups
             PlayerResultDto player1Result,
             PlayerResultDto player2Result,
             GameList player1List,
-            GameList player2List, 
-            ObjectId oldMatchId)
+            GameList player2List)
         {
             var points = CalculateWinPoints(player1Result.VictoryPoints, player2Result.VictoryPoints);
 
@@ -177,7 +173,6 @@ namespace FadingFlame.Matchups
             
             return new MatchResult
             {
-                MatchId = oldMatchId,
                 RecordedAt = DateTime.UtcNow,
                 SecondaryObjective = secondaryObjective,
                 Winner = winner,
