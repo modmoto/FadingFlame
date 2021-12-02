@@ -122,7 +122,7 @@ namespace FadingFlame.Playoffs
             {
                 var playerInLeague1 = PlayerInLeague.Create(otherMatchuP.Result?.Winner ?? ObjectId.GenerateNewId());
                 var playerInLeague2 = PlayerInLeague.Create(match.Result?.Winner ?? ObjectId.GenerateNewId());
-                var matchup = Matchup.CreateForLeague(playerInLeague1, playerInLeague2);
+                var matchup = Matchup.CreateForPlayoff(playerInLeague1, playerInLeague2);
 
                 Rounds[roundIndex + 1].Matchups[otherMatchIndex / 2] = matchup;
             }
@@ -130,7 +130,7 @@ namespace FadingFlame.Playoffs
             {
                 var playerInLeague1 = PlayerInLeague.Create(otherMatchuP.Result?.Winner ?? ObjectId.GenerateNewId());
                 var playerInLeague2 = PlayerInLeague.Create(match.Result?.Winner ?? ObjectId.GenerateNewId());
-                var matchup = Matchup.CreateForLeague(playerInLeague2, playerInLeague1);
+                var matchup = Matchup.CreateForPlayoff(playerInLeague2, playerInLeague1);
 
                 Rounds[roundIndex + 1].Matchups[matchIndex / 2] = matchup;
             }

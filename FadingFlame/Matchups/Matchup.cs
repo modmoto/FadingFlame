@@ -57,6 +57,7 @@ namespace FadingFlame.Matchups
         public bool IsChallengeOrRelegation => IsChallenge || IsRelegation;
         public bool IsChallenge { get; set; }
         public bool IsRelegation { get; set; }
+        public bool IsPlayoff { get; set; }
         public bool IsFinished => Result != null;
 
         public static Matchup CreateForLeague(PlayerInLeague playerAtHome, PlayerInLeague playerAsGuest)
@@ -67,6 +68,13 @@ namespace FadingFlame.Matchups
                 Player2 = playerAsGuest.Id,
                 Id = ObjectId.GenerateNewId()
             };
+        }
+
+        public static Matchup CreateForPlayoff(PlayerInLeague playerAtHome, PlayerInLeague playerAsGuest)
+        {
+            var matchup = CreateForLeague(playerAtHome, playerAsGuest);
+            matchup.IsPlayoff = true;
+            return matchup;
         }
 
         public static Matchup CreateChallengeGame(ObjectId challenger, ObjectId playerThatGetsChallenged)
