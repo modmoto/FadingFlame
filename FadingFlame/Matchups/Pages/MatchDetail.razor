@@ -605,6 +605,8 @@ else
         {
             result = await _playoff.ReportGame(_mmrRepository, model, _player1.Mmr, _player2.Mmr, Player1List, Player2List);
             await _playoffRepository.Update(_playoff);
+            var matchup = _playoff.Rounds.SelectMany(r => r.Matchups).Single(m => m.Id == result.MatchId);
+            await _matchupRepository.UpdateMatch(matchup);
         }
         
         _player1.UpdateMmr(result.Player1.NewMmr);
