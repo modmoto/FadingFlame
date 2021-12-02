@@ -428,7 +428,7 @@
             {
                 Id = relegation.Player2,
                 VictoryPoints = 1300
-            }, GameList.DeffLoss(), GameList.DeffLoss(), false);
+            }, GameList.DeffLoss(), GameList.DeffLoss(), false, relegation.Id);
             relegation.RecordResult(result);
             await _matchupRepository.UpdateMatch(relegation);
         }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FadingFlame;
 using FadingFlame.GlobalLadder;
 using FadingFlame.Lists;
 using FadingFlame.Matchups;
@@ -88,7 +89,7 @@ namespace FadingFlameTests
                     Rating = 1400
                 }
             });
-            var matchResult = await MatchResult.Create(TestUtils.MmrRepositoryMock(), SecondaryObjectiveState.player1, player1.Mmr, player2.Mmr, player1ResultDto, player2ResultDto, player1List, player2List, false);
+            var matchResult = await MatchResult.Create(TestUtils.MmrRepositoryMock(), SecondaryObjectiveState.player1, player1.Mmr, player2.Mmr, player1ResultDto, player2ResultDto, player1List, player2List, false, challengeGame.Id);
             challengeGame.RecordResult(matchResult);
             await matchupRepository.UpdateMatch(challengeGame);
             await playerRepository.Update(player1);

@@ -84,7 +84,7 @@ namespace FadingFlame.Leagues
 
             var match = GetMatchup(matchResultDto.MatchId);
             
-            var result = await MatchResult.Create(mmrRepository, matchResultDto.SecondaryObjective, player1Mmr, player2Mmr, player1Result, player2Result, player1List, player2List, matchResultDto.WasDefLoss);
+            var result = await MatchResult.Create(mmrRepository, matchResultDto.SecondaryObjective, player1Mmr, player2Mmr, player1Result, player2Result, player1List, player2List, matchResultDto.WasDefLoss, match.Id);
             match.RecordResult(result);
             
             player1.RecordResult(result.Player1.BattlePoints, result.Player1.VictoryPoints);

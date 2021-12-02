@@ -35,7 +35,8 @@ namespace FadingFlame.Matchups
             PlayerResultDto player2Result,
             GameList player1List, 
             GameList player2List,
-            bool wasDefLoss)
+            bool wasDefLoss,
+            ObjectId matchId)
         {
             var points = CalculateWinPoints(player1Result.VictoryPoints, player2Result.VictoryPoints);
 
@@ -54,7 +55,7 @@ namespace FadingFlame.Matchups
 
             return new MatchResult
             {
-                MatchId = ObjectId.GenerateNewId(),
+                MatchId = matchId,
                 RecordedAt = DateTime.UtcNow,
                 SecondaryObjective = secondaryObjective,
                 Winner = winner,
