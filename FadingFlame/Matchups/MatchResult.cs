@@ -147,15 +147,15 @@ namespace FadingFlame.Matchups
             };
         }
 
-        public static async Task<MatchResult> CreateKoResult(
-            IMmrRepository mmrRepository,
-            SecondaryObjectiveState secondaryObjective, 
-            Mmr player1Mmr, 
-            Mmr player2Mmr, 
-            PlayerResultDto player1Result, 
-            PlayerResultDto player2Result, 
-            GameList player1List, 
-            GameList player2List)
+        public static async Task<MatchResult> CreateKoResult(IMmrRepository mmrRepository,
+            SecondaryObjectiveState secondaryObjective,
+            Mmr player1Mmr,
+            Mmr player2Mmr,
+            PlayerResultDto player1Result,
+            PlayerResultDto player2Result,
+            GameList player1List,
+            GameList player2List, 
+            ObjectId oldMatchId)
         {
             var points = CalculateWinPoints(player1Result.VictoryPoints, player2Result.VictoryPoints);
 
@@ -176,7 +176,7 @@ namespace FadingFlame.Matchups
             
             return new MatchResult
             {
-                MatchId = ObjectId.GenerateNewId(),
+                MatchId = oldMatchId,
                 RecordedAt = DateTime.UtcNow,
                 SecondaryObjective = secondaryObjective,
                 Winner = winner,

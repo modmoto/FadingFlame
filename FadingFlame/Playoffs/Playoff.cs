@@ -111,7 +111,8 @@ namespace FadingFlame.Playoffs
                 matchResultDto.Player1, 
                 matchResultDto.Player2, 
                 player1List, 
-                player2List);
+                player2List,
+                match.Id);
             match.RecordResult(result);
 
             var otherMatchIndex = matchIndex % 2 == 0 ? matchIndex + 1 : matchIndex - 1;
