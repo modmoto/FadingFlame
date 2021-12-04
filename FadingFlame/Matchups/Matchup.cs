@@ -43,9 +43,10 @@ namespace FadingFlame.Matchups
             get
             {
                 if (IsChallengeOrRelegation)
-                    return !string.IsNullOrEmpty(ChallengePlayer1List?.List) && !string.IsNullOrEmpty(ChallengePlayer2List?.List) 
+                    return !string.IsNullOrEmpty(ChallengePlayer1List?.List) && !string.IsNullOrEmpty(ChallengePlayer2List?.List)
                         || Result?.Player1List != null && Result?.Player2List != null;
-                return !string.IsNullOrEmpty(Player1List) && !string.IsNullOrEmpty(Player2List);
+                return !string.IsNullOrEmpty(Player1List) && !string.IsNullOrEmpty(Player2List)
+                       || Result?.Player1List != null && Result?.Player1List != null;
             }
         }
 

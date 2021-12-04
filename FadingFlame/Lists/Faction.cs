@@ -33,7 +33,7 @@ namespace FadingFlame.Lists
     {
         public static string ToCamelCaseString(this Enum faction)
         {
-            return Regex.Replace(faction.ToString(), "(\\B[A-Z])", " $1")
+            return Regex.Replace(faction?.ToString() ?? "", "(\\B[A-Z])", " $1")
                 .Replace("And", "and")
                 .Replace("The", "the")
                 .Replace("Asklanders", "Åsklanders")

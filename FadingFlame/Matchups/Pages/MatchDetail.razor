@@ -307,8 +307,8 @@ else
         <div class="row align-items-start my-2">
             <div class="col">
                 <div class="form-group">
-                    <div>List: @_matchup.Player1List</div>
-                    <div><b>@(Player1List.Faction.ToCamelCaseString())</b></div>
+                    <div>List: @(Player1List?.Name ?? _matchup.Player1List)</div>
+                    <div><b>@(Player1List?.Faction.ToCamelCaseString())</b></div>
                 </div>
                 <hr class="my-3">
                 <div class="form-group">
@@ -317,8 +317,8 @@ else
             </div>
             <div class="col">
                 <div class="form-group">
-                    <div>List: @_matchup.Player2List</div>
-                    <div><b>@(Player2List.Faction.ToCamelCaseString())</b></div>
+                    <div>List: @(Player2List?.Name ?? _matchup.Player2List)</div>
+                    <div><b>@(Player2List?.Faction.ToCamelCaseString())</b></div>
                 </div>
                 <hr class="my-3">
                 <div class="form-group">
