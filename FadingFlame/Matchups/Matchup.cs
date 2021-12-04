@@ -59,6 +59,8 @@ namespace FadingFlame.Matchups
         public bool IsRelegation { get; set; }
         public bool IsPlayoff { get; set; }
         public bool IsFinished => Result != null;
+        [JsonIgnore]
+        public bool IsZeroToZero => Result?.Player1.BattlePoints == 0 && Result?.Player2.BattlePoints == 0;
 
         public static Matchup CreateForLeague(PlayerInLeague playerAtHome, PlayerInLeague playerAsGuest)
         {
@@ -124,6 +126,15 @@ namespace FadingFlame.Matchups
         public void DeleteResult()
         {
             Result = null;
+        }
+
+        public void ResetGame()
+        {
+            Result = null;
+            Player1List = null;
+            Player2List = null;
+            Player1List = null;
+            Player2List = null;
         }
 
         public void SetZeroToZero()

@@ -341,6 +341,21 @@ else
         </div>
     }
 
+    @if (_userState.UserIsAdmin && _matchup.IsFinished)
+    {
+        @if (_league != null && _matchup.IsZeroToZero)
+        {
+            <button @onclick="ResetZeroToZero" disabled="@_loading" class="btn btn-danger mt-3">
+                @if (_loading)
+                {
+                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                }
+                <span class="oi oi-shield me-2" aria-hidden="true"></span>
+                Reset game to not played and not picked
+            </button>
+        }
+    }
+
     @if (_userState.UserIsAdmin && !_matchup.IsFinished)
     {
         @if (!_matchup.IsRelegation && !_matchup.IsPlayoff)
@@ -495,6 +510,14 @@ else
     }
 
 
+
+    private async Task ResetZeroToZero()
+    {
+        _loading = true;
+        _league.ResetZeroToZero(_model.MatchId);
+        await _leagueRepository.Update(_league);
+        _loading = false;
+    }
 
     private async Task SetToZeroZero()
     {

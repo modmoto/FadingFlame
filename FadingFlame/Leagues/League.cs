@@ -182,8 +182,14 @@ namespace FadingFlame.Leagues
 
         public void DeleteGameReport(ObjectId matchId)
         {
+            var match = GetAndDeletePlayerResults(matchId);
+            match.DeleteResult();
+        }
+
+        private Matchup GetAndDeletePlayerResults(ObjectId matchId)
+        {
             var match = GetMatchup(matchId);
-            
+
             var player1 = Players.First(p => p.Id == match.Player1);
             var player2 = Players.First(p => p.Id == match.Player2);
 
@@ -191,8 +197,7 @@ namespace FadingFlame.Leagues
             player2.DeleteResult(match.Result.Player2.BattlePoints, match.Result.Player2.VictoryPoints);
 
             ReorderPlayers();
-            
-            match.DeleteResult();
+            return match;
         }
 
         public void ReorderPlayers()
@@ -249,6 +254,12 @@ namespace FadingFlame.Leagues
             }
 
             GameDays.Add(GameDay.Create(GameDays.Last().StartDate.AddDays(14), relegationMatches));
+        }
+
+        public void ResetZeroToZero(ObjectId matchId)
+        {
+            var match = GetAndDeletePlayerResults(matchId);
+            match.ResetGame();
         }
     }
 
