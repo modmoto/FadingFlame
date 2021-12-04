@@ -101,7 +101,8 @@ namespace FadingFlame.Matchups
 
         public Task UpdateMatch(Matchup matchup)
         {
-            return Upsert(matchup);
+
+            return UpsertVersionsave(matchup);
         }
 
         public Task InsertMatch(Matchup challengeGame)

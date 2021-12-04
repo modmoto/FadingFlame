@@ -10,12 +10,13 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace FadingFlame.Matchups
 {
-    public class Matchup : IIdentifiable
+    public class Matchup : IIdentifiable, IVersionable
     {
         [BsonId]
         public ObjectId Id { get; set; }
         public ObjectId Player1 { get; set; }
         public ObjectId Player2 { get; set; }
+        public int Version { get; set; }
         [JsonIgnore]
         [BsonIgnoreIfNull]
         public List<Player> OriginalPlayer1 { get; set; }
