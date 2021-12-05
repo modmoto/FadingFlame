@@ -16,7 +16,7 @@ namespace FadingFlame.Matchups
         public ObjectId Id { get; set; }
         public ObjectId Player1 { get; set; }
         public ObjectId Player2 { get; set; }
-        public int Version { get; set; }
+        public int Version { get; set; } = 0;
         [JsonIgnore]
         [BsonIgnoreIfNull]
         public List<Player> OriginalPlayer1 { get; set; }

@@ -32,6 +32,12 @@ else
             }
         </div>
     }
+    @if (_errorSaving)
+    {
+        <div class="alert alert-danger" role="alert">
+            Someone else already changed the match, the match was reloaded to not overwrite the changes.
+        </div>
+    }
     if (_matchup.IsChallengeOrRelegation)
     {
         if (!_matchup.IsFinished)
@@ -414,6 +420,7 @@ else
     private string Player2Name => _matchup.Player2 == ObjectId.Empty ? "Freewin" : _player2?.DisplayName ?? "tbd";
     private int _selectedList;
     private bool _loading = true;
+    private bool _errorSaving;
     private bool _secondaryObjectivePlayer1;
     private bool _secondaryObjectivePlayer2;
     private bool _settingDefWin;
@@ -593,7 +600,7 @@ else
     private async Task OnValidSubmit()
     {
         _loading = true;
-
+        _errorSaving = false;
         var wasAllreadyReported = _matchup.IsFinished;
         if (wasAllreadyReported)
         {
@@ -628,7 +635,8 @@ else
             var resultOfSaving = await _matchupRepository.UpdateMatch(_matchup);
             if (!resultOfSaving)
             {
-                _navigation.NavigateTo($"match/${MatchId}");
+                _errorSaving = true;
+                await OnInitializedAsync();
                 return;
             }
         }
@@ -638,7 +646,8 @@ else
             var resultOfSaving = await _leagueRepository.Update(_league);
             if (!resultOfSaving)
             {
-                _navigation.NavigateTo($"match/${MatchId}?leagueId={_league.Id}");
+                _errorSaving = true;
+                await OnInitializedAsync();
                 return;
             }
         }
@@ -649,7 +658,8 @@ else
             var resultOfSaving = await _playoffRepository.Update(_playoff);
             if (!resultOfSaving)
             {
-                _navigation.NavigateTo($"match/${MatchId}?playoffSeason={_playoff.Season}");
+                _errorSaving = true;
+                await OnInitializedAsync();
                 return;
             }
             await _matchupRepository.UpdateMatch(matchup);
@@ -675,6 +685,7 @@ else
     private async Task SelectListForMatch()
     {
         _selectingList = true;
+        _errorSaving = true;
         if (Player1LoggedIn)
         {
             UpdateSelectedList(_model.Player1.Id);
@@ -690,7 +701,8 @@ else
             var resultOfSaving = await _playoffRepository.Update(_playoff);
             if (!resultOfSaving)
             {
-                _navigation.NavigateTo($"match/${MatchId}?playoffSeason={_playoff.Season}");
+                _errorSaving = true;
+                await OnInitializedAsync();
                 return;
             }
         }
@@ -699,7 +711,8 @@ else
             var resultOfSaving = await _leagueRepository.Update(_league);
             if (!resultOfSaving)
             {
-                _navigation.NavigateTo($"match/${MatchId}?leagueId={_league.Id}");
+                _errorSaving = true;
+                await OnInitializedAsync();
                 return;
             }
         }
@@ -780,18 +793,31 @@ else
     private async Task OnSubmitList()
     {
         _loadingChallengeListEdit = true;
+        _errorSaving = false;
         if (Player1LoggedIn)
         {
             var gameList = GameList.Create(_listEditModelPlayer1.Name, _listEditModelPlayer1.List, _listEditModelPlayer1.Faction);
             _matchup.ChallengePlayer1List = gameList;
-            await _matchupRepository.UpdateMatch(_matchup);
+            var resultOfSaving = await _matchupRepository.UpdateMatch(_matchup);
+            if (!resultOfSaving)
+            {
+                _errorSaving = true;
+                await OnInitializedAsync();
+                return;
+            }
         }
         
         if (Player2LoggedIn)
         {
             var gameList = GameList.Create(_listEditModelPlayer2.Name, _listEditModelPlayer2.List, _listEditModelPlayer2.Faction);
             _matchup.ChallengePlayer2List = gameList;
-            await _matchupRepository.UpdateMatch(_matchup);
+            var resultOfSaving = await _matchupRepository.UpdateMatch(_matchup);
+            if (!resultOfSaving)
+            {
+                _errorSaving = true;
+                await OnInitializedAsync();
+                return;
+            }
         }
         _loadingChallengeListEdit = false;
     }

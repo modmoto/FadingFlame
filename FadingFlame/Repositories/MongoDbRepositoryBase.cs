@@ -79,10 +79,10 @@ namespace FadingFlame.Repositories
             var mongoCollection = mongoDatabase.GetCollection<T>(typeof(T).Name);
             insertObject.Version++;
             var replaced = await mongoCollection.ReplaceOneAsync(
-                item =>  item.Version == insertObject.Version && item.Id == insertObject.Id,
+                item => (item.Version == null || item.Version == insertObject.Version - 1) && item.Id == insertObject.Id,
                 insertObject,
                 new ReplaceOptions {IsUpsert = false});
-            return replaced.ModifiedCount == 0;
+            return replaced.ModifiedCount == 1;
         }
 
         protected Task Upsert<T>(T insertObject)  where T : IIdentifiable

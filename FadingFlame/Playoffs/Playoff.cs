@@ -17,10 +17,8 @@ namespace FadingFlame.Playoffs
         
         [BsonId]
         public ObjectId Id { get; set; }
-
         public int Season { get; set; }
-        public int Version { get; set; }
-
+        public int Version { get; set; } = 0;
         public List<Round> Rounds { get; set; }
 
         public static async Task<Playoff> Create(

@@ -16,7 +16,7 @@ namespace FadingFlame.Leagues
     {
         public const int MaxPlayerCount = 6;
         public string Name { get; set; }
-        public int Version { get; set; }
+        public int Version { get; set; } = 0;
         public int Season { get; set; }
         [BsonId]
         public ObjectId Id { get; set; }
