@@ -182,5 +182,31 @@ namespace FadingFlame.Matchups
                 Player2List = player2List
             };
         }
+
+        public static MatchResult TempInit()
+        {
+            var zeroToZero = ZeroToZero(ObjectId.Empty, ObjectId.Empty);
+            zeroToZero.Player1.BattlePoints = 10;
+            zeroToZero.Player2.BattlePoints = 10;
+            return zeroToZero;
+        }
+
+        public static MatchResult CreateWithoutMmr(
+            SecondaryObjectiveState secondaryObjective,
+            int player1VictoryPoints,
+            int player2VictoryPoints)
+        {
+            var points = CalculateWinPoints(player1VictoryPoints, player2VictoryPoints);
+
+            var pointsAfteObjective = CalculateSecondaryObjective(
+                secondaryObjective,
+                points.Player1,
+                points.Player2);
+            return new MatchResult
+            {
+                Player1 = PlayerResult.Create(ObjectId.Empty, player1VictoryPoints, pointsAfteObjective.Player1, null, null),
+                Player2 = PlayerResult.Create(ObjectId.Empty, player2VictoryPoints, pointsAfteObjective.Player2, null, null)
+            };
+        }
     }
 }

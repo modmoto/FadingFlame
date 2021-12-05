@@ -106,22 +106,24 @@ else
                 <DataAnnotationsValidator/>
                 <div class="row align-items-start mt-3">
                     <div class="col form-group">
-                        <label>Victory Points @Player1Name (0-5100):</label>
-                        <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control my-3"/>
+                        <div>Battle Points: <b>@Player1BattlePoints</b></div>
+                        <label>Victory Points @Player1Name (Diff.: @_preResult.VictoryPointsDifference):</label>
+                        <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control my-3" @onfocusout="RecreateTempMatchResult" />
                         <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
                         <div class="form-check">
-                            <InputCheckbox class="form-check-input" @onclick="() => Select2ndObjective(1)" @bind-Value="_secondaryObjectivePlayer1"/>
+                            <input type="checkbox" class="form-check-input" @onclick="() => Select2ndObjective(1)" checked="@_secondaryObjectivePlayer1">
                             <label class="form-check-label">
                                 Won secondary objective
                             </label>
                         </div>
                     </div>
                     <div class="col form-group">
-                        <label>Victory Points @_player2?.DisplayName (0-5100):</label>
-                        <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control my-3"/>
+                        <div>Battle Points: <b>@Player1BattlePoints</b></div>
+                        <label>Victory Points @_player2?.DisplayName (Diff.: @_preResult.VictoryPointsDifference):</label>
+                        <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control my-3" @onfocusout="RecreateTempMatchResult"/>
                         <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
                         <div class="form-check">
-                            <InputCheckbox class="form-check-input" @onclick="() => Select2ndObjective(2)" @bind-Value="_secondaryObjectivePlayer2"/>
+                            <input type="checkbox" class="form-check-input" @onclick="() => Select2ndObjective(2)" checked="@_secondaryObjectivePlayer2">
                             <label class="form-check-label">
                                 Won secondary objective
                             </label>
@@ -185,22 +187,24 @@ else
                     <DataAnnotationsValidator/>
                     <div class="row align-items-start mt-3">
                         <div class="col form-group">
-                            <label>Victory Points @Player1Name (0-5100):</label>
-                            <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control my-3"/>
+                            <div>Battle Points: <b>@Player1BattlePoints</b></div>
+                            <label>Victory Points @Player1Name (Diff.: @_preResult.VictoryPointsDifference):</label>
+                            <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control my-3" @onfocusout="RecreateTempMatchResult"/>
                             <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
                             <div class="form-check">
-                                <InputCheckbox class="form-check-input" @onclick="() => Select2ndObjective(1)" @bind-Value="_secondaryObjectivePlayer1"/>
+                                <input type="checkbox" class="form-check-input" @onclick="() => Select2ndObjective(1)" checked="@_secondaryObjectivePlayer1">
                                 <label class="form-check-label">
                                     Won secondary objective
                                 </label>
                             </div>
                         </div>
                         <div class="col form-group">
-                            <label>Victory Points @_player2?.DisplayName (0-5100):</label>
-                            <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control my-3"/>
+                            <div>Battle Points: <b>@Player2BattlePoints</b></div>
+                            <label>Victory Points @_player2?.DisplayName (Diff.: @_preResult.VictoryPointsDifference):</label>
+                            <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control my-3" @onfocusout="RecreateTempMatchResult"/>
                             <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
                             <div class="form-check">
-                                <InputCheckbox class="form-check-input" @onclick="() => Select2ndObjective(2)" @bind-Value="_secondaryObjectivePlayer2"/>
+                                <input type="checkbox" class="form-check-input" @onclick="() => Select2ndObjective(2)" checked="@_secondaryObjectivePlayer2">
                                 <label class="form-check-label">
                                     Won secondary objective
                                 </label>
@@ -280,7 +284,7 @@ else
         <div class="row align-items-start my-3">
             <div class="col form-group">
                 <div>@_player1.DisplayName :</div>
-                <div>Battle Points: <b>@_matchup.Result.Player1.BattlePoints</b></div>
+                <div>Battle Points: <b>@Player1BattlePoints</b></div>
                 <div>Victory Points: @_matchup.Result.Player1.VictoryPoints (Diff.: @_matchup.Result.VictoryPointsDifference)</div>
                 @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.player1)
                 {
@@ -297,7 +301,7 @@ else
             </div>
             <div class="col form-group">
                 <div>@_player2.DisplayName :</div>
-                <div>Battle Points: <b>@_matchup.Result.Player2.BattlePoints</b></div>
+                <div>Battle Points: <b>@Player2BattlePoints</b></div>
                 <div>Victory Points: @_matchup.Result.Player2.VictoryPoints (Diff.: @_matchup.Result.VictoryPointsDifference)</div>
                 @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.player2)
                 {
@@ -430,6 +434,9 @@ else
     private Army _listsOfLoggedInPlayer;
     private Player _player1;
     private Player _player2;
+    private MatchResult _preResult = MatchResult.TempInit();
+    private int Player1BattlePoints => _matchup.IsFinished ? _matchup.Result.Player1.BattlePoints : _preResult.Player1.BattlePoints;
+    private int Player2BattlePoints => _matchup.IsFinished ? _matchup.Result.Player2.BattlePoints : _preResult.Player2.BattlePoints;
     private string Player1Name => _matchup.Player1 == ObjectId.Empty ? "Freewin" : _player1?.DisplayName ?? "tbd";
     private string Player2Name => _matchup.Player2 == ObjectId.Empty ? "Freewin" : _player2?.DisplayName ?? "tbd";
     private int _selectedList;
@@ -755,13 +762,22 @@ else
     {
         if (player == 1)
         {
+            _secondaryObjectivePlayer1 = !_secondaryObjectivePlayer1;
             _secondaryObjectivePlayer2 = false;
         }
         
         if (player == 2)
         {
+            _secondaryObjectivePlayer2 = !_secondaryObjectivePlayer2;
             _secondaryObjectivePlayer1 = false;
         }
+
+        RecreateTempMatchResult();
+    }
+
+    private void RecreateTempMatchResult()
+    {
+        _preResult = MatchResult.CreateWithoutMmr(ConvertToEnum(), _model.Player1.VictoryPoints, _model.Player2.VictoryPoints);
     }
 
     private void GoToPlayer(Player player)
