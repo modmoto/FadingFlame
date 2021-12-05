@@ -72,16 +72,17 @@ namespace FadingFlame.Repositories
                 new FindOneAndReplaceOptions<T> {IsUpsert = true});
         }
 
-        protected async Task UpsertVersionsave<T>(T insertObject)
-            where T : IVersionable, IIdentifiable
+        protected async Task<bool> UpdateVersionsave<T>(T insertObject)
+            where T : class, IVersionable, IIdentifiable
         {
             var mongoDatabase = CreateClient();
             var mongoCollection = mongoDatabase.GetCollection<T>(typeof(T).Name);
             insertObject.Version++;
-            await mongoCollection.ReplaceOneAsync(
+            var replaced = await mongoCollection.ReplaceOneAsync(
                 item =>  item.Version == insertObject.Version && item.Id == insertObject.Id,
                 insertObject,
                 new ReplaceOptions {IsUpsert = false});
+            return replaced.ModifiedCount == 0;
         }
 
         protected Task Upsert<T>(T insertObject)  where T : IIdentifiable

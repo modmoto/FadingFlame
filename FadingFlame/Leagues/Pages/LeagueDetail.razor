@@ -281,12 +281,12 @@ else
         return string.Join("/", factions.Select(f => f.Value.ToCamelCaseString()));
     }
 
-    private void OnSubmitPenalty(PenaltyModel model)
+    private async Task OnSubmitPenalty(PenaltyModel model)
     {
         _loadingAdmin = true;
         _league.PenaltyPointsForPlayer(model.PlayerId, model.PenaltyPoints);
         _penalties = MapPenalties(_league);
-        _leagueRepository.Update(_league);
+        await _leagueRepository.Update(_league);
         _loadingAdmin = false;
     }
 
@@ -295,20 +295,20 @@ else
         return league.Players.Select(p => new PenaltyModel(p.Id, p.PenaltyPoints)).ToList();
     }
 
-    private void RemoveFromLeague(ObjectId playerId)
+    private async Task RemoveFromLeague(ObjectId playerId)
     {
         _loadingAdmin = true;
         _league.RemoveFromLeague(playerId);
-        _leagueRepository.Update(_league);
+        await _leagueRepository.Update(_league);
         StateHasChanged();
         _loadingAdmin = false;
     }
     
-    private void AddToLeague(string selectedNewPlayerIdRaw)
+    private async Task AddToLeague(string selectedNewPlayerIdRaw)
     {
         _loadingAdmin = true;
         _league.ReplaceDummyPlayer(new ObjectId(selectedNewPlayerIdRaw));
-        _leagueRepository.Update(_league);
+        await _leagueRepository.Update(_league);
         StateHasChanged();
         _loadingAdmin = false;
     }

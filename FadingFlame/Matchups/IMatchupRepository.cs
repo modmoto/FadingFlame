@@ -22,7 +22,7 @@ namespace FadingFlame.Matchups
         Task<List<Matchup>> LoadOpenChallengesOfPlayer(Player player);
         Task<Matchup> LoadMatch(ObjectId objectId);
         Task<Matchup> LoadChallengeOfPlayers(Player loggedInPlayer, Player player);
-        Task UpdateMatch(Matchup matchup);
+        Task<bool> UpdateMatch(Matchup matchup);
         Task InsertMatch(Matchup matchup);
         Task<List<Matchup>> LoadRealFinishedSince(DateTime sinceDate);
     }
@@ -99,10 +99,10 @@ namespace FadingFlame.Matchups
             return LoadFirst<Matchup>(m => m.IsChallenge && m.Result == null && m.Player1 == loggedInPlayer.Id && m.Player2 == player.Id);
         }
 
-        public Task UpdateMatch(Matchup matchup)
+        public Task<bool> UpdateMatch(Matchup matchup)
         {
 
-            return UpsertVersionsave(matchup);
+            return UpdateVersionsave(matchup);
         }
 
         public Task InsertMatch(Matchup challengeGame)

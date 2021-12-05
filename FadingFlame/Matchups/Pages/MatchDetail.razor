@@ -515,7 +515,11 @@ else
     {
         _loading = true;
         _league.ResetZeroToZero(_model.MatchId);
-        await _leagueRepository.Update(_league);
+        var result = await _leagueRepository.Update(_league);
+        if (!result)
+        {
+            _league = await _leagueRepository.Load(_league.Id);
+        }
         _loading = false;
     }
 
@@ -523,7 +527,11 @@ else
     {
         _loading = true;
         _league.SetZeroToZero(_model.MatchId);
-        await _leagueRepository.Update(_league);
+        var result = await _leagueRepository.Update(_league);
+        if (!result)
+        {
+            _league = await _leagueRepository.Load(_league.Id);
+        }
         _loading = false;
     }
     
@@ -617,26 +625,41 @@ else
             var gameList2 = GameList.Create(_listEditModelPlayer2.Name, _listEditModelPlayer2.List, _listEditModelPlayer2.Faction);
             result = await MatchResult.Create(_mmrRepository, model.SecondaryObjective, _player1.Mmr, _player2.Mmr, model.Player1, model.Player2, gameList1, gameList2, false);
             _matchup.RecordResult(result);
-            await _matchupRepository.UpdateMatch(_matchup);
+            var resultOfSaving = await _matchupRepository.UpdateMatch(_matchup);
+            if (!resultOfSaving)
+            {
+                _navigation.NavigateTo($"match/${MatchId}");
+                return;
+            }
         }
         else if (_league != null)
         {
             result = await _league.ReportGame(_mmrRepository, model, _player1.Mmr, _player2.Mmr, Player1List, Player2List);
-            await _leagueRepository.Update(_league);
+            var resultOfSaving = await _leagueRepository.Update(_league);
+            if (!resultOfSaving)
+            {
+                _navigation.NavigateTo($"match/${MatchId}?leagueId={_league.Id}");
+                return;
+            }
         }
         else
         {
             result = await _playoff.ReportGame(_mmrRepository, model, _player1.Mmr, _player2.Mmr, Player1List, Player2List);
             var matchup = _playoff.Rounds.SelectMany(r => r.Matchups).Single(m => m.Id == _matchup.Id);
-            await _playoffRepository.Update(_playoff);
+            var resultOfSaving = await _playoffRepository.Update(_playoff);
+            if (!resultOfSaving)
+            {
+                _navigation.NavigateTo($"match/${MatchId}?playoffSeason={_playoff.Season}");
+                return;
+            }
             await _matchupRepository.UpdateMatch(matchup);
         }
-        
+
         _player1.UpdateMmr(result.Player1.NewMmr);
         _player2.UpdateMmr(result.Player2.NewMmr);
 
         await _playerRepository.Update(_player1);
-        await _playerRepository.Update(_player2);
+        await _playerRepository.Update(_player2);    
     }
 
     private SecondaryObjectiveState ConvertToEnum()
@@ -664,11 +687,21 @@ else
 
         if (_league == null)
         {
-            await _playoffRepository.Update(_playoff);
+            var resultOfSaving = await _playoffRepository.Update(_playoff);
+            if (!resultOfSaving)
+            {
+                _navigation.NavigateTo($"match/${MatchId}?playoffSeason={_playoff.Season}");
+                return;
+            }
         }
         else
         {
-            await _leagueRepository.Update(_league);
+            var resultOfSaving = await _leagueRepository.Update(_league);
+            if (!resultOfSaving)
+            {
+                _navigation.NavigateTo($"match/${MatchId}?leagueId={_league.Id}");
+                return;
+            }
         }
         
         _selectingList = false;

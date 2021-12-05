@@ -11,7 +11,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace FadingFlame.Playoffs
 {
-    public class Playoff : IIdentifiable
+    public class Playoff : IIdentifiable, IVersionable
     {
         private static readonly List<int> NormalRounds = new() { 256, 128, 64, 32, 16, 8, 4, 2 };
         
@@ -19,6 +19,7 @@ namespace FadingFlame.Playoffs
         public ObjectId Id { get; set; }
 
         public int Season { get; set; }
+        public int Version { get; set; }
 
         public List<Round> Rounds { get; set; }
 

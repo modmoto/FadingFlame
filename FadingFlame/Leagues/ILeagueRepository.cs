@@ -14,7 +14,7 @@ namespace FadingFlame.Leagues
         Task<League> Load(ObjectId id);
         Task Insert(List<League> newLeagues);
         Task DeleteForSeason(int season);
-        Task Update(League league);
+        Task<bool> Update(League league);
         Task<List<League>> LoadLeaguesForPlayer(ObjectId playerId);
         Task<League> LoadLeagueForPlayerInSeason(ObjectId playerId, int season);
     }
@@ -83,11 +83,16 @@ namespace FadingFlame.Leagues
             await DeleteMultiple<League>(l => l.Season == season);
         }
 
-        public async Task Update(League league)
+        public async Task<bool> Update(League league)
         {
-            var matchups = league.GameDays.SelectMany(g => g.Matchups).ToList();
-            await _matchupRepository.UpdateMatches(matchups);
-            await Upsert(league);
+            var result = await UpdateVersionsave(league);
+            if (result)
+            {
+                var matchups = league.GameDays.SelectMany(g => g.Matchups).ToList();
+                await _matchupRepository.UpdateMatches(matchups);
+            }
+
+            return result;
         }
 
         public Task<List<League>> LoadLeaguesForPlayer(ObjectId playerId)

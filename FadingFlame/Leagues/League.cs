@@ -12,10 +12,11 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace FadingFlame.Leagues
 {
-    public class League : IIdentifiable
+    public class League : IIdentifiable, IVersionable
     {
         public const int MaxPlayerCount = 6;
         public string Name { get; set; }
+        public int Version { get; set; }
         public int Season { get; set; }
         [BsonId]
         public ObjectId Id { get; set; }

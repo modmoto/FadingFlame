@@ -7,7 +7,7 @@ namespace FadingFlame.Playoffs
     public interface IPlayoffRepository
     {
         Task Insert(Playoff playoffs);
-        Task Update(Playoff playoffs);
+        Task<bool> Update(Playoff playoffs);
         Task<Playoff> LoadForSeason(int season);
         Task Delete(int currentSeasonSeasonId);
     }
@@ -19,9 +19,9 @@ namespace FadingFlame.Playoffs
             return base.Insert(playoffs);
         }
 
-        public Task Update(Playoff playoffs)
+        public Task<bool> Update(Playoff playoffs)
         {
-            return Upsert(playoffs);
+            return UpdateVersionsave(playoffs);
         }
 
         public Task<Playoff> LoadForSeason(int season)
