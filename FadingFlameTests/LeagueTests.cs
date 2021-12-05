@@ -16,6 +16,32 @@ namespace FadingFlameTests
     public class LeagueTests : IntegrationTestBase
     {
         [Test]
+        public async Task VersionSaveUpdate()
+        {
+            var leagueRepository = new LeagueRepository(MongoClient, new MatchupRepository(MongoClient));
+
+            var league = League.Create(1, DateTime.Now, "1A", "Sunna");
+            await leagueRepository.Insert(new List<League> { league });
+
+            var leagueLoaded1 = await leagueRepository.Load(league.Id);
+            var leagueLoaded2 = await leagueRepository.Load(league.Id);
+
+            leagueLoaded1.AddPlayer(Player.Create("test", "test@lol.de"));
+            leagueLoaded2.AddPlayer(Player.Create("test2", "test@lol.de"));
+
+            var update1 = await leagueRepository.Update(leagueLoaded1);
+            var update2 = await leagueRepository.Update(leagueLoaded2);
+
+            Assert.IsTrue(update1);
+            Assert.IsFalse(update2);
+
+            var leagueLoadedAgain = await leagueRepository.Load(league.Id);
+
+            Assert.AreEqual(1, leagueLoadedAgain.Players.Count);
+            Assert.AreEqual(1, leagueLoadedAgain.Version);
+        }
+
+        [Test]
         public void AddPlayer()
         {
             var league = new League();
