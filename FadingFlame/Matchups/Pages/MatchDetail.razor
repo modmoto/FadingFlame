@@ -100,7 +100,7 @@ else
             }
         }
 
-        if (CanEditMatch && MatchIsEditable && _matchup.PlayersSelectedList || _matchup.PlayersSelectedList && _userState.UserIsAdmin)
+        if (CanEditMatch && MatchWasRecordedLessThanADayAgo && _matchup.PlayersSelectedList || _matchup.PlayersSelectedList && _userState.UserIsAdmin)
         {
             <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
                 <DataAnnotationsValidator/>
@@ -148,7 +148,7 @@ else
     }
     else
     {
-        if (CanEditMatch && MatchIsEditable || _userState.UserIsAdmin)
+        if (CanEditMatch && MatchWasRecordedLessThanADayAgo || _userState.UserIsAdmin)
         {
             if (_matchup.PlayersSelectedList || _userState.UserIsAdmin)
             {
@@ -156,7 +156,14 @@ else
                     <div class="col">
                         <div class="form-group">
                             <label>List of @Player1Name : </label>
-                            <div><b>@(_matchup.Player1List ?? "no list selected yet (admin view)")</b></div>
+                            @if (_userState.UserIsAdmin && !_matchup.PlayersSelectedList)
+                            {
+                                <div><b>List hidden for admins aswell ;)</b></div>
+                            }
+                            else
+                            {
+                                <div><b>@_matchup.Player1List</b></div>
+                            }
                         </div>
                     </div>
                     <div class="col">
@@ -194,7 +201,7 @@ else
                         </div>
                     </div>
                     <hr class="my-3">
-                    <button disabled="@_loading" class="btn btn-primary">
+                    <button disabled="@_loading" class="btn btn-primary mb-3">
                         @if (_loading)
                         {
                             <span class="spinner-border spinner-border-sm mr-1"></span>
@@ -210,7 +217,7 @@ else
                     </button>
                 </EditForm>
             }
-            else
+            if (!_matchup.PlayersSelectedList)
             {
                 if (_listsOfLoggedInPlayer == null && !_userState.UserIsAdmin)
                 {
@@ -435,7 +442,7 @@ else
     private bool Player1LoggedIn => _model.Player1.Id == _userState.LoggedInPlayer.Id;
     private bool Player2LoggedIn =>_model.Player2?.Id == _userState.LoggedInPlayer.Id;
     private bool CanEditMatch => Player1LoggedIn || Player2LoggedIn;
-    private bool MatchIsEditable => _matchup.Result == null || DateTime.UtcNow.AddDays(-1) < _matchup.Result.RecordedAt;
+    private bool MatchWasRecordedLessThanADayAgo => _matchup.Result == null || DateTime.UtcNow.AddDays(-1) < _matchup.Result.RecordedAt;
     private GameList Player1List
     {
         get
@@ -525,7 +532,8 @@ else
         var result = await _leagueRepository.Update(_league);
         if (!result)
         {
-            _league = await _leagueRepository.Load(_league.Id);
+            _errorSaving = true;
+            await OnInitializedAsync();
         }
         _loading = false;
     }
@@ -537,7 +545,8 @@ else
         var result = await _leagueRepository.Update(_league);
         if (!result)
         {
-            _league = await _leagueRepository.Load(_league.Id);
+            _errorSaving = true;
+            await OnInitializedAsync();
         }
         _loading = false;
     }
@@ -685,7 +694,7 @@ else
     private async Task SelectListForMatch()
     {
         _selectingList = true;
-        _errorSaving = true;
+        _errorSaving = false;
         if (Player1LoggedIn)
         {
             UpdateSelectedList(_model.Player1.Id);
