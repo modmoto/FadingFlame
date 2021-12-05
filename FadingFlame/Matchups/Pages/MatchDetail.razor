@@ -169,7 +169,14 @@ else
                     <div class="col">
                         <div class="form-group">
                             <label>List of @Player2Name : </label>
-                            <div><b>@(_matchup.Player2List ?? "no list selected yet (admin view)")</b></div>
+                            @if (_userState.UserIsAdmin && !_matchup.PlayersSelectedList)
+                            {
+                                <div><b>List hidden for admins aswell ;)</b></div>
+                            }
+                            else
+                            {
+                                <div><b>@_matchup.Player2List</b></div>
+                            }
                         </div>
                     </div>
                 </div>
