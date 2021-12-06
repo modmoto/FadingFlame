@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FadingFlame;
 using FadingFlame.GlobalLadder;
 using FadingFlame.Lists;
 using FadingFlame.Matchups;

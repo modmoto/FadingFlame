@@ -7,7 +7,6 @@ using FadingFlame.Leagues;
 using FadingFlame.Lists;
 using FadingFlame.Matchups;
 using FadingFlame.Players;
-using Moq;
 using NUnit.Framework;
 
 namespace FadingFlameTests
@@ -24,7 +23,7 @@ namespace FadingFlameTests
         private MatchupRepository _matchupRepository;
 
         [SetUp]
-        public void Setup()
+        public void SetupInner()
         {
             _listRepository = new ListRepository(MongoClient);
             _playerRepository = new PlayerRepository(MongoClient, _listRepository);
