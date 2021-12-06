@@ -27,7 +27,6 @@ namespace FadingFlame.Playoffs
             List<PlayerInLeague> playoffPlayers)
         {
             var playersWithFreeWins = new List<PlayerInLeague>();
-            playoffPlayers.Shuffle();
             var remainingRounds = NormalRounds.Where(r => r < playoffPlayers.Count).ToList();
             var roundIndex = remainingRounds.First();
             var gamesTooMuch = playoffPlayers.Count - roundIndex;
