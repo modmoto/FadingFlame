@@ -387,6 +387,51 @@ namespace FadingFlameTests
         }
 
         [Test]
+        public void PenaltyPoints_Subtracting()
+        {
+            var league = CreateLeagueToOrder();
+            league.PenaltyPointsForPlayer(league.Players[0].Id, -10);
+            league.PenaltyPointsForPlayer(league.Players[3].Id, -10);
+
+            Assert.AreEqual(-10, league.Players[3].PenaltyPoints);
+            Assert.AreEqual(-10, league.Players[3].BattlePoints);
+        }
+
+        [Test]
+        public void PenaltyPoints_Adding()
+        {
+            var league = CreateLeagueToOrder();
+            league.PenaltyPointsForPlayer(league.Players[0].Id, 10);
+            league.PenaltyPointsForPlayer(league.Players[0].Id, 10);
+
+            Assert.AreEqual(10, league.Players[0].PenaltyPoints);
+            Assert.AreEqual(10, league.Players[0].BattlePoints);
+        }
+
+        [Test]
+        public void PenaltyPoints_AddingDifferent()
+        {
+            var league = CreateLeagueToOrder();
+            league.PenaltyPointsForPlayer(league.Players[0].Id, 10);
+            league.PenaltyPointsForPlayer(league.Players[0].Id, 5);
+
+            Assert.AreEqual(5, league.Players[0].PenaltyPoints);
+            Assert.AreEqual(5, league.Players[0].BattlePoints);
+        }
+
+        [Test]
+        public void PenaltyPoints_AddingDifferent_WithStartingPoints()
+        {
+            var league = CreateLeagueToOrder();
+            league.Players[0].BattlePoints = 40;
+            league.PenaltyPointsForPlayer(league.Players[0].Id, 10);
+            league.PenaltyPointsForPlayer(league.Players[0].Id, 5);
+
+            Assert.AreEqual(5, league.Players[0].PenaltyPoints);
+            Assert.AreEqual(45, league.Players[0].BattlePoints);
+        }
+
+        [Test]
         public void ListComparerVictoryPoints()
         {
             var league = CreateLeagueToOrder();
