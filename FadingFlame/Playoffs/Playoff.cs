@@ -24,22 +24,24 @@ namespace FadingFlame.Playoffs
         public static async Task<Playoff> Create(
             IMmrRepository mmrRepository, 
             int season,
-            List<PlayerInLeague> playoffPlayers)
+            List<PlayerInLeague> weakerPlayers,
+            List<PlayerInLeague> strongerPlayers)
         {
             var playersWithFreeWins = new List<PlayerInLeague>();
-            var remainingRounds = NormalRounds.Where(r => r < playoffPlayers.Count).ToList();
+            var playersCount = weakerPlayers.Count + strongerPlayers.Count;
+            var remainingRounds = NormalRounds.Where(r => r < playersCount).ToList();
             var roundIndex = remainingRounds.First();
-            var gamesTooMuch = playoffPlayers.Count - roundIndex;
+            var gamesTooMuch = playersCount - roundIndex;
             var remainingGames = gamesTooMuch * 2;
-            var freeWinCounter = playoffPlayers.Count - remainingGames;
+            var freeWinCounter = playersCount - remainingGames;
             for (int i = 0; i < freeWinCounter; i++)
             {
                 var dummyPlayer = PlayerInLeague.Create(ObjectId.Empty);
-                playersWithFreeWins.Add(playoffPlayers[i]);
+                playersWithFreeWins.Add(weakerPlayers[i]);
                 playersWithFreeWins.Add(dummyPlayer);
             }
 
-            var lowerBracket = playoffPlayers.TakeLast(remainingGames).ToList();
+            var lowerBracket = weakerPlayers.TakeLast(remainingGames).ToList();
             playersWithFreeWins.AddRange(lowerBracket);
 
             var round = Round.Create(playersWithFreeWins);

@@ -35,15 +35,16 @@ namespace FadingFlame.Playoffs
             await _playoffRepository.Delete(_seasonState.CurrentSeason.SeasonId);
             var leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
 
-            var playoffPlayers = new List<PlayerInLeague>();
+            var weekerPlayers = new List<PlayerInLeague>();
+            var betterPlayers = new List<PlayerInLeague>();
             for (int index = 0; index < (leagues.Count + 1) / 2; index++)
             {
                 if (index == 0)
                 {
-                    playoffPlayers.Add(leagues[0].Players[0]);
-                    playoffPlayers.Add(leagues[0].Players[1]);
-                    playoffPlayers.Add(leagues[1].Players[0]);
-                    playoffPlayers.Add(leagues[1].Players[1]);
+                    weekerPlayers.Add(leagues[0].Players[0]);
+                    weekerPlayers.Add(leagues[0].Players[1]);
+                    weekerPlayers.Add(leagues[1].Players[0]);
+                    weekerPlayers.Add(leagues[1].Players[1]);
 
                     if (leagues.Count % 2 == 1)
                     {
@@ -52,33 +53,33 @@ namespace FadingFlame.Playoffs
                         if (place5A.BattlePoints == place5B.BattlePoints)
                         {
 
-                            playoffPlayers.Add(place5A.VictoryPoints > place5B.VictoryPoints ? place5A : place5B);
+                            weekerPlayers.Add(place5A.VictoryPoints > place5B.VictoryPoints ? place5A : place5B);
                         }
                         else
                         {
-                            playoffPlayers.Add(place5A.BattlePoints > place5B.BattlePoints ? place5A : place5B);
+                            weekerPlayers.Add(place5A.BattlePoints > place5B.BattlePoints ? place5A : place5B);
                         }
                     }
                 }
                 else if (index == 1)
                 {
-                    playoffPlayers.Add(leagues[2].Players[0]);
-                    playoffPlayers.Add(leagues[2].Players[1]);
-                    playoffPlayers.Add(leagues[3].Players[0]);
-                    playoffPlayers.Add(leagues[3].Players[1]);
+                    weekerPlayers.Add(leagues[2].Players[0]);
+                    weekerPlayers.Add(leagues[2].Players[1]);
+                    weekerPlayers.Add(leagues[3].Players[0]);
+                    weekerPlayers.Add(leagues[3].Players[1]);
                 }
                 else
                 {
-                    playoffPlayers.Add(leagues[index * 2].Players[0]);
+                    weekerPlayers.Add(leagues[index * 2].Players[0]);
                     var leagueBIndex = index * 2 + 1;
                     if (leagues.Count > leagueBIndex)
                     {
-                        playoffPlayers.Add(leagues[leagueBIndex].Players[0]);
+                        weekerPlayers.Add(leagues[leagueBIndex].Players[0]);
                     }
                 }
             }
 
-            var playoffs = await Playoff.Create(_mmrRepository, _seasonState.CurrentSeason.SeasonId, playoffPlayers);
+            var playoffs = await Playoff.Create(_mmrRepository, _seasonState.CurrentSeason.SeasonId, weekerPlayers, betterPlayers);
 
             await _playoffRepository.Insert(playoffs);
 
