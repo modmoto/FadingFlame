@@ -1,6 +1,5 @@
 @page "/playoffs"
 @using MongoDB.Bson
-@using FadingFlame.Leagues
 @using FadingFlame.Players
 @using FadingFlame.Admin
 @using FadingFlame.Matchups
@@ -18,10 +17,11 @@
 else
 {
     <div>
-        <div style="display: flex;">
+        <div style="display: flex; padding-top: 3rem">
             @for (int i = 0; i < _playoffs.Rounds.Count; i++)
             {
                 <div style="display: flex; flex-direction: column; justify-content: space-around; justify-items: center; ">
+                    <div class="mx-4 mt-1 mb-3" style="position: absolute; top: 10rem">Round @(_playoffs.Rounds.Count - i)</div>
                     @foreach (var matchup in _playoffs.Rounds[i].Matchups)
                     {
                         <div class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)" style="width: 12rem">
@@ -71,15 +71,6 @@ else
     protected override async Task OnInitializedAsync()
     {
         _playoffs = await _playoffRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
-        if (_playoffs == null)
-        {
-            var playerInLeagues = new List<PlayerInLeague>();
-            for (int i = 0; i < 32; i++)
-            {
-                playerInLeagues.Add(PlayerInLeague.Create(ObjectId.GenerateNewId()));
-            }
-            _playoffs = await Playoff.Create(_mmrRepository, 0, playerInLeagues, new List<PlayerInLeague>());
-        }
         var listOfPlayerInPlayoffs = _playoffs.Rounds.First().Matchups.SelectMany(m => new List<ObjectId> { m.Player1, m.Player2 }).ToList();
         _playersInPlayoffs = await _playerRepository.LoadForLeague(listOfPlayerInPlayoffs, _seasonState.CurrentSeason.SeasonId);
         _loading = false;

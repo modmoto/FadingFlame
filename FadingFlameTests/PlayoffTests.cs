@@ -67,6 +67,38 @@ namespace FadingFlameTests
         }
 
         [Test]
+        public async Task CreatePlayoffs_NoSecondRound()
+        {
+            var leagueRepository = new Mock<ILeagueRepository>();
+            leagueRepository.Setup(l => l.LoadForSeason(It.IsAny<int>())).
+                ReturnsAsync(TestLeagues(16).ToList());
+
+            var playoffCommandHandler = new PlayoffCommandHandler(
+                leagueRepository.Object,
+                new PlayoffRepository(MongoClient), new SeasonState(), TestUtils.MmrRepositoryMock());
+
+            var playoffs = await playoffCommandHandler.CreatePlayoffs();
+
+            Assert.AreEqual(5, playoffs.Rounds.Count);
+        }
+        
+        [Test]
+        public async Task CreatePlayoffs_8FreeWins_8Duels()
+        {
+            var leagueRepository = new Mock<ILeagueRepository>();
+            leagueRepository.Setup(l => l.LoadForSeason(It.IsAny<int>())).
+                ReturnsAsync(TestLeagues(19).ToList());
+
+            var playoffCommandHandler = new PlayoffCommandHandler(
+                leagueRepository.Object,
+                new PlayoffRepository(MongoClient), new SeasonState(), TestUtils.MmrRepositoryMock());
+
+            var playoffs = await playoffCommandHandler.CreatePlayoffs();
+
+            Assert.AreEqual(5, playoffs.Rounds.Count);
+        }
+
+        [Test]
         public async Task AdvanceRoundsAutomatically()
         {
             var leagueRepository = new Mock<ILeagueRepository>();
