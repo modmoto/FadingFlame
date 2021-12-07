@@ -127,8 +127,9 @@ namespace FadingFlame.Playoffs
 
         private static PlayerInLeague BetterOf(List<League> leagues, int league, int place)
         {
-            var playerA = leagues[league - 1].Players[place - 1];
-            var playerB = leagues[league].Players[place - 1];
+            var offset = (league - 1) * 2;
+            var playerA = leagues[offset].Players[place - 1];
+            var playerB = leagues[offset + 1].Players[place - 1];
             if (playerA.BattlePoints == playerB.BattlePoints)
             {
 
@@ -140,8 +141,9 @@ namespace FadingFlame.Playoffs
         
         private static PlayerInLeague WeekerOf(List<League> leagues, int league, int place)
         {
-            var playerA = leagues[league - 1].Players[place - 1];
-            var playerB = leagues[league].Players[place - 1];;
+            var offset = (league - 1) * 2;
+            var playerA = leagues[offset].Players[place - 1];
+            var playerB = leagues[offset + 1].Players[place - 1];;
             if (playerA.BattlePoints == playerB.BattlePoints)
             {
 
