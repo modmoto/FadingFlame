@@ -43,7 +43,7 @@ namespace FadingFlame.Matchups
         {
             get
             {
-                if (IsChallengeOrRelegation)
+                if (IsChallengeOrPlayoff)
                     return !string.IsNullOrEmpty(ChallengePlayer1List?.List) && !string.IsNullOrEmpty(ChallengePlayer2List?.List)
                         || Result?.Player1List != null && Result?.Player2List != null;
                 return !string.IsNullOrEmpty(Player1List) && !string.IsNullOrEmpty(Player2List)
@@ -56,7 +56,7 @@ namespace FadingFlame.Matchups
         [JsonIgnore]
         public string Player2List { get; set; }
         [BsonIgnore]
-        public bool IsChallengeOrRelegation => IsChallenge || IsRelegation;
+        public bool IsChallengeOrPlayoff => IsChallenge || IsPlayoff;
         public bool IsChallenge { get; set; }
         public bool IsRelegation { get; set; }
         public bool IsPlayoff { get; set; }

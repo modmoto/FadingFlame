@@ -101,8 +101,8 @@ else
             {
                 _leagueIdForUpcomingDay = loadLeaguesForPlayer.Id;
                 _upcomingGame = loadLeaguesForPlayer.GameDays
-                    .Select(g => g.Matchups.First(m => m.Player1 == playerId || m.Player2 == playerId))
-                    .FirstOrDefault(m => !m.IsFinished);
+                    .Select(g => g.Matchups.FirstOrDefault(m => (m.Player1 == playerId || m.Player2 == playerId) && !m.IsFinished))
+                    .FirstOrDefault();
                 if (_upcomingGame != null)
                 {
                     _upcomingOpponenName = await LoadOpponentName(_upcomingGame, playerId);

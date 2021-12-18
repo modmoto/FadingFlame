@@ -35,7 +35,7 @@ else
                     @onclick="() => SelectGameDay(gameDay.index)"
                     aria-selected="true"
                 >
-                    @(gameDay.index + 1)
+                     @GetGameDayName(gameDay.index)
                 </button>
             }
             else
@@ -51,7 +51,7 @@ else
                     @onclick="() => SelectGameDay(gameDay.index)"
                     aria-selected="true"
                 >
-                    @(gameDay.index + 1)
+                    @GetGameDayName(gameDay.index)
                 </button>
             }
         </li>
@@ -99,9 +99,10 @@ else
 @inject SeasonState _seasonState
 
 @code {
+
     [Parameter]
     public string LeagueId { get; set; }
-    
+
     private int _activeDay;
     private List<League> _leagues = new();
     private List<List<GameDay>> _selectedGameDays = new();
@@ -118,7 +119,7 @@ else
         _leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
         var playerIds = _leagues.SelectMany(l => l.Players.Select(p => p.Id)).ToList();
         _playersInSeason = await _playerRepository.LoadForLeague(playerIds, _seasonState.CurrentSeason.SeasonId);
-        
+
         var now = DateTime.UtcNow;
 
         if (_leagues.Any())
@@ -134,8 +135,8 @@ else
                     _activeDay = i;
                     foundIndex = true;
                 }
-            }    
-            
+            }
+
             StateHasChanged();
         }
     }
@@ -156,12 +157,12 @@ else
     {
         return _playersInSeason.FirstOrDefault(p => p.Id == playerId)?.DisplayName;
     }
-    
+
     private string ListName1(Matchup match)
     {
         return match.PlayersSelectedList ? $"({GetRace1(match)})" : "";
     }
-    
+
     private string ListName2(Matchup match)
     {
         return match.PlayersSelectedList ? $"({GetRace2(match)})" : "";
@@ -173,7 +174,7 @@ else
         if (player == null) return "";
         return match.Player1List == player.ArmyCurrentSeason.List1.Name ? player.ArmyCurrentSeason.List1.Faction.ToCamelCaseString() : player.ArmyCurrentSeason.List2.Faction.ToCamelCaseString();
     }
-    
+
     private string GetRace2(Matchup match)
     {
         var player = _playersInSeason.FirstOrDefault(p => p.Id == match.Player2);
@@ -203,5 +204,10 @@ else
     private string GetActiveOrNot(int index)
     {
         return index == _activeDay ? "tab-pane fade show active" : "tab-pane fade";
+    }
+
+    private string GetGameDayName(int gameDay)
+    {
+        return gameDay == League.MaxPlayerCount - 1 ? "Relegation" : (gameDay + 1).ToString();
     }
 }

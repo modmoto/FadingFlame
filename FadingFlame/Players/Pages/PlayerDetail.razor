@@ -553,7 +553,7 @@
 
   private void NavigateToMatch(Matchup match)
   {
-    if (match.IsChallengeOrRelegation)
+    if (match.IsChallengeOrPlayoff)
     {
       _navigation.NavigateTo($"match/{match.Id}");
     }

@@ -38,7 +38,7 @@ else
             Someone else already changed the match, the match was reloaded to not overwrite the changes.
         </div>
     }
-    if (_matchup.IsChallengeOrRelegation)
+    if (_matchup.IsChallengeOrPlayoff)
     {
         if (!_matchup.IsFinished)
         {
@@ -89,13 +89,16 @@ else
                             Save list
                         </button>
                     </EditForm>
-                    <button disabled="@_deletingChallenge" class="btn btn-outline-danger mt-3" @onclick="DeleteChallenge">
-                        @if (_deletingChallenge)
-                        {
-                            <span class="spinner-border spinner-border-sm mr-1"></span>
-                        }
-                        Cancel challenge
-                    </button>
+                    @if (_matchup.IsChallenge)
+                    {
+                        <button disabled="@_deletingChallenge" class="btn btn-outline-danger mt-3" @onclick="DeleteChallenge">
+                            @if (_deletingChallenge)
+                            {
+                                <span class="spinner-border spinner-border-sm mr-1"></span>
+                            }
+                            Cancel challenge
+                        </button>
+                    }
                 }
             }
         }
@@ -461,7 +464,7 @@ else
     {
         get
         {
-            if (_matchup.IsChallengeOrRelegation && !_matchup.IsFinished)
+            if (_matchup.IsChallengeOrPlayoff && !_matchup.IsFinished)
             {
                 return _matchup.ChallengePlayer1List;
             }
@@ -474,7 +477,7 @@ else
     {
         get
         {
-            if (_matchup.IsChallengeOrRelegation && !_matchup.IsFinished)
+            if (_matchup.IsChallengeOrPlayoff && !_matchup.IsFinished)
             {
                 return _matchup.ChallengePlayer2List;
             }
@@ -649,7 +652,7 @@ else
 
         model.SecondaryObjective = ConvertToEnum();
 
-        if (_matchup.IsChallengeOrRelegation)
+        if (_matchup.IsChallengeOrPlayoff)
         {
             var gameList1 = GameList.Create(_listEditModelPlayer1.Name, _listEditModelPlayer1.List, _listEditModelPlayer1.Faction);
             var gameList2 = GameList.Create(_listEditModelPlayer2.Name, _listEditModelPlayer2.List, _listEditModelPlayer2.Faction);
