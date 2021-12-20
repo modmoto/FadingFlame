@@ -76,26 +76,26 @@
         <div class="tab-pane fade" id="nav-penalties" role="tabpanel" aria-labelledby="nav-penalties-tab">
         <h3 class="m-2">Players that should get a penalty for not playing lists (@_pendingPenalties.Count):</h3>
         <div class="container">
-            @foreach (var army in _pendingPenalties)
+            @foreach (var penaltyUser in _pendingPenalties)
             {
                 <div class="card mb-3 mt-1">
                     <div class="card-body">
-                        <div class="row align-items-start" @onclick="() => GoToPlayer(army.PlayerId)">
+                        <div class="row align-items-start" @onclick="() => GoToPlayer(penaltyUser.PlayerId)">
                             <div class="form-group mb-3">
-                                <div><b>Penalty for @army.PlayerDisplayName / @army.PlayerDiscordTag</b></div> 
+                                <div><b>Penalty for @penaltyUser.PlayerDisplayName / @penaltyUser.PlayerDiscordTag in League @penaltyUser.LeagueDivisionId</b></div> 
                             </div>
                         </div>
                         <div class="row align-items-start mt-1">
                             <div class="col">
                                 <div class="form-group">
                                     <label>List 1: </label>
-                                    <div style="white-space:pre-wrap;">@army.List1</div>
+                                    <div style="white-space:pre-wrap;">@penaltyUser.List1</div>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-group">
                                     <label>List 2: </label>
-                                    <div style="white-space:pre-wrap;">@army.List2</div>
+                                    <div style="white-space:pre-wrap;">@penaltyUser.List2</div>
                                 </div>
                             </div>
                         </div>
