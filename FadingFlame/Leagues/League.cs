@@ -245,11 +245,7 @@ namespace FadingFlame.Leagues
                 relegationMatches.Add(Matchup.CreateRelegationGame(Players[3].Id, twoLeagueBelow.Players[0].Id));
             }
                 
-            if (isUneven && oneLeagueBelow != null && twoLeagueBelow == null)
-            {
-                relegationMatches.Add(Matchup.CreateRelegationGame(Players[4].Id, oneLeagueBelow.Players[2].Id));
-            } 
-            else if (oneLeagueBelow != null)
+            if (oneLeagueBelow != null)
             {
                 relegationMatches.Add(Matchup.CreateRelegationGame(Players[4].Id, oneLeagueBelow.Players[1].Id));
             }
