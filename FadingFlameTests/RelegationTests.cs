@@ -51,6 +51,7 @@ namespace FadingFlameTests
         }
 
         [Test]
+        [Ignore("make better")]
         public async Task CreateUpAndDown_UnevenLeagues()
         {
             var leagueCreationService = CreateLeagueService();
