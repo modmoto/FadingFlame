@@ -101,7 +101,6 @@ namespace FadingFlame.Matchups
 
         public Task<bool> UpdateMatch(Matchup matchup)
         {
-
             return UpdateVersionsave(matchup);
         }
 

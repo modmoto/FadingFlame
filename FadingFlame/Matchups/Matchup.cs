@@ -135,8 +135,6 @@ namespace FadingFlame.Matchups
             Result = null;
             Player1List = null;
             Player2List = null;
-            Player1List = null;
-            Player2List = null;
         }
 
         public void SetZeroToZero()
