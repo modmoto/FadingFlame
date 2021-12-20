@@ -105,7 +105,7 @@ else
 
         if (CanEditMatch && MatchWasRecordedLessThanADayAgo && _matchup.PlayersSelectedList || _matchup.PlayersSelectedList && _userState.UserIsAdmin)
         {
-            <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
+            <EditForm Model="@_model" OnValidSubmit="OnValidSubmitMatchResult">
                 <DataAnnotationsValidator/>
                 <div class="row align-items-start mt-3">
                     <div class="col form-group">
@@ -121,7 +121,7 @@ else
                         </div>
                     </div>
                     <div class="col form-group">
-                        <div>Battle Points: <b>@Player1BattlePoints</b></div>
+                        <div>Battle Points: <b>@Player2BattlePoints</b></div>
                         <label>Victory Points @_player2?.DisplayName (Diff.: @_preResult.VictoryPointsDifference):</label>
                         <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control my-3" @onfocusout="RecreateTempMatchResult"/>
                         <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
@@ -186,7 +186,7 @@ else
                     </div>
                 </div>
 
-                <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
+                <EditForm Model="@_model" OnValidSubmit="OnValidSubmitMatchResult">
                     <DataAnnotationsValidator/>
                     <div class="row align-items-start mt-3">
                         <div class="col form-group">
@@ -623,7 +623,7 @@ else
         return (army.List1.Name == listName ? army.List1.Faction : army.List2.Faction).ToCamelCaseString();
     }
 
-    private async Task OnValidSubmit()
+    private async Task OnValidSubmitMatchResult()
     {
         _loading = true;
         _errorSaving = false;
@@ -652,7 +652,7 @@ else
 
         model.SecondaryObjective = ConvertToEnum();
 
-        if (_matchup.IsChallengeOrPlayoff)
+        if (_matchup.IsChallenge)
         {
             var gameList1 = GameList.Create(_listEditModelPlayer1.Name, _listEditModelPlayer1.List, _listEditModelPlayer1.Faction);
             var gameList2 = GameList.Create(_listEditModelPlayer2.Name, _listEditModelPlayer2.List, _listEditModelPlayer2.Faction);
@@ -680,7 +680,6 @@ else
         else
         {
             result = await _playoff.ReportGame(_mmrRepository, model, _player1.Mmr, _player2.Mmr, Player1List, Player2List);
-            var matchup = _playoff.Rounds.SelectMany(r => r.Matchups).Single(m => m.Id == _matchup.Id);
             var resultOfSaving = await _playoffRepository.Update(_playoff);
             if (!resultOfSaving)
             {
@@ -688,7 +687,6 @@ else
                 await OnInitializedAsync();
                 return;
             }
-            await _matchupRepository.UpdateMatch(matchup);
         }
 
         _player1.UpdateMmr(result.Player1.NewMmr);
