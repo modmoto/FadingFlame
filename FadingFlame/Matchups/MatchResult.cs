@@ -27,7 +27,8 @@ namespace FadingFlame.Matchups
         public GameList Player2List { get; set; }
         public bool IsDraw => Winner == ObjectId.Empty;
 
-        public static async Task<MatchResult> Create(IMmrRepository mmrRepository,
+        public static async Task<MatchResult> Create(
+            IMmrRepository mmrRepository,
             SecondaryObjectiveState secondaryObjective,
             Mmr player1Mmr,
             Mmr player2Mmr,
@@ -135,6 +136,7 @@ namespace FadingFlame.Matchups
         {
             return new MatchResult
             {
+                WasDefLoss = true,
                 RecordedAt = DateTime.UtcNow,
                 Player1 = PlayerResult.ZeroToZero(player1Id),
                 Player2 = PlayerResult.ZeroToZero(player2Id),
