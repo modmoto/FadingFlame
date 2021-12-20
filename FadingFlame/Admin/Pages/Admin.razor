@@ -132,13 +132,6 @@
                         </button>
                         @if (_unfinishedRelegations.Any())
                         {
-                            <button disabled="@_loadingTempFinishMatches" class="btn btn-outline-danger mt-2" @onclick="FinishRelegationMatches">
-                                @if (_loadingTempFinishMatches)
-                                {
-                                    <span class="spinner-border spinner-border-sm mr-1"></span>
-                                }
-                                Finish relegation matches (ONLY TO TEST)
-                            </button>
                             <div>
                                 <b>Those relegation matches are unfinished (@_unfinishedRelegations.Count):</b>    
                             </div>
@@ -452,25 +445,5 @@
     private void NavigateToMatch(Matchup relegation)
     {
         _navigation.NavigateTo($"match/{relegation.Id}");
-    }
-
-    private async Task FinishRelegationMatches()
-    {
-        _loadingTempFinishMatches = true;
-        foreach (var relegation in _unfinishedRelegations)
-        {
-            var result = await MatchResult.Create(_mmrRepository, SecondaryObjectiveState.draw, Mmr.Create(), Mmr.Create(), new PlayerResultDto
-            {
-                Id = relegation.Player1,
-                VictoryPoints = 3600
-            }, new PlayerResultDto
-            {
-                Id = relegation.Player2,
-                VictoryPoints = 1300
-            }, GameList.DeffLoss(), GameList.DeffLoss(), false);
-            relegation.RecordResult(result);
-            await _matchupRepository.UpdateMatch(relegation);
-        }
-        _loadingTempFinishMatches = false;
     }
 }
