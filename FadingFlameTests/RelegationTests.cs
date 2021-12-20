@@ -147,7 +147,7 @@ namespace FadingFlameTests
 
         private LeagueCreationService CreateLeagueService()
         {
-            return new LeagueCreationService(_seasonRepository, _leagueRepository, _playerRepository);
+            return new LeagueCreationService(_seasonRepository, _leagueRepository, _playerRepository, _matchupRepository);
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FadingFlame.Admin;
+using FadingFlame.Matchups;
 using FadingFlame.Players;
 using MongoDB.Bson;
 
@@ -19,15 +20,18 @@ namespace FadingFlame.Leagues
         private readonly ISeasonRepository _seasonRepository;
         private readonly ILeagueRepository _leagueRepository;
         private readonly IPlayerRepository _playerRepository;
-        
+        private readonly IMatchupRepository _matchupRepository;
+
         public LeagueCreationService(
             ISeasonRepository seasonRepository, 
             ILeagueRepository leagueRepository,
-            IPlayerRepository playerRepository)
+            IPlayerRepository playerRepository,
+            IMatchupRepository matchupRepository)
         {
             _seasonRepository = seasonRepository;
             _leagueRepository = leagueRepository;
             _playerRepository = playerRepository;
+            _matchupRepository = matchupRepository;
         }
         
         public async Task MakePromotionsAndDemotions()
@@ -265,6 +269,11 @@ namespace FadingFlame.Leagues
                 var oneLeagueBelow = index + 2 < leaguesCount ? currentLeagues[index + 2] : null;
                 var twoLeagueBelow = index + 4 < leaguesCount ? currentLeagues[index + 4] : null;
                 var currentLeague = currentLeagues[index];
+                var relegationMatches = currentLeague.RelegationMatches;
+                if (relegationMatches.Any())
+                {
+                    await _matchupRepository.DeleteMatches(relegationMatches.Select(r => r.Id).ToList());
+                }
                 currentLeague.CreateRelegations(oneLeagueBelow, twoLeagueBelow, leaguesCount % 2 != 0);
                 await _leagueRepository.Update(currentLeague);
             }
