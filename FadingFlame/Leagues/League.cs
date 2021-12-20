@@ -240,7 +240,7 @@ namespace FadingFlame.Leagues
             
             var relegationMatches = new List<Matchup>();
                 
-            if (twoLeagueBelow != null)
+            if (twoLeagueBelow != null && !DivisionId.StartsWith("1"))
             {
                 relegationMatches.Add(Matchup.CreateRelegationGame(Players[3].Id, twoLeagueBelow.Players[0].Id));
             }
