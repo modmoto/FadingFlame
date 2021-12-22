@@ -32,7 +32,7 @@
         <td>@((int) item.value.WinRate)%</td>
         <td>@item.value.MatchCount</td>
         <td>
-          @if (item.value.Location != null)
+          @if (item.value.Location.TimezoneRaw != Location.NotSelected && _loggedInUserState.UserIsLoggedIn)
           {
             <span class="@($"ms-2 flag-container flag-icon flag-icon-{item.value.Location?.Country.TwoLetterISORegionName.ToLower()}")"></span>
             <span>@(_geoLocationService.GetTimeDiff(_loggedInUserState.CurrentUserTime, item.value.Location.TimezoneRaw).Hours)h</span>

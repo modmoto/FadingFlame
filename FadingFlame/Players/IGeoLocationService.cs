@@ -35,7 +35,8 @@ namespace FadingFlame.Players
         
         public TimeSpan GetTimeDiff(DateTimeOffset? timeOfUser, string timeZoneOfSelectedPlayer)
         {
-            var timeZoneOfPlayer = GetTimeZones().FirstOrDefault(ti => ti.Id == timeZoneOfSelectedPlayer);
+            var timeZoneInfos = GetTimeZones();
+            var timeZoneOfPlayer = timeZoneInfos.FirstOrDefault(ti => ti.Id == timeZoneOfSelectedPlayer);
             if (timeOfUser != null && timeZoneOfPlayer != null)
             {
                 if (timeZoneOfPlayer.IsDaylightSavingTime(DateTimeOffset.UtcNow))
