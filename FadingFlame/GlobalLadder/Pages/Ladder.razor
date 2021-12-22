@@ -1,5 +1,6 @@
 ﻿@page "/Ladder"
 @using MongoDB.Bson
+@using FadingFlame.Players
 
 <div>
   <h1>Fading Flame global ranking</h1>
@@ -16,6 +17,7 @@
       <th>Draws</th>
       <th>Winrate</th>
       <th>Matches</th>
+      <th>Country</th>
     </thead>
     <tbody>
     @foreach (var item in _enlistedPlayersOriginal.Select((value, index) => new {value, index}))
@@ -29,6 +31,13 @@
         <td class="draw">@item.value.Draws</td>
         <td>@((int) item.value.WinRate)%</td>
         <td>@item.value.MatchCount</td>
+        <td>
+          @if (item.value.Location != null)
+          {
+            <span class="@($"ms-2 flag-container flag-icon flag-icon-{item.value.Location?.Country.TwoLetterISORegionName.ToLower()}")"></span>
+            <span>@(_geoLocationService.GetTimeDiff(_loggedInUserState.CurrentUserTime, item.value.Location.TimezoneRaw).Hours)h</span>
+          }
+        </td>
       </tr>
     }
     </tbody>
@@ -37,6 +46,8 @@
 
 @inject IRankingReadmodelRepository _playerRepository
 @inject NavigationManager _navigation
+@inject IGeoLocationService _geoLocationService
+@inject LoggedInUserState _loggedInUserState
 
 @code {
   private List<PlayerRankingReadModel> _enlistedPlayersOriginal = new();

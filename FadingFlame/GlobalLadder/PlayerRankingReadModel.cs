@@ -21,6 +21,8 @@ namespace FadingFlame.GlobalLadder
         [BsonIgnore]
         public int MatchCount => Wins + Losses + Draws;
 
+        public Location Location { get; set; }
+
         public static PlayerRankingReadModel Create(Player player, List<MatchResult> playersMatches)
         {
             var wins = playersMatches.Count(m => m.Winner == player.Id);
@@ -35,7 +37,8 @@ namespace FadingFlame.GlobalLadder
                 WinRate = winRate * 100,
                 Losses = losses,
                 Id = player.Id,
-                Name = player.DisplayName
+                Name = player.DisplayName,
+                Location = player.Location
             };
         }
     }

@@ -14,7 +14,7 @@
     Profile @_player.DisplayName
     @if (_editUserModel.Country != null)
     {
-      <span class="@_regionCss"></span>
+      <span class="@($"ms-2 flag-container flag-icon flag-icon-{_editUserModel.Country?.ToLower()}")"></span>
     }
   </h4>
   <smal>@((int) (_player.Mmr?.Rating ?? 0)) ladder points</smal>
@@ -292,7 +292,6 @@
   private ValidationMessageStore _messageStoreLists;
   private EditContext _editContextUser;
   private EditContext _editContextLists;
-  private string _regionCss;
   private bool _isTheRightUser;
   private bool _isFreshListPossible;
   private bool _loadingChallengingPlayer;
@@ -345,7 +344,6 @@
           TimeZone = _player.Location?.TimezoneRaw ?? Location.NotSelected
         };
 
-        _regionCss = SetRegionCss();
         _isTheRightUser = Id == _loggedInUserState.LoggedInPlayer.Id.ToString();
         SetListEditModel();
 
@@ -397,11 +395,6 @@
       ProposedListChange = list?.ProposedListChange,
       Name = list?.Name
     };
-  }
-
-  private string SetRegionCss()
-  {
-    return $"ms-2 flag-container flag-icon flag-icon-{_editUserModel.Country?.ToLower()}";
   }
 
   private async Task OnSubmitList()
@@ -474,7 +467,6 @@
       return;
     }
     _player.Update(_editUserModel);
-    SetRegionCss();
     await _playerRepository.Update(_player);
     _loading = false;
     StateHasChanged();
