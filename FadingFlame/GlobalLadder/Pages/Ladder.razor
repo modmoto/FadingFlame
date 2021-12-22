@@ -32,7 +32,7 @@
         <td>@((int) item.value.WinRate)%</td>
         <td>@item.value.MatchCount</td>
         <td>
-          @if (item.value.Location.TimezoneRaw != Location.NotSelected && _loggedInUserState.UserIsLoggedIn)
+          @if (item.value.Location.TimezoneRaw != Location.NotSelected)
           {
             <span class="@($"ms-2 flag-container flag-icon flag-icon-{item.value.Location?.Country.TwoLetterISORegionName.ToLower()}")"></span>
             @if (_loggedInUserState.UserIsLoggedIn)
