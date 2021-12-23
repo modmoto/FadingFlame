@@ -20,13 +20,12 @@
     </nav>
     <div class="tab-content" id="nav-tabContent">
         <div class="tab-pane fade show active" id="nav-players" role="tabpanel" aria-labelledby="nav-players-tab">
-            <h3 class="m-2">Registered players: (@(_playersWithOutList.Count + _playersWithList.Count))</h3>
             <div class="row">
                 <div class="card m-2" style="width: 28rem;">
                     <div class="card-body">
-                        <div class="card-title">Users with lists (@_playersWithList.Count):</div>
+                        <div class="card-title">Registered players (@_players.Count):</div>
                         <ul class="list-group list-group-flush">
-                            @foreach (var player in _playersWithList)
+                            @foreach (var player in _players)
                             {
                                 <li class="list-group-item cursor" @onclick="() => GoToPlayer(player.Id)">@player.DisplayName / @player.DiscordTag</li>
                             }
@@ -36,9 +35,9 @@
                     
                 <div class="card m-2" style="width: 28rem;">
                     <div class="card-body">
-                        <div class="card-title">Users without lists (@_playersWithOutList.Count):</div>
+                        <div class="card-title">Users enrolled in next season (@_playersEnrolledInNextSeason.Count):</div>
                         <ul class="list-group list-group-flush">
-                            @foreach (var player in _playersWithOutList)
+                            @foreach (var player in _playersEnrolledInNextSeason)
                             {
                                 <li class="list-group-item cursor" @onclick="() => GoToPlayer(player.Id)">@player.DisplayName / @player.DiscordTag</li>
                             }
@@ -313,9 +312,8 @@
     private bool _loadingApproval;
     private bool _loadingMoveLeagueOver;
     private bool _loadingRelegationMatches;
-    private bool _loadingTempFinishMatches;
-    private List<Player> _playersWithList = new();
-    private List<Player> _playersWithOutList = new();
+    private List<Player> _players = new();
+    private List<Player> _playersEnrolledInNextSeason = new();
     private List<Army> _pendingListChanges = new();
     private List<PenaltyUser> _pendingPenalties = new();
     private List<League> _leaguesThisSeason = new();
@@ -330,9 +328,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _playersWithList = await _playerRepository.LoadAllWitList();
-        _playersWithOutList = (await _playerRepository.LoadAllWithoutList()).Where(u => !u.DisplayName.StartsWith("MISSING")).ToList();
-        _playersWithList = await _playerRepository.LoadAllWitList();
+        _players = await _playerRepository.LoadAll();
+        _playersEnrolledInNextSeason = await _playerRepository.PlayersThatEnlistedInNextSeason();
         _pendingListChanges = await _listRepository.LoadWithPendingChanges();
         var seasons = await _seasonRepository.LoadSeasons();
         _leaguesNextSeason = await _leagueRepository.LoadForSeason(seasons[0].SeasonId);
@@ -351,7 +348,7 @@
     
     private Player GetPlayer(ObjectId playerId)
     {
-        return _playersWithList.FirstOrDefault(p => p.Id == playerId);
+        return _players.FirstOrDefault(p => p.Id == playerId);
     }
 
     private void GoToPlayer(ObjectId playerId)
@@ -423,7 +420,7 @@
     
     private Player GetPlayer(Army player)
     {
-        return _playersWithList.FirstOrDefault(p => p.ArmyIdCurrentSeason == player.Id);
+        return _players.FirstOrDefault(p => p.ArmyIdCurrentSeason == player.Id);
     }
 
     private async void MakePromotionsAndDemotionsOver()
