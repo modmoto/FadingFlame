@@ -552,7 +552,14 @@
     else
     {
       var leagueOfMatch = _playerLeagues.FirstOrDefault(l => l.GameDays.SelectMany(p => p.MatchupIds).Contains(match.Id));
-      _navigation.NavigateTo($"match/{match.Id}?leagueId={leagueOfMatch?.Id}");
+      if (leagueOfMatch == null)
+      {
+        _navigation.NavigateTo($"match/{match.Id}?leagueId={leagueOfMatch?.Id}");
+      }
+      else
+      {
+        _navigation.NavigateTo($"match/{match.Id}?leagueId={leagueOfMatch?.Id}");
+      }
     }
   }
 
