@@ -21,6 +21,7 @@ namespace FadingFlame.Players
         public Mmr Mmr  { get; set; }
         public bool SubmittedLists => ArmyCurrentSeason != null;
         public Location Location { get; set; }
+        public bool SubmitedListsNextSeason => ArmyNextSeason != null;
 
         public static Player Create(string name, string accountMail)
         {

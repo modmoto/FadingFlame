@@ -8,8 +8,15 @@
 <div>
     <h1>Welcome to the Fading Flame League!</h1>
     <hr class="my-4">
-    <p class="lead">The next season starts on @_seasonState.CurrentSeason.StartDate.ToMyDate() and list submission will end on the @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()!</p>
-    <hr class="my-4">
+    @if (_seasonState.NextSeason.IsPubliclyVisible)
+    {
+        <p class="lead">The next season starts on @_seasonState.NextSeason.StartDate.ToMyDate() and list submission will end on the @_seasonState.NextSeason.ListSubmissionDeadline.ToMyDate()!</p>
+    }
+    else
+    {
+        <p class="lead">The next season starts on @_seasonState.CurrentSeason.StartDate.ToMyDate() and list submission will end on the @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()!</p>
+    }
+    <hr class="my-4">    
 </div>
 
 @if (_loading)
@@ -20,10 +27,10 @@
 }
 else
 {
-    @if (!_loggedInUserState.LoadingPlayer && !_loggedInUserState.LoggedInPlayer.SubmittedLists)
+    @if (!_loggedInUserState.LoadingPlayer && !_loggedInUserState.LoggedInPlayer.SubmitedListsNextSeason && _seasonState.NextSeason.IsPubliclyVisible)
     {
         <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
-            You did not submit your lists yet, to participate in the next season make sure to do that in your profile!
+            List submission for next season is open, to participate in the next season make sure to do that in your profile!
         </div>
     }
     <div class="row">
