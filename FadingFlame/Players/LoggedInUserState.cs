@@ -39,7 +39,7 @@ namespace FadingFlame.Players
         public DateTimeOffset? CurrentUserTime { get; private set; }
         public bool LoadingPlayer { get; private set; } = true;
         public string UserName => _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == JwtClaimTypes.GivenName)?.Value;
-        public string AccountEmail => "bartomiej.skwara@gmail.com";
+        public string AccountEmail => _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
 
         public void SetUserTime(DateTimeOffset currentUserTime)
         {
