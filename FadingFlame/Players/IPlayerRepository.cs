@@ -12,7 +12,7 @@ namespace FadingFlame.Players
     {
         Task<List<Player>> LoadAll();
         Task<Player> Load(ObjectId id);
-        Task UpdateWithLists(Player player, int season);
+        Task UpdateWithLists(Player player);
         Task Update(Player player);
         Task Insert(Player player);
         Task<Player> LoadByEmail(string accountEmail);
@@ -52,7 +52,7 @@ namespace FadingFlame.Players
             player.ArmyNextSeason = nextList;
         }
 
-        public async Task UpdateWithLists(Player player, int season)
+        public async Task UpdateWithLists(Player player)
         {
             if (player.ArmyCurrentSeason != null)
             {

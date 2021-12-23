@@ -53,7 +53,7 @@ namespace FadingFlame.Players
         {
             ArmyNextSeason = new Army
             {
-                Id = ArmyIdCurrentSeason,
+                Id = ArmyIdNextSeason,
                 Season = season,
                 List1 = list1,
                 List2 = list2

@@ -31,6 +31,12 @@
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="lists-tab" data-bs-toggle="tab" data-bs-target="#lists" type="button" role="tab" aria-controls="lists" aria-selected="false">Lists</button>
   </li>
+  @if (_isTheRightUser)
+  {
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="lists-next-season-tab" data-bs-toggle="tab" data-bs-target="#lists-next-season" type="button" role="tab" aria-controls="lists" aria-selected="false">Lists next Season</button>
+    </li>  
+  }
 </ul>
 <div class="tab-content" id="myTabContent">
 <div class="tab-pane fade show active pt-4" id="profile" role="tabpanel" aria-labelledby="profile-tab">
@@ -202,9 +208,7 @@
   </table>
 </div>
 <div class="tab-pane fade pt-4" id="lists" role="tabpanel" aria-labelledby="lists-tab">
-  @if (_player.SubmittedLists && _seasonState.CurrentSeason.ListSubmissionIsOver
-       || !_seasonState.CurrentSeason.ListSubmissionIsOver && _isTheRightUser
-       || _isFreshListPossible)
+  @if (_player.SubmittedLists)
   {
     <h4>Lists this season</h4>
     <EditForm EditContext="@_editContextLists">
@@ -215,7 +219,7 @@
           <ValidationMessage For="@(() => _editListModel.List1.List)"/>
           <UserListComponent
             List="@(_editListModel.List1)"
-            IsFreshListPossible="_isFreshListPossible"
+            IsFreshListPossible="false"
             IsCurrentUser="_isTheRightUser"
             OnRequestListChange="RequestListChange1"
             OnDeleteListChange="DeleteListChange1"/>
@@ -225,29 +229,49 @@
           <ValidationMessage For="@(() => _editListModel.List2.List)"/>
           <UserListComponent
             List="@(_editListModel.List2)"
-            IsFreshListPossible="_isFreshListPossible"
+            IsFreshListPossible="false"
             IsCurrentUser="_isTheRightUser"
             OnRequestListChange="RequestListChange2"
             OnDeleteListChange="DeleteListChange2"/>
         </div>
       </div>
-      @if (_isFreshListPossible)
-      {
-        <button disabled="@_loadingLists" class="btn btn-primary" @onclick="OnSubmitList">
-          @if (_loadingLists)
-          {
-            <span class="spinner-border spinner-border-sm mr-1"></span>
-          }
-          Save lists
-        </button>
-      }
 
     </EditForm>
   }
-
-  @if (!_isTheRightUser && _player.SubmittedLists && !_seasonState.CurrentSeason.ListSubmissionIsOver)
+</div>
+<div class="tab-pane fade pt-4" id="lists-next-season" role="tabpanel" aria-labelledby="lists-next-season-tab">
+  @if (!_seasonState.NextSeason.ListSubmissionIsOver && _isTheRightUser)
   {
-    <div>User is participating in the next season, lists will be displayed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate()</div>
+    <h4>Lists next season</h4>
+    <EditForm EditContext="@_editContextListsNextSeason">
+      <DataAnnotationsValidator/>
+      <div class="row align-items-start">
+        <div class="col-xs-12 col-md-12 col-lg-6">
+          <hr class="my-3">
+          <ValidationMessage For="@(() => _editListModelNextSeason.List1.List)"/>
+          <UserListComponent
+            List="@(_editListModelNextSeason.List1)"
+            IsFreshListPossible="true"
+            IsCurrentUser="_isTheRightUser"/>
+        </div>
+        <div class="col-xs-12 col-md-12 col-lg-6">
+          <hr class="my-3">
+          <ValidationMessage For="@(() => _editListModelNextSeason.List2.List)"/>
+          <UserListComponent
+            List="@(_editListModelNextSeason.List2)"
+            IsFreshListPossible="true"
+            IsCurrentUser="_isTheRightUser"/>
+        </div>
+      </div>
+      <button disabled="@_loadingListsNextSeason" class="btn btn-primary" @onclick="OnSubmitListNextSeason">
+        @if (_loadingListsNextSeason)
+        {
+          <span class="spinner-border spinner-border-sm mr-1"></span>
+        }
+        Save lists
+      </button>
+
+    </EditForm>
   }
 </div>
 </div>
@@ -273,6 +297,12 @@
     List1 = new GameListEditModel(),
     List2 = new GameListEditModel()
   };
+  
+  private EditListsModel _editListModelNextSeason = new()
+  {
+    List1 = new GameListEditModel(),
+    List2 = new GameListEditModel()
+  };
 
   private List<League> _playerLeagues = new();
   private List<RegionInfo> _countries = new();
@@ -282,6 +312,7 @@
   private Player _player = new();
   private bool _loading;
   private bool _loadingLists;
+  private bool _loadingListsNextSeason;
 
   [Parameter]
   public string Id { get; set; }
@@ -290,10 +321,11 @@
 
   private ValidationMessageStore _messageStoreUser;
   private ValidationMessageStore _messageStoreLists;
+  private ValidationMessageStore _messageStoreListsNextSeason;
   private EditContext _editContextUser;
   private EditContext _editContextLists;
+  private EditContext _editContextListsNextSeason;
   private bool _isTheRightUser;
-  private bool _isFreshListPossible;
   private bool _loadingChallengingPlayer;
 
   protected override void OnInitialized()
@@ -302,7 +334,9 @@
     _editContextUser = new EditContext(_editUserModel);
     _messageStoreUser = new ValidationMessageStore(_editContextUser);
     _editContextLists = new EditContext(_editListModel);
+    _editContextListsNextSeason = new EditContext(_editListModelNextSeason);
     _messageStoreLists = new ValidationMessageStore(_editContextLists);
+    _messageStoreListsNextSeason = new ValidationMessageStore(_editContextListsNextSeason);
 
     _editContextUser.OnValidationRequested += (_, _) => OnSubmit();
 
@@ -346,10 +380,7 @@
 
         _isTheRightUser = Id == _loggedInUserState.LoggedInPlayer.Id.ToString();
         SetListEditModel();
-
-        var userIsLate = (_editListModel.List1.Name == null || _editListModel.List2.Name == null)
-                         && _seasonState.CurrentSeason.SeasonId == _playerLeagues.FirstOrDefault()?.Season;
-        _isFreshListPossible = _isTheRightUser && (!_seasonState.CurrentSeason.ListSubmissionIsOver || _seasonState.CurrentSeason.ListSubmissionIsOver && userIsLate);
+        SetListNextSeasonEditModel();
 
         StateHasChanged();
       }
@@ -366,6 +397,15 @@
     {
       List1 = ToModel(_player.ArmyCurrentSeason?.List1),
       List2 = ToModel(_player.ArmyCurrentSeason?.List2)
+    };
+  }
+  
+  private void SetListNextSeasonEditModel()
+  {
+    _editListModelNextSeason = new EditListsModel
+    {
+      List1 = ToModel(_player.ArmyNextSeason?.List1),
+      List2 = ToModel(_player.ArmyNextSeason?.List2)
     };
   }
   
@@ -397,19 +437,30 @@
     };
   }
 
+  private async Task OnSubmitListNextSeason()
+  {
+    _loadingListsNextSeason = true;
+    await ValidateListEdit(_messageStoreListsNextSeason, _editListModelNextSeason);
+    
+    if (!_editContextListsNextSeason.Validate())
+    {
+      _loadingListsNextSeason = false;
+      return;
+    }
+    
+    var list1 = GameList.Create(_editListModelNextSeason.List1.Name, _editListModelNextSeason.List1.List, _editListModelNextSeason.List1.Faction);
+    var list2 = GameList.Create(_editListModelNextSeason.List2.Name, _editListModelNextSeason.List2.List, _editListModelNextSeason.List2.Faction);
+
+    _player.SubmitListsNextSeason(list1, list2, _seasonState.CurrentSeason.SeasonId);
+    await _playerRepository.UpdateWithLists(_player);
+    
+    _loadingListsNextSeason = false;
+  }
+  
   private async Task OnSubmitList()
   {
     _loadingLists = true;
-    _messageStoreLists.Clear();
-    if (string.IsNullOrEmpty(_editListModel.List1.Name)) _messageStoreLists.Add(() => _editListModel.List1.Name, Errors.FieldRequired);
-    if (string.IsNullOrEmpty(_editListModel.List2.Name)) _messageStoreLists.Add(() => _editListModel.List2.Name, Errors.FieldRequired);
-    if (string.IsNullOrEmpty(_editListModel.List1.List)) _messageStoreLists.Add(() => _editListModel.List1.List, Errors.FieldRequired);
-    if (string.IsNullOrEmpty(_editListModel.List2.List)) _messageStoreLists.Add(() => _editListModel.List2.List, Errors.FieldRequired);
-    if (_editListModel.List1.Faction == default) _messageStoreLists.Add(() => _editListModel.List1.Faction, Errors.FactionRequired);
-    if (_editListModel.List2.Faction == default) _messageStoreLists.Add(() => _editListModel.List2.Faction, Errors.FactionRequired);
-
-    await AddListErrors(_editListModel.List1.List, FieldIdentifier.Create(() => _editListModel.List1.List));
-    await AddListErrors(_editListModel.List2.List, FieldIdentifier.Create(() => _editListModel.List2.List));
+    await ValidateListEdit(_messageStoreLists, _editListModel);
 
     if (!_editContextLists.Validate())
     {
@@ -426,9 +477,23 @@
     var list1 = GameList.Create(_editListModel.List1.Name, _editListModel.List1.List, _editListModel.List1.Faction);
     var list2 = GameList.Create(_editListModel.List2.Name, _editListModel.List2.List, _editListModel.List2.Faction);
     _player.SubmitListsCurrentSeason(list1, list2, _seasonState.CurrentSeason.SeasonId);
-    await _playerRepository.UpdateWithLists(_player, _seasonState.CurrentSeason.SeasonId);
+    await _playerRepository.UpdateWithLists(_player);
 
     _loadingLists = false;
+  }
+
+  private async Task ValidateListEdit(ValidationMessageStore messageStoreLists, EditListsModel editListModel)
+  {
+    messageStoreLists.Clear();
+    if (string.IsNullOrEmpty(editListModel.List1.Name)) messageStoreLists.Add(() => editListModel.List1.Name, Errors.FieldRequired);
+    if (string.IsNullOrEmpty(editListModel.List2.Name)) messageStoreLists.Add(() => editListModel.List2.Name, Errors.FieldRequired);
+    if (string.IsNullOrEmpty(editListModel.List1.List)) messageStoreLists.Add(() => editListModel.List1.List, Errors.FieldRequired);
+    if (string.IsNullOrEmpty(editListModel.List2.List)) messageStoreLists.Add(() => editListModel.List2.List, Errors.FieldRequired);
+    if (editListModel.List1.Faction == default) messageStoreLists.Add(() => editListModel.List1.Faction, Errors.FactionRequired);
+    if (editListModel.List2.Faction == default) messageStoreLists.Add(() => editListModel.List2.Faction, Errors.FactionRequired);
+
+    await AddListErrors(editListModel.List1.List, FieldIdentifier.Create(() => editListModel.List1.List));
+    await AddListErrors(editListModel.List2.List, FieldIdentifier.Create(() => editListModel.List2.List));
   }
 
   private async Task AddListErrors(string list, FieldIdentifier errorField)
