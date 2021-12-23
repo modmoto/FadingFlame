@@ -270,8 +270,17 @@
         }
         Save lists
       </button>
-
     </EditForm>
+    @if (!string.IsNullOrWhiteSpace(_editListModelNextSeason.List1.List))
+    {
+      <button disabled="@_loadingListsNextSeason" class="btn btn-outline-danger mt-3" @onclick="OnRetractParticipation">
+        @if (_loadingListsNextSeason)
+        {
+          <span class="spinner-border spinner-border-sm mr-1"></span>
+        }
+        Withdraw participation from next season
+      </button>
+    }
   }
 </div>
 </div>
@@ -288,6 +297,7 @@
 @inject IGeoLocationService _geoLocationService
 @inject IListAcceptAndRejectService _acceptAndRejectService
 @inject IListValidationService _listValidationService
+@inject IListRepository _listRepository
 
 @code{
   private EditUserModel _editUserModel = new();
@@ -435,6 +445,22 @@
       ProposedListChange = list?.ProposedListChange,
       Name = list?.Name
     };
+  }
+
+  private async Task OnRetractParticipation()
+  {
+    _loadingListsNextSeason = true;
+
+    await _listRepository.Delete(_player.ArmyIdNextSeason);
+    _player.RetractParticipationNextSeason();
+    await _playerRepository.UpdateWithLists(_player);
+    _editListModelNextSeason = new EditListsModel
+    {
+      List1 = new GameListEditModel(),
+      List2 = new GameListEditModel()
+    };
+    
+    _loadingListsNextSeason = false;
   }
 
   private async Task OnSubmitListNextSeason()

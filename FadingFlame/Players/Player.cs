@@ -80,5 +80,11 @@ namespace FadingFlame.Players
                 RatingDeviation = Mmr.RatingDeviation - mmrDifference.RatingDeviation,
             };
         }
+
+        public void RetractParticipationNextSeason()
+        {
+            ArmyNextSeason = null;
+            ArmyIdNextSeason = default;
+        }
     }
 }

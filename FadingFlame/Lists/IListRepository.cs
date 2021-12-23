@@ -13,6 +13,7 @@ namespace FadingFlame.Lists
         Task Update(Army army);
         Task<List<Army>> LoadWithPendingChanges();
         Task<List<Army>> Load(List<ObjectId> armyIds);
+        Task Delete(ObjectId playerArmyIdNextSeason);
     }
 
     public class ListRepository : MongoDbRepositoryBase, IListRepository
@@ -45,6 +46,11 @@ namespace FadingFlame.Lists
         public Task<List<Army>> Load(List<ObjectId> armyIds)
         {
             return LoadAll<Army>(army => armyIds.Contains(army.Id));
+        }
+
+        public Task Delete(ObjectId playerArmyIdNextSeason)
+        {
+            return Delete<Army>(playerArmyIdNextSeason);
         }
     }
 }
