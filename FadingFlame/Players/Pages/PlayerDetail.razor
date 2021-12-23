@@ -543,7 +543,7 @@
     _loadingChallengingPlayer = false;
   }
 
-  private void NavigateToMatch(Matchup match)
+  private async Task NavigateToMatch(Matchup match)
   {
     if (match.IsChallengeOrPlayoff)
     {
@@ -554,7 +554,9 @@
       var leagueOfMatch = _playerLeagues.FirstOrDefault(l => l.GameDays.SelectMany(p => p.MatchupIds).Contains(match.Id));
       if (leagueOfMatch == null)
       {
-        _navigation.NavigateTo($"match/{match.Id}?leagueId={leagueOfMatch?.Id}");
+        var leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
+        var foreignLeague = leagues.Single(l => l.GameDays.Any(g => g.Matchups.Any(m => m.Id == match.Id)));
+        _navigation.NavigateTo($"match/{match.Id}?leagueId={foreignLeague.Id}");
       }
       else
       {
