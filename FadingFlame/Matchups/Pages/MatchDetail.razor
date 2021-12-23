@@ -669,6 +669,7 @@ else
         else if (_league != null)
         {
             result = await _league.ReportGame(_mmrRepository, model, _player1.Mmr, _player2.Mmr, Player1List, Player2List);
+
             var resultOfSaving = await _leagueRepository.Update(_league);
             if (!resultOfSaving)
             {

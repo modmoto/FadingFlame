@@ -80,18 +80,22 @@ namespace FadingFlame.Leagues
             var player1Result = matchResultDto.Player1;
             var player2Result = matchResultDto.Player2;
 
-            var player1 = Players.Single(p => p.Id == player1Result.Id);
-            var player2 = Players.Single(p => p.Id == player2Result.Id);
 
             var match = GetMatchup(matchResultDto.MatchId);
             
             var result = await MatchResult.Create(mmrRepository, matchResultDto.SecondaryObjective, player1Mmr, player2Mmr, player1Result, player2Result, player1List, player2List, matchResultDto.WasDefLoss);
             match.RecordResult(result);
-            
-            player1.RecordResult(result.Player1.BattlePoints, result.Player1.VictoryPoints);
-            player2.RecordResult(result.Player2.BattlePoints, result.Player2.VictoryPoints);
 
-            ReorderPlayers();
+            if (!match.IsRelegation)
+            {
+                var player1 = Players.Single(p => p.Id == player1Result.Id);
+                var player2 = Players.Single(p => p.Id == player2Result.Id);
+
+                player1.RecordResult(result.Player1.BattlePoints, result.Player1.VictoryPoints);
+                player2.RecordResult(result.Player2.BattlePoints, result.Player2.VictoryPoints);
+
+                ReorderPlayers();
+            }
 
             return result;
         }

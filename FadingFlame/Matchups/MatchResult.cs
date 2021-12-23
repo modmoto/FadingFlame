@@ -147,7 +147,8 @@ namespace FadingFlame.Matchups
             };
         }
 
-        public static async Task<MatchResult> CreateKoResult(IMmrRepository mmrRepository,
+        public static async Task<MatchResult> CreateKoResult(
+            IMmrRepository mmrRepository,
             SecondaryObjectiveState secondaryObjective,
             Mmr player1Mmr,
             Mmr player2Mmr,
