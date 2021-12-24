@@ -111,7 +111,7 @@ else
                     <div class="col form-group">
                         <div>Battle Points: <b>@Player1BattlePoints</b></div>
                         <label>Victory Points @Player1Name (Diff.: @_preResult.VictoryPointsDifference):</label>
-                        <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control my-3" @onfocusout="RecreateTempMatchResult" />
+                        <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control my-3" @onfocusout="RecreateTempMatchResult"/>
                         <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" @onclick="() => Select2ndObjective(1)" checked="@_secondaryObjectivePlayer1">
@@ -163,11 +163,15 @@ else
                             <label>List of @Player1Name : </label>
                             @if (_userState.UserIsAdmin && !_matchup.PlayersSelectedList)
                             {
-                                <div><b>List hidden for admins aswell ;)</b></div>
+                                <div>
+                                    <b>List hidden for admins aswell ;)</b>
+                                </div>
                             }
                             else
                             {
-                                <div><b>@_matchup.Player1List</b></div>
+                                <div>
+                                    <b>@_matchup.Player1List</b>
+                                </div>
                             }
                         </div>
                     </div>
@@ -176,11 +180,15 @@ else
                             <label>List of @Player2Name : </label>
                             @if (_userState.UserIsAdmin && !_matchup.PlayersSelectedList)
                             {
-                                <div><b>List hidden for admins aswell ;)</b></div>
+                                <div>
+                                    <b>List hidden for admins aswell ;)</b>
+                                </div>
                             }
                             else
                             {
-                                <div><b>@_matchup.Player2List</b></div>
+                                <div>
+                                    <b>@_matchup.Player2List</b>
+                                </div>
                             }
                         </div>
                     </div>
@@ -335,7 +343,9 @@ else
             <div class="col">
                 <div class="form-group">
                     <div>List: @(Player1List?.Name ?? _matchup.Player1List)</div>
-                    <div><b>@(Player1List?.Faction.ToCamelCaseString())</b></div>
+                    <div>
+                        <b>@(Player1List?.Faction.ToCamelCaseString())</b>
+                    </div>
                 </div>
                 <hr class="my-3">
                 <div class="form-group">
@@ -345,7 +355,9 @@ else
             <div class="col">
                 <div class="form-group">
                     <div>List: @(Player2List?.Name ?? _matchup.Player2List)</div>
-                    <div><b>@(Player2List?.Faction.ToCamelCaseString())</b></div>
+                    <div>
+                        <b>@(Player2List?.Faction.ToCamelCaseString())</b>
+                    </div>
                 </div>
                 <hr class="my-3">
                 <div class="form-group">
@@ -395,7 +407,7 @@ else
                 <span class="oi oi-shield me-2" aria-hidden="true"></span>Set game to 0 : 0
             </button>
         }
-        
+
         <div class="row mt-3">
             <div class="col">
                 <button disabled="@_settingDefWin" class="col btn btn-danger" @onclick="() => SetDefLoss(_player1.Id)">
@@ -429,8 +441,10 @@ else
 @inject IMmrRepository _mmrRepository
 
 @code {
+
     [Parameter]
     public string MatchId { get; set; }
+
     private MatchResultDto _model = new();
     private League _league;
     private Matchup _matchup;
@@ -457,9 +471,10 @@ else
     private GameListEditModel _listEditModelPlayer1 = new();
     private GameListEditModel _listEditModelPlayer2 = new();
     private bool Player1LoggedIn => _model.Player1.Id == _userState.LoggedInPlayer.Id;
-    private bool Player2LoggedIn =>_model.Player2?.Id == _userState.LoggedInPlayer.Id;
+    private bool Player2LoggedIn => _model.Player2?.Id == _userState.LoggedInPlayer.Id;
     private bool CanEditMatch => Player1LoggedIn || Player2LoggedIn;
     private bool MatchWasRecordedLessThanADayAgo => _matchup.Result == null || DateTime.UtcNow.AddDays(-1) < _matchup.Result.RecordedAt;
+
     private GameList Player1List
     {
         get
@@ -501,7 +516,7 @@ else
                 var league = await _leagueRepository.Load(realLeagueId);
                 var match = league.GameDays
                     .SelectMany(g => g.Matchups)
-                    .SingleOrDefault(m => m.Id.ToString() ==  MatchId);
+                    .SingleOrDefault(m => m.Id.ToString() == MatchId);
                 if (match == null)
                 {
                     var matchup = await _matchupRepository.LoadMatch(new ObjectId(MatchId));
@@ -523,7 +538,7 @@ else
                 _navigation.NavigateTo("notfound");
             }
         }
-        else if(QueryHelpers.ParseQuery(uri.Query).TryGetValue("playoffSeason", out var playoffSeason))
+        else if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("playoffSeason", out var playoffSeason))
         {
             var playoff = await _playoffRepository.LoadForSeason(Int32.Parse(playoffSeason));
             _playoff = playoff;
@@ -539,7 +554,6 @@ else
         _loading = false;
         StateHasChanged();
     }
-
 
 
     private async Task ResetZeroToZero()
@@ -567,7 +581,7 @@ else
         }
         _loading = false;
     }
-    
+
     private async Task ExtractMatch(Matchup match)
     {
         if (match == null)
@@ -585,14 +599,14 @@ else
         _model.Player1.VictoryPoints = match.Result?.Player1.VictoryPoints ?? 0;
         _model.Player2.Id = match.Player2;
         _model.Player2.VictoryPoints = match.Result?.Player2.VictoryPoints ?? 0;
-        _secondaryObjectivePlayer1 = match.Result?.SecondaryObjective == SecondaryObjectiveState.player1; 
-        _secondaryObjectivePlayer2 = match.Result?.SecondaryObjective == SecondaryObjectiveState.player2; 
+        _secondaryObjectivePlayer1 = match.Result?.SecondaryObjective == SecondaryObjectiveState.player1;
+        _secondaryObjectivePlayer2 = match.Result?.SecondaryObjective == SecondaryObjectiveState.player2;
         _model.MatchId = match.Id;
-        
-        
+
+
         _listEditModelPlayer1 = ExtractListModel(match.ChallengePlayer1List);
         _listEditModelPlayer2 = ExtractListModel(match.ChallengePlayer2List);
-        
+
         if (Player1LoggedIn)
         {
             _listsOfLoggedInPlayer = _player1.ArmyCurrentSeason;
@@ -694,7 +708,7 @@ else
         _player2.UpdateMmr(result.Player2.NewMmr);
 
         await _playerRepository.Update(_player1);
-        await _playerRepository.Update(_player2);    
+        await _playerRepository.Update(_player2);
     }
 
     private SecondaryObjectiveState ConvertToEnum()
@@ -703,7 +717,7 @@ else
         {
             return SecondaryObjectiveState.draw;
         }
-        
+
         return _secondaryObjectivePlayer1 ? SecondaryObjectiveState.player1 : SecondaryObjectiveState.player2;
     }
 
@@ -731,7 +745,7 @@ else
                 return;
             }
         }
-        
+
         if (_league != null)
         {
             var resultOfSaving = await _leagueRepository.Update(_league);
@@ -742,7 +756,7 @@ else
                 return;
             }
         }
-        
+
         _selectingList = false;
     }
 
@@ -768,7 +782,7 @@ else
             _secondaryObjectivePlayer1 = !_secondaryObjectivePlayer1;
             _secondaryObjectivePlayer2 = false;
         }
-        
+
         if (player == 2)
         {
             _secondaryObjectivePlayer2 = !_secondaryObjectivePlayer2;
@@ -842,7 +856,7 @@ else
                     await OnInitializedAsync();
                 }
             }
-        
+
             if (Player2LoggedIn)
             {
                 var gameList = GameList.Create(_listEditModelPlayer2.Name, _listEditModelPlayer2.List, _listEditModelPlayer2.Faction);
@@ -871,7 +885,7 @@ else
                 var match = _playoff.Rounds.SelectMany(r => r.Matchups).Single(m => m.Id == _matchup.Id);
                 match.ChallengePlayer2List = gameList;
             }
-            
+
             var resultOfSaving = await _playoffRepository.Update(_playoff);
             if (!resultOfSaving)
             {
@@ -879,7 +893,7 @@ else
                 await OnInitializedAsync();
             }
         }
-        
+
         _loadingChallengeListEdit = false;
     }
 
@@ -890,4 +904,5 @@ else
         _navigation.NavigateTo($"/player/{_userState.LoggedInPlayer.Id}");
         _deletingChallenge = false;
     }
+
 }
