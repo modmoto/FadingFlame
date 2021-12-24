@@ -321,7 +321,6 @@
 
   private Player _player = new();
   private bool _loading;
-  private bool _loadingLists;
   private bool _loadingListsNextSeason;
 
   [Parameter]
@@ -473,6 +472,12 @@
       _loadingListsNextSeason = false;
       return;
     }
+
+    if (_editListModel.List1.Name == _editListModel.List2.Name)
+    {
+      _editListModel.List1.Name += "_1";
+      _editListModel.List2.Name += "_2";
+    }
     
     var list1 = GameList.Create(_editListModelNextSeason.List1.Name, _editListModelNextSeason.List1.List, _editListModelNextSeason.List1.Faction);
     var list2 = GameList.Create(_editListModelNextSeason.List2.Name, _editListModelNextSeason.List2.List, _editListModelNextSeason.List2.Faction);
@@ -483,31 +488,6 @@
     _loadingListsNextSeason = false;
   }
   
-  private async Task OnSubmitList()
-  {
-    _loadingLists = true;
-    await ValidateListEdit(_messageStoreLists, _editListModel);
-
-    if (!_editContextLists.Validate())
-    {
-      _loadingLists = false;
-      return;
-    }
-
-    if (_editListModel.List1.Name == _editListModel.List2.Name)
-    {
-      _editListModel.List1.Name += "_1";
-      _editListModel.List2.Name += "_2";
-    }
-
-    var list1 = GameList.Create(_editListModel.List1.Name, _editListModel.List1.List, _editListModel.List1.Faction);
-    var list2 = GameList.Create(_editListModel.List2.Name, _editListModel.List2.List, _editListModel.List2.Faction);
-    _player.SubmitListsCurrentSeason(list1, list2, _seasonState.CurrentSeason.SeasonId);
-    await _playerRepository.UpdateWithLists(_player);
-
-    _loadingLists = false;
-  }
-
   private async Task ValidateListEdit(ValidationMessageStore messageStoreLists, EditListsModel editListModel)
   {
     messageStoreLists.Clear();
