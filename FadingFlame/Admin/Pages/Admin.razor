@@ -329,7 +329,7 @@
     protected override async Task OnInitializedAsync()
     {
         _players = await _playerRepository.LoadAll();
-        _playersEnrolledInNextSeason = await _playerRepository.PlayersThatEnlistedInNextSeason();
+        _playersEnrolledInNextSeason = await _playerRepository.PlayersThatEnrolledInNextSeason();
         _pendingListChanges = await _listRepository.LoadWithPendingChanges();
         var seasons = await _seasonRepository.LoadSeasons();
         _leaguesNextSeason = await _leagueRepository.LoadForSeason(seasons[0].SeasonId);
@@ -366,12 +366,7 @@
     private async Task CreateNextSeason()
     {
         _loadingEndingSeason = true;
-
-        _seasonState.AppendSeason(new Season
-        {
-            SeasonId = _seasonState.NextSeason.SeasonId + 1
-        });
-
+        _seasonState.AppendSeason(Season.Create(_seasonState.NextSeason.SeasonId + 1));
         await _seasonRepository.Update(_seasonState.NextSeason);
         _loadingEndingSeason = false;
     }

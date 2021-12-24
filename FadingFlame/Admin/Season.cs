@@ -5,6 +5,14 @@ namespace FadingFlame.Admin
 {
     public class Season
     {
+        public static Season Create(int seasonId)
+        {
+            return new Season
+            {
+                SeasonId = seasonId
+            };
+        }
+
         [BsonId]
         public int SeasonId { get; set; }
         public bool IsPubliclyVisible { get; set; }

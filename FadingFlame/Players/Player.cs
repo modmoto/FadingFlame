@@ -87,5 +87,13 @@ namespace FadingFlame.Players
             ArmyNextSeason = null;
             ArmyIdNextSeason = default;
         }
+
+        public void Enroll()
+        {
+            ArmyCurrentSeason = ArmyNextSeason;
+            ArmyIdCurrentSeason = ArmyIdNextSeason;
+            ArmyNextSeason = default;
+            ArmyIdNextSeason = default;
+        }
     }
 }

@@ -40,6 +40,7 @@ namespace FadingFlameTests
             await CreateDefaultLeaguesAndPlayers(20);
             await leagueCreationService.CreateRelegations();
             var leaguesForSeason = await _leagueRepository.LoadForSeason(_currentSeason);
+            var seasons = await _seasonRepository.LoadSeasons();
 
             foreach (var league in leaguesForSeason.Take(leaguesForSeason.Count - 2))
             {
@@ -48,6 +49,8 @@ namespace FadingFlameTests
 
             Assert.IsEmpty(leaguesForSeason[^1].RelegationMatches);
             Assert.IsEmpty(leaguesForSeason[^2].RelegationMatches);
+            Assert.AreEqual(3, seasons.Count);
+            Assert.AreEqual(3, seasons.Last().SeasonId);
         }
 
         [Test]

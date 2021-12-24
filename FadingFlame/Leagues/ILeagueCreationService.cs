@@ -40,7 +40,7 @@ namespace FadingFlame.Leagues
             var nextSeason = seasons[0];
             var currentSeason = seasons[1];
             await _leagueRepository.DeleteForSeason(nextSeason.SeasonId);
-            var playersEnrolled = await _playerRepository.PlayersThatEnlistedInNextSeason();
+            var enrolledPlayers = await _playerRepository.PlayersThatEnrolledInNextSeason();
 
             var currentLeagues = await _leagueRepository.LoadForSeason(currentSeason.SeasonId);
 
@@ -65,56 +65,56 @@ namespace FadingFlame.Leagues
                     var isUneven = currentLeagues.Count % 2 != 0;
                     if (isUneven && oneLeagueDownA != null && currentLeagueB != null)
                     {
-                        AddIfEnrolled(newPlayerRanks, playersEnrolled, oneLeagueDownA.Players[1].Id);
-                        AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.Players[2].Id);
+                        AddIfEnrolled(newPlayerRanks, enrolledPlayers, oneLeagueDownA.Players[1].Id);
+                        AddIfEnrolled(newPlayerRanks, enrolledPlayers, currentLeagueB.Players[2].Id);
                     }
-                    LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 3);
+                    LeavePlayerInLeague(newPlayerRanks, enrolledPlayers, currentLeagueA, currentLeagueB, 3);
                 }
-                    
+
                 if (division == divisionsTemp.Count - 1)
                 {
-                    LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 3);
-                    LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 4);
-                    LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 5);
+                    LeavePlayerInLeague(newPlayerRanks, enrolledPlayers, currentLeagueA, currentLeagueB, 3);
+                    LeavePlayerInLeague(newPlayerRanks, enrolledPlayers, currentLeagueA, currentLeagueB, 4);
+                    LeavePlayerInLeague(newPlayerRanks, enrolledPlayers, currentLeagueA, currentLeagueB, 5);
                 }
-                
-                LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 2);
+
+                LeavePlayerInLeague(newPlayerRanks, enrolledPlayers, currentLeagueA, currentLeagueB, 2);
 
                 if (oneLeagueDownB == null && oneLeagueDownA == null)
                 {
                     break;
                 }
-                
+
                 if (division == 0)
                 {
                     var newPlayerRanksOneLeaguDown = divisionsTemp[1];
-                    
-                    LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 0);
-                    LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 1);
-                    LeavePlayerInLeague(newPlayerRanks, playersEnrolled, currentLeagueA, currentLeagueB, 3);
 
-                    MoveFirstPlayerOfOneDownUp(newPlayerRanks, playersEnrolled, oneLeagueDownA, oneLeagueDownB);
-                    MoveLastPlayerDown(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueA, currentLeagueB);
+                    LeavePlayerInLeague(newPlayerRanks, enrolledPlayers, currentLeagueA, currentLeagueB, 0);
+                    LeavePlayerInLeague(newPlayerRanks, enrolledPlayers, currentLeagueA, currentLeagueB, 1);
+                    LeavePlayerInLeague(newPlayerRanks, enrolledPlayers, currentLeagueA, currentLeagueB, 3);
 
-                    SwitchRelegationsOneLeagueDown(newPlayerRanks, playersEnrolled, newPlayerRanksOneLeaguDown, currentLeagueA, currentLeagueB);
+                    MoveFirstPlayerOfOneDownUp(newPlayerRanks, enrolledPlayers, oneLeagueDownA, oneLeagueDownB);
+                    MoveLastPlayerDown(newPlayerRanksOneLeaguDown, enrolledPlayers, currentLeagueA, currentLeagueB);
+
+                    SwitchRelegationsOneLeagueDown(newPlayerRanks, enrolledPlayers, newPlayerRanksOneLeaguDown, currentLeagueA, currentLeagueB);
                 }
-                
+
                 if (division >= 1)
                 {
                     var newPlayerRanksOneLeagueDown = divisionsTemp[division + 1];
 
                     if (division == 1)
                     {
-                        MoveFirstPlayerOfOneDownUp(newPlayerRanks, playersEnrolled, oneLeagueDownA, oneLeagueDownB);
+                        MoveFirstPlayerOfOneDownUp(newPlayerRanks, enrolledPlayers, oneLeagueDownA, oneLeagueDownB);
                     }
-                    
-                    SwitchRelegationsOneLeagueDown(newPlayerRanks, playersEnrolled, newPlayerRanksOneLeagueDown, currentLeagueA, currentLeagueB);
+
+                    SwitchRelegationsOneLeagueDown(newPlayerRanks, enrolledPlayers, newPlayerRanksOneLeagueDown, currentLeagueA, currentLeagueB);
                     if (newPlayerRanksOneLeagueDown != null)
                     {
-                        SwitchRelegationsTwoLeagueasdDown(newPlayerRanks, playersEnrolled, newPlayerRanksOneLeagueDown, currentLeagueA, currentLeagueB);    
+                        SwitchRelegationsTwoLeagueasdDown(newPlayerRanks, enrolledPlayers, newPlayerRanksOneLeagueDown, currentLeagueA, currentLeagueB);
                     }
-                    
-                    MoveLastPlayerDown(newPlayerRanksOneLeagueDown, playersEnrolled, currentLeagueA, currentLeagueB);
+
+                    MoveLastPlayerDown(newPlayerRanksOneLeagueDown, enrolledPlayers, currentLeagueA, currentLeagueB);
                 }
             }
 
@@ -147,6 +147,23 @@ namespace FadingFlame.Leagues
 
             await _leagueRepository.Insert(newLeagues);
             await SetDeploymentsForNextSeason();
+            await MakeSeasonOfficial(nextSeason);
+            await MoveListsOfPlayers(enrolledPlayers);
+        }
+
+        private async Task MakeSeasonOfficial(Season nextSeason)
+        {
+            var newNextSeason = Season.Create(nextSeason.SeasonId + 1);
+            await _seasonRepository.Update(newNextSeason);
+        }
+
+        private async Task MoveListsOfPlayers(List<Player> enlistedPlayers)
+        {
+            foreach (var player in enlistedPlayers)
+            {
+                player.Enroll();
+                await _playerRepository.Update(player);
+            }
         }
 
         private void MoveFirstPlayerOfOneDownUp(List<Player> newPlayerRanks, List<Player> playersEnrolled, League oneLeagueDownA, League oneLeagueDownB)
