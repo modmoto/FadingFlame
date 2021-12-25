@@ -103,7 +103,7 @@ namespace FadingFlameTests
 
             var seasons = await _seasonRepository.LoadSeasons();
             Assert.AreEqual(3, seasons.Count);
-            Assert.AreEqual(3, seasons.Last().SeasonId);
+            Assert.AreEqual(2, seasons.First().SeasonId);
         }
 
         private async Task FinishRelegations()
