@@ -67,7 +67,7 @@
   @if (_player.SubmitedListsNextSeason)
   {
     <div class="pb-3">
-      Player is participating in next season!
+      @(_isTheRightUser ? "You are" : "Player is") participating in next season!
     </div>
   }
 
