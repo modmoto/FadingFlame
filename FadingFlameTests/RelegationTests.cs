@@ -7,6 +7,7 @@ using FadingFlame.Leagues;
 using FadingFlame.Lists;
 using FadingFlame.Matchups;
 using FadingFlame.Players;
+using MongoDB.Bson;
 using NUnit.Framework;
 
 namespace FadingFlameTests
@@ -100,10 +101,16 @@ namespace FadingFlameTests
                 }
             }
 
-
             var seasons = await _seasonRepository.LoadSeasons();
             Assert.AreEqual(3, seasons.Count);
             Assert.AreEqual(2, seasons.First().SeasonId);
+
+            var loadAll = await _playerRepository.LoadAll();
+            foreach (var player in loadAll)
+            {
+                Assert.AreEqual(ObjectId.Empty, player.ArmyIdNextSeason);
+                Assert.AreNotEqual(ObjectId.Empty, player.ArmyIdCurrentSeason);
+            }
         }
 
         private async Task FinishRelegations()

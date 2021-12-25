@@ -19,6 +19,7 @@ namespace FadingFlame.Players
         Task<List<Player>> PlayersThatEnrolledInNextSeason();
         Task<List<Player>> LoadForLeague(List<ObjectId> playerIds, int season);
         Task<List<Player>> PlayersWithListInCurrentSeason();
+        Task Update(List<Player> enlistedPlayers);
     }
 
     public class PlayerRepository : MongoDbRepositoryBase, IPlayerRepository
@@ -130,6 +131,11 @@ namespace FadingFlame.Players
             var players = await LoadAll<Player>(p => p.ArmyIdCurrentSeason != default);
             await AddArmies(players);
             return players;
+        }
+
+        public Task Update(List<Player> enlistedPlayers)
+        {
+            return UpsertMany(enlistedPlayers);
         }
     }
 }

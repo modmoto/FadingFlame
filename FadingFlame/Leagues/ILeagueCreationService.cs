@@ -162,8 +162,9 @@ namespace FadingFlame.Leagues
             foreach (var player in enlistedPlayers)
             {
                 player.Enroll();
-                await _playerRepository.Update(player);
             }
+
+            await _playerRepository.Update(enlistedPlayers);
         }
 
         private void MoveFirstPlayerOfOneDownUp(List<Player> newPlayerRanks, List<Player> playersEnrolled, League oneLeagueDownA, League oneLeagueDownB)
