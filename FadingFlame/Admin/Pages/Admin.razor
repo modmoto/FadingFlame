@@ -124,23 +124,15 @@
                             {
                                 <span>Relegation matches not created</span>
                             }
+                            else if (_unfinishedRelegations.Any())
+                            {
+                                <span>Relegation matches not finished</span>
+                            }
                             else
                             {
-                                <span>Make promotions and demotions</span>    
+                                <span>Make promotions and demotions</span>
                             }
                         </button>
-                        @if (_unfinishedRelegations.Any())
-                        {
-                            <div>
-                                <b>Those relegation matches are unfinished (@_unfinishedRelegations.Count):</b>    
-                            </div>
-                            @foreach (var relegation in _unfinishedRelegations)
-                            {
-                                <div class="row m-2 cursor" @onclick="() => NavigateToMatch(relegation)">
-                                    @relegation.Id
-                                </div>
-                            }
-                        }
                     </div>
                     <div class="m-2 col">
                         <button disabled="@_loadingRelegationMatches" type="button" class="btn btn-primary" @onclick="CreateRelegatonMatches">
