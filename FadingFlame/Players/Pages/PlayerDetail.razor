@@ -31,7 +31,7 @@
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="lists-tab" data-bs-toggle="tab" data-bs-target="#lists" type="button" role="tab" aria-controls="lists" aria-selected="false">Lists</button>
   </li>
-  @if (_isTheRightUser)
+  @if (_isTheRightUser && !_seasonState.NextSeason.ListSubmissionIsOver)
   {
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="lists-next-season-tab" data-bs-toggle="tab" data-bs-target="#lists-next-season" type="button" role="tab" aria-controls="lists" aria-selected="false">Lists next Season</button>
@@ -63,6 +63,14 @@
       }
     </div>
   }
+
+  @if (_player.SubmitedListsNextSeason)
+  {
+    <div class="pb-3">
+      Player is participating in next season!
+    </div>
+  }
+
   @if (UserParticipatesInCurrentSeason)
   {
     <div class="pt-3 pb-3 alert alert-success" role="alert" style="max-width: 25rem">
@@ -243,6 +251,7 @@
   @if (!_seasonState.NextSeason.ListSubmissionIsOver && _isTheRightUser)
   {
     <h4>Lists next season</h4>
+    <div>Lists can be changed until the @_seasonState.NextSeason.ListSubmissionDeadline.ToMyDate() and are not visible to other players</div>
     <EditForm EditContext="@_editContextListsNextSeason">
       <DataAnnotationsValidator/>
       <div class="row align-items-start">
