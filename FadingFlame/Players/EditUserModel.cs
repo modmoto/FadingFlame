@@ -12,6 +12,7 @@ namespace FadingFlame.Players
     
     public class EditListsModel
     {
+        public int? SelfAssessment { get; set; }
         public GameListEditModel List1 { get; set; }
         public GameListEditModel List2 { get; set; }
     }

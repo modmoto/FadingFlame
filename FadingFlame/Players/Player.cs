@@ -22,6 +22,7 @@ namespace FadingFlame.Players
         public bool SubmittedLists => ArmyIdCurrentSeason != default;
         public Location Location { get; set; }
         public bool SubmitedListsNextSeason => ArmyIdNextSeason != default;
+        public int? SelfAssessment { get; set; }
 
         public static Player Create(string name, string accountMail)
         {
@@ -39,19 +40,12 @@ namespace FadingFlame.Players
             Mmr = mmr;
         }
 
-        public void SubmitListsCurrentSeason(GameList list1, GameList list2, int season)
+        public void SubmitListsNextSeason(GameList list1, GameList list2, int season, int? selfAssessment)
         {
-            ArmyCurrentSeason = new Army
+            if (selfAssessment != null)
             {
-                Id = ArmyIdCurrentSeason,
-                Season = season,
-                List1 = list1,
-                List2 = list2
-            };
-        }
-        
-        public void SubmitListsNextSeason(GameList list1, GameList list2, int season)
-        {
+                SelfAssessment = selfAssessment;
+            }
             ArmyNextSeason = new Army
             {
                 Id = ArmyIdNextSeason,

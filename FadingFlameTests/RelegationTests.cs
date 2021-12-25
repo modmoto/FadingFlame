@@ -149,7 +149,7 @@ namespace FadingFlameTests
                 {
                     var player = Player.Create($"layer{i}_{j}", $"test{i}_{j}@lol.de");
                     await _playerRepository.Insert(player);
-                    player.SubmitListsNextSeason(GameList.DeffLoss(), GameList.DeffLoss(), _nextSeason);
+                    player.SubmitListsNextSeason(GameList.DeffLoss(), GameList.DeffLoss(), _nextSeason, 4);
                     await _playerRepository.UpdateWithLists(player);
                     league.AddPlayer(player);
                 }
