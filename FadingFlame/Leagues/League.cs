@@ -195,13 +195,17 @@ namespace FadingFlame.Leagues
         {
             var match = GetMatchup(matchId);
 
-            var player1 = Players.First(p => p.Id == match.Player1);
-            var player2 = Players.First(p => p.Id == match.Player2);
+            if (!match.IsRelegation)
+            {
+                var player1 = Players.First(p => p.Id == match.Player1);
+                var player2 = Players.First(p => p.Id == match.Player2);
 
-            player1.DeleteResult(match.Result.Player1.BattlePoints, match.Result.Player1.VictoryPoints);
-            player2.DeleteResult(match.Result.Player2.BattlePoints, match.Result.Player2.VictoryPoints);
+                player1.DeleteResult(match.Result.Player1.BattlePoints, match.Result.Player1.VictoryPoints);
+                player2.DeleteResult(match.Result.Player2.BattlePoints, match.Result.Player2.VictoryPoints);
 
-            ReorderPlayers();
+                ReorderPlayers();
+            }
+
             return match;
         }
 
@@ -228,14 +232,17 @@ namespace FadingFlame.Leagues
         {
             var match = GetMatchup(matchId);
             match.SetZeroToZero();
-            
-            var player1 = Players.First(p => p.Id == match.Player1);
-            var player2 = Players.First(p => p.Id == match.Player2);
 
-            player1.RecordResult(match.Result.Player1.BattlePoints, match.Result.Player1.VictoryPoints);
-            player2.RecordResult(match.Result.Player2.BattlePoints, match.Result.Player2.VictoryPoints);
-            
-            ReorderPlayers();
+            if (!match.IsRelegation)
+            {
+                var player1 = Players.First(p => p.Id == match.Player1);
+                var player2 = Players.First(p => p.Id == match.Player2);
+
+                player1.RecordResult(match.Result.Player1.BattlePoints, match.Result.Player1.VictoryPoints);
+                player2.RecordResult(match.Result.Player2.BattlePoints, match.Result.Player2.VictoryPoints);
+
+                ReorderPlayers();
+            }
         }
 
         public void CreateRelegations(League oneLeagueBelow, League twoLeagueBelow, bool isUneven)
