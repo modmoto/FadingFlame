@@ -644,25 +644,22 @@
 
   private async Task NavigateToMatch(Matchup match)
   {
-    if (match.IsChallengeOrPlayoff)
+    if (match.IsChallenge)
     {
       _navigation.NavigateTo($"match/{match.Id}");
+    }
+    else if (match.IsPlayoff)
+    {
+      _navigation.NavigateTo($"match/{match.Id}?playoffSeason={_seasonState.CurrentSeason.SeasonId}");
     }
     else
     {
       var leagueOfMatch = _playerLeagues.FirstOrDefault(l => l.GameDays.SelectMany(p => p.MatchupIds).Contains(match.Id));
       if (leagueOfMatch == null)
       {
-        if (match.IsPlayoff)
-        {
-          _navigation.NavigateTo($"match/{match.Id}?playoffSeason={_seasonState.CurrentSeason.SeasonId}");
-        }
-        else
-        {
-          var leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
-          var foreignLeague = leagues.Single(l => l.GameDays.Any(g => g.Matchups.Any(m => m.Id == match.Id)));
-          _navigation.NavigateTo($"match/{match.Id}?leagueId={foreignLeague.Id}");
-        }
+        var leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
+        var foreignLeague = leagues.Single(l => l.GameDays.Any(g => g.Matchups.Any(m => m.Id == match.Id)));
+        _navigation.NavigateTo($"match/{match.Id}?leagueId={foreignLeague.Id}");
       }
       else
       {
