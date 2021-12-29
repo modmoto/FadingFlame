@@ -45,6 +45,8 @@ namespace FadingFlame.Playoffs
         public async Task<Playoff> LoadForSeason(int season)
         {
             var playoff = await LoadFirst<Playoff>(l => l.Season == season);
+            if (playoff == null) return null;
+
             var matchIds = playoff.Rounds.SelectMany(g => g.MatchupIds).ToList();
             var matches = await _matchupRepository.LoadMatches(matchIds.ToList());
             if (matches.Count == 0) return playoff;
@@ -61,6 +63,7 @@ namespace FadingFlame.Playoffs
         public async Task Delete(int season)
         {
             var playoff = await LoadForSeason(season);
+            if (playoff == null) return;
             var matchups = playoff.Rounds.SelectMany(g => g.Matchups).Select(m => m.Id).ToList();
             await _matchupRepository.DeleteMatches(matchups);
             await base.Delete<Playoff>(p => p.Season == season);
