@@ -1,5 +1,6 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using FadingFlame.Admin;
 using FadingFlame.Discord;
 using FadingFlame.GlobalLadder;
@@ -119,6 +120,20 @@ namespace FadingFlame
             services.AddScoped<SeasonState>();
             services.AddHttpContextAccessor();
             services.AddReadModelService<PlayerRankingModelReadHandler>();
+
+            // var buildServiceProvider = services.BuildServiceProvider();
+            // var matchupRepository = buildServiceProvider.GetService<IMatchupRepository>();
+            // var playoffRepo = buildServiceProvider.GetService<IPlayoffRepository>();
+            //
+            // var playoff = playoffRepo.LoadForSeason(2).Result;
+            // var matchups = playoff.Rounds.SelectMany(r => r.Matchups).ToList();
+            // matchupRepository.InsertMatches(matchups).Wait();
+            // foreach (var playoffRound in playoff.Rounds)
+            // {
+            //     playoffRound.MatchupIds = playoffRound.Matchups.Select(m => m.Id).ToList();
+            //     playoffRound.Matchups = null;
+            // }
+            // playoffRepo.Update(playoff).Wait();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

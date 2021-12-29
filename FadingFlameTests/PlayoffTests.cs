@@ -25,7 +25,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient), new SeasonState(), TestUtils.MmrRepositoryMock());
+                new PlayoffRepository(MongoClient, new MatchupRepository(MongoClient)), new SeasonState(), TestUtils.MmrRepositoryMock());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
 
@@ -42,7 +42,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient), new SeasonState(), TestUtils.MmrRepositoryMock());
+                new PlayoffRepository(MongoClient, new MatchupRepository(MongoClient)), new SeasonState(), TestUtils.MmrRepositoryMock());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
 
@@ -60,7 +60,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient), new SeasonState(), TestUtils.MmrRepositoryMock());
+                new PlayoffRepository(MongoClient, new MatchupRepository(MongoClient)), new SeasonState(), TestUtils.MmrRepositoryMock());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
 
@@ -78,7 +78,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient), new SeasonState(), TestUtils.MmrRepositoryMock());
+                new PlayoffRepository(MongoClient, new MatchupRepository(MongoClient)), new SeasonState(), TestUtils.MmrRepositoryMock());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
 
@@ -94,7 +94,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient), new SeasonState(), TestUtils.MmrRepositoryMock());
+                new PlayoffRepository(MongoClient, new MatchupRepository(MongoClient)), new SeasonState(), TestUtils.MmrRepositoryMock());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
 
@@ -111,7 +111,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient), new SeasonState(), TestUtils.MmrRepositoryMock());
+                new PlayoffRepository(MongoClient, new MatchupRepository(MongoClient)), new SeasonState(), TestUtils.MmrRepositoryMock());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
 
@@ -166,7 +166,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient), new SeasonState(), TestUtils.MmrRepositoryMock());
+                new PlayoffRepository(MongoClient, new MatchupRepository(MongoClient)), new SeasonState(), TestUtils.MmrRepositoryMock());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
             
@@ -193,7 +193,7 @@ namespace FadingFlameTests
 
             var playoffCommandHandler = new PlayoffCommandHandler(
                 leagueRepository.Object,
-                new PlayoffRepository(MongoClient), new SeasonState(), TestUtils.MmrRepositoryMock());
+                new PlayoffRepository(MongoClient, new MatchupRepository(MongoClient)), new SeasonState(), TestUtils.MmrRepositoryMock());
 
             var playoffs = await playoffCommandHandler.CreatePlayoffs();
             

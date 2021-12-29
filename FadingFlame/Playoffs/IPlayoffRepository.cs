@@ -1,4 +1,6 @@
+using System.Linq;
 using System.Threading.Tasks;
+using FadingFlame.Matchups;
 using FadingFlame.Repositories;
 using MongoDB.Driver;
 
@@ -9,33 +11,60 @@ namespace FadingFlame.Playoffs
         Task Insert(Playoff playoffs);
         Task<bool> Update(Playoff playoffs);
         Task<Playoff> LoadForSeason(int season);
-        Task Delete(int currentSeasonSeasonId);
+        Task Delete(int season);
     }
 
     public class PlayoffRepository : MongoDbRepositoryBase, IPlayoffRepository
     {
-        public Task Insert(Playoff playoffs)
+        private readonly IMatchupRepository _matchupRepository;
+
+        public PlayoffRepository(MongoClient mongoClient, IMatchupRepository matchupRepository) : base(mongoClient)
         {
-            return base.Insert(playoffs);
+            _matchupRepository = matchupRepository;
         }
 
-        public Task<bool> Update(Playoff playoffs)
+        public async Task Insert(Playoff playoffs)
         {
-            return UpdateVersionsave(playoffs);
+            var matchups = playoffs.Rounds.SelectMany(g => g.Matchups).ToList();
+            await _matchupRepository.InsertMatches(matchups);
+            await base.Insert(playoffs);
         }
 
-        public Task<Playoff> LoadForSeason(int season)
+        public async Task<bool> Update(Playoff playoffs)
         {
-            return LoadFirst<Playoff>(p => p.Season == season);
+            var result = await UpdateVersionsave(playoffs);
+            if (result)
+            {
+                var matchups = playoffs.Rounds.Where(m => m.Matchups != null).SelectMany(g => g.Matchups).ToList();
+                await _matchupRepository.UpdateMatches(matchups);
+            }
+
+            return result;
         }
 
-        public Task Delete(int currentSeasonSeasonId)
+        public async Task<Playoff> LoadForSeason(int season)
         {
-            return base.Delete<Playoff>(p => p.Season == currentSeasonSeasonId);
+            var playoff = await LoadFirst<Playoff>(l => l.Season == season);
+            var matchIds = playoff.Rounds.SelectMany(g => g.MatchupIds).ToList();
+            var matches = await _matchupRepository.LoadMatches(matchIds.ToList());
+            if (matches.Count == 0) return playoff;
+
+            foreach (var gameDay in playoff.Rounds)
+            {
+                var matchesInGameDay = matches.Where(m => gameDay.MatchupIds.Contains(m.Id)).ToList();
+                gameDay.Matchups = matchesInGameDay;
+            }
+
+            return playoff;
         }
 
-        public PlayoffRepository(MongoClient mongoClient) : base(mongoClient)
+        public async Task Delete(int season)
         {
+            var playoff = await LoadForSeason(season);
+            var matchups = playoff.Rounds.SelectMany(g => g.Matchups).Select(m => m.Id).ToList();
+            await _matchupRepository.DeleteMatches(matchups);
+            await base.Delete<Playoff>(p => p.Season == season);
         }
+
     }
 }
