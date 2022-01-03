@@ -5,7 +5,7 @@
 @using FadingFlame.Matchups
 
 <div>
-    <h1>Playoffs Season @_seasonState.CurrentSeason.SeasonId</h1>
+    <h1>Playoffs Season @(_seasonState.CurrentSeason.SeasonId != 0 ? _seasonState.CurrentSeason.SeasonId.ToString() : "")</h1>
     <hr class="my-4">
 </div>
 @if (_loading)
@@ -71,9 +71,12 @@ else
     protected override async Task OnInitializedAsync()
     {
         _playoffs = await _playoffRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
-        var listOfPlayerInPlayoffs = _playoffs.Rounds.First().Matchups.SelectMany(m => new List<ObjectId> { m.Player1, m.Player2 }).ToList();
-        _playersInPlayoffs = await _playerRepository.LoadForLeague(listOfPlayerInPlayoffs, _seasonState.CurrentSeason.SeasonId);
-        _loading = false;
+        if (_playoffs != null)
+        {
+            var listOfPlayerInPlayoffs = _playoffs?.Rounds.First().Matchups.SelectMany(m => new List<ObjectId> { m.Player1, m.Player2 }).ToList();
+            _playersInPlayoffs = await _playerRepository.LoadForLeague(listOfPlayerInPlayoffs, _seasonState.CurrentSeason.SeasonId);
+            _loading = false;
+        }
     }
 
     public void GoToMatch(Matchup matchup)
