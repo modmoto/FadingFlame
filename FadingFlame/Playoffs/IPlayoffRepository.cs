@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FadingFlame.Matchups;
@@ -53,8 +54,11 @@ namespace FadingFlame.Playoffs
 
             foreach (var gameDay in playoff.Rounds)
             {
-                var matchesInGameDay = matches.Where(m => gameDay.MatchupIds.Contains(m.Id)).ToList();
-                gameDay.Matchups = matchesInGameDay;
+                gameDay.Matchups = new List<Matchup>();
+                foreach (var match in gameDay.MatchupIds.Select(id => matches.Single(m => m.Id == id)))
+                {
+                    gameDay.Matchups.Add(match);
+                }
             }
 
             return playoff;
