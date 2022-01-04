@@ -34,6 +34,34 @@ namespace FadingFlameTests
         }
 
         [Test]
+        public async Task LoadPlayoffsInRightOrder()
+        {
+            var leagueRepository = new Mock<ILeagueRepository>();
+            leagueRepository.Setup(l => l.LoadForSeason(It.IsAny<int>())).
+                ReturnsAsync(TestLeagues(19).ToList());
+
+            var playoffRepository = new PlayoffRepository(MongoClient, new MatchupRepository(MongoClient));
+            var playoffCommandHandler = new PlayoffCommandHandler(
+                leagueRepository.Object,
+                playoffRepository, new SeasonState(), TestUtils.MmrRepositoryMock());
+
+            await playoffCommandHandler.CreatePlayoffs();
+            var playoffs = await playoffRepository.LoadForSeason(0);
+
+            Assert.AreEqual(5, playoffs.Rounds.Count);
+            var round2 = playoffs.Rounds[1];
+            Assert.AreEqual(8, round2.Matchups.Count);
+            Assert.AreEqual(round2.MatchupIds[0], round2.Matchups[0].Id);
+            Assert.AreEqual(round2.MatchupIds[1], round2.Matchups[1].Id);
+            Assert.AreEqual(round2.MatchupIds[2], round2.Matchups[2].Id);
+            Assert.AreEqual(round2.MatchupIds[3], round2.Matchups[3].Id);
+            Assert.AreEqual(round2.MatchupIds[4], round2.Matchups[4].Id);
+            Assert.AreEqual(round2.MatchupIds[5], round2.Matchups[5].Id);
+            Assert.AreEqual(round2.MatchupIds[6], round2.Matchups[6].Id);
+            Assert.AreEqual(round2.MatchupIds[7], round2.Matchups[7].Id);
+        }
+
+        [Test]
         public async Task CreateFirstPlayoffs_Corner()
         {
             var leagueRepository = new Mock<ILeagueRepository>();
