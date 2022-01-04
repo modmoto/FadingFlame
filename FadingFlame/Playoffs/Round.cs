@@ -19,7 +19,7 @@ namespace FadingFlame.Playoffs
 
             for (var index = 0; index < playerIds.Count; index += 2)
             {
-                var matchup = Matchup.CreateForPlayoff(playerIds[index], playerIds[index + 1]);
+                var matchup = Matchup.CreateForPlayoff(ObjectId.GenerateNewId(), playerIds[index], playerIds[index + 1]);
                 matchups.Add(matchup);
                 matchupIds.Add(matchup.Id);
             }

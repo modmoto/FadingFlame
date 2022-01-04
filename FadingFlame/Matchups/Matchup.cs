@@ -74,10 +74,11 @@ namespace FadingFlame.Matchups
             };
         }
 
-        public static Matchup CreateForPlayoff(PlayerInLeague playerAtHome, PlayerInLeague playerAsGuest)
+        public static Matchup CreateForPlayoff(ObjectId matchId, PlayerInLeague playerAtHome, PlayerInLeague playerAsGuest)
         {
             var matchup = CreateForLeague(playerAtHome, playerAsGuest);
             matchup.IsPlayoff = true;
+            matchup.Id = matchId;
             return matchup;
         }
 
