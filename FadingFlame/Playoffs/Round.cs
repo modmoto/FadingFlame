@@ -8,7 +8,7 @@ namespace FadingFlame.Playoffs
 {
     public class Round
     {
-        [BsonIgnoreIfNull]
+        [BsonIgnore]
         public List<Matchup> Matchups { get; set; }
         public List<ObjectId> MatchupIds { get; set; } = new();
 
