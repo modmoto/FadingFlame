@@ -61,7 +61,7 @@ namespace FadingFlame.Matchups
 
         public async Task<List<Matchup>> LoadMatchesOfPlayer(Player player)
         {
-            var loadMatchesOfPlayer = await LoadMatchesWithPlayerNames(m => m.Player1 == player.Id || m.Player2 == player.Id);
+            var loadMatchesOfPlayer = await LoadMatchesWithPlayerNames(m => (m.Player1 == player.Id || m.Player2 == player.Id) && m.Player2 != ObjectId.Empty);
             return loadMatchesOfPlayer.OrderByDescending(l => l.Id).ToList();
         }
 
@@ -114,6 +114,7 @@ namespace FadingFlame.Matchups
             var loadFinishedSince = await LoadAll<Matchup>(m => 
                 m.Result.RecordedAt > sinceDate 
                 && !m.Result.WasDefLoss 
+                && m.Player2 != ObjectId.Empty 
                 && !(m.Result.Player1.BattlePoints == 0 && m.Result.Player2.BattlePoints == 0));
             return loadFinishedSince.OrderBy(m => m.Result.RecordedAt).ToList();
         }
