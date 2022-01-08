@@ -841,6 +841,10 @@ else
 
     private async Task OnSubmitListForSingleListMatch()
     {
+        if (!_editContextLists.Validate())
+        {
+            return;
+        }
         _loadingChallengeListEdit = true;
         _errorSaving = false;
         if (_matchup.IsChallenge)
