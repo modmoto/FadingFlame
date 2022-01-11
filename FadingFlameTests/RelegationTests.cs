@@ -130,7 +130,10 @@ namespace FadingFlameTests
                         {
                             Id = relegationMatch.Player2,
                             VictoryPoints = 1000
-                        }, GameList.DeffLoss(), GameList.DeffLoss());
+                        }, 
+                        GameList.DeffLoss(), 
+                        GameList.DeffLoss(), 
+                        false);
                     relegationMatch.RecordResult(result);
                     await _matchupRepository.UpdateMatch(relegationMatch);
                 }

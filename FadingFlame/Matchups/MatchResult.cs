@@ -155,7 +155,8 @@ namespace FadingFlame.Matchups
             PlayerResultDto player1Result,
             PlayerResultDto player2Result,
             GameList player1List,
-            GameList player2List)
+            GameList player2List,
+            bool wasDefLoss)
         {
             var points = CalculateWinPoints(player1Result.VictoryPoints, player2Result.VictoryPoints);
 
@@ -182,7 +183,8 @@ namespace FadingFlame.Matchups
                 Player1 = PlayerResult.Create(player1Result.Id, player1Result.VictoryPoints, pointsAfteObjective.Player1, player1Mmr, newMmrs.Item1),
                 Player2 = PlayerResult.Create(player2Result.Id, player2Result.VictoryPoints, pointsAfteObjective.Player2, player2Mmr, newMmrs.Item2),
                 Player1List = player1List,
-                Player2List = player2List
+                Player2List = player2List,
+                WasDefLoss = wasDefLoss
             };
         }
 

@@ -154,11 +154,11 @@ namespace FadingFlame.Playoffs
         }
 
         public async Task<MatchResult> ReportGame(
-            IMmrRepository mmrRepository, 
-            MatchResultDto matchResultDto, 
-            Mmr player1Mmr, 
-            Mmr player2Mmr, 
-            GameList player1List, 
+            IMmrRepository mmrRepository,
+            MatchResultDto matchResultDto,
+            Mmr player1Mmr,
+            Mmr player2Mmr,
+            GameList player1List,
             GameList player2List)
         {
             var roundIndex = Rounds.FindIndex(r => r.Matchups.Any(m => m.Id == matchResultDto.MatchId));
@@ -175,7 +175,8 @@ namespace FadingFlame.Playoffs
                 matchResultDto.Player1, 
                 matchResultDto.Player2, 
                 player1List, 
-                player2List);
+                player2List, 
+                matchResultDto.WasDefLoss);
             match.RecordResult(result);
 
             var otherMatchIndex = matchIndex % 2 == 0 ? matchIndex + 1 : matchIndex - 1;
