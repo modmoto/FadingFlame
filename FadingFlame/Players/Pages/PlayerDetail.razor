@@ -34,7 +34,17 @@
   @if (_isTheRightUser && !_seasonState.NextSeason.ListSubmissionIsOver)
   {
     <li class="nav-item" role="presentation">
-      <button class="nav-link" id="lists-next-season-tab" data-bs-toggle="tab" data-bs-target="#lists-next-season" type="button" role="tab" aria-controls="lists" aria-selected="false">Lists next Season</button>
+      <button class="nav-link" id="lists-next-season-tab" data-bs-toggle="tab" data-bs-target="#lists-next-season" type="button" role="tab" aria-controls="lists" aria-selected="false">
+        @if (_player.SubmitedListsNextSeason)
+        {
+          <span>Lists next Season</span>
+        }
+        else
+        {
+          <span>Enroll in next season!</span>
+        }
+        
+      </button>
     </li>  
   }
 </ul>
@@ -64,10 +74,10 @@
     </div>
   }
 
-  @if (_player.SubmitedListsNextSeason)
+  @if (_player.SubmitedListsNextSeason && !_isTheRightUser)
   {
     <div class="pb-3 alert alert-info" role="alert" style="max-width: 25rem">
-      @(_isTheRightUser ? "You are" : "Player is") participating in the next season!
+      Player is participating in the next season!
     </div>
   }
 
@@ -251,6 +261,12 @@
   @if (!_seasonState.NextSeason.ListSubmissionIsOver && _isTheRightUser)
   {
     <h4>Lists next season</h4>
+    @if (_player.SubmitedListsNextSeason)
+    {
+      <div class="pb-3 mt-3 alert alert-info" role="alert" style="max-width: 25rem">
+        You are participating in the next season!
+      </div>  
+    }
     <div>Lists can be changed until the @_seasonState.NextSeason.ListSubmissionDeadline.ToMyDate() and are not visible to other players</div>
     <EditForm EditContext="@_editContextListsNextSeason">
       @if (!_playerLeagues.Any())
