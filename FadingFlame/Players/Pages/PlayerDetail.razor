@@ -700,7 +700,7 @@
 
   private string GetRaceStrings(MatchResult result)
   {
-    if (result?.Player1List == null) return null;
+    if (result?.Player1List == null || result.Player2List == null) return null;
     return result.Player1.Id == _player.Id
       ? $"{result.Player1List.Faction.ToCamelCaseString()} vs {result.Player2List.Faction.ToCamelCaseString()}"
       : $"{result.Player2List.Faction.ToCamelCaseString()} vs {result.Player1List.Faction.ToCamelCaseString()}";
