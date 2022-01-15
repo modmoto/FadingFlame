@@ -281,7 +281,20 @@
               <option selected value="null">Rate skill</option>
               @foreach (var skill in Enumerable.Range(1, 10).Reverse())
               {
-                <option value="@skill">@skill</option>
+                <option value="@skill">
+                  @if (skill == 10)
+                  {
+                    <span>@skill (high skill)</span>
+                  }
+                  else if (skill == 1)
+                  {
+                    <span>@skill (low skill)</span>
+                  }
+                  else
+                  {
+                    <span>@skill</span>
+                  }
+                </option>
               }
             </select>
           </div>
