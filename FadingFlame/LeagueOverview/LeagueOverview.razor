@@ -10,7 +10,7 @@
     <hr class="my-4">
     @if (_seasonState.NextSeason.IsPubliclyVisible)
     {
-        <p class="lead">The next season starts on @_seasonState.NextSeason.StartDate.ToMyDate() and list submission will end on the @_seasonState.NextSeason.ListSubmissionDeadline.ToMyDate()!</p>
+        <p class="lead">You can register for next season until the end of the @_seasonState.NextSeason.ListSubmissionDeadline.ToMyDate() and the next season will start on @_seasonState.NextSeason.StartDate.ToMyDate()!</p>
     }
     else
     {
