@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using FadingFlame.Leagues;
 using FadingFlame.Players;
 using FadingFlame.Repositories;
 using MongoDB.Bson;
@@ -64,7 +65,9 @@ namespace FadingFlame.Matchups
             var loadMatchesOfPlayer = await LoadMatchesWithPlayerNames(m => 
                 (m.Player1 == player.Id || m.Player2 == player.Id)
                 && m.Player1 != ObjectId.Empty 
-                && m.Player2 != ObjectId.Empty);
+                && m.Player2 != ObjectId.Empty
+                && m.Player1 != LeagueConstants.FreeWinPlayer 
+                && m.Player2 != LeagueConstants.FreeWinPlayer);
             var matchesOfPlayer = loadMatchesOfPlayer.OrderByDescending(l => l.Id).ToList();
             return matchesOfPlayer.Where(m => m.OriginalPlayer1.Any() && m.OriginalPlayer2.Any()).ToList();
         }
