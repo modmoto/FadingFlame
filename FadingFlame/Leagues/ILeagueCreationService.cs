@@ -13,6 +13,7 @@ namespace FadingFlame.Leagues
     {
         Task MakePromotionsAndDemotions();
         Task CreateRelegations();
+        Task MakeSeasonOfficial();
     }
 
     public class LeagueCreationService : ILeagueCreationService
@@ -119,9 +120,28 @@ namespace FadingFlame.Leagues
             }
 
             var newLeagues = new List<League>();
+            var playerIdsFromLastSeason = divisionsTemp.SelectMany(p => p).Select(p => p.Id).ToList();
+            var playersThatNotParticipatedLastSeason = enrolledPlayers.Where(p => !playerIdsFromLastSeason.Contains(p.Id)).OrderByDescending(p => p.SelfAssessment).ToList();
+            var playerCountPerDivision = League.MaxPlayerCount * 2;
+            
             for (int division = 0; division < divisionsTemp.Count; division++)
             {
                 var players = divisionsTemp[division];
+                if (players.Count != playerCountPerDivision)
+                {
+                    var leftPlayerCount = playerCountPerDivision - players.Count;
+                    if (leftPlayerCount <= playersThatNotParticipatedLastSeason.Count)
+                    {
+                        var playersThatShouldGoToThisLeague = playersThatNotParticipatedLastSeason.Take(leftPlayerCount);
+                        playersThatNotParticipatedLastSeason = playersThatNotParticipatedLastSeason.Skip(leftPlayerCount).ToList();
+                        players.AddRange(playersThatShouldGoToThisLeague);
+                    }
+                    else
+                    {
+                        players.AddRange(playersThatNotParticipatedLastSeason);
+                        playersThatNotParticipatedLastSeason = new List<Player>();
+                    }
+                }
                 players.Shuffle();
                 var leagueIndex = division * 2;
                 var leagueA = League.Create(seasons[0].SeasonId, seasons[0].StartDate, LeagueConstants.Ids[leagueIndex], LeagueConstants.Names[leagueIndex]);
@@ -147,24 +167,23 @@ namespace FadingFlame.Leagues
 
             await _leagueRepository.Insert(newLeagues);
             await SetDeploymentsForNextSeason();
-            await MakeSeasonOfficial(nextSeason);
-            await MoveListsOfPlayers(enrolledPlayers);
         }
 
-        private async Task MakeSeasonOfficial(Season nextSeason)
+        public async Task MakeSeasonOfficial()
         {
+            var seasons = await _seasonRepository.LoadSeasons();
+            var nextSeason = seasons[0];
+            
             var newNextSeason = Season.Create(nextSeason.SeasonId + 1);
             await _seasonRepository.Update(newNextSeason);
-        }
-
-        private async Task MoveListsOfPlayers(List<Player> enlistedPlayers)
-        {
-            foreach (var player in enlistedPlayers)
+            
+            var enrolledPlayers = await _playerRepository.PlayersThatEnrolledInNextSeason();
+            foreach (var player in enrolledPlayers)
             {
                 player.Enroll();
             }
 
-            await _playerRepository.Update(enlistedPlayers);
+            await _playerRepository.Update(enrolledPlayers);
         }
 
         private void MoveFirstPlayerOfOneDownUp(List<Player> newPlayerRanks, List<Player> playersEnrolled, League oneLeagueDownA, League oneLeagueDownB)

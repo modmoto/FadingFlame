@@ -39,6 +39,7 @@ namespace FadingFlame.Players
         public async Task<Player> Load(ObjectId id)
         {
             var player = await LoadFirst<Player>(id);
+            if (player == null) return null;
             await LoadLists(player);
             return player;
         }

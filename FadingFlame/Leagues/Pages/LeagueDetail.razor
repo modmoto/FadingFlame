@@ -61,20 +61,20 @@ else
                             else
                             {
                                 <EditForm OnSubmit="() => OnSubmitPenalty(_penalties[item.index])" Model="@_penalties[item.index]">
-                                <DataAnnotationsValidator/>
-                                <div style="display: flex; flex-direction: row;">
-                                     <div class="form-group" style="max-width: 5rem; margin-bottom: 0!important;">
-                                         <InputNumber @bind-Value="_penalties[item.index].PenaltyPoints" class="form-control"/>
-                                         <ValidationMessage For="@(() => _penalties[item.index].PenaltyPoints)"/>
-                                     </div>
-                                     <button @onclick:stopPropagation="false" disabled="@_loadingAdmin" class="btn btn-danger ms-1">
-                                         @if (_loadingAdmin)
-                                         {
-                                             <span class="spinner-border spinner-border-sm mr-1"></span>
-                                         }
-                                         <span class="oi oi-shield me-2" aria-hidden="true"></span>Save
-                                     </button>
-                                </div>
+                                    <DataAnnotationsValidator/>
+                                    <div style="display: flex; flex-direction: row;">
+                                        <div class="form-group" style="max-width: 5rem; margin-bottom: 0!important;">
+                                            <InputNumber @bind-Value="_penalties[item.index].PenaltyPoints" class="form-control"/>
+                                            <ValidationMessage For="@(() => _penalties[item.index].PenaltyPoints)"/>
+                                        </div>
+                                        <button @onclick:stopPropagation="false" disabled="@_loadingAdmin" class="btn btn-danger ms-1">
+                                            @if (_loadingAdmin)
+                                            {
+                                                <span class="spinner-border spinner-border-sm mr-1"></span>
+                                            }
+                                            <span class="oi oi-shield me-2" aria-hidden="true"></span>Save
+                                        </button>
+                                    </div>
                                 </EditForm>
                                 <button @onclick="() => RemoveFromLeague(item.value.Id)" disabled="@_loadingAdmin" class="btn btn-danger ms-1">
                                     @if (_loadingAdmin)
@@ -95,8 +95,17 @@ else
             </tr>
         }
         </tbody>
-    </table>    
-    
+    </table>
+    @if (_league.Players.Count != League.MaxPlayerCount)
+    {
+        <button
+            class="btn btn-danger"
+            type="button"
+            @onclick="AddFreewinPlayer"
+        >
+            Add free win dummy player
+        </button> 
+    }
     <div>
         <h2>Gamedays</h2>
         <hr class="my-4">
@@ -217,6 +226,21 @@ else
                 }
             }
         }
+    }
+
+    private async void AddFreewinPlayer()
+    {
+        var freeWinPlayer = await _playerRepository.Load(LeagueConstants.FreeWinPlayer);
+        if (freeWinPlayer == null)
+        {
+            freeWinPlayer = Player.Create("Free Win Dummy", $"{LeagueConstants.FreeWinPlayer}@lel.de");
+            freeWinPlayer.Id = LeagueConstants.FreeWinPlayer;
+            freeWinPlayer.Mmr = new Mmr();
+            await _playerRepository.Update(freeWinPlayer);
+        }
+        
+        _league.AddPlayer(freeWinPlayer);
+        await _leagueRepository.Update(_league);
     }
     
     private string GetActiveOrNot(int index)

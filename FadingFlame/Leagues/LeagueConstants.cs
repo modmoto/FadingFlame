@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using DSharpPlus.Entities;
+using MongoDB.Bson;
 
 namespace FadingFlame.Leagues
 {
     public class LeagueConstants
     {
+        public static ObjectId FreeWinPlayer => new("507f1f77bcf86cd799439011");
         public static List<string> Names => new()
         {
             "Sunna",

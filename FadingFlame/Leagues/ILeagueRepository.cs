@@ -17,6 +17,7 @@ namespace FadingFlame.Leagues
         Task<bool> Update(League league);
         Task<List<League>> LoadLeaguesForPlayer(ObjectId playerId);
         Task<League> LoadLeagueForPlayerInSeason(ObjectId playerId, int season);
+        Task DeleteLeague(ObjectId leagueId);
     }
 
     public class LeagueRepository : MongoDbRepositoryBase, ILeagueRepository
@@ -105,6 +106,11 @@ namespace FadingFlame.Leagues
             var league = await LoadFirst<League>(l => l.Players.Any(r => r.Id == playerId) && l.Season == season);
             await AddMatches(league);
             return league;
+        }
+
+        public Task DeleteLeague(ObjectId leagueId)
+        {
+            return Delete<League>(leagueId);
         }
     }
 }

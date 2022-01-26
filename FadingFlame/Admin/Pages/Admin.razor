@@ -56,7 +56,7 @@
                         <ListApproveComponent
                             List="army.List1"
                             Player="@GetPlayer(army)"
-                            Loading="_loadingApproval"
+                            Loading="_loadingApprovalOfList"
                             OnApproveListChange="() => ApproveList1(army)"
                             OnRejectListChange="() => RejectList1(army)"/>
                     }
@@ -65,7 +65,7 @@
                         <ListApproveComponent
                             List="army.List2"
                             Player="@GetPlayer(army)"
-                            Loading="_loadingApproval"
+                            Loading="_loadingApprovalOfList"
                             OnApproveListChange="() => ApproveList2(army)"
                             OnRejectListChange="() => RejectList2(army)"/>
                     }
@@ -133,6 +133,24 @@
                                 <span>Make promotions and demotions</span>
                             }
                         </button>
+                    </div>
+                    <div class="m-2 col">
+                         @if (!_leaguesNextSeason.Any())
+                         {
+                             <button disabled type="button" class="btn btn-primary">
+                                 Matches not created for next season, make promotions and demotions first to make next season official
+                             </button>
+                         }
+                         else
+                         {
+                             <button disabled="@_loadingMakingSeasonOfficial" class="btn btn-primary" @onclick="ApproveMatchesNextSeason">
+                                 @if (_loadingMakingSeasonOfficial)
+                                 {
+                                     <span class="spinner-border spinner-border-sm mr-1"></span>
+                                 }
+                                 Make next season official and release lists and matches
+                             </button>
+                         }
                     </div>
                     <div class="m-2 col">
                         @if (_relegationMatchesStarted)
@@ -265,8 +283,11 @@
                         @foreach (var league in _leaguesThisSeason)
                         {
                             <div class="card mt-2">
-                                <div class="card-header">
+                                <div class="card-header cursor" @onclick="() => GoToLeague(league)">
                                     @league.DivisionId @league.Name
+                                    <button type="button" class="btn btn-danger float-end" style="visibility: collapse">
+                                        Delete League
+                                    </button>
                                 </div>
                                 <div class="card-body">
                                     @foreach (var player in league.Players.Select((value, index) => new {value, index}))
@@ -282,8 +303,11 @@
                         @foreach (var league in _leaguesNextSeason)
                         {
                             <div class="card mt-2">
-                                <div class="card-header">
+                                <div class="card-header cursor" @onclick="() => GoToLeague(league)">
                                     @league.DivisionId @league.Name
+                                    <button type="button" class="btn btn-danger float-end" @onclick="() => DeleteLeague(league)">
+                                        Delete League
+                                    </button>
                                 </div>
                                 <div class="card-body">
                                     @foreach (var player in league.Players.Select((value, index) => new {value, index}))
@@ -320,7 +344,7 @@
     private bool _loadingPlayoffs;
     private bool _loadingSeasons;
     private bool _loadingEndingSeason;
-    private bool _loadingApproval;
+    private bool _loadingApprovalOfList;
     private bool _loadingMoveLeagueOver;
     private bool _loadingRelegationMatches;
     private List<Player> _players = new();
@@ -333,6 +357,7 @@
     private bool _relegationMatchesNotCreatedEverywhere;
     private bool _relegationMatchesStarted;
     private bool _playoffsStarted;
+    private bool _loadingMakingSeasonOfficial;
 
     protected override void OnInitialized()
     {
@@ -355,7 +380,13 @@
         _unfinishedRelegations = relegationMatches.Where(r => !r.IsFinished).ToList();
         _relegationMatchesStarted = !_relegationMatchesNotCreatedEverywhere && relegationMatches.Any(m => m.IsFinished);
     }
-    
+
+    private async Task ApproveMatchesNextSeason()
+    {
+        _loadingMakingSeasonOfficial = true;
+        await _leagueCreationService.MakeSeasonOfficial();
+        _loadingMakingSeasonOfficial = false;
+    }
     private async Task CreatePlayoffs()
     {
         _loadingPlayoffs = true;
@@ -400,33 +431,33 @@
 
     private async void ApproveList1(Army army)
     {
-        _loadingApproval = true;
+        _loadingApprovalOfList = true;
         await _acceptAndRejectService.ApproveList1(army, GetPlayer(army)?.DiscordTag);
-        _loadingApproval = false;
+        _loadingApprovalOfList = false;
         StateHasChanged();
     }
 
     private async void ApproveList2(Army army)
     {
-        _loadingApproval = true;
+        _loadingApprovalOfList = true;
         await _acceptAndRejectService.ApproveList2(army, GetPlayer(army)?.DiscordTag);
-        _loadingApproval = false;
+        _loadingApprovalOfList = false;
         StateHasChanged();
     }
     
     private async void RejectList1(Army army)
     {
-        _loadingApproval = true;
+        _loadingApprovalOfList = true;
         await _acceptAndRejectService.RejectList1(army, GetPlayer(army)?.DiscordTag, true);
-        _loadingApproval = false;
+        _loadingApprovalOfList = false;
         StateHasChanged();
     }
 
     private async void RejectList2(Army army)
     {
-        _loadingApproval = true;
+        _loadingApprovalOfList = true;
         await _acceptAndRejectService.RejectList2(army, GetPlayer(army)?.DiscordTag, true);
-        _loadingApproval = false;
+        _loadingApprovalOfList = false;
         StateHasChanged();
     }
     
@@ -451,8 +482,13 @@
         StateHasChanged();
     }
 
-    private void NavigateToMatch(Matchup relegation)
+    private void GoToLeague(League league)
     {
-        _navigation.NavigateTo($"match/{relegation.Id}");
+        _navigation.NavigateTo($"/league/{league.Id}");
+    }
+
+    private async Task DeleteLeague(League league)
+    {
+        await _leagueRepository.DeleteLeague(league.Id);
     }
 }
