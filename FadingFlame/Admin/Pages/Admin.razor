@@ -140,6 +140,11 @@
                              <button disabled type="button" class="btn btn-primary">
                                  Matches not created for next season, make promotions and demotions first to make next season official
                              </button>
+                         } else if (_leaguesNextSeason.All(l => l.Players.Count == League.MaxPlayerCount))
+                         {
+                             <button disabled type="button" class="btn btn-primary">
+                                 Not all leagues have @League.MaxPlayerCount players, add players or dummies first or delete them
+                             </button>
                          }
                          else
                          {
