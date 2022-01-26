@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FadingFlame.Leagues;
 using FadingFlame.Repositories;
 using MongoDB.Driver;
 
@@ -20,7 +21,7 @@ namespace FadingFlame.GlobalLadder
         
         public async Task<List<PlayerRankingReadModel>> LoadAllRanked()
         {
-            var loadAllRanked = await LoadAll<PlayerRankingReadModel>();
+            var loadAllRanked = await LoadAll<PlayerRankingReadModel>(r => r.Id != LeagueConstants.FreeWinPlayer);
             return loadAllRanked.OrderByDescending(i => i.Mmr).ToList();
         }
 
