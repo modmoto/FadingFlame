@@ -246,7 +246,11 @@ else
                 List1 = dummyList,
                 List2 = dummyList
             };
-            freeWinPlayer.ArmyNextSeason = freeWinPlayer.ArmyCurrentSeason;
+            freeWinPlayer.ArmyNextSeason = new Army
+            {
+                List1 = dummyList,
+                List2 = dummyList
+            };
             await _playerRepository.UpdateWithLists(freeWinPlayer);
         }
         else
