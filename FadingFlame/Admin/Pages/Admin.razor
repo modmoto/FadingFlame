@@ -305,7 +305,7 @@
                             <div class="card mt-2">
                                 <div class="card-header cursor" @onclick="() => GoToLeague(league)">
                                     @league.DivisionId @league.Name
-                                    <button type="button" class="btn btn-danger float-end" @onclick="() => DeleteLeague(league)">
+                                    <button type="button" class="btn btn-danger float-end" @onclick="() => DeleteLeague(league)" @onclick:preventDefault="true" @onclick:stopPropagation="true">
                                         Delete League
                                     </button>
                                 </div>
