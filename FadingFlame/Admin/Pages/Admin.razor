@@ -126,7 +126,7 @@
                             }
                             else if (_unfinishedRelegations.Any())
                             {
-                                <span>Relegation matches not finished</span>
+                                <span>Relegation matches not finished, can not make pro and demotions</span>
                             }
                             else
                             {
@@ -135,22 +135,40 @@
                         </button>
                     </div>
                     <div class="m-2 col">
-                        <button disabled="@_loadingRelegationMatches" type="button" class="btn btn-primary" @onclick="CreateRelegatonMatches">
-                            @if (_loadingRelegationMatches)
-                            {
-                                <span class="spinner-border spinner-border-sm mr-1"></span>
-                            }
-                            Recreate Relegation matches (will delete current results)
-                        </button>
+                        @if (_relegationMatchesStarted)
+                        {
+                            <button disabled type="button" class="btn btn-primary">
+                                There are finished relegation matches, can not create relegation matches anymore
+                            </button>
+                        }
+                        else
+                        {
+                            <button disabled="@_loadingRelegationMatches" type="button" class="btn btn-primary" @onclick="CreateRelegatonMatches">
+                                @if (_loadingRelegationMatches)
+                                {
+                                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                                }
+                                Create Relegation matches
+                            </button>
+                        }
                     </div>
                     <div class="m-2 col">
-                        <button disabled="@_loadingPlayoffs" type="button" class="btn btn-primary" @onclick="CreatePlayoffs">
-                            @if (_loadingPlayoffs)
-                            {
-                                <span class="spinner-border spinner-border-sm mr-1"></span>
-                            }
-                            Create Playoffs Season 1
-                        </button>
+                        @if (_playoffsStarted)
+                        {
+                            <button disabled type="button" class="btn btn-primary">
+                                There are finished playoff games, can not create playoffs anymore
+                            </button>
+                        }
+                        else
+                        {
+                            <button disabled="@_loadingPlayoffs" type="button" class="btn btn-primary" @onclick="CreatePlayoffs">
+                                @if (_loadingPlayoffs)
+                                {
+                                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                                }
+                                Create Playoffs Season 1
+                            </button>
+                        }
                     </div>
                 </div>
             </div>
@@ -296,6 +314,7 @@
 @inject IMmrRepository _mmrRepository
 @inject IMatchupRepository _matchupRepository
 @inject PenaltyService _penaltyService
+@inject IPlayoffRepository _playoffRepository
 
 @code {
     private bool _loadingPlayoffs;
@@ -312,6 +331,8 @@
     private List<League> _leaguesNextSeason = new();
     private List<Matchup> _unfinishedRelegations = new();
     private bool _relegationMatchesNotCreatedEverywhere;
+    private bool _relegationMatchesStarted;
+    private bool _playoffsStarted;
 
     protected override void OnInitialized()
     {
@@ -327,8 +348,12 @@
         _leaguesNextSeason = await _leagueRepository.LoadForSeason(seasons[0].SeasonId);
         _leaguesThisSeason = await _leagueRepository.LoadForSeason(seasons[1].SeasonId);
         _pendingPenalties = await _penaltyService.GetPenalties(seasons[1].SeasonId);
+        var playoff = await _playoffRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
+        _playoffsStarted = playoff.Rounds.Any() && playoff.Rounds.SelectMany(r => r.Matchups).Any(m => m.IsFinished);
         _relegationMatchesNotCreatedEverywhere = _leaguesThisSeason[0].RelegationMatches.Count == 0;
-        _unfinishedRelegations = _leaguesThisSeason.SelectMany(c => c.RelegationMatches).Where(r => !r.IsFinished).ToList();
+        var relegationMatches = _leaguesThisSeason.SelectMany(c => c.RelegationMatches).ToList();
+        _unfinishedRelegations = relegationMatches.Where(r => !r.IsFinished).ToList();
+        _relegationMatchesStarted = !_relegationMatchesNotCreatedEverywhere && relegationMatches.Any(m => m.IsFinished);
     }
     
     private async Task CreatePlayoffs()
