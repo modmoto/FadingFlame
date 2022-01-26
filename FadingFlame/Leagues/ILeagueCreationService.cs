@@ -280,8 +280,8 @@ namespace FadingFlame.Leagues
 
             var currentLeagues = await _leagueRepository.LoadForSeason(currentSeason.SeasonId);
 
-            var secondaryObjectives = Enum.GetValues<SecondaryObjective>().ToList();
-            var deployments = Enum.GetValues<Deployment>().ToList();
+            var secondaryObjectives = Enum.GetValues<SecondaryObjective>().Where(r => r != SecondaryObjective.RandomObjective).ToList();
+            var deployments = Enum.GetValues<Deployment>().Where(r => r != Deployment.RandomDeployment).ToList();
             secondaryObjectives.Shuffle();
             deployments.Shuffle();
 
