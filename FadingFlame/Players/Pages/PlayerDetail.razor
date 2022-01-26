@@ -31,7 +31,7 @@
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="lists-tab" data-bs-toggle="tab" data-bs-target="#lists" type="button" role="tab" aria-controls="lists" aria-selected="false">Lists</button>
   </li>
-  @if (_isTheRightUser && !_seasonState.NextSeason.ListSubmissionIsOver)
+  @if (_isTheRightUser && !_seasonState.NextSeason.ListSubmissionIsOver || _seasonState.NextSeason.ListSubmissionIsOver && _loggedInUserState.UserIsAdmin)
   {
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="lists-next-season-tab" data-bs-toggle="tab" data-bs-target="#lists-next-season" type="button" role="tab" aria-controls="lists" aria-selected="false">
@@ -43,7 +43,6 @@
         {
           <span>Enroll in next season!</span>
         }
-        
       </button>
     </li>  
   }
@@ -258,7 +257,7 @@
   }
 </div>
 <div class="tab-pane fade pt-4" id="lists-next-season" role="tabpanel" aria-labelledby="lists-next-season-tab">
-  @if (!_seasonState.NextSeason.ListSubmissionIsOver && _isTheRightUser)
+  @if (!_seasonState.NextSeason.ListSubmissionIsOver && _isTheRightUser || _seasonState.NextSeason.ListSubmissionIsOver && _loggedInUserState.UserIsAdmin)
   {
     <h4>Lists next season</h4>
     @if (_player.SubmitedListsNextSeason)
@@ -308,7 +307,7 @@
           <UserListComponent
             List="@(_editListModelNextSeason.List1)"
             IsFreshListPossible="true"
-            IsCurrentUser="_isTheRightUser"/>
+            IsCurrentUser="true"/>
         </div>
         <div class="col-xs-12 col-md-12 col-lg-6">
           <hr class="my-3">
@@ -316,7 +315,7 @@
           <UserListComponent
             List="@(_editListModelNextSeason.List2)"
             IsFreshListPossible="true"
-            IsCurrentUser="_isTheRightUser"/>
+            IsCurrentUser="true"/>
         </div>
       </div>
       <button disabled="@_loadingListsNextSeason" class="btn btn-primary" @onclick="OnSubmitListNextSeason">
