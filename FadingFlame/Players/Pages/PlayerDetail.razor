@@ -79,6 +79,13 @@
       Player is participating in the next season!
     </div>
   }
+  
+  @if (_player.SubmitedListsNextSeason && _isTheRightUser)
+    {
+      <div class="pb-3 alert alert-info" role="alert" style="max-width: 25rem">
+        You are participating in the next season, lists will be revealed soon!
+      </div>
+    }
 
   @if (UserParticipatesInCurrentSeason)
   {
