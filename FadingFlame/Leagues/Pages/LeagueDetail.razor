@@ -236,7 +236,24 @@ else
             freeWinPlayer = Player.Create("Free Win Dummy", $"{LeagueConstants.FreeWinPlayer}@lel.de");
             freeWinPlayer.Id = LeagueConstants.FreeWinPlayer;
             freeWinPlayer.Mmr = new Mmr();
-            await _playerRepository.Update(freeWinPlayer);
+            var dummyList = new GameList 
+            { 
+                Faction = Faction.None,
+                List = "Dummy"
+            };
+            freeWinPlayer.ArmyCurrentSeason = new Army
+            {
+                List1 = dummyList,
+                List2 = dummyList
+            };
+            freeWinPlayer.ArmyNextSeason = freeWinPlayer.ArmyCurrentSeason;
+            await _playerRepository.UpdateWithLists(freeWinPlayer);
+        }
+        else
+        {
+            freeWinPlayer.ArmyNextSeason = freeWinPlayer.ArmyCurrentSeason;
+            freeWinPlayer.ArmyIdNextSeason = freeWinPlayer.ArmyIdCurrentSeason;
+            await _playerRepository.UpdateWithLists(freeWinPlayer);
         }
         
         _league.AddPlayer(freeWinPlayer);

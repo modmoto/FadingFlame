@@ -33,7 +33,6 @@ namespace FadingFlame.Admin
                     if (player.ArmyCurrentSeason.List1.List == player.ArmyCurrentSeason.List2.List) continue;
                     if (player.ArmyCurrentSeason.List2.List == "NA") continue;
                     if (player.ArmyCurrentSeason.List2.List == "none") continue;
-                    if (player.Id == ObjectId.Parse("6148722d2315e65e4f8a14d7")) continue;
                     
                     var matchesOfPlayer = matchups.Where(m => m.Player1 == leaguePlayer.Id || m.Player2 == leaguePlayer.Id);
                     var list1Count = 0;
