@@ -37,7 +37,7 @@ namespace FadingFlame.Discord
             };
             
             _client = new DiscordClient(discordConfiguration);
-            _client.ConnectAsync().Wait();
+            // _client.ConnectAsync().Wait();
         }
         
         public async Task CreateLeagueChannelsAndTags(List<League> leagues)
