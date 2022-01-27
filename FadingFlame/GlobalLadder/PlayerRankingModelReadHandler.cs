@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using FadingFlame.Leagues;
 using FadingFlame.Matchups;
 using FadingFlame.Players;
 using FadingFlame.ReadModelBase;
@@ -36,6 +37,9 @@ namespace FadingFlame.GlobalLadder
             var lastVersion = currentVersion.Version;
             foreach (var match in newMatches)
             {
+                if (match.Player1 == LeagueConstants.FreeWinPlayer || match.Player2 == LeagueConstants.FreeWinPlayer) 
+                    continue;
+                
                 var player1 = await _playerRepository.Load(match.Player1);
                 var player2 = await _playerRepository.Load(match.Player2);
 
