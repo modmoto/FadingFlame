@@ -5,7 +5,7 @@
 @using FadingFlame.Matchups
 
 <div>
-    <h1>Playoffs Season @(_seasonState.CurrentSeason.SeasonId != 0 ? _seasonState.CurrentSeason.SeasonId.ToString() : "")</h1>
+    <h1>Playoffs Season @(_playoffs?.Season)</h1>
     <hr class="my-4">
 </div>
 @if (_loading)
@@ -70,11 +70,22 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _playoffs = await _playoffRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
+        await LoadPlayoffs(_seasonState.CurrentSeason.SeasonId);
+        if (_playoffs == null)
+        {
+            await LoadPlayoffs(_seasonState.CurrentSeason.SeasonId - 1);
+        }
+    }
+
+    private async Task LoadPlayoffs(int seasonId)
+    {
+        _playoffs = await _playoffRepository.LoadForSeason(seasonId);
         if (_playoffs != null)
         {
-            var listOfPlayerInPlayoffs = _playoffs?.Rounds.First().Matchups.SelectMany(m => new List<ObjectId> { m.Player1, m.Player2 }).ToList();
-            _playersInPlayoffs = await _playerRepository.LoadForLeague(listOfPlayerInPlayoffs, _seasonState.CurrentSeason.SeasonId);
+            var listOfPlayerInPlayoffs = _playoffs?.Rounds.First().Matchups
+                .SelectMany(m => new List<ObjectId> {m.Player1, m.Player2}).ToList();
+            _playersInPlayoffs =
+                await _playerRepository.LoadForLeague(listOfPlayerInPlayoffs, seasonId);
             _loading = false;
         }
     }
