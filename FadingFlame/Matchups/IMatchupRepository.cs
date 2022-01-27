@@ -63,9 +63,9 @@ namespace FadingFlame.Matchups
         public async Task<List<Matchup>> LoadMatchesOfPlayer(Player player)
         {
             var loadMatchesOfPlayer = await LoadMatchesWithPlayerNames(m => 
-                (m.Player1 == player.Id || m.Player2 == player.Id)
+                (m.Player1 == player.Id || m.Player2 == player.Id) 
                 && m.Player1 != ObjectId.Empty 
-                && m.Player2 != ObjectId.Empty
+                && m.Player2 != ObjectId.Empty 
                 && m.Player1 != LeagueConstants.FreeWinPlayer 
                 && m.Player2 != LeagueConstants.FreeWinPlayer);
             var matchesOfPlayer = loadMatchesOfPlayer.OrderByDescending(l => l.Id).ToList();
@@ -74,8 +74,13 @@ namespace FadingFlame.Matchups
 
         public Task<List<Matchup>> LoadFinishedMatchesOfPlayer(Player player)
         {
-
-            return LoadAll<Matchup>(m => m.Result != null && (m.Player1 == player.Id || m.Player2 == player.Id));
+            return LoadAll<Matchup>(m => 
+                m.Result != null 
+                && (m.Player1 == player.Id || m.Player2 == player.Id) 
+                && m.Player1 != ObjectId.Empty 
+                && m.Player2 != ObjectId.Empty 
+                && m.Player1 != LeagueConstants.FreeWinPlayer 
+                && m.Player2 != LeagueConstants.FreeWinPlayer);
         }
 
         public Task<List<Matchup>> LoadOpenChallengesOfPlayer(Player player)
