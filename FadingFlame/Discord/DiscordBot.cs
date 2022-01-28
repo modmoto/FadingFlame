@@ -43,10 +43,22 @@ namespace FadingFlame.Discord
             var playerInLeagues = leagues.SelectMany(l => l.Players);
             var players = await _playerRepository.LoadForLeague(playerInLeagues.Select(p => p.Id).ToList());
             var notFoundPlayers = new List<PlayerAndLeagueError>();
+            
             foreach (var clientGuild in _client.Guilds)
             {
                 var guild = clientGuild.Value;
 
+                foreach (var discordMember in guild.Members)
+                {
+                    var member = discordMember.Value;
+                    var oldLeagueRoles = member.Roles.Where(r => LeagueConstants.Ids.Contains(r.Name)).ToList();
+                    foreach (var oldLeagueRole in oldLeagueRoles)
+                    {
+                        await member.RevokeRoleAsync(oldLeagueRole);
+                        Task.Delay(50).Wait();
+                    }
+                }
+                
                 foreach (var player in players)
                 {
                     var member = guild.Members.FirstOrDefault(member => member.Value.Username?.ToLower() + "#" + member.Value.Discriminator == player.DiscordTag?.ToLower()).Value;
@@ -58,12 +70,6 @@ namespace FadingFlame.Discord
                     else
                     {
                         var role = guild.Roles.FirstOrDefault(r => r.Value.Name == leagueOfPlayer.DivisionId).Value;
-                        var oldLeagueRoles = member.Roles.Where(r => LeagueConstants.Ids.Contains(r.Name)).ToList();
-                        foreach (var oldLeagueRole in oldLeagueRoles)
-                        {
-                            await member.RevokeRoleAsync(oldLeagueRole);
-                            Task.Delay(50).Wait();
-                        }
                         await member.GrantRoleAsync(role);
                         Task.Delay(50).Wait();
                     }
