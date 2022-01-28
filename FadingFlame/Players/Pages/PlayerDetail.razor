@@ -31,7 +31,7 @@
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="lists-tab" data-bs-toggle="tab" data-bs-target="#lists" type="button" role="tab" aria-controls="lists" aria-selected="false">Lists</button>
   </li>
-  @if (_isTheRightUser && !_seasonState.NextSeason.ListSubmissionIsOver || _seasonState.NextSeason.ListSubmissionIsOver && _loggedInUserState.UserIsAdmin)
+  @if (_isTheRightUser && !_seasonState.NextSeason.ListSubmissionIsOver && _seasonState.NextSeason.IsPubliclyVisible || _seasonState.NextSeason.ListSubmissionIsOver && _loggedInUserState.UserIsAdmin && _seasonState.NextSeason.IsPubliclyVisible)
   {
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="lists-next-season-tab" data-bs-toggle="tab" data-bs-target="#lists-next-season" type="button" role="tab" aria-controls="lists" aria-selected="false">

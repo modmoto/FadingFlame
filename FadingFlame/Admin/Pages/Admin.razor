@@ -23,21 +23,20 @@
             <div class="row">
                 <div class="card m-2" style="width: 28rem;">
                     <div class="card-body">
-                        <div class="card-title">Registered players (@_players.Count):</div>
+                        <div class="card-title">Users enrolled in next season (@_playersEnrolledInNextSeason.Count):</div>
                         <ul class="list-group list-group-flush">
-                            @foreach (var player in _players)
+                            @foreach (var player in _playersEnrolledInNextSeason)
                             {
                                 <li class="list-group-item cursor" @onclick="() => GoToPlayer(player.Id)">@player.DisplayName / @player.DiscordTag</li>
                             }
                         </ul>
                     </div>
                 </div>
-                    
                 <div class="card m-2" style="width: 28rem;">
                     <div class="card-body">
-                        <div class="card-title">Users enrolled in next season (@_playersEnrolledInNextSeason.Count):</div>
+                        <div class="card-title">Registered players (@_players.Count):</div>
                         <ul class="list-group list-group-flush">
-                            @foreach (var player in _playersEnrolledInNextSeason)
+                            @foreach (var player in _players)
                             {
                                 <li class="list-group-item cursor" @onclick="() => GoToPlayer(player.Id)">@player.DisplayName / @player.DiscordTag</li>
                             }
@@ -196,8 +195,8 @@
                     </div>
                 </div>
             </div>
-               
             <div class="container">
+                <hr class="my-4"/>
                 <div class="row">
                     <div class="col">
                         <h4>Current Season (@_seasonState.CurrentSeason.SeasonId):</h4>
@@ -258,25 +257,6 @@
                                 Save next season
                             </button>
                         </EditForm>
-                    </div>
-                </div>
-                <div class="row mt-2">
-                    <div class="col"></div>
-                    <div class="col">
-                        <button disabled="@_loadingEndingSeason" type="button" class="btn btn-danger" @onclick="CreateNextSeason">
-                            @if (_loadingEndingSeason)
-                            {
-                                <span class="spinner-border spinner-border-sm mr-1"></span>
-                            }
-                            Create new next season
-                        </button>
-                        <button disabled="@_loadingEndingSeason" class="btn btn-danger" @onclick="DeleteCurrentSeason">
-                            @if (_loadingEndingSeason)
-                            {
-                                <span class="spinner-border spinner-border-sm mr-1"></span>
-                            }
-                            Delete next season
-                        </button>
                     </div>
                 </div>
             </div>
@@ -380,7 +360,10 @@
         _leaguesThisSeason = await _leagueRepository.LoadForSeason(seasons[1].SeasonId);
         _pendingPenalties = await _penaltyService.GetPenalties(seasons[1].SeasonId);
         var playoff = await _playoffRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
-        _playoffsStarted = playoff.Rounds.Any() && playoff.Rounds.SelectMany(r => r.Matchups).Any(m => m.IsFinished);
+        if (playoff != null)
+        {
+            _playoffsStarted = playoff.Rounds.Any() && playoff.Rounds.SelectMany(r => r.Matchups).Any(m => m.IsFinished);    
+        }
         _relegationMatchesNotCreatedEverywhere = _leaguesThisSeason[0].RelegationMatches.Count == 0;
         var relegationMatches = _leaguesThisSeason.SelectMany(c => c.RelegationMatches).ToList();
         _unfinishedRelegations = relegationMatches.Where(r => !r.IsFinished).ToList();
@@ -415,24 +398,6 @@
         _loadingSeasons = true;
         await _seasonRepository.Update(season);
         _loadingSeasons = false;
-    }
-
-    private async Task CreateNextSeason()
-    {
-        _loadingEndingSeason = true;
-        _seasonState.AppendSeason(Season.Create(_seasonState.NextSeason.SeasonId + 1));
-        await _seasonRepository.Update(_seasonState.NextSeason);
-        _loadingEndingSeason = false;
-    }
-
-    private async Task DeleteCurrentSeason()
-    {
-        _loadingEndingSeason = true;
-
-        var season = _seasonState.PopLastSeason();
-
-        await _seasonRepository.Delete(season);
-        _loadingEndingSeason = false;
     }
 
     private async void ApproveList1(Army army)
