@@ -107,7 +107,7 @@
     }
   }
 
-  @if (_isTheRightUser || _loggedInUserState.UserIsAdmin)
+  @if (_isTheRightUser)
   {
     <EditForm OnSubmit="OnSubmit" EditContext="@_editContextUser">
       <div class="form-group">

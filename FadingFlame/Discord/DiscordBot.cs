@@ -63,10 +63,10 @@ namespace FadingFlame.Discord
                         var oldLeagueRoles = member.Roles.Where(r => LeagueConstants.Ids.Contains(r.Name)).ToList();
                         foreach (var oldLeagueRole in oldLeagueRoles)
                         {
-                            // await member.RevokeRoleAsync(oldLeagueRole);
+                            await member.RevokeRoleAsync(oldLeagueRole);
                             Task.Delay(50).Wait();
                         }
-                        // await member.GrantRoleAsync(role);
+                        await member.GrantRoleAsync(role);
                         Task.Delay(50).Wait();
                     }
                 }
