@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus;
-using DSharpPlus.EventArgs;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
 
@@ -12,7 +10,7 @@ namespace FadingFlame.Discord
 {
     public interface IDiscordBot
     {
-        Task<List<Player>> SetLeagueTagsOnPlayers(List<League> leagues);
+        Task<List<PlayerAndLeagueError>> SetLeagueTagsOnPlayers(List<League> leagues);
         Task SendRequestListChangedToBotsChannel(int pendingChanges);
         Task ConfirmationMessageToUser(string discordTag, bool wasAccepterd);
     }
@@ -40,11 +38,11 @@ namespace FadingFlame.Discord
             _client.ConnectAsync().Wait();
         }
 
-        public async Task<List<Player>> SetLeagueTagsOnPlayers(List<League> leagues)
+        public async Task<List<PlayerAndLeagueError>> SetLeagueTagsOnPlayers(List<League> leagues)
         {
             var playerInLeagues = leagues.SelectMany(l => l.Players);
             var players = await _playerRepository.LoadForLeague(playerInLeagues.Select(p => p.Id).ToList());
-            var notFoundPlayers = new List<Player>();
+            var notFoundPlayers = new List<PlayerAndLeagueError>();
             foreach (var clientGuild in _client.Guilds)
             {
                 var guild = clientGuild.Value;
@@ -55,7 +53,7 @@ namespace FadingFlame.Discord
                     var leagueOfPlayer = leagues.Single(l => l.Players.Select(p => p.Id).Contains(player.Id));
                     if (member == null)
                     {
-                        notFoundPlayers.Add(player);
+                        notFoundPlayers.Add(new PlayerAndLeagueError(player.DisplayName, player.DiscordTag, leagueOfPlayer.DivisionId));
                     }
                     else
                     {
@@ -111,6 +109,20 @@ namespace FadingFlame.Discord
             {
                 // ignored, dont care
             }
+        }
+    }
+
+    public class PlayerAndLeagueError
+    {
+        public string DisplayName { get; }
+        public string DiscordTag { get; }
+        public string LeagueTag { get; }
+
+        public PlayerAndLeagueError(string displayName, string discordTag, string leagueTag)
+        {
+            DisplayName = displayName;
+            DiscordTag = discordTag;
+            LeagueTag = leagueTag;
         }
     }
 }

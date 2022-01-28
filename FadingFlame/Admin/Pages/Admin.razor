@@ -165,14 +165,6 @@
                             }
                             Create Discord Tags
                         </button>
-                        @if (_playersNotFound.Any())
-                        {
-                            <h2>Not found players</h2>
-                            foreach (var player in _playersNotFound)
-                            {
-                                <div>@player.DisplayName / @player.DiscordTag</div> 
-                            }
-                        }
                     </div>
                     <div class="m-2 col">
                         @if (_relegationMatchesStarted)
@@ -214,6 +206,16 @@
             </div>
             <div class="container">
                 <hr class="my-4"/>
+                <div class="row">
+                    @if (_playersNotFound.Any())
+                    {
+                        <h2>Was not able to create tag for players</h2>
+                        foreach (var player in _playersNotFound)
+                        {
+                            <div>@player.LeagueTag - @player.DisplayName / @player.DiscordTag</div> 
+                        }
+                    }
+                </div>
                 <div class="row">
                     <div class="col">
                         <h4>Current Season (@_seasonState.CurrentSeason.SeasonId):</h4>
@@ -362,7 +364,7 @@
     private bool _relegationMatchesStarted;
     private bool _playoffsStarted;
     private bool _loadingMakingSeasonOfficial;
-    private List<Player> _playersNotFound = new();
+    private List<PlayerAndLeagueError> _playersNotFound = new();
 
     protected override void OnInitialized()
     {
