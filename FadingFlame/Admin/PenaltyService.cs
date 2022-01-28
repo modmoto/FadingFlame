@@ -22,7 +22,7 @@ namespace FadingFlame.Admin
         {
             var leagues = await _leagueRepository.LoadForSeason(season);
             var playerIds = leagues.SelectMany(l => l.Players).Select(p => p.Id).ToList();
-            var players = await _playerRepository.LoadForLeague(playerIds, season);
+            var players = await _playerRepository.LoadForLeague(playerIds);
             var penalties = new List<PenaltyUser>();
             foreach (var league in leagues)
             {

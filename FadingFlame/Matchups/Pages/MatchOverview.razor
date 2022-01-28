@@ -118,7 +118,7 @@ else
     {
         _leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
         var playerIds = _leagues.SelectMany(l => l.Players.Select(p => p.Id)).ToList();
-        _playersInSeason = await _playerRepository.LoadForLeague(playerIds, _seasonState.CurrentSeason.SeasonId);
+        _playersInSeason = await _playerRepository.LoadForLeague(playerIds);
 
         var now = DateTime.UtcNow;
 

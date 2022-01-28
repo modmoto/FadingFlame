@@ -99,7 +99,7 @@ else
     {
         _loading = true;
         _leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
-        _playersInLeague = await _playerRepository.LoadForLeague(_leagues.SelectMany(l => l.Players).Select(p => p.Id).ToList(), _seasonState.CurrentSeason.SeasonId);
+        _playersInLeague = await _playerRepository.LoadForLeague(_leagues.SelectMany(l => l.Players).Select(p => p.Id).ToList());
         if (_loggedInUserState.UserIsLoggedIn)
         {
             var playerId = _loggedInUserState.LoggedInPlayer.Id;

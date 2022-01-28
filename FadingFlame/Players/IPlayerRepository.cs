@@ -17,7 +17,7 @@ namespace FadingFlame.Players
         Task Insert(Player player);
         Task<Player> LoadByEmail(string accountEmail);
         Task<List<Player>> PlayersThatEnrolledInNextSeason();
-        Task<List<Player>> LoadForLeague(List<ObjectId> playerIds, int season);
+        Task<List<Player>> LoadForLeague(List<ObjectId> playerIds);
         Task<List<Player>> PlayersWithListInCurrentSeason();
         Task Update(List<Player> enlistedPlayers);
     }
@@ -109,7 +109,7 @@ namespace FadingFlame.Players
             return LoadAll<Player>(p => p.ArmyIdNextSeason != default);
         }
 
-        public async Task<List<Player>> LoadForLeague(List<ObjectId> playerIds, int season)
+        public async Task<List<Player>> LoadForLeague(List<ObjectId> playerIds)
         {
             var players = await LoadAll<Player>(p => playerIds.Contains(p.Id));
             await AddArmies(players);

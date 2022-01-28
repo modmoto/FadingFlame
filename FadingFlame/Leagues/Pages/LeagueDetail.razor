@@ -214,7 +214,7 @@ else
         {
             _league = await _leagueRepository.Load(parsed);
             _penalties = MapPenalties(_league);
-            _playersInLeague = await _playerRepository.LoadForLeague(_league.Players.Select(p => p.Id).ToList(), _league.Season);
+            _playersInLeague = await _playerRepository.LoadForLeague(_league.Players.Select(p => p.Id).ToList());
             _playersNotInLeagues = (await _playerRepository.LoadAll()).OrderBy(p => p.DisplayName).ToList();
             var now = DateTime.UtcNow;
             for (int i = 0; i < _league.GameDays.Count; i++)

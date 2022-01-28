@@ -134,28 +134,45 @@
                         </button>
                     </div>
                     <div class="m-2 col">
-                         @if (!_leaguesNextSeason.Any())
-                         {
-                             <button disabled type="button" class="btn btn-primary">
-                                 Matches not created for next season, make promotions and demotions first to make next season official
-                             </button>
-                         } 
-                         else if (_leaguesNextSeason.Any(l => l.Players.Count != League.MaxPlayerCount))
-                         {
-                             <button disabled type="button" class="btn btn-primary">
-                                 Not all leagues have @League.MaxPlayerCount players, add players or delete the league
-                             </button>
-                         }
-                         else
-                         {
-                             <button disabled="@_loadingMakingSeasonOfficial" class="btn btn-primary" @onclick="ApproveMatchesNextSeason">
-                                 @if (_loadingMakingSeasonOfficial)
-                                 {
-                                     <span class="spinner-border spinner-border-sm mr-1"></span>
-                                 }
-                                 Make next season official and release lists and matches
-                             </button>
-                         }
+                        @if (!_leaguesNextSeason.Any())
+                        {
+                            <button disabled type="button" class="btn btn-primary">
+                                Matches not created for next season, make promotions and demotions first to make next season official
+                            </button>
+                        } 
+                        else if (_leaguesNextSeason.Any(l => l.Players.Count != League.MaxPlayerCount))
+                        {
+                            <button disabled type="button" class="btn btn-primary">
+                                Not all leagues have @League.MaxPlayerCount players, add players or delete the league
+                            </button>
+                        }
+                        else
+                        {
+                            <button disabled="@_loadingMakingSeasonOfficial" class="btn btn-primary" @onclick="ApproveMatchesNextSeason">
+                                @if (_loadingMakingSeasonOfficial)
+                                {
+                                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                                }
+                                Make next season official and release lists and matches
+                            </button>
+                        }
+                    </div>
+                    <div class="m-2 col">
+                        <button disabled="@_loadingDiscordTags" type="button" class="btn btn-primary" @onclick="MakeDiscordTags">
+                            @if (_loadingDiscordTags)
+                            {
+                                <span class="spinner-border spinner-border-sm mr-1"></span>
+                            }
+                            Create Discord Tags
+                        </button>
+                        @if (_playersNotFound.Any())
+                        {
+                            <h2>Not found players</h2>
+                            foreach (var player in _playersNotFound)
+                            {
+                                <div>@player.DisplayName / @player.DiscordTag</div> 
+                            }
+                        }
                     </div>
                     <div class="m-2 col">
                         @if (_relegationMatchesStarted)
@@ -333,6 +350,7 @@
     private bool _loadingApprovalOfList;
     private bool _loadingMoveLeagueOver;
     private bool _loadingRelegationMatches;
+    private bool _loadingDiscordTags;
     private List<Player> _players = new();
     private List<Player> _playersEnrolledInNextSeason = new();
     private List<Army> _pendingListChanges = new();
@@ -344,6 +362,7 @@
     private bool _relegationMatchesStarted;
     private bool _playoffsStarted;
     private bool _loadingMakingSeasonOfficial;
+    private List<Player> _playersNotFound = new();
 
     protected override void OnInitialized()
     {
@@ -370,6 +389,13 @@
         _relegationMatchesStarted = !_relegationMatchesNotCreatedEverywhere && relegationMatches.Any(m => m.IsFinished);
     }
 
+    private async Task MakeDiscordTags()
+    {
+        _loadingDiscordTags = true;
+        _playersNotFound = await _discordBot.SetLeagueTagsOnPlayers(_leaguesThisSeason);
+        _loadingDiscordTags = false;
+    }
+    
     private async Task ApproveMatchesNextSeason()
     {
         _loadingMakingSeasonOfficial = true;
