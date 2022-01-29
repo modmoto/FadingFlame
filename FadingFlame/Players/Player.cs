@@ -55,6 +55,17 @@ namespace FadingFlame.Players
             };
         }
 
+        public void SubmitLateList(GameList list1, GameList list2, int season)
+        {
+            ArmyCurrentSeason = new Army
+            {
+                Id = ArmyIdCurrentSeason,
+                Season = season,
+                List1 = list1,
+                List2 = list2
+            };
+        }
+
         public void Update(EditUserModel model)
         {
             DiscordTag = model.DiscordTag;

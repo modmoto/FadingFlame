@@ -243,7 +243,7 @@
           <ValidationMessage For="@(() => _editListModel.List1.List)"/>
           <UserListComponent
             List="@(_editListModel.List1)"
-            IsFreshListPossible="false"
+            IsFreshListPossible="_playerIsLateSignup"
             IsCurrentUser="_isTheRightUser"
             OnRequestListChange="RequestListChange1"
             OnDeleteListChange="DeleteListChange1"/>
@@ -253,13 +253,24 @@
           <ValidationMessage For="@(() => _editListModel.List2.List)"/>
           <UserListComponent
             List="@(_editListModel.List2)"
-            IsFreshListPossible="false"
+            IsFreshListPossible="_playerIsLateSignup"
             IsCurrentUser="_isTheRightUser"
             OnRequestListChange="RequestListChange2"
             OnDeleteListChange="DeleteListChange2"/>
         </div>
       </div>
 
+
+      @if (_playerIsLateSignup)
+      {
+        <button disabled="@_loadingLateListSubmit" class="btn btn-primary" @onclick="OnSubmitLateList">
+          @if (_loadingLateListSubmit)
+          {
+            <span class="spinner-border spinner-border-sm mr-1"></span>
+          }
+          Submit lists
+        </button>
+      }
     </EditForm>
   }
 </div>
@@ -399,6 +410,7 @@
   private bool _isTheRightUser;
   private bool _loadingChallengingPlayer;
   private bool _playerIsLateSignup;
+  private bool _loadingLateListSubmit;
 
   protected override void OnInitialized()
   {
@@ -451,7 +463,9 @@
         };
 
         _isTheRightUser = Id == _loggedInUserState.LoggedInPlayer.Id.ToString();
-        _playerIsLateSignup = _isTheRightUser && _playerLeagues.FirstOrDefault()?.Season == _seasonState.CurrentSeason.SeasonId;
+        _playerIsLateSignup = _isTheRightUser
+                              && _playerLeagues.FirstOrDefault()?.Season == _seasonState.CurrentSeason.SeasonId
+                              && !_player.SubmittedLists;
         SetListEditModel();
         SetListNextSeasonEditModel();
 
@@ -753,5 +767,21 @@
   private void GoToChallenge()
   {
     _navigation.NavigateTo($"match/{_challengeIdFromLoggedInUser}");
+  }
+
+  private async Task OnSubmitLateList()
+  {
+    _loadingLateListSubmit = true;
+    if (_editListModel.List1.Name == _editListModel.List2.Name)
+    {
+      _editListModel.List1.Name += "_1";
+      _editListModel.List2.Name += "_2";
+    }
+    _player.SubmitLateList(
+      GameList.Create(_editListModel.List1.Name, _editListModel.List1.List, _editListModel.List1.Faction)
+      , GameList.Create(_editListModel.List2.Name, _editListModel.List2.List, _editListModel.List2.Faction)
+      , _seasonState.CurrentSeason.SeasonId);
+    await _playerRepository.UpdateWithLists(_player);
+    _loadingLateListSubmit = false;
   }
 }
