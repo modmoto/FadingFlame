@@ -232,7 +232,7 @@
   </table>
 </div>
 <div class="tab-pane fade pt-4" id="lists" role="tabpanel" aria-labelledby="lists-tab">
-  @if (_player.SubmittedLists)
+  @if (_player.SubmittedLists || _playerIsLateSignup)
   {
     <h4>Lists this season</h4>
     <EditForm EditContext="@_editContextLists">
@@ -398,6 +398,7 @@
   private EditContext _editContextListsNextSeason;
   private bool _isTheRightUser;
   private bool _loadingChallengingPlayer;
+  private bool _playerIsLateSignup;
 
   protected override void OnInitialized()
   {
@@ -450,6 +451,7 @@
         };
 
         _isTheRightUser = Id == _loggedInUserState.LoggedInPlayer.Id.ToString();
+        _playerIsLateSignup = _isTheRightUser && _playerLeagues.FirstOrDefault()?.Season == _seasonState.CurrentSeason.SeasonId;
         SetListEditModel();
         SetListNextSeasonEditModel();
 
