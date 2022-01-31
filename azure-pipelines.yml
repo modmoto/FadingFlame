@@ -1,5 +1,10 @@
 name: $(Build.BuildID)
 
+trigger:
+  branches:
+    include:
+      - master
+
 pool:
   vmImage: "ubuntu-20.04"
 

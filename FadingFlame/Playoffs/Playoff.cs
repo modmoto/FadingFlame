@@ -28,40 +28,48 @@ namespace FadingFlame.Playoffs
         {
             var weekerPlayers = new List<PlayerInLeague>();
             var betterPlayers = new List<PlayerInLeague>();
-            // first leagues
-            betterPlayers.Add(BetterOf(leagues, 1, 1));
-            betterPlayers.Add(BetterOf(leagues, 2, 2));
-            betterPlayers.Add(WeekerOf(leagues, 1, 2));
-            betterPlayers.Add(BetterOf(leagues, 2, 1));
-            betterPlayers.Add(WeekerOf(leagues, 1, 1));
-            betterPlayers.Add(BetterOf(leagues, 1, 3));
-            betterPlayers.Add(BetterOf(leagues, 1, 2));
-            betterPlayers.Add(WeekerOf(leagues, 2, 1));
 
-            // lower leagues
-            weekerPlayers.Add(BetterOf(leagues, 6, 1));
-            weekerPlayers.Add(WeekerOf(leagues, 6, 1));
+            if (leagues.Count % 2 == 0)
+            {
+                
+            }
+            else
+            {
+                // first leagues
+                betterPlayers.Add(BetterOf(leagues, 1, 1));
+                betterPlayers.Add(BetterOf(leagues, 2, 2));
+                betterPlayers.Add(WeekerOf(leagues, 1, 2));
+                betterPlayers.Add(BetterOf(leagues, 2, 1));
+                betterPlayers.Add(WeekerOf(leagues, 1, 1));
+                betterPlayers.Add(BetterOf(leagues, 1, 3));
+                betterPlayers.Add(BetterOf(leagues, 1, 2));
+                betterPlayers.Add(WeekerOf(leagues, 2, 1));
+
+                // lower leagues
+                weekerPlayers.Add(BetterOf(leagues, 6, 1));
+                weekerPlayers.Add(WeekerOf(leagues, 6, 1));
             
-            weekerPlayers.Add(WeekerOf(leagues, 2, 2));
-            weekerPlayers.Add(leagues[18].Players[0]);
+                weekerPlayers.Add(WeekerOf(leagues, 2, 2));
+                weekerPlayers.Add(leagues[18].Players[0]);
             
-            weekerPlayers.Add(WeekerOf(leagues, 4, 1));
-            weekerPlayers.Add(BetterOf(leagues, 8, 1));
+                weekerPlayers.Add(WeekerOf(leagues, 4, 1));
+                weekerPlayers.Add(BetterOf(leagues, 8, 1));
             
-            weekerPlayers.Add(BetterOf(leagues, 4, 1));
-            weekerPlayers.Add(WeekerOf(leagues, 8, 1));
+                weekerPlayers.Add(BetterOf(leagues, 4, 1));
+                weekerPlayers.Add(WeekerOf(leagues, 8, 1));
             
-            weekerPlayers.Add(WeekerOf(leagues, 5, 1));
-            weekerPlayers.Add(BetterOf(leagues, 7, 1));
+                weekerPlayers.Add(WeekerOf(leagues, 5, 1));
+                weekerPlayers.Add(BetterOf(leagues, 7, 1));
             
-            weekerPlayers.Add(BetterOf(leagues, 3, 1));
-            weekerPlayers.Add(WeekerOf(leagues, 9, 1));
+                weekerPlayers.Add(BetterOf(leagues, 3, 1));
+                weekerPlayers.Add(WeekerOf(leagues, 9, 1));
             
-            weekerPlayers.Add(BetterOf(leagues, 5, 1));
-            weekerPlayers.Add(WeekerOf(leagues, 7, 1));
+                weekerPlayers.Add(BetterOf(leagues, 5, 1));
+                weekerPlayers.Add(WeekerOf(leagues, 7, 1));
             
-            weekerPlayers.Add(WeekerOf(leagues, 3, 1));
-            weekerPlayers.Add(BetterOf(leagues, 9, 1));
+                weekerPlayers.Add(WeekerOf(leagues, 3, 1));
+                weekerPlayers.Add(BetterOf(leagues, 9, 1));
+            }
             
             var playersWithFreeWins = new List<PlayerInLeague>();
             var playersCount = weekerPlayers.Count + betterPlayers.Count;
