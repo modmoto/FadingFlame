@@ -260,7 +260,6 @@
         </div>
       </div>
 
-
       @if (_playerIsLateSignup)
       {
         <button disabled="@_loadingLateListSubmit" class="btn btn-primary" @onclick="OnSubmitLateList">
@@ -554,8 +553,8 @@
 
     if (_editListModel.List1.Name == _editListModel.List2.Name)
     {
-      _editListModel.List1.Name += "_1";
-      _editListModel.List2.Name += "_2";
+      _editListModelNextSeason.List1.Name += "_1";
+      _editListModelNextSeason.List2.Name += "_2";
     }
     
     var list1 = GameList.Create(_editListModelNextSeason.List1.Name, _editListModelNextSeason.List1.List, _editListModelNextSeason.List1.Faction);
