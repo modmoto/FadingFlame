@@ -32,9 +32,16 @@ namespace FadingFlame.Players
             LoadingPlayer = false;
             UserLoggedIn?.Invoke(this, EventArgs.Empty);
         }
+        
+        public virtual void ToggleAdmin()
+        {
+            UserIsAdmin = !UserIsAdmin;
+            UserLoggedIn?.Invoke(this, EventArgs.Empty);
+        }
 
         public bool UserIsLoggedIn => _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;
-        public bool UserIsAdmin => Admins.Contains(AccountEmail);
+        public bool UserCanBeAdmin => Admins.Contains(AccountEmail);
+        public bool UserIsAdmin { get; private set; }
         public Player LoggedInPlayer { get; private set; } = new();
         public DateTimeOffset? CurrentUserTime { get; private set; }
         public bool LoadingPlayer { get; private set; } = true;

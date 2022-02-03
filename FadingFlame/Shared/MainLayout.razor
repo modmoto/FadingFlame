@@ -16,6 +16,19 @@
             </NavLink>
             <AuthorizeView>
                 <Authorized>
+                    @if (_loggedInUserState.UserCanBeAdmin)
+                    {
+                        <button class="btn btn-warning ms-4" @onclick="_loggedInUserState.ToggleAdmin">
+                            @if (_loggedInUserState.UserIsAdmin)
+                            {
+                                <span>Disable admin mode</span>
+                            }
+                            else
+                            {
+                                <span>Enable admin mode</span>
+                            }
+                        </button>    
+                    }
                     <span><a href="@($"/player/{_loggedInUserState.LoggedInPlayer.Id}")">My profile</a></span>
                     <a href="/Logout">
                         <span class="oi oi-account-logout" aria-hidden="true"></span>
