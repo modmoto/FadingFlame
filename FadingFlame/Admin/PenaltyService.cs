@@ -72,7 +72,7 @@ namespace FadingFlame.Admin
                         }
                     }
 
-                    if (list1Count < 2 || list2Count < 2)
+                    if (list1Count < 1 || list2Count < 1)
                     {
                         penalties.Add(new PenaltyUser(player.Id, player.DisplayName, player.DiscordTag, league.DivisionId, league.Name, player.ArmyCurrentSeason.List1.List, player.ArmyCurrentSeason.List2.List));
                     }
