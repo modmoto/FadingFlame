@@ -181,7 +181,8 @@ namespace FadingFlame.Playoffs
 
             var otherMatchIndex = matchIndex % 2 == 0 ? matchIndex + 1 : matchIndex - 1;
 
-            if (round.Matchups.Count != 1)
+            // except finale
+            if (round.Matchups.Count > 1)
             {
                 var otherMatchuP = round.Matchups[otherMatchIndex];
 
