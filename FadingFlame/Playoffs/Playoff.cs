@@ -181,25 +181,28 @@ namespace FadingFlame.Playoffs
 
             var otherMatchIndex = matchIndex % 2 == 0 ? matchIndex + 1 : matchIndex - 1;
 
-            var otherMatchuP = round.Matchups[otherMatchIndex];
-
-            if (otherMatchIndex < matchIndex)
+            if (round.Matchups.Count != 1)
             {
-                var playerInLeague1 = PlayerInLeague.Create(otherMatchuP.Result?.Winner ?? ObjectId.GenerateNewId());
-                var playerInLeague2 = PlayerInLeague.Create(match.Result?.Winner ?? ObjectId.GenerateNewId());
-                var matchup = Matchup.CreateForPlayoff(Rounds[roundIndex + 1].Matchups[otherMatchIndex / 2].Id, playerInLeague1, playerInLeague2);
+                var otherMatchuP = round.Matchups[otherMatchIndex];
 
-                Rounds[roundIndex + 1].Matchups[otherMatchIndex / 2] = matchup;
+                if (otherMatchIndex < matchIndex)
+                {
+                    var playerInLeague1 = PlayerInLeague.Create(otherMatchuP.Result?.Winner ?? ObjectId.GenerateNewId());
+                    var playerInLeague2 = PlayerInLeague.Create(match.Result?.Winner ?? ObjectId.GenerateNewId());
+                    var matchup = Matchup.CreateForPlayoff(Rounds[roundIndex + 1].Matchups[otherMatchIndex / 2].Id, playerInLeague1, playerInLeague2);
+
+                    Rounds[roundIndex + 1].Matchups[otherMatchIndex / 2] = matchup;
+                }
+                else
+                {
+                    var playerInLeague1 = PlayerInLeague.Create(otherMatchuP.Result?.Winner ?? ObjectId.GenerateNewId());
+                    var playerInLeague2 = PlayerInLeague.Create(match.Result?.Winner ?? ObjectId.GenerateNewId());
+                    var matchup = Matchup.CreateForPlayoff(Rounds[roundIndex + 1].Matchups[matchIndex / 2].Id, playerInLeague2, playerInLeague1);
+
+                    Rounds[roundIndex + 1].Matchups[matchIndex / 2] = matchup;
+                }
             }
-            else
-            {
-                var playerInLeague1 = PlayerInLeague.Create(otherMatchuP.Result?.Winner ?? ObjectId.GenerateNewId());
-                var playerInLeague2 = PlayerInLeague.Create(match.Result?.Winner ?? ObjectId.GenerateNewId());
-                var matchup = Matchup.CreateForPlayoff(Rounds[roundIndex + 1].Matchups[matchIndex / 2].Id, playerInLeague2, playerInLeague1);
-
-                Rounds[roundIndex + 1].Matchups[matchIndex / 2] = matchup;
-            }
-
+           
             return result;
         }
 
