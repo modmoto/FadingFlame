@@ -30,6 +30,7 @@ namespace FadingFlame.Admin
                 foreach (var leaguePlayer in league.Players)
                 {
                     var player = players.Single(p => p.Id == leaguePlayer.Id);
+                    if (player.ArmyCurrentSeason == null) continue;
                     if (player.ArmyCurrentSeason.List1.List == player.ArmyCurrentSeason.List2.List) continue;
                     if (player.ArmyCurrentSeason.List2.List == "NA") continue;
                     if (player.ArmyCurrentSeason.List2.List == "none") continue;
