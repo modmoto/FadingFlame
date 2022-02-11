@@ -36,25 +36,31 @@ else
     <div class="row">
         @if (_upcomingGame != null)
         {
-            <div class="col mx-2 pt-3 pb-3 alert alert-info text-center cursor" role="alert" @onclick="@(() => _navigation.NavigateTo($"match/{_upcomingGame.Id}?leagueId={_leagueIdForUpcomingDay}"))">
-                Upcoming game against @_upcomingOpponenName
+            <div class="col mx-2 pt-3 pb-3 alert alert-info text-center" role="alert">
+                <NavLink class="nolinkstyle" Match="NavLinkMatch.All" href="@($"match/{_upcomingGame.Id}?leagueId={_leagueIdForUpcomingDay}")">
+                    Upcoming game against @_upcomingOpponenName
+                </NavLink>
             </div>
         }
         @if (_upcomingChallenge != null)
         {
-            <div class="col mx-2 pt-3 pb-3 alert alert-info text-center cursor" role="alert" @onclick="@(() => _navigation.NavigateTo($"match/{_upcomingChallenge.Id}"))">
-                Upcoming challenge against @_upcomingChallengeName
+            <div class="col mx-2 pt-3 pb-3 alert alert-info text-center" role="alert">
+                <NavLink class="nolinkstyle" Match="NavLinkMatch.All" href="@($"match/{_upcomingChallenge.Id}")">
+                    Upcoming challenge against @_upcomingChallengeName
+                </NavLink>
             </div>
         }
     </div>
     <div class="row row-cols-auto justify-content-around">
         @foreach (var league in _leagues)
         {
-            <div class="col mb-4 cursor" @onclick="() => GoToLeague(league.Id)">
+            <div class="col mb-4">
                 <div class="card" style="width: 18rem;">
-                    <div class="card-header">
-                        @league.DivisionId @league.Name
-                    </div>
+                    <NavLink class="nolinkstyle" Match="NavLinkMatch.All" href="@($"league/{league.Id}")">
+                        <div class="card-header">
+                            @league.DivisionId @league.Name
+                        </div>
+                    </NavLink>
                     <div class="card-body">
                         <span class="oi oi-star" aria-hidden="true"></span><span class="card-title mx-2">@GetName(league.Players.First().Id)</span>
                     </div>
@@ -67,7 +73,6 @@ else
 
 @inject IPlayerRepository _playerRepository
 @inject ILeagueRepository _leagueRepository
-@inject NavigationManager _navigation
 @inject SeasonState _seasonState
 @inject LoggedInUserState _loggedInUserState
 @inject IMatchupRepository _matchupRepository
@@ -137,10 +142,5 @@ else
     private string GetName(ObjectId playerId)
     {
         return _playersInLeague.FirstOrDefault(p => p.Id == playerId)?.DisplayName;
-    }
-
-    public void GoToLeague(ObjectId leagueId)
-    {
-        _navigation.NavigateTo($"league/{leagueId}");
     }
 }
