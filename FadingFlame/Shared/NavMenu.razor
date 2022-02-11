@@ -2,6 +2,23 @@
 
 <div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand ms-4" href="">Fading Flame</a>
+    @if (_loggedInUserState.UserCanBeAdmin)
+    {
+        <div class="d-xxl-none d-xl-none d-lg-none d-md-none d-sm-none">
+            @if (_loggedInUserState.UserIsAdmin)
+            {
+                <button class="btn btn-warning" @onclick="_loggedInUserState.ToggleAdmin">
+                    <span class="oi oi-shield" aria-hidden="true"></span>
+                </button>  
+            }
+            else
+            {
+                <button class="btn btn-outline-warning" @onclick="_loggedInUserState.ToggleAdmin">
+                    <span class="oi oi-shield" aria-hidden="true"></span>
+                </button>  
+            }
+        </div>
+    }
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
     </button>

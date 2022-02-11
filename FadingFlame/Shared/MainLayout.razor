@@ -18,16 +18,18 @@
                 <Authorized>
                     @if (_loggedInUserState.UserCanBeAdmin)
                     {
-                        <button class="btn btn-warning ms-4" @onclick="_loggedInUserState.ToggleAdmin">
-                            @if (_loggedInUserState.UserIsAdmin)
-                            {
-                                <span>Disable admin mode</span>
-                            }
-                            else
-                            {
-                                <span>Enable admin mode</span>
-                            }
-                        </button>    
+                        @if (_loggedInUserState.UserIsAdmin)
+                        {
+                            <button class="btn btn-warning ms-4" @onclick="_loggedInUserState.ToggleAdmin">
+                                <span class="oi oi-shield" aria-hidden="true"></span>
+                            </button>  
+                        }
+                        else
+                        {
+                            <button class="btn btn-outline-warning ms-4" @onclick="_loggedInUserState.ToggleAdmin">
+                                <span class="oi oi-shield" aria-hidden="true"></span>
+                            </button>  
+                        }  
                     }
                     <span><a href="@($"/player/{_loggedInUserState.LoggedInPlayer.Id}")">My profile</a></span>
                     <a href="/Logout">
