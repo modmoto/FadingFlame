@@ -22,9 +22,13 @@
     <tbody>
     @foreach (var item in _enlistedPlayersOriginal.Select((value, index) => new {value, index}))
     {
-      <tr @onclick="() => GoToPlayer(item.value.Id)" class="cursor">
+      <tr>
         <td>@(item.index + 1).</td>
-        <td>@item.value.Name</td>
+        <td>
+          <NavLink class="nolinkstyle" Match="NavLinkMatch.All" href="@($"/player/{item.value.Id}")">
+            @item.value.Name
+          </NavLink>
+        </td>
         <td>@item.value.Mmr</td>
         <td class="won">@item.value.Wins</td>
         <td class="lost">@item.value.Losses</td>
@@ -48,7 +52,6 @@
 </div>
 
 @inject IRankingReadmodelRepository _playerRepository
-@inject NavigationManager _navigation
 @inject IGeoLocationService _geoLocationService
 @inject LoggedInUserState _loggedInUserState
 
@@ -58,10 +61,5 @@
   protected override async Task OnInitializedAsync()
   {
     _enlistedPlayersOriginal = await _playerRepository.LoadAllRanked();
-  }
-
-  private void GoToPlayer(ObjectId playerId)
-  {
-    _navigation.NavigateTo($"player/{playerId}");
   }
 }

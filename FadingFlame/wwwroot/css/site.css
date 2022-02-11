@@ -20,6 +20,15 @@ html, body {
     color: #BBAA1BFF;    
 }
 
+.nolinkstyle {
+    text-decoration: none;
+    color: inherit;
+}
+
+.nolinkstyle:hover {
+    color: inherit;
+}
+
 a, .btn-link {
     color: #0366d6;
 }

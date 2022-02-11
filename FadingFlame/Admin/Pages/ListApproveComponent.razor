@@ -4,7 +4,11 @@
     <div class="card-body">
         <div class="row align-items-start">
             <div class="form-group mb-3">
-                <div><b>Reques from @Player.DisplayName / @Player.DiscordTag</b></div> 
+                <NavLink class="nolinkstyle" Match="NavLinkMatch.All" href="@($"/player/{Player.Id}")">
+                    <b>
+                        Request from @Player.DisplayName / @Player.DiscordTag
+                    </b>
+                </NavLink>
             </div>
         </div>
         <div class="row align-items-start mb-3">

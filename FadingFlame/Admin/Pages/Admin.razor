@@ -27,7 +27,11 @@
                         <ul class="list-group list-group-flush">
                             @foreach (var player in _playersEnrolledInNextSeason)
                             {
-                                <li class="list-group-item cursor" @onclick="() => GoToPlayer(player.Id)">@player.DisplayName / @player.DiscordTag</li>
+                                <li class="list-group-item">
+                                    <NavLink class="nolinkstyle" Match="NavLinkMatch.All" href="@($"/player/{player.Id}")">
+                                        @player.DisplayName / @player.DiscordTag
+                                    </NavLink>
+                                </li>
                             }
                         </ul>
                     </div>
@@ -38,7 +42,11 @@
                         <ul class="list-group list-group-flush">
                             @foreach (var player in _players)
                             {
-                                <li class="list-group-item cursor" @onclick="() => GoToPlayer(player.Id)">@player.DisplayName / @player.DiscordTag</li>
+                                <li class="list-group-item">
+                                    <NavLink class="nolinkstyle" Match="NavLinkMatch.All" href="@($"/player/{player.Id}")">
+                                        @player.DisplayName / @player.DiscordTag
+                                    </NavLink>
+                                </li>
                             }
                         </ul>
                     </div>
@@ -78,9 +86,11 @@
             {
                 <div class="card mb-3 mt-1">
                     <div class="card-body">
-                        <div class="row align-items-start" @onclick="() => GoToPlayer(penaltyUser.PlayerId)">
+                        <div class="row align-items-start">
                             <div class="form-group mb-3">
-                                <div><b>Penalty for @penaltyUser.PlayerDisplayName / @penaltyUser.PlayerDiscordTag in League @penaltyUser.LeagueDivisionId</b></div> 
+                                <NavLink class="nolinkstyle" Match="NavLinkMatch.All" href="@($"/player/{penaltyUser.PlayerId}")">
+                                    <b>Penalty for @penaltyUser.PlayerDisplayName / @penaltyUser.PlayerDiscordTag in League @penaltyUser.LeagueDivisionId</b>
+                                </NavLink>
                             </div>
                         </div>
                         <details>
@@ -413,11 +423,6 @@
     private Player GetPlayer(ObjectId playerId)
     {
         return _players.FirstOrDefault(p => p.Id == playerId);
-    }
-
-    private void GoToPlayer(ObjectId playerId)
-    {
-        _navigation.NavigateTo($"player/{playerId}");
     }
 
     private async Task SaveSeason(Season season)
