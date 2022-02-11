@@ -32,8 +32,12 @@ else
         <tbody class="league table table-hover">
         @foreach (var item in _league.Players.Select((value, index) => new { value, index }))
         {
-            <tr @onclick="() => GoToPlayer(item.value.Id)" class="cursor">
-                <td>@GetName(item.value.Id)</td>
+            <tr>
+                <td>
+                    <NavLink class="nolinkstyle" Match="NavLinkMatch.All" href="@($"player/{item.value.Id}")">
+                        @GetName(item.value.Id)
+                    </NavLink>
+                </td>
                 <td>@GetRace(item.value.Id)</td>
                 <td>@item.value.BattlePoints</td>
                 <td>@item.value.VictoryPoints</td>
@@ -158,27 +162,29 @@ else
                 <div class="row row-cols-auto justify-content-around">
                     @foreach (var matchup in gameDay.value.Matchups)
                     {
-                        <div class="col pb-4">
-                            <div class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)" style="width: 24rem;">
-                                <div class="card-header">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1">@(GetName(matchup.Player1)) vs @(GetName(matchup.Player2))</h5>
-                                        <small>@matchup.Result?.RecordedAt.ToMyDate()</small>
+                        <NavLink class="nolinkstyle" Match="NavLinkMatch.All" href="@($"match/{matchup.Id}?leagueId={_league.Id}")">
+                            <div class="col pb-4">
+                                <div class="@GetClasses(matchup)" style="width: 24rem;">
+                                    <div class="card-header">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h5 class="mb-1">@(GetName(matchup.Player1)) vs @(GetName(matchup.Player2))</h5>
+                                            <small>@matchup.Result?.RecordedAt.ToMyDate()</small>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        @if (matchup.Result != null)
+                                        {
+                                            <p class="mb-1">@matchup.Result.Player1.BattlePoints : @matchup.Result.Player2.BattlePoints</p>
+                                            <small>@GetOriginalPointsString(matchup.Result)</small>
+                                        }
+                                        else
+                                        {
+                                            <p class="mb-1">not reported yet</p>
+                                        }
                                     </div>
                                 </div>
-                                <div class="card-body">
-                                    @if (matchup.Result != null)
-                                    {
-                                        <p class="mb-1">@matchup.Result.Player1.BattlePoints : @matchup.Result.Player2.BattlePoints</p>
-                                        <small>@GetOriginalPointsString(matchup.Result)</small>
-                                    }
-                                    else
-                                    {
-                                        <p class="mb-1">not reported yet</p>
-                                    }
-                                </div>
                             </div>
-                        </div>
+                        </NavLink>
                     }
                 </div>
             </div>
@@ -188,7 +194,6 @@ else
 
 @inject ILeagueRepository _leagueRepository
 @inject IPlayerRepository _playerRepository
-@inject NavigationManager _navigation
 @inject LoggedInUserState _loggedInUserState
 
 @code {
@@ -269,20 +274,10 @@ else
         return index == _activeDay ? "tab-pane fade show active" : "tab-pane fade";
     }
 
-    private void GoToPlayer(ObjectId playerId)
-    {
-        _navigation.NavigateTo($"player/{playerId}");
-    }
-
     private void SelectGameDay(int id)
     {
         _activeDay = id;
         StateHasChanged();
-    }
-
-    private void GoToMatch(Matchup matchup)
-    {
-        _navigation.NavigateTo($"match/{matchup.Id}?leagueId={_league.Id}");
     }
 
     private string GetSecondaryStringForPlayer1(SecondaryObjectiveState resultSecondaryObjective)
