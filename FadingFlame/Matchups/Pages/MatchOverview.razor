@@ -172,14 +172,14 @@ else
     {
         var player = _playersInSeason.FirstOrDefault(p => p.Id == match.Player1);
         if (player == null) return "";
-        return match.Player1List == player.ArmyCurrentSeason.List1.Name ? player.ArmyCurrentSeason.List1.Faction.ToCamelCaseString() : player.ArmyCurrentSeason.List2.Faction.ToCamelCaseString();
+        return match.Player1List == player.ArmyCurrentSeason?.List1.Name ? player.ArmyCurrentSeason?.List1.Faction.ToCamelCaseString() : player.ArmyCurrentSeason?.List2.Faction.ToCamelCaseString();
     }
 
     private string GetRace2(Matchup match)
     {
         var player = _playersInSeason.FirstOrDefault(p => p.Id == match.Player2);
         if (player == null) return "";
-        return match.Player2List == player?.ArmyCurrentSeason.List1.Name ? player.ArmyCurrentSeason.List1.Faction.ToCamelCaseString() : player.ArmyCurrentSeason.List2.Faction.ToCamelCaseString();
+        return match.Player2List == player.ArmyCurrentSeason?.List1.Name ? player.ArmyCurrentSeason?.List1.Faction.ToCamelCaseString() : player.ArmyCurrentSeason?.List2.Faction.ToCamelCaseString();
     }
 
     private string GetResult(Matchup match)
