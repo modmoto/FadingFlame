@@ -445,7 +445,6 @@
       }
       else
       {
-        
         _playerLeagues = (await _leagueRepository.LoadLeaguesForPlayer(_player.Id))
           .OrderByDescending(r => r.Season).ToList();
 
@@ -462,9 +461,13 @@
         };
 
         _isTheRightUser = Id == _loggedInUserState.LoggedInPlayer.Id.ToString();
+        _player.ArmyCurrentSeason = null;
+        _player.ArmyIdCurrentSeason = default;
+        
         _playerIsLateSignup = _isTheRightUser
                               && _playerLeagues.FirstOrDefault()?.Season == _seasonState.CurrentSeason.SeasonId
                               && !_player.SubmittedLists;
+
         SetListEditModel();
         SetListNextSeasonEditModel();
 
@@ -771,6 +774,14 @@
   private async Task OnSubmitLateList()
   {
     _loadingLateListSubmit = true;
+    await ValidateListEdit(_messageStoreLists, _editListModel);
+    
+    if (!_editContextLists.Validate())
+    {
+      _loadingLateListSubmit = false;
+      return;
+    }
+    
     if (_editListModel.List1.Name == _editListModel.List2.Name)
     {
       _editListModel.List1.Name += "_1";
