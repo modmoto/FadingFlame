@@ -461,9 +461,6 @@
         };
 
         _isTheRightUser = Id == _loggedInUserState.LoggedInPlayer.Id.ToString();
-        _player.ArmyCurrentSeason = null;
-        _player.ArmyIdCurrentSeason = default;
-        
         _playerIsLateSignup = _isTheRightUser
                               && _playerLeagues.FirstOrDefault()?.Season == _seasonState.CurrentSeason.SeasonId
                               && !_player.SubmittedLists;
