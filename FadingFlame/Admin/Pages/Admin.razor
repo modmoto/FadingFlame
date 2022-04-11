@@ -208,7 +208,7 @@
                                 {
                                     <span class="spinner-border spinner-border-sm mr-1"></span>
                                 }
-                                Create Playoffs Season 1
+                                Create Playoffs Season @_seasonState.CurrentSeason.SeasonId
                             </button>
                         }
                     </div>
@@ -392,7 +392,7 @@
         var playoff = await _playoffRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
         if (playoff != null)
         {
-            _playoffsStarted = playoff.Rounds.Any() && playoff.Rounds.SelectMany(r => r.Matchups).Any(m => m.IsFinished);    
+            _playoffsStarted = playoff.Rounds.Any() && playoff.Rounds.SelectMany(r => r.Matchups).Any(m => m.IsFinished && m.Player2 != ObjectId.Empty);    
         }
         _relegationMatchesNotCreatedEverywhere = _leaguesThisSeason[0].RelegationMatches.Count == 0;
         var relegationMatches = _leaguesThisSeason.SelectMany(c => c.RelegationMatches).ToList();

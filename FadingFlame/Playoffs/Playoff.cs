@@ -26,7 +26,6 @@ namespace FadingFlame.Playoffs
             int season,
             List<League> leagues)
         {
-            var weekerPlayers = new List<PlayerInLeague>();
             var betterPlayers = new List<PlayerInLeague>();
             // first leagues
             betterPlayers.Add(BetterOf(leagues, 1, 1));
@@ -38,39 +37,19 @@ namespace FadingFlame.Playoffs
             betterPlayers.Add(BetterOf(leagues, 1, 2));
             betterPlayers.Add(WeekerOf(leagues, 2, 1));
 
-            // lower leagues
-            weekerPlayers.Add(BetterOf(leagues, 6, 1));
-            weekerPlayers.Add(WeekerOf(leagues, 6, 1));
-            
-            weekerPlayers.Add(WeekerOf(leagues, 2, 2));
-            weekerPlayers.Add(leagues[18].Players[0]);
-            
-            weekerPlayers.Add(WeekerOf(leagues, 4, 1));
-            weekerPlayers.Add(BetterOf(leagues, 8, 1));
-            
-            weekerPlayers.Add(BetterOf(leagues, 4, 1));
-            weekerPlayers.Add(WeekerOf(leagues, 8, 1));
-            
-            weekerPlayers.Add(WeekerOf(leagues, 5, 1));
-            weekerPlayers.Add(BetterOf(leagues, 7, 1));
-            
-            weekerPlayers.Add(BetterOf(leagues, 3, 1));
-            weekerPlayers.Add(WeekerOf(leagues, 9, 1));
-            
-            weekerPlayers.Add(BetterOf(leagues, 5, 1));
-            weekerPlayers.Add(WeekerOf(leagues, 7, 1));
-            
-            weekerPlayers.Add(WeekerOf(leagues, 3, 1));
-            weekerPlayers.Add(BetterOf(leagues, 9, 1));
-            
+            var lowerLeagues = leagues.Skip(4).ToList();
+            var weekerPlayers = lowerLeagues.Select(l => l.Players.First()).ToList();
+            if (weekerPlayers.Count < 16)
+            {
+                var remainingSeconds = lowerLeagues.Select(l => l.Players.Skip(1).First()).Take(16 - weekerPlayers.Count);
+                weekerPlayers.AddRange(remainingSeconds);
+            }
+            weekerPlayers.Shuffle();
+
             var playersWithFreeWins = new List<PlayerInLeague>();
             var playersCount = weekerPlayers.Count + betterPlayers.Count;
             var remainingRounds = NormalRounds.Where(r => r < playersCount).ToList();
-            var roundIndex = remainingRounds.First();
-            var gamesTooMuch = playersCount - roundIndex;
-            var remainingGames = gamesTooMuch * 2;
-            var freeWinCounter = playersCount - remainingGames;
-            for (int i = 0; i < freeWinCounter; i++)
+            for (int i = 0; i < 8; i++)
             {
                 var dummyPlayer = PlayerInLeague.Create(ObjectId.Empty);
                 playersWithFreeWins.Add(betterPlayers[i]);
