@@ -1,3 +1,6 @@
+
+using System.Text.Json.Serialization;
+
 namespace FadingFlame.Lists
 {
     public class GameList
@@ -31,6 +34,7 @@ namespace FadingFlame.Lists
         public Faction Faction { get; set; }
 
         public string List { get; set; }
+        [JsonIgnore]
         public string ProposedListChange { get; set; }
 
         public string Name { get; set; }

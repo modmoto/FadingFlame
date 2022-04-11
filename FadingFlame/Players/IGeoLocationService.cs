@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.JSInterop;
-using Newtonsoft.Json;
 
 namespace FadingFlame.Players
 {
@@ -55,7 +56,7 @@ namespace FadingFlame.Players
             var decodedIp = HttpUtility.UrlEncode(userIpAdress?.ToString());
             var httpResponseMessage = await _httpClient.GetAsync($"?ip={decodedIp}");
             var content = await httpResponseMessage.Content.ReadAsStringAsync();
-            var info = JsonConvert.DeserializeObject<LocationDto>(content);
+            var info = JsonSerializer.Deserialize<LocationDto>(content);
             var timeZoneInfos = GetTimeZones();
 
             var location = new Location();
@@ -113,9 +114,9 @@ namespace FadingFlame.Players
 
     public class LocationDto
     {
-        [JsonProperty("geoplugin_countryCode")]
+        [JsonPropertyName("geoplugin_countryCode")]
         public string CuntryCode { get; set; }
-        [JsonProperty("geoplugin_timezone")]
+        [JsonPropertyName("geoplugin_timezone")]
         public string Timezone { get; set; }
     }
 }
