@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -130,6 +131,17 @@ namespace FadingFlame.Playoffs
             }
 
             return playerA.BattlePoints < playerB.BattlePoints ? playerA : playerB;
+        }
+
+        public void SetDeadline(List<DateTime> dateTimes)
+        {
+            if (dateTimes.Count == Rounds.Count)
+            {
+                for (int i = 0; i < Rounds.Count; i++)
+                {
+                    Rounds[i].DeadLine = dateTimes[i];
+                }
+            }
         }
 
         public async Task<MatchResult> ReportGame(

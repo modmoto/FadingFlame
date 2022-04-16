@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FadingFlame.Leagues;
 using FadingFlame.Matchups;
@@ -9,6 +10,7 @@ namespace FadingFlame.Playoffs
     public class Round
     {
         [BsonIgnore]
+        public DateTime DeadLine { get; set; }
         public List<Matchup> Matchups { get; set; }
         public List<ObjectId> MatchupIds { get; set; } = new();
 
