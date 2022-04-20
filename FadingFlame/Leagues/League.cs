@@ -15,6 +15,7 @@ namespace FadingFlame.Leagues
     public class League : IIdentifiable, IVersionable
     {
         public const int MaxPlayerCount = 6;
+        public const int GamesCount = MaxPlayerCount - 1;
         public string Name { get; set; }
         public int Version { get; set; } = 0;
         public int Season { get; set; }

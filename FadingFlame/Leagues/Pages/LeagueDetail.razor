@@ -278,7 +278,7 @@ else
     
     private string GetActiveOrNot(int index)
     {
-        return index == _activeDay ? "tab-pane fade show active" : "tab-pane fade";
+        return index == _activeDay || index == League.GamesCount ? "tab-pane fade show active" : "tab-pane fade";
     }
 
     private void SelectGameDay(int id)
@@ -362,6 +362,6 @@ else
 
     private static string GetGameDay(int gameDay)
     {
-        return gameDay == League.MaxPlayerCount - 1 ? "Relegation" : $"{gameDay + 1}";
+        return gameDay == League.GamesCount ? "Relegation" : $"{gameDay + 1}";
     }
 }
