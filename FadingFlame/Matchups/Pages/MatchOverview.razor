@@ -63,7 +63,7 @@ else
         <div class="@GetActiveOrNot(gameDay.index)" id="@("game-day-" + gameDay.index + 1)" role="tabpanel" aria-labelledby="@("#game-day-" + gameDay.index + 1)">
             @if (gameDay.index == 5)
             {
-                <div class="lead mb-3">@_leagues.First().RelegationDeadLine.ToMyDate()  —  @Deployment.RandomDeployment.ToCamelCaseString() with @SecondaryObjective.RandomObjective.ToCamelCaseString()</div>
+                <div class="lead mb-3">@_leagues.First().GameDays.SkipLast(1).Last().EndDate.ToMyDate() - @_leagues.First().RelegationDeadLine.ToMyDate()  —  @Deployment.RandomDeployment.ToCamelCaseString() with @SecondaryObjective.RandomObjective.ToCamelCaseString()</div>
             }
             else
             {
