@@ -35,6 +35,7 @@ namespace FadingFlame.Leagues
         public Matchup RelegationMatchOverTwoLeagues => RelegationMatches.SkipLast(1).LastOrDefault();
 
         public DateTime StartDate { get; set; }
+        public DateTime RelegationDeadLine { get; set; }
 
         public void RemoveFromLeague(ObjectId playerId)
         {

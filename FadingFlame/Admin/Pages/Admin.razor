@@ -288,6 +288,19 @@
                             </button>
                         </EditForm>
 
+                        <h5 class="mt-3">Relegation Deadline</h5>
+                        <div class="form-group">
+                            <input type="date" @bind="_deadLineRelegations" class="form-control mb-3"/>
+                        </div>
+
+                        <button disabled="@_loadingSeasons" class="btn btn-primary" @onclick="SaveRelegationDeadline">
+                            @if (_loadingSeasons)
+                            {
+                                <span class="spinner-border spinner-border-sm mr-1"></span>
+                            }
+                            Save deadlines of relegations
+                        </button>
+
                     </div>
                     <div class="col">
                         <h4>Next Season (@_seasonState.NextSeason.SeasonId):</h4>
@@ -403,6 +416,7 @@
     private List<League> _leaguesNextSeason = new();
     private List<Matchup> _unfinishedRelegations = new();
     private List<DateTime> _deadLineOfPlayoffs = new DateTime[5].ToList();
+    private DateTime _deadLineRelegations;
     private bool _relegationMatchesNotCreatedEverywhere;
     private bool _relegationMatchesStarted;
     private bool _playoffsStarted;
@@ -430,6 +444,7 @@
             _deadLineOfPlayoffs = _playoff.Rounds.Select(r => r.DeadLine).ToList();
         }
         _relegationMatchesNotCreatedEverywhere = _leaguesThisSeason[0].RelegationMatches.Count == 0;
+        _deadLineRelegations = _leaguesThisSeason[0].RelegationDeadLine;
         var relegationMatches = _leaguesThisSeason.SelectMany(c => c.RelegationMatches).ToList();
         _unfinishedRelegations = relegationMatches.Where(r => !r.IsFinished).ToList();
         _relegationMatchesStarted = !_relegationMatchesNotCreatedEverywhere && relegationMatches.Any(m => m.IsFinished);
@@ -439,6 +454,16 @@
     {
         _playoff.SetDeadline(_deadLineOfPlayoffs);
         await _playoffRepository.Update(_playoff);
+    }
+
+    private async Task SaveRelegationDeadline()
+    {
+
+        foreach (var league in _leaguesThisSeason)
+        {
+            league.RelegationDeadLine = _deadLineRelegations;
+            await _leagueRepository.Update(league);
+        }
     }
 
     private async Task MakeDiscordTags()
@@ -454,6 +479,7 @@
         await _leagueCreationService.MakeSeasonOfficial();
         _loadingMakingSeasonOfficial = false;
     }
+
     private async Task CreatePlayoffs()
     {
         _loadingPlayoffs = true;
