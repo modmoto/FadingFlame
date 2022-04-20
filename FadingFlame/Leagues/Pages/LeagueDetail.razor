@@ -158,7 +158,14 @@ else
         @foreach (var gameDay in _league.GameDays.Select((value, index) => new {value, index}))
         {
             <div class="@GetActiveOrNot(gameDay.index)" id="@("game-day-league-" + gameDay.index + 1)" role="tabpanel" aria-labelledby="@("#game-day-league-" + gameDay.index + 1)">
-                <div class="lead mb-3">@gameDay.value.StartDate.ToMyDate() - @gameDay.value.EndDate.ToMyDate()  —  @gameDay.value.Deployment.ToCamelCaseString() with @gameDay.value.SecondaryObjective.ToCamelCaseString()</div>
+                @if (gameDay.index == 5)
+                {
+                    <div class="lead mb-3">@_league.RelegationDeadLine.ToMyDate()  —  @Deployment.RandomDeployment.ToCamelCaseString() with @SecondaryObjective.RandomObjective.ToCamelCaseString()</div>
+                }
+                else
+                {
+                    <div class="lead mb-3">@gameDay.value.StartDate.ToMyDate() - @gameDay.value.EndDate.ToMyDate()  —  @gameDay.value.Deployment.ToCamelCaseString() with @gameDay.value.SecondaryObjective.ToCamelCaseString()</div>
+                }
                 <div class="row row-cols-auto justify-content-around">
                     @foreach (var matchup in gameDay.value.Matchups)
                     {
