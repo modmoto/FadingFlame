@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using FadingFlame.Leagues;
 using FadingFlame.Matchups;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 
 namespace FadingFlame.Playoffs
 {
     public class Round
     {
-        [BsonIgnore]
         public DateTime DeadLine { get; set; }
         public List<Matchup> Matchups { get; set; }
         public List<ObjectId> MatchupIds { get; set; } = new();

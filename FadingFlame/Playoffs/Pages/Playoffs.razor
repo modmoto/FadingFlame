@@ -22,6 +22,7 @@ else
             {
                 <div style="display: flex; flex-direction: column; justify-content: space-around; justify-items: center; ">
                     <div class="mx-4 mt-1 mb-3" style="position: absolute; top: 10rem">Round @(_playoffs.Rounds.Count - i)</div>
+                    <div class="mx-4 mt-1 mb-3 blockquote-footer" style="position: absolute; top: 11.5rem">until @_playoffs.Rounds[i].DeadLine.ToMyDate()</div>
                     @foreach (var matchup in _playoffs.Rounds[i].Matchups)
                     {
                         <div class="@GetClasses(matchup)" @onclick="() => GoToMatch(matchup)" style="width: 12rem">

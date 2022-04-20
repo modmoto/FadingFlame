@@ -258,13 +258,27 @@
                         </EditForm>
                         <h5>Playoff Deadlines</h5>
                         <EditForm OnSubmit="() => SaveDeadlines()" Model="@_deadLineOfPlayoffs">
-                            @for (int i = 0; i < _deadLineOfPlayoffs.Count; i++)
-                            {
-                                <div class="form-group">
-                                    <div class="pb-2">Round ():</div>
-                                    <input type="date" @onchange="e => _deadLineOfPlayoffs[i] = DateTime.Parse(e.Value.ToString())" class="form-control mb-3"/>
-                                </div>
-                            }
+                            <div class="form-group">
+                                <div class="pb-2">Round of 32:</div>
+                                <input type="date" @bind="_deadLineOfPlayoffs[0]" class="form-control mb-3"/>
+                            </div>
+                            <div class="form-group">
+                                <div class="pb-2">Round of 16:</div>
+                                <input type="date" @bind="_deadLineOfPlayoffs[1]" class="form-control mb-3"/>
+                            </div>
+                            <div class="form-group">
+                                <div class="pb-2">Round of 8:</div>
+                                <input type="date" @bind="_deadLineOfPlayoffs[2]" class="form-control mb-3"/>
+                            </div>
+                            <div class="form-group">
+                                <div class="pb-2">Semi Final:</div>
+                                <input type="date" @bind="_deadLineOfPlayoffs[3]" class="form-control mb-3"/>
+                            </div>
+                            <div class="form-group">
+                                <div class="pb-2">Finals:</div>
+                                <input type="date" @bind="_deadLineOfPlayoffs[4]" class="form-control mb-3"/>
+                            </div>
+
                             <button disabled="@_loadingSeasons" class="btn btn-primary">
                                 @if (_loadingSeasons)
                                 {
@@ -380,6 +394,7 @@
     private bool _loadingMoveLeagueOver;
     private bool _loadingRelegationMatches;
     private bool _loadingDiscordTags;
+    private Playoff _playoff;
     private List<Player> _players = new();
     private List<Player> _playersEnrolledInNextSeason = new();
     private List<Army> _pendingListChanges = new();
@@ -387,7 +402,7 @@
     private List<League> _leaguesThisSeason = new();
     private List<League> _leaguesNextSeason = new();
     private List<Matchup> _unfinishedRelegations = new();
-    private List<DateTime> _deadLineOfPlayoffs = new();
+    private List<DateTime> _deadLineOfPlayoffs = new DateTime[5].ToList();
     private bool _relegationMatchesNotCreatedEverywhere;
     private bool _relegationMatchesStarted;
     private bool _playoffsStarted;
@@ -408,11 +423,11 @@
         _leaguesNextSeason = await _leagueRepository.LoadForSeason(seasons[0].SeasonId);
         _leaguesThisSeason = await _leagueRepository.LoadForSeason(seasons[1].SeasonId);
         _pendingPenalties = await _penaltyService.GetPenalties(seasons[1].SeasonId);
-        var playoff = await _playoffRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
-        if (playoff != null)
+        _playoff = await _playoffRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
+        if (_playoff != null)
         {
-            _playoffsStarted = playoff.Rounds.Any() && playoff.Rounds.SelectMany(r => r.Matchups).Any(m => m.IsFinished && m.Player2 != ObjectId.Empty);
-            _deadLineOfPlayoffs = playoff.Rounds.Select(r => r.DeadLine).ToList();
+            _playoffsStarted = _playoff.Rounds.Any() && _playoff.Rounds.SelectMany(r => r.Matchups).Any(m => m.IsFinished && m.Player2 != ObjectId.Empty);
+            _deadLineOfPlayoffs = _playoff.Rounds.Select(r => r.DeadLine).ToList();
         }
         _relegationMatchesNotCreatedEverywhere = _leaguesThisSeason[0].RelegationMatches.Count == 0;
         var relegationMatches = _leaguesThisSeason.SelectMany(c => c.RelegationMatches).ToList();
@@ -422,9 +437,8 @@
 
     private async Task SaveDeadlines()
     {
-        var playoff = await _playoffRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
-        playoff.SetDeadline(_deadLineOfPlayoffs);
-        await _playoffRepository.Update(playoff);
+        _playoff.SetDeadline(_deadLineOfPlayoffs);
+        await _playoffRepository.Update(_playoff);
     }
 
     private async Task MakeDiscordTags()
