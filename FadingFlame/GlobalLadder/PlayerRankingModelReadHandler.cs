@@ -37,6 +37,10 @@ namespace FadingFlame.GlobalLadder
             var lastVersion = currentVersion.Version;
             foreach (var match in newMatches)
             {
+                lastVersion = match.Result.RecordedAt.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+                if (match.Player2 == default) 
+                    continue;
+                
                 var player1 = await _playerRepository.Load(match.Player1);
                 var player2 = await _playerRepository.Load(match.Player2);
 
@@ -47,8 +51,6 @@ namespace FadingFlame.GlobalLadder
                 var model2 = PlayerRankingReadModel.Create(player2, matchesPlayer2.Select(m => m.Result).ToList());
 
                 await _rankingReadmodelRepository.Upsert(new List<PlayerRankingReadModel> {model1, model2});
-                
-                lastVersion = match.Result.RecordedAt.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
             }
 
             return HandlerVersion.CreateFrom<PlayerRankingModelReadHandler>(lastVersion);
