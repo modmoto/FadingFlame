@@ -150,14 +150,14 @@
                                 Matches not created for next season, make promotions and demotions first to make next season official
                             </button>
                         } 
-                        else if (_leaguesNextSeason.Any(l => l.Players.Count != League.MaxPlayerCount))
-                        {
-                            <button disabled type="button" class="btn btn-primary">
-                                Not all leagues have @League.MaxPlayerCount players, add players or delete the league
-                            </button>
-                        }
                         else
                         {
+                            if (_leaguesNextSeason.Any(l => l.Players.Count != League.MaxPlayerCount))
+                            {
+                                <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
+                                    Not all leagues have @League.MaxPlayerCount players, make sure this is wanted like that
+                                </div>
+                            }
                             <button disabled="@_loadingMakingSeasonOfficial" class="btn btn-primary" @onclick="ApproveMatchesNextSeason">
                                 @if (_loadingMakingSeasonOfficial)
                                 {
@@ -458,7 +458,6 @@
 
     private async Task SaveRelegationDeadline()
     {
-
         foreach (var league in _leaguesThisSeason)
         {
             league.RelegationDeadLine = _deadLineRelegations;
@@ -477,6 +476,7 @@
     {
         _loadingMakingSeasonOfficial = true;
         await _leagueCreationService.MakeSeasonOfficial();
+        await OnInitializedAsync();
         _loadingMakingSeasonOfficial = false;
     }
 
@@ -484,6 +484,7 @@
     {
         _loadingPlayoffs = true;
         await _playoffCommandHandler.CreatePlayoffs();
+        await OnInitializedAsync();
         _loadingPlayoffs = false;
     }
     
