@@ -110,6 +110,18 @@ else
             Add free win dummy player
         </button> 
     }
+    
+    @if (_loggedInUserState.UserIsAdmin)
+    {
+        <button
+            class="btn btn-danger"
+            type="button"
+            disabled="@(_league.GameDays.Any(g => g.Matchups.Any(m => m.IsFinished)))"
+            @onclick="RecreateMatches"
+        >
+            Recreate Matches
+        </button> 
+    }
     <div>
         <h2>Gamedays</h2>
         <hr class="my-4">
@@ -202,6 +214,7 @@ else
 @inject ILeagueRepository _leagueRepository
 @inject IPlayerRepository _playerRepository
 @inject LoggedInUserState _loggedInUserState
+@inject IMatchupRepository _matchupRepository
 
 @code {
     [Parameter]
@@ -240,6 +253,14 @@ else
         }
     }
 
+    private async void RecreateMatches()
+    {
+        var matchIds = _league.GameDays.SelectMany(g => g.Matchups).Select(m => m.Id).ToList();
+        await _matchupRepository.DeleteMatches(matchIds);
+        _league.CreateGameDays();
+        await _leagueRepository.Update(_league);
+    }
+    
     private async void AddFreewinPlayer()
     {
         var freeWinPlayer = await _playerRepository.Load(LeagueConstants.FreeWinPlayer);
