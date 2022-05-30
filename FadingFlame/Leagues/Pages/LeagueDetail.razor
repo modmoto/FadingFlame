@@ -103,7 +103,7 @@ else
     @if (_league.Players.Count != League.MaxPlayerCount && _loggedInUserState.UserIsAdmin)
     {
         <button
-            class="btn btn-danger"
+            class="btn btn-danger me-3"
             type="button"
             @onclick="AddFreewinPlayer"
         >
@@ -111,12 +111,11 @@ else
         </button> 
     }
     
-    @if (_loggedInUserState.UserIsAdmin)
+    @if (!_league.GameDays.Any(g => g.Matchups.Any(m => m.IsFinished)) && _loggedInUserState.UserIsAdmin)
     {
         <button
             class="btn btn-danger"
             type="button"
-            disabled="@(_league.GameDays.Any(g => g.Matchups.Any(m => m.IsFinished)))"
             @onclick="RecreateMatches"
         >
             Recreate Matches
