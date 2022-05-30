@@ -135,7 +135,7 @@ else
             var league = _leagues.First();
             for (var i = 0; i < league.GameDays.Count; i++)
             {
-                var gameDays = _leagues.Select(l => l.GameDays[i]).ToList();
+                var gameDays = _leagues.Where(l => i < l.GameDays.Count).Select(l => l.GameDays[i]).ToList();
                 _selectedGameDays.Add(gameDays);
                 if (!foundIndex && now < league.GameDays[i].EndDate)
                 {
