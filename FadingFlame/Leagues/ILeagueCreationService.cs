@@ -140,13 +140,17 @@ namespace FadingFlame.Leagues
                     }
                     else
                     {
-                        var playersThatShouldGoToThisLeague = playersThatNotParticipatedLastSeason.Take(amountOfFreshPLayersEachLeague);
-                        playersThatNotParticipatedLastSeason = playersThatNotParticipatedLastSeason.Skip(amountOfFreshPLayersEachLeague).ToList();
+                        var playersToTakeFromNewPlayers = amountOfFreshPLayersEachLeague > playerCountPerDivision - players.Count
+                                ? playerCountPerDivision - players.Count
+                                : amountOfFreshPLayersEachLeague;
+                        
+                        var playersThatShouldGoToThisLeague = playersThatNotParticipatedLastSeason.Take(playersToTakeFromNewPlayers);
+                        playersThatNotParticipatedLastSeason = playersThatNotParticipatedLastSeason.Skip(playersToTakeFromNewPlayers).ToList();
                         players.AddRange(playersThatShouldGoToThisLeague);
                         
                         var newPlayerCountMissingFromDivision = playerCountPerDivision - players.Count;
                         var remainingPlayers = divisionsTemp.Skip(division).Sum(d => d.Count);
-                        while (playerCountPerDivision - players.Count > 0 && remainingPlayers != 0)
+                        while (newPlayerCountMissingFromDivision > 0 && remainingPlayers >= 0 && newPlayerCountMissingFromDivision < remainingPlayers)
                         {
                             MovePlayersUp(division, divisionsTemp, newPlayerCountMissingFromDivision);
                             newPlayerCountMissingFromDivision = playerCountPerDivision - players.Count;
@@ -181,6 +185,11 @@ namespace FadingFlame.Leagues
                 {
                     newLeagues.Add(leagueB);
                 }
+            }
+
+            foreach (var newLeague in newLeagues)
+            {
+                newLeague.CreateGameDays();
             }
 
             await _leagueRepository.Insert(newLeagues);

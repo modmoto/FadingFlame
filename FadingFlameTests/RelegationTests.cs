@@ -157,6 +157,7 @@ namespace FadingFlameTests
                     await _playerRepository.UpdateWithLists(player);
                     league.AddPlayer(player);
                 }
+                league.CreateGameDays();
 
                 await _leagueRepository.Insert(new List<League> { league });
             }

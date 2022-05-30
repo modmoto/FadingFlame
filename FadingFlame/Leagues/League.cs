@@ -109,11 +109,6 @@ namespace FadingFlame.Leagues
             Players = Players.Where(p => p.Id != player.Id).ToList();
             var playerInLeague = PlayerInLeague.Create(player.Id);
             Players.Add(playerInLeague);
-
-            if (Players.Count == MaxPlayerCount)
-            {
-                CreateGameDays();
-            }
         }
 
         public static League Create(int season, DateTime startDate, string divisionId, string name)
