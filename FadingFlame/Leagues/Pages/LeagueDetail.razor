@@ -100,7 +100,7 @@ else
         }
         </tbody>
     </table>
-    @if (_league.Players.Count != League.MaxPlayerCount)
+    @if (_league.Players.Count != League.MaxPlayerCount && _loggedInUserState.UserIsAdmin)
     {
         <button
             class="btn btn-danger"
