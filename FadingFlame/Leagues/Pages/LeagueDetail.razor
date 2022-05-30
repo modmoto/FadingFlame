@@ -257,7 +257,12 @@ else
     {
         var matchIds = _league.GameDays.SelectMany(g => g.Matchups).Select(m => m.Id).ToList();
         await _matchupRepository.DeleteMatches(matchIds);
+        var leagues = await _leagueRepository.LoadForSeason(_league.Season);
+        var league = leagues.First();
+        var deployments = league.GameDays.Select(g => g.Deployment).ToList();
+        var secondaryObjectives = league.GameDays.Select(g => g.SecondaryObjective).ToList();
         _league.CreateGameDays();
+        _league.SetScenarioAndDeployments(secondaryObjectives, deployments);
         await _leagueRepository.Update(_league);
     }
     
