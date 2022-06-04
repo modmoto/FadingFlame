@@ -19,6 +19,7 @@ namespace FadingFlame.Discord
     {
         private readonly IPlayerRepository _playerRepository;
         private readonly DiscordClient _client;
+        private string _participantRole = "League Participant";
 
         public DiscordBot(string token, IPlayerRepository playerRepository)
         {
@@ -48,16 +49,18 @@ namespace FadingFlame.Discord
             {
                 var guild = clientGuild.Value;
 
-                foreach (var discordMember in guild.Members)
-                {
-                    var member = discordMember.Value;
-                    var oldLeagueRoles = member.Roles.Where(r => LeagueConstants.Ids.Contains(r.Name)).ToList();
-                    foreach (var oldLeagueRole in oldLeagueRoles)
-                    {
-                        await member.RevokeRoleAsync(oldLeagueRole);
-                        await Task.Delay(50);
-                    }
-                }
+                // foreach (var discordMember in guild.Members)
+                // {
+                //     var member = discordMember.Value;
+                //     var oldLeagueRoles = member.Roles.Where(r => LeagueConstants.Ids.Contains(r.Name)).ToList();
+                //     foreach (var oldLeagueRole in oldLeagueRoles)
+                //     {
+                //         await member.RevokeRoleAsync(oldLeagueRole);
+                //         await Task.Delay(50);
+                //     }
+                // }
+                
+                var participantRole = guild.Roles.FirstOrDefault(r => r.Value.Name == _participantRole).Value;
                 
                 foreach (var player in players)
                 {
@@ -69,8 +72,10 @@ namespace FadingFlame.Discord
                     }
                     else
                     {
-                        var role = guild.Roles.FirstOrDefault(r => r.Value.Name == leagueOfPlayer.DivisionId).Value;
-                        await member.GrantRoleAsync(role);
+                        var leagueRole = guild.Roles.FirstOrDefault(r => r.Value.Name == leagueOfPlayer.DivisionId).Value;
+                        await member.GrantRoleAsync(leagueRole);
+                        await Task.Delay(50);
+                        await member.GrantRoleAsync(participantRole);
                         await Task.Delay(50);
                     }
                 }
