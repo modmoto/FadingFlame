@@ -56,7 +56,6 @@ namespace FadingFlame.Discord
                     foreach (var oldLeagueRole in oldLeagueRoles)
                     {
                         await member.RevokeRoleAsync(oldLeagueRole);
-                        await Task.Delay(50);
                     }
                 }
                 
@@ -74,9 +73,7 @@ namespace FadingFlame.Discord
                     {
                         var leagueRole = guild.Roles.FirstOrDefault(r => r.Value.Name == leagueOfPlayer.DivisionId).Value;
                         await member.GrantRoleAsync(leagueRole);
-                        await Task.Delay(50);
                         await member.GrantRoleAsync(participantRole);
-                        await Task.Delay(50);
                     }
                 }
             }
