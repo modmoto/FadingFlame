@@ -11,21 +11,21 @@
             <div class="col">
                 <h1>Match Overview</h1>
             </div>
-            @* <div class="col"> *@
-            @*     <div class="dropdown float-end"> *@
-            @*         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownSeason" data-bs-toggle="dropdown" aria-expanded="false"> *@
-            @*             Switch season *@
-            @*         </button> *@
-            @*         <ul class="dropdown-menu" aria-labelledby="dropdownSeason"> *@
-            @*             @foreach (var season in _seasons) *@
-            @*             { *@
-            @*                 <li> *@
-            @*                     <a class="dropdown-item" @onclick="() => SelectSeason(season)">@season</a> *@
-            @*                 </li> *@
-            @*             } *@
-            @*         </ul> *@
-            @*     </div> *@
-            @* </div> *@
+            <div class="col">
+                <div class="dropdown float-end">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownSeason" data-bs-toggle="dropdown" aria-expanded="false">
+                        Switch season
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownSeason">
+                        @foreach (var season in _seasons)
+                        {
+                            <li>
+                                <a class="dropdown-item" @onclick="() => SelectSeason(season)">@season</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
         </div>  
     <hr class="my-4">
 </div>
@@ -116,7 +116,6 @@ else
     }
 </div>
 }
- 
 
 @inject ILeagueRepository _leagueRepository
 @inject IPlayerRepository _playerRepository
@@ -143,6 +142,10 @@ else
     
     private async void SelectSeason(int season)
     {
+        _selectedGameDays = new();
+        _playersInSeason = new();
+        _leagues = new();
+        _activeDay = 0;
         await LoadData(season);
     }
 
