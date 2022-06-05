@@ -5,7 +5,26 @@
 @using FadingFlame.Matchups
 
 <div>
-    <h1>Playoffs Season @(_playoffs?.Season)</h1>
+    <div class="row">
+        <div class="col">
+            <h1>Playoffs Season @(_playoffs?.Season)</h1>
+        </div>
+        <div class="col">
+            <div class="dropdown float-end">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownSeason" data-bs-toggle="dropdown" aria-expanded="false">
+                    Switch season
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownSeason">
+                    @foreach (var season in _seasons)
+                    {
+                        <li>
+                            <a class="dropdown-item" @onclick="() => SelectSeason(season)">@season</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>        
     <hr class="my-4">
 </div>
 @if (_loading)
@@ -49,7 +68,6 @@ else
 @inject NavigationManager _navigation
 @inject LoggedInUserState _loggedInUserState
 @inject SeasonState _seasonState
-@inject IMmrRepository _mmrRepository
 
 @code
 {
@@ -57,15 +75,17 @@ else
     private Playoff _playoffs;
     private List<Player> _playersInPlayoffs = new();
     private readonly string _unknownPlayer = "tbd";
+    private List<int> _seasons = new();
 
     protected override void OnInitialized()
     {
-        _seasonState.SeasonsChanged += LoadStuff;
+        _seasonState.SeasonsChanged += (_, _) => LoadStuff();
     }
 
-    private async void LoadStuff(object sender, EventArgs e)
+    private async void LoadStuff()
     {
         await OnInitializedAsync();
+        _seasons = Enumerable.Range(2, _seasonState.CurrentSeason.SeasonId - 1).Reverse().ToList();
         StateHasChanged();
     }
 
@@ -88,6 +108,7 @@ else
             _playersInPlayoffs =
                 await _playerRepository.LoadForLeague(listOfPlayerInPlayoffs);
             _loading = false;
+            StateHasChanged();
         }
     }
 
@@ -128,5 +149,11 @@ else
         if (playerId == ObjectId.Empty) return "Freewin";
 
         return _playersInPlayoffs.FirstOrDefault(p => p.Id == playerId)?.DisplayName ?? _unknownPlayer;
+    }
+
+    private async void SelectSeason(int season)
+    {
+        _loading = true;
+        await LoadPlayoffs(season);
     }
 }

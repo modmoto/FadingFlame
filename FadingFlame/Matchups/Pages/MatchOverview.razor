@@ -7,7 +7,26 @@
 @using FadingFlame.Matchups
 
 <div>
-    <h1>Match Overview</h1>
+    <div class="row">
+            <div class="col">
+                <h1>Match Overview</h1>
+            </div>
+            @* <div class="col"> *@
+            @*     <div class="dropdown float-end"> *@
+            @*         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownSeason" data-bs-toggle="dropdown" aria-expanded="false"> *@
+            @*             Switch season *@
+            @*         </button> *@
+            @*         <ul class="dropdown-menu" aria-labelledby="dropdownSeason"> *@
+            @*             @foreach (var season in _seasons) *@
+            @*             { *@
+            @*                 <li> *@
+            @*                     <a class="dropdown-item" @onclick="() => SelectSeason(season)">@season</a> *@
+            @*                 </li> *@
+            @*             } *@
+            @*         </ul> *@
+            @*     </div> *@
+            @* </div> *@
+        </div>  
     <hr class="my-4">
 </div>
 @if (!_leagues.Any())
@@ -114,21 +133,31 @@ else
     private List<League> _leagues = new();
     private List<List<GameDay>> _selectedGameDays = new();
     private List<Player> _playersInSeason = new();
+    private List<int> _seasons = new();
 
     protected override void OnInitialized()
     {
         _loggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
         _seasonState.SeasonsChanged += LoadStuff;
     }
+    
+    private async void SelectSeason(int season)
+    {
+        await LoadData(season);
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        _leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
+        await LoadData(_seasonState.CurrentSeason.SeasonId);
+    }
+
+    private async Task LoadData(int seasonId)
+    {
+        _leagues = await _leagueRepository.LoadForSeason(seasonId);
         var playerIds = _leagues.SelectMany(l => l.Players.Select(p => p.Id)).ToList();
         _playersInSeason = await _playerRepository.LoadForLeague(playerIds);
-
+        
         var now = DateTime.UtcNow;
-
         if (_leagues.Any())
         {
             var foundIndex = false;
@@ -151,6 +180,7 @@ else
     private async void LoadStuff(object sender, EventArgs eventArgs)
     {
         await OnInitializedAsync();
+        _seasons = Enumerable.Range(2, _seasonState.CurrentSeason.SeasonId - 1).Reverse().ToList();
         StateHasChanged();
     }
 
