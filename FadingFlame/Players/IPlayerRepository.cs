@@ -18,7 +18,6 @@ namespace FadingFlame.Players
         Task<Player> LoadByEmail(string accountEmail);
         Task<List<Player>> PlayersThatEnrolledInNextSeason();
         Task<List<Player>> LoadForLeague(List<ObjectId> playerIds);
-        Task<List<Player>> PlayersWithListInCurrentSeason();
         Task Update(List<Player> enlistedPlayers);
     }
 
@@ -125,13 +124,6 @@ namespace FadingFlame.Players
                 var armyOfPlayer = armies.SingleOrDefault(a => a.Id == player.ArmyIdCurrentSeason);
                 player.ArmyCurrentSeason = armyOfPlayer;
             }
-        }
-
-        public async Task<List<Player>> PlayersWithListInCurrentSeason()
-        {
-            var players = await LoadAll<Player>(p => p.ArmyIdCurrentSeason != default);
-            await AddArmies(players);
-            return players;
         }
 
         public Task Update(List<Player> enlistedPlayers)

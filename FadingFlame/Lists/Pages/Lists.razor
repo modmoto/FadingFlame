@@ -28,9 +28,11 @@
         @foreach (var player in _enlistedPlayers)
         {
             <div class="card">
-                <div class="card-header cursor" @onclick="() => GoToPlayer(player.Id)">
-                    <div><b>@player.DisplayName: </b></div>
-                </div>
+                <NavLink class="nolinkstyle" href="@($"/player/{player.Id}")" Match="NavLinkMatch.All">
+                    <div class="card-header">
+                        <div><b>@player.DisplayName: </b></div>
+                    </div>
+                </NavLink>
                 <div class="card-body">
                     <div class="row align-items-start">
                         <div class="col">
@@ -65,12 +67,10 @@
     {
         <h4>Lists will be displayed after @(_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate())</h4>
     }
-    
 </div>
 
 @inject IPlayerRepository _playerRepository
 @inject ILeagueRepository _leagueRepository
-@inject NavigationManager _navigation
 @inject SeasonState _seasonState
 
 @code
@@ -83,7 +83,7 @@
 
     protected override void OnInitialized()
     {
-        _seasonState.SeasonsChanged += LoadRest;
+        _seasonState.SeasonsChanged += (_, _) => LoadStuff();
     }
 
     protected override async Task OnInitializedAsync()
@@ -91,22 +91,13 @@
         await LoadStuff();
     }
 
-    private async void LoadRest(object sender, EventArgs e)
-    {
-        await LoadStuff();
-    }
-
     private async Task LoadStuff()
     {
         _leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
-        _enlistedPlayersOriginal = await _playerRepository.PlayersWithListInCurrentSeason();
+        var playerIds = _leagues.SelectMany(l => l.Players.Select(p => p.Id)).ToList();
+        _enlistedPlayersOriginal = await _playerRepository.LoadForLeague(playerIds);
         _enlistedPlayers = _enlistedPlayersOriginal;
         StateHasChanged();
-    }
-
-    private void GoToPlayer(ObjectId playerId)
-    {
-        _navigation.NavigateTo($"player/{playerId}");
     }
 
     private void SelectFaction(ChangeEventArgs e)
