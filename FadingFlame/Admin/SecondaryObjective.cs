@@ -1,13 +1,12 @@
-namespace FadingFlame.Admin
+namespace FadingFlame.Admin;
+
+public enum SecondaryObjective
 {
-    public enum SecondaryObjective
-    {
-        RandomObjective = 0,
-        HoldTheGround = 1,
-        Breakthrough = 2,
-        SpoilsOfWar = 3,
-        KingOfTheHill = 4, 
-        CaptureTheFlags = 5,
-        SecureTarget = 6
-    }
+    RandomObjective = 0,
+    HoldTheGround = 1,
+    Breakthrough = 2,
+    SpoilsOfWar = 3,
+    KingOfTheHill = 4, 
+    CaptureTheFlags = 5,
+    SecureTarget = 6
 }

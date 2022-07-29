@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
 
-namespace FadingFlame.ReadModelBase
+namespace FadingFlame.ReadModelBase;
+
+public interface IVersionRepository
 {
-    public interface IVersionRepository
-    {
-        Task<HandlerVersion> GetLastVersion<T>();
-        Task SaveLastVersion<T>(HandlerVersion lastVersion);
-    }
+    Task<HandlerVersion> GetLastVersion<T>();
+    Task SaveLastVersion<T>(HandlerVersion lastVersion);
 }

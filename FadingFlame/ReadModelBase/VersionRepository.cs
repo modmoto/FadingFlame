@@ -2,23 +2,22 @@
 using FadingFlame.Repositories;
 using MongoDB.Driver;
 
-namespace FadingFlame.ReadModelBase
+namespace FadingFlame.ReadModelBase;
+
+public class VersionRepository : MongoDbRepositoryBase, IVersionRepository
 {
-    public class VersionRepository : MongoDbRepositoryBase, IVersionRepository
+    public VersionRepository(MongoClient mongoClient) : base(mongoClient)
     {
-        public VersionRepository(MongoClient mongoClient) : base(mongoClient)
-        {
-        }
+    }
 
-        public async Task<HandlerVersion> GetLastVersion<T>()
-        {
-            var loadFirst = await LoadFirst<HandlerVersion>(h => h.HandlerName == HandlerVersion.CreateFrom<T>(null).HandlerName);
-            return loadFirst ?? HandlerVersion.CreateFrom<T>(null);
-        }
+    public async Task<HandlerVersion> GetLastVersion<T>()
+    {
+        var loadFirst = await LoadFirst<HandlerVersion>(h => h.HandlerName == HandlerVersion.CreateFrom<T>(null).HandlerName);
+        return loadFirst ?? HandlerVersion.CreateFrom<T>(null);
+    }
 
-        public Task SaveLastVersion<T>(HandlerVersion lastVersion)
-        {
-            return Upsert(lastVersion, v => v.HandlerName == lastVersion.HandlerName);
-        }
+    public Task SaveLastVersion<T>(HandlerVersion lastVersion)
+    {
+        return Upsert(lastVersion, v => v.HandlerName == lastVersion.HandlerName);
     }
 }

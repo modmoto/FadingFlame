@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace FadingFlame.ReadModelBase
+namespace FadingFlame.ReadModelBase;
+
+public interface IAsyncUpdatable
 {
-    public interface IAsyncUpdatable
-    {
-        Task<HandlerVersion> Update(HandlerVersion currentVersion);
-    }
+    Task<HandlerVersion> Update(HandlerVersion currentVersion);
 }

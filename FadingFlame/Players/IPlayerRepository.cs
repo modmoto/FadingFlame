@@ -6,129 +6,128 @@ using FadingFlame.Repositories;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace FadingFlame.Players
+namespace FadingFlame.Players;
+
+public interface IPlayerRepository
 {
-    public interface IPlayerRepository
+    Task<List<Player>> LoadAll();
+    Task<Player> Load(ObjectId id);
+    Task UpdateWithLists(Player player);
+    Task Update(Player player);
+    Task Insert(Player player);
+    Task<Player> LoadByEmail(string accountEmail);
+    Task<List<Player>> PlayersThatEnrolledInNextSeason();
+    Task<List<Player>> LoadForLeague(List<ObjectId> playerIds);
+    Task Update(List<Player> enlistedPlayers);
+}
+
+public class PlayerRepository : MongoDbRepositoryBase, IPlayerRepository
+{
+    private readonly IListRepository _listRepository;
+
+    public PlayerRepository(MongoClient mongoClient, IListRepository listRepository) : base(mongoClient)
     {
-        Task<List<Player>> LoadAll();
-        Task<Player> Load(ObjectId id);
-        Task UpdateWithLists(Player player);
-        Task Update(Player player);
-        Task Insert(Player player);
-        Task<Player> LoadByEmail(string accountEmail);
-        Task<List<Player>> PlayersThatEnrolledInNextSeason();
-        Task<List<Player>> LoadForLeague(List<ObjectId> playerIds);
-        Task Update(List<Player> enlistedPlayers);
+        _listRepository = listRepository;
     }
 
-    public class PlayerRepository : MongoDbRepositoryBase, IPlayerRepository
+    public Task<List<Player>> LoadAll()
     {
-        private readonly IListRepository _listRepository;
+        return LoadAll<Player>();
+    }
 
-        public PlayerRepository(MongoClient mongoClient, IListRepository listRepository) : base(mongoClient)
-        {
-            _listRepository = listRepository;
-        }
+    public async Task<Player> Load(ObjectId id)
+    {
+        var player = await LoadFirst<Player>(id);
+        if (player == null) return null;
+        await LoadLists(player);
+        return player;
+    }
 
-        public Task<List<Player>> LoadAll()
-        {
-            return LoadAll<Player>();
-        }
+    private async Task LoadLists(Player player)
+    {
+        var currentList = await _listRepository.Load(player.ArmyIdCurrentSeason);
+        var nextList = await _listRepository.Load(player.ArmyIdNextSeason);
+        player.ArmyCurrentSeason = currentList;
+        player.ArmyNextSeason = nextList;
+    }
 
-        public async Task<Player> Load(ObjectId id)
+    public async Task UpdateWithLists(Player player)
+    {
+        if (player.ArmyCurrentSeason != null)
         {
-            var player = await LoadFirst<Player>(id);
-            if (player == null) return null;
-            await LoadLists(player);
-            return player;
-        }
-
-        private async Task LoadLists(Player player)
-        {
-            var currentList = await _listRepository.Load(player.ArmyIdCurrentSeason);
-            var nextList = await _listRepository.Load(player.ArmyIdNextSeason);
-            player.ArmyCurrentSeason = currentList;
-            player.ArmyNextSeason = nextList;
-        }
-
-        public async Task UpdateWithLists(Player player)
-        {
-            if (player.ArmyCurrentSeason != null)
+            if (player.ArmyIdCurrentSeason == default)
             {
-                if (player.ArmyIdCurrentSeason == default)
-                {
-                    await _listRepository.Insert(player.ArmyCurrentSeason);
-                    player.ArmyIdCurrentSeason = player.ArmyCurrentSeason.Id;
-                }
-                else
-                {
-                    await _listRepository.Update(player.ArmyCurrentSeason);
-                }
+                await _listRepository.Insert(player.ArmyCurrentSeason);
+                player.ArmyIdCurrentSeason = player.ArmyCurrentSeason.Id;
             }
+            else
+            {
+                await _listRepository.Update(player.ArmyCurrentSeason);
+            }
+        }
             
-            if (player.ArmyNextSeason != null)
+        if (player.ArmyNextSeason != null)
+        {
+            if (player.ArmyIdNextSeason == default)
             {
-                if (player.ArmyIdNextSeason == default)
-                {
-                    await _listRepository.Insert(player.ArmyNextSeason);
-                    player.ArmyIdNextSeason = player.ArmyNextSeason.Id;
-                }
-                else
-                {
-                    await _listRepository.Update(player.ArmyNextSeason);
-                }
+                await _listRepository.Insert(player.ArmyNextSeason);
+                player.ArmyIdNextSeason = player.ArmyNextSeason.Id;
             }
-
-            await Upsert(player);
-        }
-
-        public Task Update(Player player)
-        {
-            return Upsert(player);
-        }
-
-        public Task Insert(Player player)
-        {
-            return base.Insert(player);
-        }
-
-        public async Task<Player> LoadByEmail(string accountEmail)
-        {
-            var player = await LoadFirst<Player>(p => p.AccountEmail == accountEmail);
-            if (player != null)
+            else
             {
-                await LoadLists(player);    
+                await _listRepository.Update(player.ArmyNextSeason);
             }
+        }
+
+        await Upsert(player);
+    }
+
+    public Task Update(Player player)
+    {
+        return Upsert(player);
+    }
+
+    public Task Insert(Player player)
+    {
+        return base.Insert(player);
+    }
+
+    public async Task<Player> LoadByEmail(string accountEmail)
+    {
+        var player = await LoadFirst<Player>(p => p.AccountEmail == accountEmail);
+        if (player != null)
+        {
+            await LoadLists(player);    
+        }
             
-            return player;
-        }
+        return player;
+    }
 
-        public Task<List<Player>> PlayersThatEnrolledInNextSeason()
-        {
-            return LoadAll<Player>(p => p.ArmyIdNextSeason != default);
-        }
+    public Task<List<Player>> PlayersThatEnrolledInNextSeason()
+    {
+        return LoadAll<Player>(p => p.ArmyIdNextSeason != default);
+    }
 
-        public async Task<List<Player>> LoadForLeague(List<ObjectId> playerIds)
-        {
-            var players = await LoadAll<Player>(p => playerIds.Contains(p.Id));
-            await AddArmies(players);
-            return players;
-        }
+    public async Task<List<Player>> LoadForLeague(List<ObjectId> playerIds)
+    {
+        var players = await LoadAll<Player>(p => playerIds.Contains(p.Id));
+        await AddArmies(players);
+        return players;
+    }
 
-        private async Task AddArmies(List<Player> players)
+    private async Task AddArmies(List<Player> players)
+    {
+        var armyIds = players.Select(p => p.ArmyIdCurrentSeason).ToList();
+        var armies = await _listRepository.Load(armyIds);
+        foreach (var player in players)
         {
-            var armyIds = players.Select(p => p.ArmyIdCurrentSeason).ToList();
-            var armies = await _listRepository.Load(armyIds);
-            foreach (var player in players)
-            {
-                var armyOfPlayer = armies.SingleOrDefault(a => a.Id == player.ArmyIdCurrentSeason);
-                player.ArmyCurrentSeason = armyOfPlayer;
-            }
+            var armyOfPlayer = armies.SingleOrDefault(a => a.Id == player.ArmyIdCurrentSeason);
+            player.ArmyCurrentSeason = armyOfPlayer;
         }
+    }
 
-        public Task Update(List<Player> enlistedPlayers)
-        {
-            return UpsertMany(enlistedPlayers);
-        }
+    public Task Update(List<Player> enlistedPlayers)
+    {
+        return UpsertMany(enlistedPlayers);
     }
 }

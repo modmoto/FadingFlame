@@ -1,16 +1,15 @@
 using MongoDB.Bson;
 
-namespace FadingFlame.Admin
+namespace FadingFlame.Admin;
+
+public class PenaltyModel
 {
-    public class PenaltyModel
+    public PenaltyModel(ObjectId playerId, int penaltyPoints)
     {
-        public PenaltyModel(ObjectId playerId, int penaltyPoints)
-        {
-            PlayerId = playerId;
-            PenaltyPoints = penaltyPoints;
-        }
-        
-        public ObjectId PlayerId { get; set; }
-        public int PenaltyPoints { get; set; }
+        PlayerId = playerId;
+        PenaltyPoints = penaltyPoints;
     }
+        
+    public ObjectId PlayerId { get; set; }
+    public int PenaltyPoints { get; set; }
 }

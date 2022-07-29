@@ -1,35 +1,34 @@
 using System;
 using System.Globalization;
 
-namespace FadingFlame.Players
+namespace FadingFlame.Players;
+
+public class Location
 {
-    public class Location
+    public const string NotSelected = "nono";
+
+    public static Location Create(string country, string timeZone)
     {
-        public const string NotSelected = "nono";
-
-        public static Location Create(string country, string timeZone)
+        var location = new Location();
+        if (country != NotSelected)
         {
-            var location = new Location();
-            if (country != NotSelected)
+            try
             {
-                try
-                {
-                    location.Country = new RegionInfo(country);
-                }
-                catch (Exception)
-                {
-                    // ignored as Regioninfo has no try parse
-                }
+                location.Country = new RegionInfo(country);
             }
-            
-            if (timeZone != NotSelected)
+            catch (Exception)
             {
-                location.TimezoneRaw = timeZone;
+                // ignored as Regioninfo has no try parse
             }
-
-            return location;
         }
-        public RegionInfo Country { get; set; }
-        public string TimezoneRaw { get; set; }
+            
+        if (timeZone != NotSelected)
+        {
+            location.TimezoneRaw = timeZone;
+        }
+
+        return location;
     }
+    public RegionInfo Country { get; set; }
+    public string TimezoneRaw { get; set; }
 }

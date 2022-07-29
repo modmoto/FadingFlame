@@ -5,96 +5,95 @@ using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace FadingFlame.Players
+namespace FadingFlame.Players;
+
+public interface IMmrRepository
 {
-    public interface IMmrRepository
-    {
-        Task<List<Mmr>> UpdateMmrs(UpdateMmrRequest updateMmrRequest);
-    }
+    Task<List<Mmr>> UpdateMmrs(UpdateMmrRequest updateMmrRequest);
+}
     
-    public class MmrRepository : IMmrRepository
-    {
-        private readonly HttpClient _httpClient;
+public class MmrRepository : IMmrRepository
+{
+    private readonly HttpClient _httpClient;
 
-        public MmrRepository(HttpClient httpClient)
+    public MmrRepository(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+    }
+
+    public async Task<List<Mmr>> UpdateMmrs(UpdateMmrRequest updateMmrRequest)
+    {
+        var response = await _httpClient.PostAsJsonAsync("/mmr/update", updateMmrRequest);
+
+        if (response.IsSuccessStatusCode)
         {
-            _httpClient = httpClient;
+            var result = await response.Content.ReadFromJsonAsync<UpdateMmrResponse>();
+            return TransformResponse(result);
         }
 
-        public async Task<List<Mmr>> UpdateMmrs(UpdateMmrRequest updateMmrRequest)
-        {
-            var response = await _httpClient.PostAsJsonAsync("/mmr/update", updateMmrRequest);
+        return null;
+    }
 
-            if (response.IsSuccessStatusCode)
+    private List<Mmr> TransformResponse(UpdateMmrResponse response) {
+        var ret = response.RatingsList.Select((rating, index) =>
+            new Mmr
             {
-                var result = await response.Content.ReadFromJsonAsync<UpdateMmrResponse>();
-                return TransformResponse(result);
+                Rating = rating,
+                RatingDeviation = response.RatingDeviationsList[index],
             }
+        ).ToList();
 
-            return null;
-        }
-
-        private List<Mmr> TransformResponse(UpdateMmrResponse response) {
-            var ret = response.RatingsList.Select((rating, index) =>
-                new Mmr
-                {
-                    Rating = rating,
-                    RatingDeviation = response.RatingDeviationsList[index],
-                }
-            ).ToList();
-
-            return ret;
-        }
+        return ret;
     }
+}
 
-    public class UpdateMmrResponse
+public class UpdateMmrResponse
+{
+    [JsonPropertyName("ratings_list")]
+    public List<double> RatingsList { get; set; }
+
+    [JsonPropertyName("rds_list")]
+    public List<double> RatingDeviationsList { get; set; }
+}
+
+public class UpdateMmrRequest
+{
+    [JsonPropertyName("ratings_list")]
+    public List<double> RatingsList { get; set; }
+
+    [JsonPropertyName("rds_list")]
+    public List<double> RdsList { get; set; }
+
+    [JsonPropertyName("winning_team")]
+    public int WinningTeam { get; set; }
+
+    [JsonPropertyName("number_of_teams")]
+    public int NumberOfTeams { get; init; }
+
+    [JsonPropertyName("beta")]
+    public double Beta { get; init; }
+
+    [JsonPropertyName("p_mean")]
+    public double PMEan { get; init; }
+
+    [JsonPropertyName("min_rating_deviation")]
+    public double MinRatingDeviation { get; init; }
+
+    public static UpdateMmrRequest Create(List<Mmr> mmrs, int winningTeam)
     {
-        [JsonPropertyName("ratings_list")]
-        public List<double> RatingsList { get; set; }
+        var ratingsList = mmrs.Select(t => t.Rating).ToList();
+        var rdsList = mmrs.Select(t => t.RatingDeviation).ToList();
 
-        [JsonPropertyName("rds_list")]
-        public List<double> RatingDeviationsList { get; set; }
-    }
-
-    public class UpdateMmrRequest
-    {
-        [JsonPropertyName("ratings_list")]
-        public List<double> RatingsList { get; set; }
-
-        [JsonPropertyName("rds_list")]
-        public List<double> RdsList { get; set; }
-
-        [JsonPropertyName("winning_team")]
-        public int WinningTeam { get; set; }
-
-        [JsonPropertyName("number_of_teams")]
-        public int NumberOfTeams { get; init; }
-
-        [JsonPropertyName("beta")]
-        public double Beta { get; init; }
-
-        [JsonPropertyName("p_mean")]
-        public double PMEan { get; init; }
-
-        [JsonPropertyName("min_rating_deviation")]
-        public double MinRatingDeviation { get; init; }
-
-        public static UpdateMmrRequest Create(List<Mmr> mmrs, int winningTeam)
+        return new UpdateMmrRequest
         {
-            var ratingsList = mmrs.Select(t => t.Rating).ToList();
-            var rdsList = mmrs.Select(t => t.RatingDeviation).ToList();
+            RatingsList = ratingsList,
+            RdsList = rdsList,
+            WinningTeam = winningTeam,
 
-            return new UpdateMmrRequest
-            {
-                RatingsList = ratingsList,
-                RdsList = rdsList,
-                WinningTeam = winningTeam,
-
-                NumberOfTeams = 2,
-                Beta = 0.85,
-                MinRatingDeviation = 80,
-                PMEan = 1
-            };
-        }
+            NumberOfTeams = 2,
+            Beta = 0.85,
+            MinRatingDeviation = 80,
+            PMEan = 1
+        };
     }
 }

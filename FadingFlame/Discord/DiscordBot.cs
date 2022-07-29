@@ -6,131 +6,130 @@ using DSharpPlus;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
 
-namespace FadingFlame.Discord
+namespace FadingFlame.Discord;
+
+public interface IDiscordBot
 {
-    public interface IDiscordBot
+    Task<List<PlayerAndLeagueError>> SetLeagueTagsOnPlayers(List<League> leagues);
+    Task SendRequestListChangedToBotsChannel(int pendingChanges);
+    Task ConfirmationMessageToUser(string discordTag, bool wasAccepterd);
+}
+
+public class DiscordBot : IDiscordBot
+{
+    private readonly IPlayerRepository _playerRepository;
+    private readonly DiscordClient _client;
+    private string _participantRole = "League Participant";
+
+    public DiscordBot(string token, IPlayerRepository playerRepository)
     {
-        Task<List<PlayerAndLeagueError>> SetLeagueTagsOnPlayers(List<League> leagues);
-        Task SendRequestListChangedToBotsChannel(int pendingChanges);
-        Task ConfirmationMessageToUser(string discordTag, bool wasAccepterd);
+        _playerRepository = playerRepository;
+        var discordConfiguration = new DiscordConfiguration
+        {
+            Token = token,
+            TokenType = TokenType.Bot,
+            AutoReconnect = true,
+            Intents = DiscordIntents.GuildMembers
+                      | DiscordIntents.GuildPresences
+                      | DiscordIntents.Guilds
+                      | DiscordIntents.DirectMessages
+        };
+            
+        _client = new DiscordClient(discordConfiguration);
+        _client.ConnectAsync().Wait();
     }
 
-    public class DiscordBot : IDiscordBot
+    public async Task<List<PlayerAndLeagueError>> SetLeagueTagsOnPlayers(List<League> leagues)
     {
-        private readonly IPlayerRepository _playerRepository;
-        private readonly DiscordClient _client;
-        private string _participantRole = "League Participant";
-
-        public DiscordBot(string token, IPlayerRepository playerRepository)
-        {
-            _playerRepository = playerRepository;
-            var discordConfiguration = new DiscordConfiguration
-            {
-                Token = token,
-                TokenType = TokenType.Bot,
-                AutoReconnect = true,
-                Intents = DiscordIntents.GuildMembers
-                        | DiscordIntents.GuildPresences
-                        | DiscordIntents.Guilds
-                        | DiscordIntents.DirectMessages
-            };
+        var playerInLeagues = leagues.SelectMany(l => l.Players);
+        var players = await _playerRepository.LoadForLeague(playerInLeagues.Select(p => p.Id).ToList());
+        var notFoundPlayers = new List<PlayerAndLeagueError>();
             
-            _client = new DiscordClient(discordConfiguration);
-            _client.ConnectAsync().Wait();
-        }
-
-        public async Task<List<PlayerAndLeagueError>> SetLeagueTagsOnPlayers(List<League> leagues)
+        foreach (var clientGuild in _client.Guilds)
         {
-            var playerInLeagues = leagues.SelectMany(l => l.Players);
-            var players = await _playerRepository.LoadForLeague(playerInLeagues.Select(p => p.Id).ToList());
-            var notFoundPlayers = new List<PlayerAndLeagueError>();
-            
-            foreach (var clientGuild in _client.Guilds)
-            {
-                var guild = clientGuild.Value;
+            var guild = clientGuild.Value;
 
-                foreach (var discordMember in guild.Members)
+            foreach (var discordMember in guild.Members)
+            {
+                var member = discordMember.Value;
+                var oldLeagueRoles = member.Roles.Where(r => LeagueConstants.Ids.Contains(r.Name)).ToList();
+                foreach (var oldLeagueRole in oldLeagueRoles)
                 {
-                    var member = discordMember.Value;
-                    var oldLeagueRoles = member.Roles.Where(r => LeagueConstants.Ids.Contains(r.Name)).ToList();
-                    foreach (var oldLeagueRole in oldLeagueRoles)
-                    {
-                        await member.RevokeRoleAsync(oldLeagueRole);
-                    }
+                    await member.RevokeRoleAsync(oldLeagueRole);
                 }
+            }
                 
-                var participantRole = guild.Roles.FirstOrDefault(r => r.Value.Name == _participantRole).Value;
+            var participantRole = guild.Roles.FirstOrDefault(r => r.Value.Name == _participantRole).Value;
                 
-                foreach (var player in players)
-                {
-                    var member = guild.Members.FirstOrDefault(member => member.Value.Username?.ToLower() + "#" + member.Value.Discriminator == player.DiscordTag?.ToLower()).Value;
-                    var leagueOfPlayer = leagues.Single(l => l.Players.Select(p => p.Id).Contains(player.Id));
-                    if (member == null)
-                    {
-                        notFoundPlayers.Add(new PlayerAndLeagueError(player.DisplayName, player.DiscordTag, leagueOfPlayer.DivisionId));
-                    }
-                    else
-                    {
-                        var leagueRole = guild.Roles.FirstOrDefault(r => r.Value.Name == leagueOfPlayer.DivisionId).Value;
-                        await member.GrantRoleAsync(leagueRole);
-                        await member.GrantRoleAsync(participantRole);
-                    }
-                }
-            }
-
-            return notFoundPlayers;
-        }
-
-        public async Task SendRequestListChangedToBotsChannel(int pendingChanges)
-        {
-            try
+            foreach (var player in players)
             {
-                var channels = _client.Guilds.SelectMany(g => g.Value.Channels).Where(c => c.Value.Name == "bots");
-                foreach (var channel in channels)
+                var member = guild.Members.FirstOrDefault(member => member.Value.Username?.ToLower() + "#" + member.Value.Discriminator == player.DiscordTag?.ToLower()).Value;
+                var leagueOfPlayer = leagues.Single(l => l.Players.Select(p => p.Id).Contains(player.Id));
+                if (member == null)
                 {
-                    await channel.Value.SendMessageAsync($"{pendingChanges} pending list changes are waiting on the website");
+                    notFoundPlayers.Add(new PlayerAndLeagueError(player.DisplayName, player.DiscordTag, leagueOfPlayer.DivisionId));
                 }
-            }
-            catch (Exception)
-            {
-                // ignored, dont care
+                else
+                {
+                    var leagueRole = guild.Roles.FirstOrDefault(r => r.Value.Name == leagueOfPlayer.DivisionId).Value;
+                    await member.GrantRoleAsync(leagueRole);
+                    await member.GrantRoleAsync(participantRole);
+                }
             }
         }
 
-        public async Task ConfirmationMessageToUser(string discordTag, bool wasAccepterd)
+        return notFoundPlayers;
+    }
+
+    public async Task SendRequestListChangedToBotsChannel(int pendingChanges)
+    {
+        try
         {
-            try
+            var channels = _client.Guilds.SelectMany(g => g.Value.Channels).Where(c => c.Value.Name == "bots");
+            foreach (var channel in channels)
             {
-                foreach (var guild in _client.Guilds)
-                {
-                    var members = await guild.Value.GetAllMembersAsync();
-                    var lower = discordTag.ToLower();
-                    var discordMember = members.FirstOrDefault(c => $"{c.Username.ToLower()}#{c.Discriminator}" == lower);
-                    if (discordMember is not null)
-                    {
-                        var resul = wasAccepterd ? "accepted, see you on the battlefield =)" : "rejected, reach out to the orga team if you do not approve";
-                        await discordMember.SendMessageAsync($"Your list change on fading-flame was {resul}");
-                    }
-                }
+                await channel.Value.SendMessageAsync($"{pendingChanges} pending list changes are waiting on the website");
             }
-            catch (Exception)
-            {
-                // ignored, dont care
-            }
+        }
+        catch (Exception)
+        {
+            // ignored, dont care
         }
     }
 
-    public class PlayerAndLeagueError
+    public async Task ConfirmationMessageToUser(string discordTag, bool wasAccepterd)
     {
-        public string DisplayName { get; }
-        public string DiscordTag { get; }
-        public string LeagueTag { get; }
-
-        public PlayerAndLeagueError(string displayName, string discordTag, string leagueTag)
+        try
         {
-            DisplayName = displayName;
-            DiscordTag = discordTag;
-            LeagueTag = leagueTag;
+            foreach (var guild in _client.Guilds)
+            {
+                var members = await guild.Value.GetAllMembersAsync();
+                var lower = discordTag.ToLower();
+                var discordMember = members.FirstOrDefault(c => $"{c.Username.ToLower()}#{c.Discriminator}" == lower);
+                if (discordMember is not null)
+                {
+                    var resul = wasAccepterd ? "accepted, see you on the battlefield =)" : "rejected, reach out to the orga team if you do not approve";
+                    await discordMember.SendMessageAsync($"Your list change on fading-flame was {resul}");
+                }
+            }
         }
+        catch (Exception)
+        {
+            // ignored, dont care
+        }
+    }
+}
+
+public class PlayerAndLeagueError
+{
+    public string DisplayName { get; }
+    public string DiscordTag { get; }
+    public string LeagueTag { get; }
+
+    public PlayerAndLeagueError(string displayName, string discordTag, string leagueTag)
+    {
+        DisplayName = displayName;
+        DiscordTag = discordTag;
+        LeagueTag = leagueTag;
     }
 }

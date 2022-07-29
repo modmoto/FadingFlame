@@ -3,55 +3,54 @@ using FadingFlame.Players;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace FadingFlame.Matchups
+namespace FadingFlame.Matchups;
+
+public class PlayerResult
 {
-    public class PlayerResult
+    public ObjectId Id { get; set; }
+
+    /// <summary>
+    /// the points you get by killing enemies
+    /// </summary>
+    public int VictoryPoints { get; set; }
+
+    /// <summary>
+    /// the points you get for secondary objective and victory points difference
+    /// </summary>
+    public int BattlePoints { get; set; }
+    public Mmr OldMmr { get; set; }
+    public Mmr NewMmr { get; set; }
+
+    [JsonIgnore]
+    [BsonIgnore]
+    public Mmr MmrDifference => new()
     {
-        public ObjectId Id { get; set; }
+        Rating = NewMmr.Rating - OldMmr.Rating,
+        RatingDeviation = NewMmr.RatingDeviation - OldMmr.RatingDeviation
+    };
 
-        /// <summary>
-        /// the points you get by killing enemies
-        /// </summary>
-        public int VictoryPoints { get; set; }
-
-        /// <summary>
-        /// the points you get for secondary objective and victory points difference
-        /// </summary>
-        public int BattlePoints { get; set; }
-        public Mmr OldMmr { get; set; }
-        public Mmr NewMmr { get; set; }
-
-        [JsonIgnore]
-        [BsonIgnore]
-        public Mmr MmrDifference => new()
+    public static PlayerResult Create(
+        ObjectId playerId,
+        int battlePoints,
+        int winPoints,
+        Mmr oldMmr,
+        Mmr newMmr)
+    {
+        return new()
         {
-            Rating = NewMmr.Rating - OldMmr.Rating,
-            RatingDeviation = NewMmr.RatingDeviation - OldMmr.RatingDeviation
+            VictoryPoints = battlePoints,
+            BattlePoints = winPoints,
+            Id = playerId,
+            OldMmr = oldMmr,
+            NewMmr = newMmr
         };
+    }
 
-        public static PlayerResult Create(
-            ObjectId playerId,
-            int battlePoints,
-            int winPoints,
-            Mmr oldMmr,
-            Mmr newMmr)
+    public static PlayerResult ZeroToZero(ObjectId playerId)
+    {
+        return new ()
         {
-            return new()
-            {
-                VictoryPoints = battlePoints,
-                BattlePoints = winPoints,
-                Id = playerId,
-                OldMmr = oldMmr,
-                NewMmr = newMmr
-            };
-        }
-
-        public static PlayerResult ZeroToZero(ObjectId playerId)
-        {
-            return new ()
-            {
-                Id = playerId
-            };
-        }
+            Id = playerId
+        };
     }
 }

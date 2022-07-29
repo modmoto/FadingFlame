@@ -1,29 +1,28 @@
 using System;
 using System.Collections.Generic;
 
-namespace FadingFlame.Leagues
+namespace FadingFlame.Leagues;
+
+public static class ListExtensions
 {
-    public static class ListExtensions
+    private static Random rng = new();
+
+    public static void Shuffle<T>(this IList<T> list)
     {
-        private static Random rng = new();
+        var shuffledList = new List<T>();
+        var listCount = list.Count;
 
-        public static void Shuffle<T>(this IList<T> list)
+        for (int i = 0; i < listCount; i++)
         {
-            var shuffledList = new List<T>();
-            var listCount = list.Count;
+            var maxValue = list.Count - 1;
+            var randomIndex = rng.Next(maxValue);
+            shuffledList.Add(list[randomIndex]);
+            list.Remove(shuffledList[i]);
+        }
 
-            for (int i = 0; i < listCount; i++)
-            {
-                var maxValue = list.Count - 1;
-                var randomIndex = rng.Next(maxValue);
-                shuffledList.Add(list[randomIndex]);
-                list.Remove(shuffledList[i]);
-            }
-
-            foreach (var item in shuffledList)
-            {
-                list.Add(item);
-            }
+        foreach (var item in shuffledList)
+        {
+            list.Add(item);
         }
     }
 }
