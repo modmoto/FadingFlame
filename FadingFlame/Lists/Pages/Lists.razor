@@ -7,7 +7,7 @@
 <div>
     <h1>Lists played this season</h1>
     <hr class="my-4">
-    @if (_seasonState.CurrentSeason.ListSubmissionIsOver)
+    @if (SeasonState.CurrentSeason.ListSubmissionIsOver)
     {
         <div style="display: flex; flex-direction: row">
             <select class="form-select form-select-lg mb-3 me-2" aria-label=".form-select-lg example" @onchange="SelectFaction">
@@ -65,13 +65,13 @@
     }
     else
     {
-        <h4>Lists will be displayed after @(_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate())</h4>
+        <h4>Lists will be displayed after @(SeasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate())</h4>
     }
 </div>
 
-@inject IPlayerRepository _playerRepository
-@inject ILeagueRepository _leagueRepository
-@inject SeasonState _seasonState
+@inject IPlayerRepository PlayerRepository
+@inject ILeagueRepository LeagueRepository
+@inject SeasonState SeasonState
 
 @code
 {
@@ -83,7 +83,7 @@
 
     protected override void OnInitialized()
     {
-        _seasonState.SeasonsChanged += (_, _) => LoadStuff();
+        SeasonState.SeasonsChanged += async (_, _) => await LoadStuff();
     }
 
     protected override async Task OnInitializedAsync()
@@ -93,9 +93,9 @@
 
     private async Task LoadStuff()
     {
-        _leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
+        _leagues = await LeagueRepository.LoadForSeason(SeasonState.CurrentSeason.SeasonId);
         var playerIds = _leagues.SelectMany(l => l.Players.Select(p => p.Id)).ToList();
-        _enlistedPlayersOriginal = await _playerRepository.LoadForLeague(playerIds);
+        _enlistedPlayersOriginal = await PlayerRepository.LoadForLeague(playerIds);
         _enlistedPlayers = _enlistedPlayersOriginal;
         StateHasChanged();
     }

@@ -2,18 +2,18 @@
 
 <div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand ms-4" href="">Fading Flame</a>
-    @if (_loggedInUserState.UserCanBeAdmin)
+    @if (LoggedInUserState.UserCanBeAdmin)
     {
         <div class="d-xxl-none d-xl-none d-lg-none d-md-none d-sm-none">
-            @if (_loggedInUserState.UserIsAdmin)
+            @if (LoggedInUserState.UserIsAdmin)
             {
-                <button class="btn btn-warning" @onclick="_loggedInUserState.ToggleAdmin">
+                <button class="btn btn-warning" @onclick="LoggedInUserState.ToggleAdmin">
                     <span class="oi oi-shield" aria-hidden="true"></span>
                 </button>  
             }
             else
             {
-                <button class="btn btn-outline-warning" @onclick="_loggedInUserState.ToggleAdmin">
+                <button class="btn btn-outline-warning" @onclick="LoggedInUserState.ToggleAdmin">
                     <span class="oi oi-shield" aria-hidden="true"></span>
                 </button>  
             }
@@ -62,14 +62,14 @@
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/admin" Match="NavLinkMatch.All" hidden="@(!_loggedInUserState.UserIsAdmin)">
+            <NavLink class="nav-link" href="/admin" Match="NavLinkMatch.All" hidden="@(!LoggedInUserState.UserIsAdmin)">
                 <span class="oi oi-shield" aria-hidden="true"></span>Admin
             </NavLink>
         </li>
         <AuthorizeView>
             <Authorized>
                 <li class="nav-item px-3 d-xxl-none d-xl-none d-lg-none d-md-none d-sm-none">
-                    <NavLink class="nav-link" href="@($"/player/{_loggedInUserState.LoggedInPlayer.Id}")" Match="NavLinkMatch.All">
+                    <NavLink class="nav-link" href="@($"/player/{LoggedInUserState.LoggedInPlayer.Id}")" Match="NavLinkMatch.All">
                         <span class="oi oi-person" aria-hidden="true"></span>My profile
                     </NavLink>
                 </li>
@@ -90,7 +90,7 @@
     </ul>
 </div>
 
-@inject LoggedInUserState _loggedInUserState
+@inject LoggedInUserState LoggedInUserState
 
 @code {
     private bool _collapseNavMenu = true;
@@ -102,6 +102,6 @@
 
     protected override void OnInitialized()
     {
-        _loggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
+        LoggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
     }
 }

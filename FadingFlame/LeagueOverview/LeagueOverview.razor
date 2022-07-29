@@ -8,13 +8,13 @@
 <div>
     <h1>Welcome to the Fading Flame League!</h1>
     <hr class="my-4">
-    @if (_seasonState.NextSeason.IsPubliclyVisible)
+    @if (SeasonState.NextSeason.IsPubliclyVisible)
     {
-        <p class="lead">You can register for next season until the end of the @_seasonState.NextSeason.ListSubmissionDeadline.ToMyDate() and the next season will start on @_seasonState.NextSeason.StartDate.ToMyDate()!</p>
+        <p class="lead">You can register for next season until the end of the @SeasonState.NextSeason.ListSubmissionDeadline.ToMyDate() and the next season will start on @SeasonState.NextSeason.StartDate.ToMyDate()!</p>
     }
     else
     {
-        <p class="lead">The current season started on @_seasonState.CurrentSeason.StartDate.ToMyDate() The next season is not open for registration yet.</p>
+        <p class="lead">The current season started on @SeasonState.CurrentSeason.StartDate.ToMyDate() The next season is not open for registration yet.</p>
     }
     <hr class="my-4">
 </div>
@@ -27,7 +27,7 @@
 }
 else
 {
-    @if (!_loggedInUserState.LoadingPlayer && !_loggedInUserState.LoggedInPlayer.SubmitedListsNextSeason && _seasonState.NextSeason.IsPubliclyVisible)
+    @if (!LoggedInUserState.LoadingPlayer && !LoggedInUserState.LoggedInPlayer.SubmitedListsNextSeason && SeasonState.NextSeason.IsPubliclyVisible)
     {
         <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
             List submission for next season is open, to participate in the next season make sure to do that in your profile!
@@ -71,11 +71,11 @@ else
 }
 
 
-@inject IPlayerRepository _playerRepository
-@inject ILeagueRepository _leagueRepository
-@inject SeasonState _seasonState
-@inject LoggedInUserState _loggedInUserState
-@inject IMatchupRepository _matchupRepository
+@inject IPlayerRepository PlayerRepository
+@inject ILeagueRepository LeagueRepository
+@inject SeasonState SeasonState
+@inject LoggedInUserState LoggedInUserState
+@inject IMatchupRepository MatchupRepository
 
 @code
 {
@@ -90,8 +90,8 @@ else
 
     protected override void OnInitialized()
     {
-        _seasonState.SeasonsChanged += LoadStuff;
-        _loggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
+        SeasonState.SeasonsChanged += LoadStuff;
+        LoggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
     }
 
     private async void LoadStuff(object sender, EventArgs e)
@@ -103,12 +103,12 @@ else
     protected override async Task OnInitializedAsync()
     {
         _loading = true;
-        _leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
-        _playersInLeague = await _playerRepository.LoadForLeague(_leagues.SelectMany(l => l.Players).Select(p => p.Id).ToList());
-        if (_loggedInUserState.UserIsLoggedIn)
+        _leagues = await LeagueRepository.LoadForSeason(SeasonState.CurrentSeason.SeasonId);
+        _playersInLeague = await PlayerRepository.LoadForLeague(_leagues.SelectMany(l => l.Players).Select(p => p.Id).ToList());
+        if (LoggedInUserState.UserIsLoggedIn)
         {
-            var playerId = _loggedInUserState.LoggedInPlayer.Id;
-            var loadLeaguesForPlayer = await _leagueRepository.LoadLeagueForPlayerInSeason(playerId, _seasonState.CurrentSeason.SeasonId);
+            var playerId = LoggedInUserState.LoggedInPlayer.Id;
+            var loadLeaguesForPlayer = await LeagueRepository.LoadLeagueForPlayerInSeason(playerId, SeasonState.CurrentSeason.SeasonId);
             if (loadLeaguesForPlayer != null && _playersInLeague.Any())
             {
                 _leagueIdForUpcomingDay = loadLeaguesForPlayer.Id;
@@ -119,7 +119,7 @@ else
                     _upcomingOpponenName = await LoadOpponentName(_upcomingGame, playerId);
                 }
 
-                var challenges = await _matchupRepository.LoadOpenChallengesOfPlayer(_loggedInUserState.LoggedInPlayer);
+                var challenges = await MatchupRepository.LoadOpenChallengesOfPlayer(LoggedInUserState.LoggedInPlayer);
                 _upcomingChallenge = challenges.FirstOrDefault();
                 if (_upcomingChallenge != null)
                 {
@@ -134,8 +134,8 @@ else
     private async Task<string> LoadOpponentName(Matchup matchup, ObjectId loggedInplayer)
     {
         var player = matchup.Player1 == loggedInplayer
-            ? await _playerRepository.Load(matchup.Player2)
-            : await _playerRepository.Load(matchup.Player1);
+            ? await PlayerRepository.Load(matchup.Player2)
+            : await PlayerRepository.Load(matchup.Player1);
         return $"{player?.DisplayName} / {player?.DiscordTag}";
     }
 

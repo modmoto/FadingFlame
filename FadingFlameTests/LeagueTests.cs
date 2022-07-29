@@ -54,7 +54,7 @@ public class LeagueTests : IntegrationTestBase
         
     [TestCase(1, 0, 10, 10)]
     [TestCase(225, 0, 10, 10)]
-    public void ShouldCalculateResult_Draw(
+    public async Task ShouldCalculateResult_Draw(
         int player1Points,
         int player2Points,
         int exectedoints1,
@@ -74,7 +74,7 @@ public class LeagueTests : IntegrationTestBase
         var result = new MatchResultDto
         {
             MatchId = league.GameDays.First().Matchups.First().Id,
-            SecondaryObjective = SecondaryObjectiveState.draw,
+            SecondaryObjective = SecondaryObjectiveState.Draw,
             Player1 = new PlayerResultDto
             {
                 Id = player1.Id,
@@ -87,7 +87,7 @@ public class LeagueTests : IntegrationTestBase
             }
         };
 
-        league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
+        await league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
         league.ReorderPlayers();
 
         league.Players[1].Id.Should().Be(player1.Id);
@@ -112,7 +112,7 @@ public class LeagueTests : IntegrationTestBase
     [TestCase(3151, 0, 17, 3)]
     [TestCase(5100, 0, 17, 3)]
     [TestCase(5101, 0, 17, 3)]
-    public void ShouldCalculateResult_DrawInSecondObjectiveOneWins(
+    public async Task ShouldCalculateResult_DrawInSecondObjectiveOneWins(
         int player1Points,
         int player2Points,
         int exectedoints1,
@@ -132,7 +132,7 @@ public class LeagueTests : IntegrationTestBase
         var result = new MatchResultDto
         {
             MatchId = league.GameDays.First().Matchups.First().Id,
-            SecondaryObjective = SecondaryObjectiveState.draw,
+            SecondaryObjective = SecondaryObjectiveState.Draw,
             Player1 = new PlayerResultDto
             {
                 Id = player1.Id,
@@ -145,7 +145,7 @@ public class LeagueTests : IntegrationTestBase
             }
         };
 
-        league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
+        await league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
         league.ReorderPlayers();
 
         league.Players[0].Id.Should().Be(player1.Id);
@@ -174,7 +174,7 @@ public class LeagueTests : IntegrationTestBase
     [TestCase(0, 3151, 3, 17)]
     [TestCase(0, 5100, 3, 17)]
     [TestCase(0, 5101, 3, 17)]
-    public void ShouldCalculateResult_DrawInSecondObjectiveTwoWins(
+    public async Task ShouldCalculateResult_DrawInSecondObjectiveTwoWins(
         int player1Points,
         int player2Points,
         int exectedoints1,
@@ -194,7 +194,7 @@ public class LeagueTests : IntegrationTestBase
         var result = new MatchResultDto
         {
             MatchId = league.GameDays.First().Matchups.First().Id,
-            SecondaryObjective = SecondaryObjectiveState.draw,
+            SecondaryObjective = SecondaryObjectiveState.Draw,
             Player1 = new PlayerResultDto
             {
                 Id = player1.Id,
@@ -207,7 +207,7 @@ public class LeagueTests : IntegrationTestBase
             }
         };
 
-        league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
+        await league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
         league.ReorderPlayers();
 
         league.Players[1].Id.Should().Be(player1.Id);
@@ -231,7 +231,7 @@ public class LeagueTests : IntegrationTestBase
     [TestCase(2252, 0, 19, 1)]
     [TestCase(3150, 0, 19, 1)]
     [TestCase(3151, 0, 20, 0)]
-    public void ShouldCalculateResult_player1wins(
+    public async Task ShouldCalculateResult_player1wins(
         int player1Points,
         int player2Points,
         int exectedoints1,
@@ -251,7 +251,7 @@ public class LeagueTests : IntegrationTestBase
         var result = new MatchResultDto
         {
             MatchId = league.GameDays.First().Matchups.First().Id,
-            SecondaryObjective = SecondaryObjectiveState.player1,
+            SecondaryObjective = SecondaryObjectiveState.Player1,
             Player1 = new PlayerResultDto
             {
                 Id = player1.Id,
@@ -264,7 +264,7 @@ public class LeagueTests : IntegrationTestBase
             }
         };
 
-        league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
+        await league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
         league.ReorderPlayers();
 
         league.Players[0].Id.Should().Be(player1.Id);
@@ -288,7 +288,7 @@ public class LeagueTests : IntegrationTestBase
     [TestCase(2252, 0, 19, 1)]
     [TestCase(3150, 0, 19, 1)]
     [TestCase(3151, 0, 20, 0)]
-    public void ShouldCalculateResult_player2wins(
+    public async Task ShouldCalculateResult_player2wins(
         int player2Points,
         int player1Points,
         int expectedPoints2,
@@ -308,7 +308,7 @@ public class LeagueTests : IntegrationTestBase
         var result = new MatchResultDto
         {
             MatchId = league.GameDays.First().Matchups.First().Id,
-            SecondaryObjective = SecondaryObjectiveState.player2,
+            SecondaryObjective = SecondaryObjectiveState.Player2,
             Player1 = new PlayerResultDto
             {
                 Id = player1.Id,
@@ -321,7 +321,7 @@ public class LeagueTests : IntegrationTestBase
             }
         };
 
-        league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
+        await league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
         league.ReorderPlayers();
 
         league.Players[0].Id.Should().Be(player2.Id);
@@ -332,7 +332,7 @@ public class LeagueTests : IntegrationTestBase
     }
 
     [Test]
-    public void DeleteGameReport()
+    public async Task DeleteGameReport()
     {
         var league = new League();
 
@@ -348,7 +348,7 @@ public class LeagueTests : IntegrationTestBase
         var result = new MatchResultDto
         {
             MatchId = league.GameDays.First().Matchups.First().Id,
-            SecondaryObjective = SecondaryObjectiveState.player1,
+            SecondaryObjective = SecondaryObjectiveState.Player1,
             Player1 = new PlayerResultDto
             {
                 Id = player1.Id,
@@ -361,7 +361,7 @@ public class LeagueTests : IntegrationTestBase
             }
         };
 
-        league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
+        await league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
 
         league.ReorderPlayers();
         league.Players[0].Id.Should().Be(player1.Id);
@@ -371,7 +371,8 @@ public class LeagueTests : IntegrationTestBase
         league.Players[1].VictoryPoints.Should().Be(100);
             
         league.DeleteGameReport(result.MatchId);
-            
+        league.ReorderPlayers();
+
         league.Players[0].VictoryPoints.Should().Be(0);
         league.Players[1].VictoryPoints.Should().Be(0);
         league.Players[0].BattlePoints.Should().Be(0);
@@ -454,7 +455,7 @@ public class LeagueTests : IntegrationTestBase
     }
 
     [Test]
-    public void ListComparerDirectComComparison()
+    public async Task ListComparerDirectComComparison()
     {
         var league = CreateLeagueToOrder();
 
@@ -466,7 +467,7 @@ public class LeagueTests : IntegrationTestBase
         var result = new MatchResultDto
         {
             MatchId = league.GameDays[2].Matchups[0].Id,
-            SecondaryObjective = SecondaryObjectiveState.player2,
+            SecondaryObjective = SecondaryObjectiveState.Player2,
             Player1 = new PlayerResultDto
             {
                 Id = id1,
@@ -479,7 +480,7 @@ public class LeagueTests : IntegrationTestBase
             }
         };
 
-        league.ReportGame(TestUtils.MmrRepositoryMock(), result, Mmr.Create(), Mmr.Create(), null, null);
+        await league.ReportGame(TestUtils.MmrRepositoryMock(), result, Mmr.Create(), Mmr.Create(), null, null);
 
         league.ReorderPlayers();
         Assert.AreEqual(20, league.Players[0].BattlePoints);

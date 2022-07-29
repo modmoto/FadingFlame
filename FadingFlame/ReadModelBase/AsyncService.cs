@@ -9,13 +9,13 @@ namespace FadingFlame.ReadModelBase;
 
 public class AsyncService<THandler> : IHostedService where THandler : IAsyncUpdatable
 {
-    private readonly IServiceScopeFactory ServiceScopeFactory;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
     private Task _executingTask;
     private readonly CancellationTokenSource _stoppingCts = new();
 
     public AsyncService(IServiceScopeFactory serviceScopeFactory)
     {
-        ServiceScopeFactory = serviceScopeFactory;
+        _serviceScopeFactory = serviceScopeFactory;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -34,7 +34,7 @@ public class AsyncService<THandler> : IHostedService where THandler : IAsyncUpda
     {
         do
         {
-            using (var scope = ServiceScopeFactory.CreateScope())
+            using (var scope = _serviceScopeFactory.CreateScope())
             {
                 try
                 {

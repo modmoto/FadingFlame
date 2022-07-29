@@ -103,7 +103,7 @@ else
             }
         }
 
-        if (CanEditMatch && MatchWasRecordedLessThanADayAgo && _matchup.PlayersSelectedList || _matchup.PlayersSelectedList && _userState.UserIsAdmin)
+        if (CanEditMatch && MatchWasRecordedLessThanADayAgo && _matchup.PlayersSelectedList || _matchup.PlayersSelectedList && UserState.UserIsAdmin)
         {
             <EditForm Model="@_model" OnValidSubmit="OnValidSubmitMatchResult">
                 <DataAnnotationsValidator/>
@@ -114,7 +114,7 @@ else
                         <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control my-3" @onfocusout="RecreateTempMatchResult"/>
                         <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
                         <div class="form-check">
-                            <input type="checkbox" class="form-check-input" @onclick="() => Select2ndObjective(1)" checked="@_secondaryObjectivePlayer1">
+                            <input type="checkbox" class="form-check-input" @onclick="() => Select2NdObjective(1)" checked="@_secondaryObjectivePlayer1">
                             <label class="form-check-label">
                                 Won secondary objective
                             </label>
@@ -126,7 +126,7 @@ else
                         <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control my-3" @onfocusout="RecreateTempMatchResult"/>
                         <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
                         <div class="form-check">
-                            <input type="checkbox" class="form-check-input" @onclick="() => Select2ndObjective(2)" checked="@_secondaryObjectivePlayer2">
+                            <input type="checkbox" class="form-check-input" @onclick="() => Select2NdObjective(2)" checked="@_secondaryObjectivePlayer2">
                             <label class="form-check-label">
                                 Won secondary objective
                             </label>
@@ -153,15 +153,15 @@ else
     }
     else
     {
-        if (CanEditMatch && MatchWasRecordedLessThanADayAgo || _userState.UserIsAdmin)
+        if (CanEditMatch && MatchWasRecordedLessThanADayAgo || UserState.UserIsAdmin)
         {
-            if (_matchup.PlayersSelectedList || _userState.UserIsAdmin)
+            if (_matchup.PlayersSelectedList || UserState.UserIsAdmin)
             {
                 <div class="row align-items-start my-2">
                     <div class="col">
                         <div class="form-group">
                             <label>List of @Player1Name : </label>
-                            @if (_userState.UserIsAdmin && !_matchup.PlayersSelectedList)
+                            @if (UserState.UserIsAdmin && !_matchup.PlayersSelectedList)
                             {
                                 <div>
                                     <b>List hidden for admins aswell ;)</b>
@@ -178,7 +178,7 @@ else
                     <div class="col">
                         <div class="form-group">
                             <label>List of @Player2Name : </label>
-                            @if (_userState.UserIsAdmin && !_matchup.PlayersSelectedList)
+                            @if (UserState.UserIsAdmin && !_matchup.PlayersSelectedList)
                             {
                                 <div>
                                     <b>List hidden for admins aswell ;)</b>
@@ -203,7 +203,7 @@ else
                             <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control my-3" @onfocusout="RecreateTempMatchResult"/>
                             <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" @onclick="() => Select2ndObjective(1)" checked="@_secondaryObjectivePlayer1">
+                                <input type="checkbox" class="form-check-input" @onclick="() => Select2NdObjective(1)" checked="@_secondaryObjectivePlayer1">
                                 <label class="form-check-label">
                                     Won secondary objective
                                 </label>
@@ -215,7 +215,7 @@ else
                             <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control my-3" @onfocusout="RecreateTempMatchResult"/>
                             <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" @onclick="() => Select2ndObjective(2)" checked="@_secondaryObjectivePlayer2">
+                                <input type="checkbox" class="form-check-input" @onclick="() => Select2NdObjective(2)" checked="@_secondaryObjectivePlayer2">
                                 <label class="form-check-label">
                                     Won secondary objective
                                 </label>
@@ -241,7 +241,7 @@ else
             }
             if (!_matchup.PlayersSelectedList)
             {
-                if (_listsOfLoggedInPlayer == null && !_userState.UserIsAdmin)
+                if (_listsOfLoggedInPlayer == null && !UserState.UserIsAdmin)
                 {
                     <div class="alert alert-danger" role="alert">
                         You did not submit a list, submit a list on your profile!
@@ -297,13 +297,13 @@ else
                 <div>@_player1.DisplayName :</div>
                 <div>Battle Points: <b>@Player1BattlePoints</b></div>
                 <div>Victory Points: @_matchup.Result.Player1.VictoryPoints (Diff.: @_matchup.Result.VictoryPointsDifference)</div>
-                @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.player1)
+                @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.Player1)
                 {
                     <div class="form-check-label">
                         Won secondary objective
                     </div>
                 }
-                @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.draw)
+                @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.Draw)
                 {
                     <div class="form-check-label">
                         Draw on secondary objective
@@ -314,13 +314,13 @@ else
                 <div>@_player2.DisplayName :</div>
                 <div>Battle Points: <b>@Player2BattlePoints</b></div>
                 <div>Victory Points: @_matchup.Result.Player2.VictoryPoints (Diff.: @_matchup.Result.VictoryPointsDifference)</div>
-                @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.player2)
+                @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.Player2)
                 {
                     <div class="form-check-label">
                         Won secondary objective
                     </div>
                 }
-                @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.draw)
+                @if (_matchup.Result.SecondaryObjective == SecondaryObjectiveState.Draw)
                 {
                     <div class="form-check-label">
                         Draw on secondary objective
@@ -380,7 +380,7 @@ else
         </div>
     }
 
-    @if (_userState.UserIsAdmin && _matchup.IsFinished)
+    @if (UserState.UserIsAdmin && _matchup.IsFinished)
     {
         @if (_league != null && _matchup.IsZeroToZero)
         {
@@ -395,7 +395,7 @@ else
         }
     }
 
-    @if (_userState.UserIsAdmin && !_matchup.IsFinished)
+    @if (UserState.UserIsAdmin && !_matchup.IsFinished)
     {
         @if (!_matchup.IsRelegation && !_matchup.IsPlayoff)
         {
@@ -431,14 +431,14 @@ else
     }
 }
 
-@inject NavigationManager _navigation
-@inject ILeagueRepository _leagueRepository
-@inject IMatchupRepository _matchupRepository
-@inject IPlayerRepository _playerRepository
-@inject IChallengeService _challengeService
-@inject IPlayoffRepository _playoffRepository
-@inject LoggedInUserState _userState
-@inject IMmrRepository _mmrRepository
+@inject NavigationManager Navigation
+@inject ILeagueRepository LeagueRepository
+@inject IMatchupRepository MatchupRepository
+@inject IPlayerRepository PlayerRepository
+@inject IChallengeService ChallengeService
+@inject IPlayoffRepository PlayoffRepository
+@inject LoggedInUserState UserState
+@inject IMmrRepository MmrRepository
 
 @code {
 
@@ -470,8 +470,8 @@ else
     private Playoff _playoff;
     private GameListEditModel _listEditModelPlayer1 = new();
     private GameListEditModel _listEditModelPlayer2 = new();
-    private bool Player1LoggedIn => _model.Player1.Id == _userState.LoggedInPlayer.Id;
-    private bool Player2LoggedIn => _model.Player2?.Id == _userState.LoggedInPlayer.Id;
+    private bool Player1LoggedIn => _model.Player1.Id == UserState.LoggedInPlayer.Id;
+    private bool Player2LoggedIn => _model.Player2?.Id == UserState.LoggedInPlayer.Id;
     private bool CanEditMatch => Player1LoggedIn || Player2LoggedIn;
     private bool MatchWasRecordedLessThanADayAgo => _matchup.Result == null || DateTime.UtcNow.AddDays(-1) < _matchup.Result.RecordedAt;
 
@@ -503,26 +503,26 @@ else
 
     protected override void OnInitialized()
     {
-        _userState.UserLoggedIn += (_, _) => StateHasChanged();
+        UserState.UserLoggedIn += (_, _) => StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
     {
-        var uri = _navigation.ToAbsoluteUri(_navigation.Uri);
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
         if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("leagueId", out var leagueId))
         {
             if (ObjectId.TryParse(leagueId, out var realLeagueId))
             {
-                var league = await _leagueRepository.Load(realLeagueId);
+                var league = await LeagueRepository.Load(realLeagueId);
                 var match = league.GameDays
                     .SelectMany(g => g.Matchups)
                     .SingleOrDefault(m => m.Id.ToString() == MatchId);
                 if (match == null)
                 {
-                    var matchup = await _matchupRepository.LoadMatch(new ObjectId(MatchId));
+                    var matchup = await MatchupRepository.LoadMatch(new ObjectId(MatchId));
                     if (matchup == null)
                     {
-                        _navigation.NavigateTo("notfound");
+                        Navigation.NavigateTo("notfound");
                     }
                     await ExtractMatch(matchup);
                 }
@@ -535,19 +535,19 @@ else
             }
             else
             {
-                _navigation.NavigateTo("notfound");
+                Navigation.NavigateTo("notfound");
             }
         }
         else if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("playoffSeason", out var playoffSeason))
         {
-            var playoff = await _playoffRepository.LoadForSeason(Int32.Parse(playoffSeason));
+            var playoff = await PlayoffRepository.LoadForSeason(Int32.Parse(playoffSeason));
             _playoff = playoff;
             var matchup = _playoff.Rounds.SelectMany(r => r.Matchups).FirstOrDefault(m => m.Id.ToString() == MatchId);
             await ExtractMatch(matchup);
         }
         else
         {
-            var matchup = await _matchupRepository.LoadMatch(new ObjectId(MatchId));
+            var matchup = await MatchupRepository.LoadMatch(new ObjectId(MatchId));
             await ExtractMatch(matchup);
         }
 
@@ -560,7 +560,7 @@ else
     {
         _loading = true;
         _league.ResetZeroToZero(_model.MatchId);
-        var result = await _leagueRepository.Update(_league);
+        var result = await LeagueRepository.Update(_league);
         if (!result)
         {
             _errorSaving = true;
@@ -573,7 +573,7 @@ else
     {
         _loading = true;
         _league.SetZeroToZero(_model.MatchId);
-        var result = await _leagueRepository.Update(_league);
+        var result = await LeagueRepository.Update(_league);
         if (!result)
         {
             _errorSaving = true;
@@ -586,21 +586,21 @@ else
     {
         if (match == null)
         {
-            _navigation.NavigateTo("notfound");
+            Navigation.NavigateTo("notfound");
             return;
         }
 
         _matchup = match;
 
-        _player1 = await _playerRepository.Load(match.Player1);
-        _player2 = await _playerRepository.Load(match.Player2);
+        _player1 = await PlayerRepository.Load(match.Player1);
+        _player2 = await PlayerRepository.Load(match.Player2);
 
         _model.Player1.Id = match.Player1;
         _model.Player1.VictoryPoints = match.Result?.Player1.VictoryPoints ?? 0;
         _model.Player2.Id = match.Player2;
         _model.Player2.VictoryPoints = match.Result?.Player2.VictoryPoints ?? 0;
-        _secondaryObjectivePlayer1 = match.Result?.SecondaryObjective == SecondaryObjectiveState.player1;
-        _secondaryObjectivePlayer2 = match.Result?.SecondaryObjective == SecondaryObjectiveState.player2;
+        _secondaryObjectivePlayer1 = match.Result?.SecondaryObjective == SecondaryObjectiveState.Player1;
+        _secondaryObjectivePlayer2 = match.Result?.SecondaryObjective == SecondaryObjectiveState.Player2;
         _model.MatchId = match.Id;
 
 
@@ -670,9 +670,9 @@ else
         {
             var gameList1 = GameList.Create(_listEditModelPlayer1.Name, _listEditModelPlayer1.List, _listEditModelPlayer1.Faction);
             var gameList2 = GameList.Create(_listEditModelPlayer2.Name, _listEditModelPlayer2.List, _listEditModelPlayer2.Faction);
-            result = await MatchResult.Create(_mmrRepository, model.SecondaryObjective, _player1.Mmr, _player2.Mmr, model.Player1, model.Player2, gameList1, gameList2, false);
+            result = await MatchResult.Create(MmrRepository, model.SecondaryObjective, _player1.Mmr, _player2.Mmr, model.Player1, model.Player2, gameList1, gameList2, false);
             _matchup.RecordResult(result);
-            var resultOfSaving = await _matchupRepository.UpdateMatch(_matchup);
+            var resultOfSaving = await MatchupRepository.UpdateMatch(_matchup);
             if (!resultOfSaving)
             {
                 _errorSaving = true;
@@ -682,9 +682,9 @@ else
         }
         else if (_league != null)
         {
-            result = await _league.ReportGame(_mmrRepository, model, _player1.Mmr, _player2.Mmr, Player1List, Player2List);
+            result = await _league.ReportGame(MmrRepository, model, _player1.Mmr, _player2.Mmr, Player1List, Player2List);
 
-            var resultOfSaving = await _leagueRepository.Update(_league);
+            var resultOfSaving = await LeagueRepository.Update(_league);
             if (!resultOfSaving)
             {
                 _errorSaving = true;
@@ -694,8 +694,8 @@ else
         }
         else
         {
-            result = await _playoff.ReportGame(_mmrRepository, model, _player1.Mmr, _player2.Mmr, Player1List, Player2List);
-            var resultOfSaving = await _playoffRepository.Update(_playoff);
+            result = await _playoff.ReportGame(MmrRepository, model, _player1.Mmr, _player2.Mmr, Player1List, Player2List);
+            var resultOfSaving = await PlayoffRepository.Update(_playoff);
             if (!resultOfSaving)
             {
                 _errorSaving = true;
@@ -707,18 +707,18 @@ else
         _player1.UpdateMmr(result.Player1.NewMmr);
         _player2.UpdateMmr(result.Player2.NewMmr);
 
-        await _playerRepository.Update(_player1);
-        await _playerRepository.Update(_player2);
+        await PlayerRepository.Update(_player1);
+        await PlayerRepository.Update(_player2);
     }
 
     private SecondaryObjectiveState ConvertToEnum()
     {
         if (!_secondaryObjectivePlayer1 && !_secondaryObjectivePlayer2)
         {
-            return SecondaryObjectiveState.draw;
+            return SecondaryObjectiveState.Draw;
         }
 
-        return _secondaryObjectivePlayer1 ? SecondaryObjectiveState.player1 : SecondaryObjectiveState.player2;
+        return _secondaryObjectivePlayer1 ? SecondaryObjectiveState.Player1 : SecondaryObjectiveState.Player2;
     }
 
     private async Task SelectListForMatch()
@@ -737,7 +737,7 @@ else
 
         if (_playoff != null)
         {
-            var resultOfSaving = await _playoffRepository.Update(_playoff);
+            var resultOfSaving = await PlayoffRepository.Update(_playoff);
             if (!resultOfSaving)
             {
                 _errorSaving = true;
@@ -748,7 +748,7 @@ else
 
         if (_league != null)
         {
-            var resultOfSaving = await _leagueRepository.Update(_league);
+            var resultOfSaving = await LeagueRepository.Update(_league);
             if (!resultOfSaving)
             {
                 _errorSaving = true;
@@ -775,7 +775,7 @@ else
         }
     }
 
-    private void Select2ndObjective(int player)
+    private void Select2NdObjective(int player)
     {
         if (player == 1)
         {
@@ -799,7 +799,7 @@ else
 
     private void GoToPlayer(Player player)
     {
-        _navigation.NavigateTo($"player/{player?.Id}");
+        Navigation.NavigateTo($"player/{player?.Id}");
     }
 
     private async Task SetDefLoss(ObjectId playerId)
@@ -853,7 +853,7 @@ else
             {
                 var gameList = GameList.Create(_listEditModelPlayer1.Name, _listEditModelPlayer1.List, _listEditModelPlayer1.Faction);
                 _matchup.ChallengePlayer1List = gameList;
-                var resultOfSaving = await _matchupRepository.UpdateMatch(_matchup);
+                var resultOfSaving = await MatchupRepository.UpdateMatch(_matchup);
                 if (!resultOfSaving)
                 {
                     _errorSaving = true;
@@ -865,7 +865,7 @@ else
             {
                 var gameList = GameList.Create(_listEditModelPlayer2.Name, _listEditModelPlayer2.List, _listEditModelPlayer2.Faction);
                 _matchup.ChallengePlayer2List = gameList;
-                var resultOfSaving = await _matchupRepository.UpdateMatch(_matchup);
+                var resultOfSaving = await MatchupRepository.UpdateMatch(_matchup);
                 if (!resultOfSaving)
                 {
                     _errorSaving = true;
@@ -890,7 +890,7 @@ else
                 match.ChallengePlayer2List = gameList;
             }
 
-            var resultOfSaving = await _playoffRepository.Update(_playoff);
+            var resultOfSaving = await PlayoffRepository.Update(_playoff);
             if (!resultOfSaving)
             {
                 _errorSaving = true;
@@ -904,8 +904,8 @@ else
     private async Task DeleteChallenge()
     {
         _deletingChallenge = true;
-        await _challengeService.RevokeChallenge(_matchup);
-        _navigation.NavigateTo($"/player/{_userState.LoggedInPlayer.Id}");
+        await ChallengeService.RevokeChallenge(_matchup);
+        Navigation.NavigateTo($"/player/{UserState.LoggedInPlayer.Id}");
         _deletingChallenge = false;
     }
 

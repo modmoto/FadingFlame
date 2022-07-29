@@ -119,12 +119,12 @@ public class MatchResult
         int points1,
         int points2)
     {
-        if (secondaryObjective == SecondaryObjectiveState.player1)
+        if (secondaryObjective == SecondaryObjectiveState.Player1)
         {
             return new PointTuple(points1 + 3, points2 - 3);
         }
 
-        if (secondaryObjective == SecondaryObjectiveState.player2)
+        if (secondaryObjective == SecondaryObjectiveState.Player2)
         {
             return new PointTuple(points1 - 3, points2 + 3);
         }
@@ -141,7 +141,7 @@ public class MatchResult
             Player1 = PlayerResult.ZeroToZero(player1Id),
             Player2 = PlayerResult.ZeroToZero(player2Id),
             Winner = ObjectId.Empty,
-            SecondaryObjective = SecondaryObjectiveState.draw,
+            SecondaryObjective = SecondaryObjectiveState.Draw,
             Player1List = GameList.DeffLoss(),
             Player2List = GameList.DeffLoss()
         };

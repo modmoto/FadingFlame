@@ -98,7 +98,7 @@ public class Playoff : IIdentifiable, IVersionable
                     Id = freeWin.Player2,
                     VictoryPoints = 0
                 },
-                SecondaryObjective = SecondaryObjectiveState.player1
+                SecondaryObjective = SecondaryObjectiveState.Player1
             }, Mmr.Create(), Mmr.Create(), null, null);
         }
             

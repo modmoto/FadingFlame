@@ -31,7 +31,7 @@
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="lists-tab" data-bs-toggle="tab" data-bs-target="#lists" type="button" role="tab" aria-controls="lists" aria-selected="false">Lists</button>
   </li>
-  @if (_isTheRightUser && !_seasonState.NextSeason.ListSubmissionIsOver && _seasonState.NextSeason.IsPubliclyVisible || _seasonState.NextSeason.ListSubmissionIsOver && _loggedInUserState.UserIsAdmin && _seasonState.NextSeason.IsPubliclyVisible)
+  @if (_isTheRightUser && !SeasonState.NextSeason.ListSubmissionIsOver && SeasonState.NextSeason.IsPubliclyVisible || SeasonState.NextSeason.ListSubmissionIsOver && LoggedInUserState.UserIsAdmin && SeasonState.NextSeason.IsPubliclyVisible)
   {
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="lists-next-season-tab" data-bs-toggle="tab" data-bs-target="#lists-next-season" type="button" role="tab" aria-controls="lists" aria-selected="false">
@@ -49,7 +49,7 @@
 </ul>
 <div class="tab-content" id="myTabContent">
 <div class="tab-pane fade show active pt-4" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-  @if (!_isTheRightUser && _loggedInUserState.UserIsLoggedIn)
+  @if (!_isTheRightUser && LoggedInUserState.UserIsLoggedIn)
   {
     <div class="form-group pb-3">
       @if (_challengeIdFromLoggedInUser != ObjectId.Empty)
@@ -137,7 +137,7 @@
           <div class="pb-2">Timezone: </div>
           <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" @bind="_editUserModel.TimeZone">
             <option selected value="@Location.NotSelected">Dont show timezone</option>
-            @foreach (var timeZone in _geoLocationService.GetTimeZones())
+            @foreach (var timeZone in GeoLocationService.GetTimeZones())
             {
               <option value="@timeZone.Id">@timeZone.Id @(timeZone.BaseUtcOffset)</option>
             }
@@ -156,28 +156,28 @@
 
     <hr class="my-3">
 
-    @if (!_seasonState.CurrentSeason.ListSubmissionIsOver)
+    @if (!SeasonState.CurrentSeason.ListSubmissionIsOver)
     {
       @if (!_player.SubmittedLists)
       {
         <div class="pt-3 pb-3 alert alert-warning text-center" role="alert">
-          To participate in the next season, submit your lists here. The lists can not be changed after @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate() and are not visible to other players until then.
+          To participate in the next season, submit your lists here. The lists can not be changed after @SeasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate() and are not visible to other players until then.
         </div>
       }
       else
       {
         <div class="pt-3 pb-3 alert alert-success text-center" role="alert">
-          Lists submitted, you will participate in the next season. You can still change the lists until @_seasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate() and they are not visible to other players until then.
+          Lists submitted, you will participate in the next season. You can still change the lists until @SeasonState.CurrentSeason.ListSubmissionDeadline.ToMyDate() and they are not visible to other players until then.
         </div>
       }
     }
   }
   else
   {
-    @if (_editUserModel.TimeZone != Location.NotSelected && _loggedInUserState.UserIsLoggedIn)
+    @if (_editUserModel.TimeZone != Location.NotSelected && LoggedInUserState.UserIsLoggedIn)
     {
       <div class="form-group pb-3">
-        <label>Time difference to you: @(_geoLocationService.GetTimeDiff(_loggedInUserState.CurrentUserTime, _editUserModel.TimeZone).Hours)h (@_editUserModel.TimeZone)</label>
+        <label>Time difference to you: @(GeoLocationService.GetTimeDiff(LoggedInUserState.CurrentUserTime, _editUserModel.TimeZone).Hours)h (@_editUserModel.TimeZone)</label>
       </div>
     }
     <div class="form-group pb-3">
@@ -274,7 +274,7 @@
   }
 </div>
 <div class="tab-pane fade pt-4" id="lists-next-season" role="tabpanel" aria-labelledby="lists-next-season-tab">
-  @if (!_seasonState.NextSeason.ListSubmissionIsOver && _isTheRightUser || _seasonState.NextSeason.ListSubmissionIsOver && _loggedInUserState.UserIsAdmin)
+  @if (!SeasonState.NextSeason.ListSubmissionIsOver && _isTheRightUser || SeasonState.NextSeason.ListSubmissionIsOver && LoggedInUserState.UserIsAdmin)
   {
     <h4>Lists next season</h4>
     @if (_player.SubmitedListsNextSeason)
@@ -283,7 +283,7 @@
         You are participating in the next season!
       </div>  
     }
-    <div>Lists can be changed until the @_seasonState.NextSeason.ListSubmissionDeadline.ToMyDate() and are not visible to other players</div>
+    <div>Lists can be changed until the @SeasonState.NextSeason.ListSubmissionDeadline.ToMyDate() and are not visible to other players</div>
     <EditForm EditContext="@_editContextListsNextSeason">
       @if (!_playerLeagues.Any())
       {
@@ -359,17 +359,17 @@
 </div>
 </div>
 
-@inject IPlayerRepository _playerRepository
-@inject IMatchupRepository _matchupRepository
-@inject IChallengeService _challengeService
-@inject ILeagueRepository _leagueRepository
-@inject LoggedInUserState _loggedInUserState
-@inject SeasonState _seasonState
-@inject NavigationManager _navigation
-@inject IGeoLocationService _geoLocationService
-@inject IListAcceptAndRejectService _acceptAndRejectService
-@inject IListValidationService _listValidationService
-@inject IListRepository _listRepository
+@inject IPlayerRepository PlayerRepository
+@inject IMatchupRepository MatchupRepository
+@inject IChallengeService ChallengeService
+@inject ILeagueRepository LeagueRepository
+@inject LoggedInUserState LoggedInUserState
+@inject SeasonState SeasonState
+@inject NavigationManager Navigation
+@inject IGeoLocationService GeoLocationService
+@inject IListAcceptAndRejectService AcceptAndRejectService
+@inject IListValidationService ListValidationService
+@inject IListRepository ListRepository
 
 @code{
   private EditUserModel _editUserModel = new();
@@ -413,7 +413,7 @@
 
   protected override void OnInitialized()
   {
-    _countries = _geoLocationService.GetCountries();
+    _countries = GeoLocationService.GetCountries();
     _editContextUser = new EditContext(_editUserModel);
     _messageStoreUser = new ValidationMessageStore(_editContextUser);
     _editContextLists = new EditContext(_editListModel);
@@ -423,9 +423,9 @@
 
     _editContextUser.OnValidationRequested += (_, _) => OnSubmit();
 
-    _loggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
-    _loggedInUserState.UserTimeSet += (_, _) => StateHasChanged();
-    _seasonState.SeasonsChanged += (_, _) => StateHasChanged();
+    LoggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
+    LoggedInUserState.UserTimeSet += (_, _) => StateHasChanged();
+    SeasonState.SeasonsChanged += (_, _) => StateHasChanged();
   }
 
   public override async Task SetParametersAsync(ParameterView parameters)
@@ -438,20 +438,20 @@
   {
     if (ObjectId.TryParse(Id, out var realId))
     {
-      _player = await _playerRepository.Load(realId);
+      _player = await PlayerRepository.Load(realId);
       if (_player == null)
       {
-        _navigation.NavigateTo("notfound");
+        Navigation.NavigateTo("notfound");
       }
       else
       {
-        _playerLeagues = (await _leagueRepository.LoadLeaguesForPlayer(_player.Id))
+        _playerLeagues = (await LeagueRepository.LoadLeaguesForPlayer(_player.Id))
           .OrderByDescending(r => r.Season).ToList();
 
-        _challenges = await _matchupRepository.LoadOpenChallengesOfPlayer(_player);
-        _matches = await _matchupRepository.LoadMatchesOfPlayer(_player);
+        _challenges = await MatchupRepository.LoadOpenChallengesOfPlayer(_player);
+        _matches = await MatchupRepository.LoadMatchesOfPlayer(_player);
 
-        _challengeIdFromLoggedInUser = (await _matchupRepository.LoadChallengeOfPlayers(_loggedInUserState.LoggedInPlayer, _player))?.Id ?? ObjectId.Empty;
+        _challengeIdFromLoggedInUser = (await MatchupRepository.LoadChallengeOfPlayers(LoggedInUserState.LoggedInPlayer, _player))?.Id ?? ObjectId.Empty;
         _editUserModel = new EditUserModel
         {
           DiscordTag = _player.DiscordTag,
@@ -460,9 +460,9 @@
           TimeZone = _player.Location?.TimezoneRaw ?? Location.NotSelected
         };
 
-        _isTheRightUser = Id == _loggedInUserState.LoggedInPlayer.Id.ToString();
+        _isTheRightUser = Id == LoggedInUserState.LoggedInPlayer.Id.ToString();
         _playerIsLateSignup = _isTheRightUser
-                              && _playerLeagues.FirstOrDefault()?.Season == _seasonState.CurrentSeason.SeasonId
+                              && _playerLeagues.FirstOrDefault()?.Season == SeasonState.CurrentSeason.SeasonId
                               && !_player.SubmittedLists;
 
         SetListEditModel();
@@ -473,7 +473,7 @@
     }
     else
     {
-      _navigation.NavigateTo("notfound");
+      Navigation.NavigateTo("notfound");
     }
   }
 
@@ -505,12 +505,12 @@
   
   private string GetSecondaryStringForPlayer1(SecondaryObjectiveState resultSecondaryObjective)
   {
-    return resultSecondaryObjective == SecondaryObjectiveState.player1 ? "(+2nd obj.)" : "";
+    return resultSecondaryObjective == SecondaryObjectiveState.Player1 ? "(+2nd obj.)" : "";
   }
   
   private string GetSecondaryStringForPlayer2(SecondaryObjectiveState resultSecondaryObjective)
   {
-    return resultSecondaryObjective == SecondaryObjectiveState.player2 ? "(+2nd obj.)" : "";
+    return resultSecondaryObjective == SecondaryObjectiveState.Player2 ? "(+2nd obj.)" : "";
   }
 
   private static GameListEditModel ToModel(GameList list)
@@ -528,9 +528,9 @@
   {
     _loadingListsNextSeason = true;
 
-    await _listRepository.Delete(_player.ArmyIdNextSeason);
+    await ListRepository.Delete(_player.ArmyIdNextSeason);
     _player.RetractParticipationNextSeason();
-    await _playerRepository.UpdateWithLists(_player);
+    await PlayerRepository.UpdateWithLists(_player);
     _editListModelNextSeason = new EditListsModel
     {
       List1 = new GameListEditModel(),
@@ -560,8 +560,8 @@
     var list1 = GameList.Create(_editListModelNextSeason.List1.Name, _editListModelNextSeason.List1.List, _editListModelNextSeason.List1.Faction);
     var list2 = GameList.Create(_editListModelNextSeason.List2.Name, _editListModelNextSeason.List2.List, _editListModelNextSeason.List2.Faction);
 
-    _player.SubmitListsNextSeason(list1, list2, _seasonState.CurrentSeason.SeasonId, _editListModelNextSeason.SelfAssessment);
-    await _playerRepository.UpdateWithLists(_player);
+    _player.SubmitListsNextSeason(list1, list2, SeasonState.CurrentSeason.SeasonId, _editListModelNextSeason.SelfAssessment);
+    await PlayerRepository.UpdateWithLists(_player);
     
     _loadingListsNextSeason = false;
   }
@@ -582,7 +582,7 @@
 
   private async Task AddListErrors(string list, FieldIdentifier errorField)
   {
-    var validationErrors1 = await _listValidationService.Validate(list);
+    var validationErrors1 = await ListValidationService.Validate(list);
     if (validationErrors1.Any())
     {
       foreach (var error in validationErrors1)
@@ -616,14 +616,14 @@
       return;
     }
     _player.Update(_editUserModel);
-    await _playerRepository.Update(_player);
+    await PlayerRepository.Update(_player);
     _loading = false;
     StateHasChanged();
   }
 
   private void NavigateToLeague(ObjectId leagueId)
   {
-    _navigation.NavigateTo($"league/{leagueId}");
+    Navigation.NavigateTo($"league/{leagueId}");
   }
 
   private int GetRank(League league)
@@ -639,7 +639,7 @@
     get
     {
       if (!_playerLeagues.Any()) return false;
-      return _playerLeagues[0].Season == _seasonState.CurrentSeason.SeasonId;
+      return _playerLeagues[0].Season == SeasonState.CurrentSeason.SeasonId;
     }
   }
 
@@ -653,7 +653,7 @@
       return;
     }
 
-    await _acceptAndRejectService.RequestList1(_player.ArmyCurrentSeason, _editListModel.List1.ProposedListChange);
+    await AcceptAndRejectService.RequestList1(_player.ArmyCurrentSeason, _editListModel.List1.ProposedListChange);
     SetListEditModel();
   }
 
@@ -668,27 +668,27 @@
       return;
     }
 
-    await _acceptAndRejectService.RequestList2(_player.ArmyCurrentSeason, _editListModel.List2.ProposedListChange);
+    await AcceptAndRejectService.RequestList2(_player.ArmyCurrentSeason, _editListModel.List2.ProposedListChange);
     SetListEditModel();
   }
 
   private async Task DeleteListChange1()
   {
-    await _acceptAndRejectService.RejectList1(_player.ArmyCurrentSeason, "", false);
+    await AcceptAndRejectService.RejectList1(_player.ArmyCurrentSeason, "", false);
     SetListEditModel();
   }
 
   private async Task DeleteListChange2()
   {
-    await _acceptAndRejectService.RejectList2(_player.ArmyCurrentSeason, "", false);
+    await AcceptAndRejectService.RejectList2(_player.ArmyCurrentSeason, "", false);
     SetListEditModel();
   }
 
   private async Task ChallengePlayer()
   {
     _loadingChallengingPlayer = true;
-    var newId = await _challengeService.ChallengePlayer(_loggedInUserState.LoggedInPlayer, _player);
-    _navigation.NavigateTo($"/match/{newId}");
+    var newId = await ChallengeService.ChallengePlayer(LoggedInUserState.LoggedInPlayer, _player);
+    Navigation.NavigateTo($"/match/{newId}");
     _loadingChallengingPlayer = false;
   }
 
@@ -696,24 +696,24 @@
   {
     if (match.IsChallenge)
     {
-      _navigation.NavigateTo($"match/{match.Id}");
+      Navigation.NavigateTo($"match/{match.Id}");
     }
     else if (match.IsPlayoff)
     {
-      _navigation.NavigateTo($"match/{match.Id}?playoffSeason={_seasonState.CurrentSeason.SeasonId}");
+      Navigation.NavigateTo($"match/{match.Id}?playoffSeason={SeasonState.CurrentSeason.SeasonId}");
     }
     else
     {
       var leagueOfMatch = _playerLeagues.FirstOrDefault(l => l.GameDays.SelectMany(p => p.MatchupIds).Contains(match.Id));
       if (leagueOfMatch == null)
       {
-        var leagues = await _leagueRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
+        var leagues = await LeagueRepository.LoadForSeason(SeasonState.CurrentSeason.SeasonId);
         var foreignLeague = leagues.Single(l => l.GameDays.Any(g => g.Matchups.Any(m => m.Id == match.Id)));
-        _navigation.NavigateTo($"match/{match.Id}?leagueId={foreignLeague.Id}");
+        Navigation.NavigateTo($"match/{match.Id}?leagueId={foreignLeague.Id}");
       }
       else
       {
-        _navigation.NavigateTo($"match/{match.Id}?leagueId={leagueOfMatch.Id}");
+        Navigation.NavigateTo($"match/{match.Id}?leagueId={leagueOfMatch.Id}");
       }
     }
   }
@@ -765,7 +765,7 @@
 
   private void GoToChallenge()
   {
-    _navigation.NavigateTo($"match/{_challengeIdFromLoggedInUser}");
+    Navigation.NavigateTo($"match/{_challengeIdFromLoggedInUser}");
   }
 
   private async Task OnSubmitLateList()
@@ -787,8 +787,8 @@
     _player.SubmitLateList(
       GameList.Create(_editListModel.List1.Name, _editListModel.List1.List, _editListModel.List1.Faction)
       , GameList.Create(_editListModel.List2.Name, _editListModel.List2.List, _editListModel.List2.Faction)
-      , _seasonState.CurrentSeason.SeasonId);
-    await _playerRepository.UpdateWithLists(_player);
+      , SeasonState.CurrentSeason.SeasonId);
+    await PlayerRepository.UpdateWithLists(_player);
     _loadingLateListSubmit = false;
   }
 }

@@ -13,7 +13,7 @@ public class MatchResultDto
 
 public enum SecondaryObjectiveState
 {
-    draw = 0,
-    player1 = 1,
-    player2 = 2
+    Draw = 0,
+    Player1 = 1,
+    Player2 = 2
 }

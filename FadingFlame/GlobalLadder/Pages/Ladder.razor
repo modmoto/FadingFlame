@@ -41,9 +41,9 @@
             {
               <span class="@($"ms-2 flag-container flag-icon flag-icon-{item.value.Location?.Country?.TwoLetterISORegionName.ToLower()}")"></span>  
             }
-            @if (_loggedInUserState.UserIsLoggedIn)
+            @if (LoggedInUserState.UserIsLoggedIn)
             {
-              <span>(@(_geoLocationService.GetTimeDiff(_loggedInUserState.CurrentUserTime, item.value.Location.TimezoneRaw).Hours)h)</span>
+              <span>(@(GeoLocationService.GetTimeDiff(LoggedInUserState.CurrentUserTime, item.value.Location.TimezoneRaw).Hours)h)</span>
             }
           }
         </td>
@@ -53,15 +53,15 @@
   </table>
 </div>
 
-@inject IRankingReadmodelRepository _playerRepository
-@inject IGeoLocationService _geoLocationService
-@inject LoggedInUserState _loggedInUserState
+@inject IRankingReadmodelRepository PlayerRepository
+@inject IGeoLocationService GeoLocationService
+@inject LoggedInUserState LoggedInUserState
 
 @code {
   private List<PlayerRankingReadModel> _enlistedPlayersOriginal = new();
 
   protected override async Task OnInitializedAsync()
   {
-    _enlistedPlayersOriginal = await _playerRepository.LoadAllRanked();
+    _enlistedPlayersOriginal = await PlayerRepository.LoadAllRanked();
   }
 }

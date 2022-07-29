@@ -7,7 +7,7 @@
 @using FadingFlame.Playoffs
 @using MongoDB.Bson
 
-@if (_loggedInUserState.UserIsAdmin)
+@if (LoggedInUserState.UserIsAdmin)
 {
     <nav>
         <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -208,7 +208,7 @@
                                 {
                                     <span class="spinner-border spinner-border-sm mr-1"></span>
                                 }
-                                Create Playoffs Season @_seasonState.CurrentSeason.SeasonId
+                                Create Playoffs Season @SeasonState.CurrentSeason.SeasonId
                             </button>
                         }
                     </div>
@@ -228,22 +228,22 @@
                 </div>
                 <div class="row">
                     <div class="col">
-                        <h4>Current Season (@_seasonState.CurrentSeason.SeasonId):</h4>
-                        <EditForm OnSubmit="() => SaveSeason(_seasonState.CurrentSeason)" Model="@_seasonState.CurrentSeason">
+                        <h4>Current Season (@SeasonState.CurrentSeason.SeasonId):</h4>
+                        <EditForm OnSubmit="() => SaveSeason(SeasonState.CurrentSeason)" Model="@SeasonState.CurrentSeason">
                             <DataAnnotationsValidator/>
                             <div class="form-group">
                                 <div class="pb-2">List Submission deadline:</div>
-                                <InputDate @bind-Value="_seasonState.CurrentSeason.ListSubmissionDeadline" class="form-control mb-3"/>
-                                <ValidationMessage For="@(() => _seasonState.CurrentSeason.ListSubmissionDeadline)"/>
+                                <InputDate @bind-Value="SeasonState.CurrentSeason.ListSubmissionDeadline" class="form-control mb-3"/>
+                                <ValidationMessage For="@(() => SeasonState.CurrentSeason.ListSubmissionDeadline)"/>
                             </div>
                             <DataAnnotationsValidator/>
                             <div class="form-group">
                                 <div class="pb-2">Start date:</div>
-                                <InputDate @bind-Value="_seasonState.CurrentSeason.StartDate" class="form-control mb-3"/>
-                                <ValidationMessage For="@(() => _seasonState.CurrentSeason.StartDate)"/>
+                                <InputDate @bind-Value="SeasonState.CurrentSeason.StartDate" class="form-control mb-3"/>
+                                <ValidationMessage For="@(() => SeasonState.CurrentSeason.StartDate)"/>
                             </div>
                             <div class="form-group">
-                                <InputCheckbox class="form-check-input" @bind-Value="_seasonState.CurrentSeason.IsPubliclyVisible"/>
+                                <InputCheckbox class="form-check-input" @bind-Value="SeasonState.CurrentSeason.IsPubliclyVisible"/>
                                 <label class="form-check-label">
                                     Season is publicly visible
                                 </label>
@@ -303,22 +303,22 @@
 
                     </div>
                     <div class="col">
-                        <h4>Next Season (@_seasonState.NextSeason.SeasonId):</h4>
-                        <EditForm OnSubmit="() => SaveSeason(_seasonState.NextSeason)" Model="@_seasonState.NextSeason">
+                        <h4>Next Season (@SeasonState.NextSeason.SeasonId):</h4>
+                        <EditForm OnSubmit="() => SaveSeason(SeasonState.NextSeason)" Model="@SeasonState.NextSeason">
                             <DataAnnotationsValidator/>
                             <div class="form-group">
                                 <div class="pb-2">List Submission deadline:</div>
-                                <InputDate @bind-Value="_seasonState.NextSeason.ListSubmissionDeadline" class="form-control mb-3"/>
-                                <ValidationMessage For="@(() => _seasonState.NextSeason.ListSubmissionDeadline)"/>
+                                <InputDate @bind-Value="SeasonState.NextSeason.ListSubmissionDeadline" class="form-control mb-3"/>
+                                <ValidationMessage For="@(() => SeasonState.NextSeason.ListSubmissionDeadline)"/>
                             </div>
                             <DataAnnotationsValidator/>
                             <div class="form-group">
                                 <div class="pb-2">Start date:</div>
-                                <InputDate @bind-Value="_seasonState.NextSeason.StartDate" class="form-control mb-3"/>
-                                <ValidationMessage For="@(() => _seasonState.NextSeason.StartDate)"/>
+                                <InputDate @bind-Value="SeasonState.NextSeason.StartDate" class="form-control mb-3"/>
+                                <ValidationMessage For="@(() => SeasonState.NextSeason.StartDate)"/>
                             </div>
                             <div class="form-group">
-                                <InputCheckbox class="form-check-input" @bind-Value="_seasonState.NextSeason.IsPubliclyVisible"/>
+                                <InputCheckbox class="form-check-input" @bind-Value="SeasonState.NextSeason.IsPubliclyVisible"/>
                                 <label class="form-check-label">
                                     Season is publicly visible
                                 </label>
@@ -384,19 +384,19 @@
     </div>
 }
 
-@inject LoggedInUserState _loggedInUserState
-@inject IPlayoffCommandHandler _playoffCommandHandler
-@inject IPlayerRepository _playerRepository
-@inject ILeagueRepository _leagueRepository
-@inject IDiscordBot _discordBot
-@inject NavigationManager _navigation
-@inject ISeasonRepository _seasonRepository
-@inject SeasonState _seasonState
-@inject ILeagueCreationService _leagueCreationService
-@inject IListAcceptAndRejectService _acceptAndRejectService
-@inject IListRepository _listRepository
-@inject PenaltyService _penaltyService
-@inject IPlayoffRepository _playoffRepository
+@inject LoggedInUserState LoggedInUserState
+@inject IPlayoffCommandHandler PlayoffCommandHandler
+@inject IPlayerRepository PlayerRepository
+@inject ILeagueRepository LeagueRepository
+@inject IDiscordBot DiscordBot
+@inject NavigationManager Navigation
+@inject ISeasonRepository SeasonRepository
+@inject SeasonState SeasonState
+@inject ILeagueCreationService LeagueCreationService
+@inject IListAcceptAndRejectService AcceptAndRejectService
+@inject IListRepository ListRepository
+@inject PenaltyService PenaltyService
+@inject IPlayoffRepository PlayoffRepository
 
 @code {
     private bool _loadingPlayoffs;
@@ -423,19 +423,19 @@
 
     protected override void OnInitialized()
     {
-        _loggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
+        LoggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
     {
-        _players = await _playerRepository.LoadAll();
-        _playersEnrolledInNextSeason = await _playerRepository.PlayersThatEnrolledInNextSeason();
-        _pendingListChanges = await _listRepository.LoadWithPendingChanges();
-        var seasons = await _seasonRepository.LoadSeasons();
-        _leaguesNextSeason = await _leagueRepository.LoadForSeason(seasons[0].SeasonId);
-        _leaguesThisSeason = await _leagueRepository.LoadForSeason(seasons[1].SeasonId);
-        _pendingPenalties = await _penaltyService.GetPenalties(seasons[1].SeasonId);
-        _playoff = await _playoffRepository.LoadForSeason(_seasonState.CurrentSeason.SeasonId);
+        _players = await PlayerRepository.LoadAll();
+        _playersEnrolledInNextSeason = await PlayerRepository.PlayersThatEnrolledInNextSeason();
+        _pendingListChanges = await ListRepository.LoadWithPendingChanges();
+        var seasons = await SeasonRepository.LoadSeasons();
+        _leaguesNextSeason = await LeagueRepository.LoadForSeason(seasons[0].SeasonId);
+        _leaguesThisSeason = await LeagueRepository.LoadForSeason(seasons[1].SeasonId);
+        _pendingPenalties = await PenaltyService.GetPenalties(seasons[1].SeasonId);
+        _playoff = await PlayoffRepository.LoadForSeason(SeasonState.CurrentSeason.SeasonId);
         if (_playoff != null)
         {
             _playoffsStarted = _playoff.Rounds.Any() && _playoff.Rounds.SelectMany(r => r.Matchups).Any(m => m.IsFinished && m.Player2 != ObjectId.Empty);
@@ -451,7 +451,7 @@
     private async Task SaveDeadlines()
     {
         _playoff.SetDeadline(_deadLineOfPlayoffs);
-        await _playoffRepository.Update(_playoff);
+        await PlayoffRepository.Update(_playoff);
     }
 
     private async Task SaveRelegationDeadline()
@@ -459,21 +459,21 @@
         foreach (var league in _leaguesThisSeason)
         {
             league.RelegationDeadLine = _deadLineRelegations;
-            await _leagueRepository.Update(league);
+            await LeagueRepository.Update(league);
         }
     }
 
     private async Task MakeDiscordTags()
     {
         _loadingDiscordTags = true;
-        _playersNotFound = await _discordBot.SetLeagueTagsOnPlayers(_leaguesThisSeason);
+        _playersNotFound = await DiscordBot.SetLeagueTagsOnPlayers(_leaguesThisSeason);
         _loadingDiscordTags = false;
     }
     
     private async Task ApproveMatchesNextSeason()
     {
         _loadingMakingSeasonOfficial = true;
-        await _leagueCreationService.MakeSeasonOfficial();
+        await LeagueCreationService.MakeSeasonOfficial();
         await OnInitializedAsync();
         _loadingMakingSeasonOfficial = false;
     }
@@ -481,7 +481,7 @@
     private async Task CreatePlayoffs()
     {
         _loadingPlayoffs = true;
-        await _playoffCommandHandler.CreatePlayoffs();
+        await PlayoffCommandHandler.CreatePlayoffs();
         await OnInitializedAsync();
         _loadingPlayoffs = false;
     }
@@ -494,14 +494,14 @@
     private async Task SaveSeason(Season season)
     {
         _loadingSeasons = true;
-        await _seasonRepository.Update(season);
+        await SeasonRepository.Update(season);
         _loadingSeasons = false;
     }
 
     private async void ApproveList1(Army army)
     {
         _loadingApprovalOfList = true;
-        await _acceptAndRejectService.ApproveList1(army, GetPlayer(army)?.DiscordTag);
+        await AcceptAndRejectService.ApproveList1(army, GetPlayer(army)?.DiscordTag);
         _loadingApprovalOfList = false;
         StateHasChanged();
     }
@@ -509,7 +509,7 @@
     private async void ApproveList2(Army army)
     {
         _loadingApprovalOfList = true;
-        await _acceptAndRejectService.ApproveList2(army, GetPlayer(army)?.DiscordTag);
+        await AcceptAndRejectService.ApproveList2(army, GetPlayer(army)?.DiscordTag);
         _loadingApprovalOfList = false;
         StateHasChanged();
     }
@@ -517,7 +517,7 @@
     private async void RejectList1(Army army)
     {
         _loadingApprovalOfList = true;
-        await _acceptAndRejectService.RejectList1(army, GetPlayer(army)?.DiscordTag, true);
+        await AcceptAndRejectService.RejectList1(army, GetPlayer(army)?.DiscordTag, true);
         _loadingApprovalOfList = false;
         StateHasChanged();
     }
@@ -525,7 +525,7 @@
     private async void RejectList2(Army army)
     {
         _loadingApprovalOfList = true;
-        await _acceptAndRejectService.RejectList2(army, GetPlayer(army)?.DiscordTag, true);
+        await AcceptAndRejectService.RejectList2(army, GetPlayer(army)?.DiscordTag, true);
         _loadingApprovalOfList = false;
         StateHasChanged();
     }
@@ -538,7 +538,7 @@
     private async void MakePromotionsAndDemotionsOver()
     {
         _loadingMoveLeagueOver = true;
-        await _leagueCreationService.MakePromotionsAndDemotions();
+        await LeagueCreationService.MakePromotionsAndDemotions();
         _loadingMoveLeagueOver = false;
         StateHasChanged();
     }
@@ -546,18 +546,18 @@
     private async void CreateRelegatonMatches()
     {
         _loadingRelegationMatches = true;
-        await _leagueCreationService.CreateRelegations();
+        await LeagueCreationService.CreateRelegations();
         _loadingRelegationMatches = false;
         StateHasChanged();
     }
 
     private void GoToLeague(League league)
     {
-        _navigation.NavigateTo($"/league/{league.Id}");
+        Navigation.NavigateTo($"/league/{league.Id}");
     }
 
     private async Task DeleteLeague(League league)
     {
-        await _leagueRepository.DeleteLeague(league.Id);
+        await LeagueRepository.DeleteLeague(league.Id);
     }
 }

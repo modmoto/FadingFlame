@@ -63,11 +63,11 @@ else
     </div>
 }
 
-@inject IPlayoffRepository _playoffRepository
-@inject IPlayerRepository _playerRepository
-@inject NavigationManager _navigation
-@inject LoggedInUserState _loggedInUserState
-@inject SeasonState _seasonState
+@inject IPlayoffRepository PlayoffRepository
+@inject IPlayerRepository PlayerRepository
+@inject NavigationManager Navigation
+@inject LoggedInUserState LoggedInUserState
+@inject SeasonState SeasonState
 
 @code
 {
@@ -79,38 +79,38 @@ else
 
     protected override void OnInitialized()
     {
-        _seasonState.SeasonsChanged += (_, _) => LoadStuff();
-        if (_seasonState.CurrentSeason != null && _seasonState.CurrentSeason?.SeasonId != 0)
+        SeasonState.SeasonsChanged += (_, _) => LoadStuff();
+        if (SeasonState.CurrentSeason != null && SeasonState.CurrentSeason?.SeasonId != 0)
         {
-            _seasons = Enumerable.Range(2, _seasonState.CurrentSeason.SeasonId - 1).Reverse().ToList();
+            _seasons = Enumerable.Range(2, SeasonState.CurrentSeason.SeasonId - 1).Reverse().ToList();
         }
     }
 
     private async void LoadStuff()
     {
         await OnInitializedAsync();
-        _seasons = Enumerable.Range(2, _seasonState.CurrentSeason.SeasonId - 1).Reverse().ToList();
+        _seasons = Enumerable.Range(2, SeasonState.CurrentSeason.SeasonId - 1).Reverse().ToList();
         StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadPlayoffs(_seasonState.CurrentSeason.SeasonId);
+        await LoadPlayoffs(SeasonState.CurrentSeason.SeasonId);
         if (_playoffs == null)
         {
-            await LoadPlayoffs(_seasonState.CurrentSeason.SeasonId - 1);
+            await LoadPlayoffs(SeasonState.CurrentSeason.SeasonId - 1);
         }
     }
 
     private async Task LoadPlayoffs(int seasonId)
     {
-        _playoffs = await _playoffRepository.LoadForSeason(seasonId);
+        _playoffs = await PlayoffRepository.LoadForSeason(seasonId);
         if (_playoffs != null)
         {
             var listOfPlayerInPlayoffs = _playoffs?.Rounds.First().Matchups
                 .SelectMany(m => new List<ObjectId> {m.Player1, m.Player2}).ToList();
             _playersInPlayoffs =
-                await _playerRepository.LoadForLeague(listOfPlayerInPlayoffs);
+                await PlayerRepository.LoadForLeague(listOfPlayerInPlayoffs);
             _loading = false;
             StateHasChanged();
         }
@@ -120,7 +120,7 @@ else
     {
         if (GameHasAllPlayers(matchup))
         {
-            _navigation.NavigateTo($"match/{matchup.Id}?playoffSeason={_playoffs.Season}");
+            Navigation.NavigateTo($"match/{matchup.Id}?playoffSeason={_playoffs.Season}");
         }
     }
     
@@ -145,7 +145,7 @@ else
 
     private bool UserIsOneOfThePlayers(Matchup matchup)
     {
-        return _loggedInUserState.LoggedInPlayer.Id == matchup.Player1 || _loggedInUserState.LoggedInPlayer.Id == matchup.Player2;
+        return LoggedInUserState.LoggedInPlayer.Id == matchup.Player1 || LoggedInUserState.LoggedInPlayer.Id == matchup.Player2;
     }
     
     private string GetName(ObjectId playerId)

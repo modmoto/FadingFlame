@@ -16,22 +16,22 @@
             </NavLink>
             <AuthorizeView>
                 <Authorized>
-                    @if (_loggedInUserState.UserCanBeAdmin)
+                    @if (LoggedInUserState.UserCanBeAdmin)
                     {
-                        @if (_loggedInUserState.UserIsAdmin)
+                        @if (LoggedInUserState.UserIsAdmin)
                         {
-                            <button class="btn btn-warning ms-4" @onclick="_loggedInUserState.ToggleAdmin">
+                            <button class="btn btn-warning ms-4" @onclick="LoggedInUserState.ToggleAdmin">
                                 <span class="oi oi-shield" aria-hidden="true"></span>
                             </button>  
                         }
                         else
                         {
-                            <button class="btn btn-outline-warning ms-4" @onclick="_loggedInUserState.ToggleAdmin">
+                            <button class="btn btn-outline-warning ms-4" @onclick="LoggedInUserState.ToggleAdmin">
                                 <span class="oi oi-shield" aria-hidden="true"></span>
                             </button>  
                         }  
                     }
-                    <span><a href="@($"/player/{_loggedInUserState.LoggedInPlayer.Id}")">My profile</a></span>
+                    <span><a href="@($"/player/{LoggedInUserState.LoggedInPlayer.Id}")">My profile</a></span>
                     <a href="/Logout">
                         <span class="oi oi-account-logout" aria-hidden="true"></span>
                     </a>
@@ -53,26 +53,26 @@
     </div>
 </div>
 
-@inject IPlayerRepository _playerRepository
-@inject LoggedInUserState _loggedInUserState
-@inject SeasonState _seasonState
-@inject IHttpContextAccessor _httpContextAccessor
-@inject ISeasonRepository _seasonRepository
-@inject IGeoLocationService _geoLocationService
+@inject IPlayerRepository PlayerRepository
+@inject LoggedInUserState LoggedInUserState
+@inject SeasonState SeasonState
+@inject IHttpContextAccessor HttpContextAccessor
+@inject ISeasonRepository SeasonRepository
+@inject IGeoLocationService GeoLocationService
 
 @code
 {
     protected override void OnInitialized()
     {
-        _loggedInUserState.UserLoggedIn += (_,_) => StateHasChanged();
+        LoggedInUserState.UserLoggedIn += (_,_) => StateHasChanged();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            var loggedInUserTime = await _geoLocationService.GetLoggedInUserTime();
-            _loggedInUserState.SetUserTime(loggedInUserTime);
+            var loggedInUserTime = await GeoLocationService.GetLoggedInUserTime();
+            LoggedInUserState.SetUserTime(loggedInUserTime);
             
             StateHasChanged();
         }
@@ -81,18 +81,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var httpContext = _httpContextAccessor.HttpContext;
+        var httpContext = HttpContextAccessor.HttpContext;
         if (httpContext != null)
         {
             await httpContext.AuthenticateAsync("Cookies");
             
-            if (_loggedInUserState.UserIsLoggedIn)
+            if (LoggedInUserState.UserIsLoggedIn)
             {
-                var player = await _playerRepository.LoadByEmail(_loggedInUserState.AccountEmail);
+                var player = await PlayerRepository.LoadByEmail(LoggedInUserState.AccountEmail);
                 if (player == null)
                 {
-                    player = Player.Create(_loggedInUserState.UserName, _loggedInUserState.AccountEmail);
-                    await _playerRepository.Insert(player);
+                    player = Player.Create(LoggedInUserState.UserName, LoggedInUserState.AccountEmail);
+                    await PlayerRepository.Insert(player);
                 }
                 
                 #pragma warning disable 4014
@@ -102,17 +102,17 @@
                     if (player.Location == null)
                     {
                         Task.Delay(1000).Wait();
-                        var location = _geoLocationService.GetLoggedInUserLocation().Result;
+                        var location = GeoLocationService.GetLoggedInUserLocation().Result;
                         player.SetLocalInformation(location);
-                        _playerRepository.Update(player).Wait();
+                        PlayerRepository.Update(player).Wait();
                     }
                 });
 
-                _loggedInUserState.SetUserData(player);
+                LoggedInUserState.SetUserData(player);
             }
         }
         
-        var loadSeasons = await _seasonRepository.LoadSeasons();
-        _seasonState.SetSeasons(loadSeasons);
+        var loadSeasons = await SeasonRepository.LoadSeasons();
+        SeasonState.SetSeasons(loadSeasons);
     }
 }

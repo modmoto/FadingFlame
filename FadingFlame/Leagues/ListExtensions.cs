@@ -5,7 +5,7 @@ namespace FadingFlame.Leagues;
 
 public static class ListExtensions
 {
-    private static Random rng = new();
+    private static Random _rng = new();
 
     public static void Shuffle<T>(this IList<T> list)
     {
@@ -15,7 +15,7 @@ public static class ListExtensions
         for (int i = 0; i < listCount; i++)
         {
             var maxValue = list.Count - 1;
-            var randomIndex = rng.Next(maxValue);
+            var randomIndex = _rng.Next(maxValue);
             shuffledList.Add(list[randomIndex]);
             list.Remove(shuffledList[i]);
         }

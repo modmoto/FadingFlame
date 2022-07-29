@@ -18,7 +18,7 @@ public class LoggedInUserState
     public event EventHandler UserLoggedIn;
     public event EventHandler UserTimeSet;
 
-    private List<string> Admins = new()
+    private List<string> _admins = new()
     {
         "simonheiss87@gmail.com", // modmoto
         "tulmir@gmail.com", // tulmir
@@ -40,7 +40,7 @@ public class LoggedInUserState
     }
 
     public bool UserIsLoggedIn => _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;
-    public bool UserCanBeAdmin => Admins.Contains(AccountEmail);
+    public bool UserCanBeAdmin => _admins.Contains(AccountEmail);
     public bool UserIsAdmin { get; private set; }
     public Player LoggedInPlayer { get; private set; } = new();
     public DateTimeOffset? CurrentUserTime { get; private set; }

@@ -122,7 +122,7 @@ public class RelegationTests : IntegrationTestBase
             var leagueRelegationMatches = league.RelegationMatches;
             foreach (var relegationMatch in leagueRelegationMatches)
             {
-                var result = await MatchResult.CreateKoResult(TestUtils.MmrRepositoryMock(), SecondaryObjectiveState.draw, Mmr.Create(),
+                var result = await MatchResult.CreateKoResult(TestUtils.MmrRepositoryMock(), SecondaryObjectiveState.Draw, Mmr.Create(),
                     Mmr.Create(), new PlayerResultDto
                     {
                         Id = relegationMatch.Player1,

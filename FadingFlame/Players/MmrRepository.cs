@@ -74,7 +74,7 @@ public class UpdateMmrRequest
     public double Beta { get; init; }
 
     [JsonPropertyName("p_mean")]
-    public double PMEan { get; init; }
+    public double PmEan { get; init; }
 
     [JsonPropertyName("min_rating_deviation")]
     public double MinRatingDeviation { get; init; }
@@ -93,7 +93,7 @@ public class UpdateMmrRequest
             NumberOfTeams = 2,
             Beta = 0.85,
             MinRatingDeviation = 80,
-            PMEan = 1
+            PmEan = 1
         };
     }
 }
