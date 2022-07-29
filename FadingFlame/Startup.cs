@@ -1,6 +1,5 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using FadingFlame.Admin;
 using FadingFlame.Discord;
 using FadingFlame.GlobalLadder;
@@ -92,13 +91,13 @@ public class Startup
            
         services.AddSingleton(_ =>
         {
-            var mongoConnectionString = "mongodb://admin:JzZxkHsmL2f62PEX@65.21.139.246:1001";
+            var mongoConnectionString = Environment.GetEnvironmentVariable("MONGO_DB_CONNECTION_STRING");
             return new MongoClient(mongoConnectionString);
         });
             
         services.AddSingleton<IDiscordBot>(option =>
         {
-            var token = "ODgwNDk0NDk1MzIwMzk1ODA4.YSfGZg.IxTXdSYuDGLuUVjZlUtZ50xqlow";
+            var token = Environment.GetEnvironmentVariable("DISCORD_TOKEN");
             var discordBot = new DiscordBot(token, option.GetService<IPlayerRepository>());
             return discordBot;
         });
@@ -119,7 +118,7 @@ public class Startup
         services.AddScoped<LoggedInUserState>();
         services.AddScoped<SeasonState>();
         services.AddHttpContextAccessor();
-        // services.AddReadModelService<PlayerRankingModelReadHandler>();
+        services.AddReadModelService<PlayerRankingModelReadHandler>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
