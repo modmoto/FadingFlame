@@ -88,6 +88,7 @@ public class LeagueTests : IntegrationTestBase
         };
 
         league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
+        league.ReorderPlayers();
 
         league.Players[1].Id.Should().Be(player1.Id);
         league.Players[0].Id.Should().Be(player2.Id);
@@ -145,6 +146,7 @@ public class LeagueTests : IntegrationTestBase
         };
 
         league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
+        league.ReorderPlayers();
 
         league.Players[0].Id.Should().Be(player1.Id);
         league.Players[1].Id.Should().Be(player2.Id);
@@ -206,6 +208,7 @@ public class LeagueTests : IntegrationTestBase
         };
 
         league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
+        league.ReorderPlayers();
 
         league.Players[1].Id.Should().Be(player1.Id);
         league.Players[0].Id.Should().Be(player2.Id);
@@ -262,6 +265,7 @@ public class LeagueTests : IntegrationTestBase
         };
 
         league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
+        league.ReorderPlayers();
 
         league.Players[0].Id.Should().Be(player1.Id);
         league.Players[1].Id.Should().Be(player2.Id);
@@ -318,6 +322,7 @@ public class LeagueTests : IntegrationTestBase
         };
 
         league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
+        league.ReorderPlayers();
 
         league.Players[0].Id.Should().Be(player2.Id);
         league.Players[1].Id.Should().Be(player1.Id);
@@ -358,6 +363,7 @@ public class LeagueTests : IntegrationTestBase
 
         league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
 
+        league.ReorderPlayers();
         league.Players[0].Id.Should().Be(player1.Id);
         league.Players[1].Id.Should().Be(player2.Id);
 
@@ -392,6 +398,7 @@ public class LeagueTests : IntegrationTestBase
         var league = CreateLeagueToOrder();
         league.PenaltyPointsForPlayer(league.Players[0].Id, -10);
         league.PenaltyPointsForPlayer(league.Players[3].Id, -10);
+        league.ReorderPlayers();
 
         Assert.AreEqual(-10, league.Players[3].PenaltyPoints);
         Assert.AreEqual(-10, league.Players[3].BattlePoints);
@@ -404,6 +411,7 @@ public class LeagueTests : IntegrationTestBase
         league.PenaltyPointsForPlayer(league.Players[0].Id, 10);
         league.PenaltyPointsForPlayer(league.Players[0].Id, 10);
 
+        league.ReorderPlayers();
         Assert.AreEqual(10, league.Players[0].PenaltyPoints);
         Assert.AreEqual(10, league.Players[0].BattlePoints);
     }
@@ -414,6 +422,7 @@ public class LeagueTests : IntegrationTestBase
         var league = CreateLeagueToOrder();
         league.PenaltyPointsForPlayer(league.Players[0].Id, 10);
         league.PenaltyPointsForPlayer(league.Players[0].Id, 5);
+        league.ReorderPlayers();
 
         Assert.AreEqual(5, league.Players[0].PenaltyPoints);
         Assert.AreEqual(5, league.Players[0].BattlePoints);
@@ -426,6 +435,7 @@ public class LeagueTests : IntegrationTestBase
         league.Players[0].BattlePoints = 40;
         league.PenaltyPointsForPlayer(league.Players[0].Id, 10);
         league.PenaltyPointsForPlayer(league.Players[0].Id, 5);
+        league.ReorderPlayers();
 
         Assert.AreEqual(5, league.Players[0].PenaltyPoints);
         Assert.AreEqual(45, league.Players[0].BattlePoints);
@@ -471,6 +481,7 @@ public class LeagueTests : IntegrationTestBase
 
         league.ReportGame(TestUtils.MmrRepositoryMock(), result, Mmr.Create(), Mmr.Create(), null, null);
 
+        league.ReorderPlayers();
         Assert.AreEqual(20, league.Players[0].BattlePoints);
         Assert.AreEqual(20, league.Players[1].BattlePoints);
         Assert.AreEqual(id2, league.Players[0].Id);
