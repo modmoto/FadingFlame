@@ -22,8 +22,8 @@ public class LoggedInUserState
     {
         "simonheiss87@gmail.com", // modmoto
         "tulmir@gmail.com", // tulmir
-        "herzog1602@googlemail.com", //almentro
-        "antonhermann1989@gmail.com", //Sterotony
+        "naughtylusbupport@protonmail.com", // nautilus
+        "kara_te@yahoo.de", // just_flo
     };
 
     public virtual void SetUserData(Player player)
@@ -40,7 +40,7 @@ public class LoggedInUserState
     }
 
     public bool UserIsLoggedIn => _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;
-    public bool UserCanBeAdmin => _admins.Contains(AccountEmail);
+    public bool UserCanBeAdmin => _admins.Contains(AccountEmail.ToLower());
     public bool UserIsAdmin { get; private set; }
     public Player LoggedInPlayer { get; private set; } = new();
     public DateTimeOffset? CurrentUserTime { get; private set; }
