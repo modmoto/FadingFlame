@@ -117,11 +117,11 @@ else
 </div>
 }
 
-@inject ILeagueRepository _leagueRepository
-@inject IPlayerRepository _playerRepository
-@inject NavigationManager _navigation
-@inject LoggedInUserState _loggedInUserState
-@inject SeasonState _seasonState
+@inject ILeagueRepository LeagueRepository
+@inject IPlayerRepository PlayerRepository
+@inject NavigationManager Navigation
+@inject LoggedInUserState LoggedInUserState
+@inject SeasonState SeasonState
 
 @code {
 
@@ -136,8 +136,8 @@ else
 
     protected override void OnInitialized()
     {
-        _loggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
-        _seasonState.SeasonsChanged += LoadStuff;
+        LoggedInUserState.UserLoggedIn += (_, _) => StateHasChanged();
+        SeasonState.SeasonsChanged += LoadStuff;
     }
     
     private async void SelectSeason(int season)
@@ -151,14 +151,15 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData(_seasonState.CurrentSeason.SeasonId);
+        await LoadData(SeasonState.CurrentSeason.SeasonId);
+        _seasons = Enumerable.Range(2, SeasonState.CurrentSeason.SeasonId - 1).Reverse().ToList();
     }
 
     private async Task LoadData(int seasonId)
     {
-        _leagues = await _leagueRepository.LoadForSeason(seasonId);
+        _leagues = await LeagueRepository.LoadForSeason(seasonId);
         var playerIds = _leagues.SelectMany(l => l.Players.Select(p => p.Id)).ToList();
-        _playersInSeason = await _playerRepository.LoadForLeague(playerIds);
+        _playersInSeason = await PlayerRepository.LoadForLeague(playerIds);
         
         var now = DateTime.UtcNow;
         if (_leagues.Any())
@@ -183,7 +184,6 @@ else
     private async void LoadStuff(object sender, EventArgs eventArgs)
     {
         await OnInitializedAsync();
-        _seasons = Enumerable.Range(2, _seasonState.CurrentSeason.SeasonId - 1).Reverse().ToList();
         StateHasChanged();
     }
 
@@ -238,7 +238,7 @@ else
     private void GoToMatch(Matchup match)
     {
         var league = GetLeague(match);
-        _navigation.NavigateTo($"match/{match.Id}?leagueId={league.Id}");
+        Navigation.NavigateTo($"match/{match.Id}?leagueId={league.Id}");
     }
 
     private string GetActiveOrNot(int index)

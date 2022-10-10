@@ -40,7 +40,7 @@ public class LoggedInUserState
     }
 
     public bool UserIsLoggedIn => _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;
-    public bool UserCanBeAdmin => _admins.Contains(AccountEmail.ToLower());
+    public bool UserCanBeAdmin => _admins.Contains(AccountEmail?.ToLower());
     public bool UserIsAdmin { get; private set; }
     public Player LoggedInPlayer { get; private set; } = new();
     public DateTimeOffset? CurrentUserTime { get; private set; }
