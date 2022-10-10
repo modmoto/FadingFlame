@@ -152,6 +152,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         await LoadData(SeasonState.CurrentSeason.SeasonId);
+        _seasons = Enumerable.Range(2, SeasonState.CurrentSeason.SeasonId - 1).Reverse().ToList();
     }
 
     private async Task LoadData(int seasonId)
@@ -183,7 +184,6 @@ else
     private async void LoadStuff(object sender, EventArgs eventArgs)
     {
         await OnInitializedAsync();
-        _seasons = Enumerable.Range(2, SeasonState.CurrentSeason.SeasonId - 1).Reverse().ToList();
         StateHasChanged();
     }
 
