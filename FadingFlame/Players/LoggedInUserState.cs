@@ -24,6 +24,7 @@ public class LoggedInUserState
         "tulmir@gmail.com", // tulmir
         "naughtylusbupport@protonmail.com", // nautilus
         "kara_te@yahoo.de", // just_flo
+        "maik.henschen@web.de", // SouthsideDevil
     };
 
     public virtual void SetUserData(Player player)
