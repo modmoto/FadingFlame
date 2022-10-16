@@ -19,7 +19,6 @@ namespace FadingFlame.Discord
     {
         private readonly IPlayerRepository _playerRepository;
         private readonly DiscordClient _client;
-        private string _participantRole = "League Participant";
 
         public DiscordBot(string token, IPlayerRepository playerRepository)
         {
@@ -59,8 +58,6 @@ namespace FadingFlame.Discord
                     }
                 }
                 
-                var participantRole = guild.Roles.FirstOrDefault(r => r.Value.Name == _participantRole).Value;
-                
                 foreach (var player in players)
                 {
                     var member = guild.Members.FirstOrDefault(member => member.Value.Username?.ToLower() + "#" + member.Value.Discriminator == player.DiscordTag?.ToLower()).Value;
@@ -73,7 +70,6 @@ namespace FadingFlame.Discord
                     {
                         var leagueRole = guild.Roles.FirstOrDefault(r => r.Value.Name == leagueOfPlayer.DivisionId).Value;
                         await member.GrantRoleAsync(leagueRole);
-                        await member.GrantRoleAsync(participantRole);
                     }
                 }
             }
