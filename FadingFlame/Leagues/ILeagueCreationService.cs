@@ -120,13 +120,18 @@ namespace FadingFlame.Leagues
             }
 
             var newLeagues = new List<League>();
+            // hack until i get it
+            divisionsTemp[6] = divisionsTemp[6].Where(p => p.Id != ObjectId.Parse("61478c3f2315e65e4f8a02f4")).ToList();
+
             var playerIdsFromLastSeason = divisionsTemp.SelectMany(p => p).Select(p => p.Id).ToList();
-            
-            var playersThatNotParticipatedLastSeason = enrolledPlayers.Where(p => !playerIdsFromLastSeason.Contains(p.Id))
-                .OrderByDescending(p => p.SelfAssessment ?? (int) ((p.Mmr.Rating - 1000 ) / 100)).ToList();
+
+            var enrolledPlayersOrderedBySkill = enrolledPlayers
+                .Where(p => !playerIdsFromLastSeason.Contains(p.Id))
+                .OrderByDescending(RatePlayer).ToList();
+
             var playerCountPerDivision = League.MaxPlayerCount * 2;
             var newDivisionCountExceptFirstAndSecond = enrolledPlayers.Count / League.MaxPlayerCount / 2 - 2;
-            var amountOfFreshPLayersEachLeague = (int) Math.Ceiling((decimal) playersThatNotParticipatedLastSeason.Count / newDivisionCountExceptFirstAndSecond);
+            var amountOfFreshPLayersEachLeague = (int) Math.Ceiling((decimal) enrolledPlayersOrderedBySkill.Count / newDivisionCountExceptFirstAndSecond);
             
             for (int division = 0; division < divisionsTemp.Count; division++)
             {
@@ -140,21 +145,32 @@ namespace FadingFlame.Leagues
                     }
                     else
                     {
-                        var playersToTakeFromNewPlayers = amountOfFreshPLayersEachLeague > playerCountPerDivision - players.Count
+                        var isLowestDivision = division == divisionsTemp.Count - 1;
+                        if (isLowestDivision)
+                        {
+                            players = enrolledPlayersOrderedBySkill;
+                            divisionsTemp[division] = players;
+                        }
+                        else
+                        {
+                            var playersToTakeFromNewPlayers = amountOfFreshPLayersEachLeague > playerCountPerDivision - players.Count
                                 ? playerCountPerDivision - players.Count
                                 : amountOfFreshPLayersEachLeague;
                         
-                        var playersThatShouldGoToThisLeague = playersThatNotParticipatedLastSeason.Take(playersToTakeFromNewPlayers);
-                        playersThatNotParticipatedLastSeason = playersThatNotParticipatedLastSeason.Skip(playersToTakeFromNewPlayers).ToList();
-                        players.AddRange(playersThatShouldGoToThisLeague);
+                            var playersThatShouldGoToThisLeague = enrolledPlayersOrderedBySkill.Take(playersToTakeFromNewPlayers);
+                            enrolledPlayersOrderedBySkill = enrolledPlayersOrderedBySkill.Skip(playersToTakeFromNewPlayers).ToList();
+                            players.AddRange(playersThatShouldGoToThisLeague);
                         
-                        var newPlayerCountMissingFromDivision = playerCountPerDivision - players.Count;
-                        var remainingPlayers = divisionsTemp.Skip(division).Sum(d => d.Count);
-                        while (newPlayerCountMissingFromDivision > 0 && remainingPlayers >= 0 && newPlayerCountMissingFromDivision < remainingPlayers)
-                        {
-                            MovePlayersUp(division, divisionsTemp, newPlayerCountMissingFromDivision);
-                            newPlayerCountMissingFromDivision = playerCountPerDivision - players.Count;
-                            remainingPlayers = divisionsTemp.Skip(division).Sum(d => d.Count);
+                            var newPlayerCountMissingFromDivision = playerCountPerDivision - players.Count;
+                            var remainingPlayers = divisionsTemp.Skip(division).Sum(d => d.Count);
+                            while (newPlayerCountMissingFromDivision > 0 
+                                   && remainingPlayers >= 0 
+                                   && newPlayerCountMissingFromDivision < remainingPlayers)
+                            {
+                                MovePlayersUp(division, divisionsTemp, newPlayerCountMissingFromDivision);
+                                newPlayerCountMissingFromDivision = playerCountPerDivision - players.Count;
+                                remainingPlayers = divisionsTemp.Skip(division).Sum(d => d.Count);
+                            }
                         }
                     }
                 }
@@ -194,6 +210,16 @@ namespace FadingFlame.Leagues
 
             await _leagueRepository.Insert(newLeagues);
             await SetDeploymentsForNextSeason();
+        }
+
+        private int RatePlayer(Player player)
+        {
+            if (Math.Abs(player.Mmr.Rating - Mmr.Create().Rating) < 0.00001)
+            {
+                return player.SelfAssessment ?? 1;
+            }
+
+            return (int)((player.Mmr.Rating - 1000) / 100);
         }
 
         private static void MovePlayersUp(int division, List<List<Player>> divisionsTemp, int playerCountMissingFromDivision)
