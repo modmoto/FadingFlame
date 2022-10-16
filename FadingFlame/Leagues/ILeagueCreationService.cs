@@ -287,7 +287,14 @@ namespace FadingFlame.Leagues
             League currentLeagueB,
             int index)
         {
+            if (index >= currentLeagueA.Players.Count) 
+                return;
+            
             AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueA.Players[index].Id);
+            
+            if (index >= currentLeagueB?.Players.Count) 
+                return;
+            
             AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB?.Players[index].Id ?? ObjectId.Empty);
         }
 
