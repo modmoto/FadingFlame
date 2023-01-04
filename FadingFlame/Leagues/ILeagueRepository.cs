@@ -11,6 +11,7 @@ namespace FadingFlame.Leagues
     public interface ILeagueRepository
     {
         Task<List<League>> LoadForSeason(int season);
+        Task<List<League>> LoadAllLeagues();
         Task<League> Load(ObjectId id);
         Task Insert(List<League> newLeagues);
         Task DeleteForSeason(int season);
@@ -45,6 +46,11 @@ namespace FadingFlame.Leagues
             }
             
             return leagues;
+        }
+
+        public Task<List<League>> LoadAllLeagues()
+        {
+            return LoadAll<League>();
         }
 
         public async Task<League> Load(ObjectId id)
