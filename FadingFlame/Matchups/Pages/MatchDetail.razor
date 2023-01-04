@@ -397,7 +397,7 @@ else
 
     @if (_userState.UserIsAdmin && !_matchup.IsFinished)
     {
-        @if (!_matchup.IsRelegation && !_matchup.IsPlayoff)
+        @if (!_matchup.IsPromotion && !_matchup.IsPlayoff)
         {
             <button @onclick="SetToZeroZero" disabled="@_loading" class="btn btn-danger mt-3">
                 @if (_loading)

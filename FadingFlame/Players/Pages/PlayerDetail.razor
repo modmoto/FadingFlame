@@ -224,7 +224,7 @@
           }
         </td>
         <td>@GetRaceStrings(matchup.Result)</td>
-        <td>@(matchup.IsChallenge ? "Challenge" : matchup.IsPlayoff ? "Playoffs" :  matchup.IsRelegation ? "Relegation" : "League")</td>
+        <td>@(matchup.IsChallenge ? "Challenge" : matchup.IsPlayoff ? "Playoffs" :  matchup.IsPromotion ? "Promotion" : "League")</td>
         <td>@matchup.Result?.RecordedAt.ToMyDateYear()</td>
       </tr>
     }

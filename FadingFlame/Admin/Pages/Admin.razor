@@ -124,18 +124,18 @@
             <div class="container">
                 <div class="row">
                     <div class="m-2 col">
-                        <button disabled="@(_loadingMoveLeagueOver || _unfinishedRelegations.Any() || _relegationMatchesNotCreatedEverywhere)" type="button" class="btn btn-primary" @onclick="MakePromotionsAndDemotionsOver">
+                        <button disabled="@(_loadingMoveLeagueOver || _unfinishedPromotions.Any() || _promotionsMatchesNotCreatedEverywhere)" type="button" class="btn btn-primary" @onclick="MakePromotionsAndDemotionsOver">
                             @if (_loadingMoveLeagueOver)
                             {
                                 <span class="spinner-border spinner-border-sm mr-1"></span>
                             }
-                            @if (_relegationMatchesNotCreatedEverywhere)
+                            @if (_promotionsMatchesNotCreatedEverywhere)
                             {
-                                <span>Relegation matches not created</span>
+                                <span>Promotion matches not created</span>
                             }
-                            else if (_unfinishedRelegations.Any())
+                            else if (_unfinishedPromotions.Any())
                             {
-                                <span>Relegation matches not finished, can not make pro and demotions</span>
+                                <span>Promotion matches not finished, can not make pro and demotions</span>
                             }
                             else
                             {
@@ -177,20 +177,20 @@
                         </button>
                     </div>
                     <div class="m-2 col">
-                        @if (_relegationMatchesStarted)
+                        @if (_promotionMatchesStarted)
                         {
                             <button disabled type="button" class="btn btn-primary">
-                                There are finished relegation matches, can not create relegation matches anymore
+                                There are finished promotion matches, can not create promotion matches anymore
                             </button>
                         }
                         else
                         {
-                            <button disabled="@_loadingRelegationMatches" type="button" class="btn btn-primary" @onclick="CreateRelegatonMatches">
-                                @if (_loadingRelegationMatches)
+                            <button disabled="@_loadingPromotionMatches" type="button" class="btn btn-primary" @onclick="CreateRelegatonMatches">
+                                @if (_loadingPromotionMatches)
                                 {
                                     <span class="spinner-border spinner-border-sm mr-1"></span>
                                 }
-                                Create Relegation matches
+                                Create Promotion matches
                             </button>
                         }
                     </div>
@@ -288,17 +288,17 @@
                             </button>
                         </EditForm>
 
-                        <h5 class="mt-3">Relegation Deadline</h5>
+                        <h5 class="mt-3">Promotion Deadline</h5>
                         <div class="form-group">
-                            <input type="date" @bind="_deadLineRelegations" class="form-control mb-3"/>
+                            <input type="date" @bind="_deadLinePromotions" class="form-control mb-3"/>
                         </div>
 
-                        <button disabled="@_loadingSeasons" class="btn btn-primary" @onclick="SaveRelegationDeadline">
+                        <button disabled="@_loadingSeasons" class="btn btn-primary" @onclick="SavePromotionDeadline">
                             @if (_loadingSeasons)
                             {
                                 <span class="spinner-border spinner-border-sm mr-1"></span>
                             }
-                            Save deadlines of relegations
+                            Save deadlines of promotions
                         </button>
 
                     </div>
@@ -403,7 +403,7 @@
     private bool _loadingSeasons;
     private bool _loadingApprovalOfList;
     private bool _loadingMoveLeagueOver;
-    private bool _loadingRelegationMatches;
+    private bool _loadingPromotionMatches;
     private bool _loadingDiscordTags;
     private Playoff _playoff;
     private List<Player> _players = new();
@@ -412,11 +412,11 @@
     private List<PenaltyUser> _pendingPenalties = new();
     private List<League> _leaguesThisSeason = new();
     private List<League> _leaguesNextSeason = new();
-    private List<Matchup> _unfinishedRelegations = new();
+    private List<Matchup> _unfinishedPromotions = new();
     private List<DateTime> _deadLineOfPlayoffs = new DateTime[5].ToList();
-    private DateTime _deadLineRelegations;
-    private bool _relegationMatchesNotCreatedEverywhere;
-    private bool _relegationMatchesStarted;
+    private DateTime _deadLinePromotions;
+    private bool _promotionsMatchesNotCreatedEverywhere;
+    private bool _promotionMatchesStarted;
     private bool _playoffsStarted;
     private bool _loadingMakingSeasonOfficial;
     private List<PlayerAndLeagueError> _playersNotFound = new();
@@ -441,11 +441,11 @@
             _playoffsStarted = _playoff.Rounds.Any() && _playoff.Rounds.SelectMany(r => r.Matchups).Any(m => m.IsFinished && m.Player2 != ObjectId.Empty);
             _deadLineOfPlayoffs = _playoff.Rounds.Select(r => r.DeadLine).ToList();
         }
-        _relegationMatchesNotCreatedEverywhere = _leaguesThisSeason[0].RelegationMatches.Count == 0;
-        _deadLineRelegations = _leaguesThisSeason[0].RelegationDeadLine;
-        var relegationMatches = _leaguesThisSeason.SelectMany(c => c.RelegationMatches).ToList();
-        _unfinishedRelegations = relegationMatches.Where(r => !r.IsFinished).ToList();
-        _relegationMatchesStarted = !_relegationMatchesNotCreatedEverywhere && relegationMatches.Any(m => m.IsFinished);
+        _promotionsMatchesNotCreatedEverywhere = _leaguesThisSeason[0].PromotionMatches.Count == 0;
+        _deadLinePromotions = _leaguesThisSeason[0].PromotionDeadLine;
+        var promotionMatches = _leaguesThisSeason.SelectMany(c => c.PromotionMatches).ToList();
+        _unfinishedPromotions = promotionMatches.Where(r => !r.IsFinished).ToList();
+        _promotionMatchesStarted = !_promotionsMatchesNotCreatedEverywhere && promotionMatches.Any(m => m.IsFinished);
     }
 
     private async Task SaveDeadlines()
@@ -454,11 +454,11 @@
         await _playoffRepository.Update(_playoff);
     }
 
-    private async Task SaveRelegationDeadline()
+    private async Task SavePromotionDeadline()
     {
         foreach (var league in _leaguesThisSeason)
         {
-            league.RelegationDeadLine = _deadLineRelegations;
+            league.PromotionDeadLine = _deadLinePromotions;
             await _leagueRepository.Update(league);
         }
     }
@@ -545,9 +545,9 @@
 
     private async void CreateRelegatonMatches()
     {
-        _loadingRelegationMatches = true;
-        await _leagueCreationService.CreateRelegations();
-        _loadingRelegationMatches = false;
+        _loadingPromotionMatches = true;
+        await _leagueCreationService.CreatePromotions();
+        _loadingPromotionMatches = false;
         StateHasChanged();
     }
 

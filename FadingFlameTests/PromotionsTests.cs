@@ -13,7 +13,7 @@ using NUnit.Framework;
 namespace FadingFlameTests
 {
     [TestFixture]
-    public class RelegationTests : IntegrationTestBase
+    public class PromotionsTests : IntegrationTestBase
     {
         private ListRepository _listRepository;
         private PlayerRepository _playerRepository;
@@ -34,21 +34,21 @@ namespace FadingFlameTests
         }
 
         [Test]
-        public async Task CreateRelegationWorks()
+        public async Task CreatePromotionWorks()
         {
             var leagueCreationService = CreateLeagueService();
 
             await CreateDefaultLeaguesAndPlayers(20);
-            await leagueCreationService.CreateRelegations();
+            await leagueCreationService.CreatePromotions();
             var leaguesForSeason = await _leagueRepository.LoadForSeason(_currentSeason);
 
             foreach (var league in leaguesForSeason.Take(leaguesForSeason.Count - 2))
             {
-                Assert.IsNotEmpty(league.RelegationMatches);
+                Assert.IsNotEmpty(league.PromotionMatches);
             }
 
-            Assert.IsEmpty(leaguesForSeason[^1].RelegationMatches);
-            Assert.IsEmpty(leaguesForSeason[^2].RelegationMatches);
+            Assert.IsEmpty(leaguesForSeason[^1].PromotionMatches);
+            Assert.IsEmpty(leaguesForSeason[^2].PromotionMatches);
         }
 
         [Test]
@@ -58,8 +58,8 @@ namespace FadingFlameTests
             var leagueCreationService = CreateLeagueService();
 
             await CreateDefaultLeaguesAndPlayers(19);
-            await leagueCreationService.CreateRelegations();
-            await FinishRelegations();
+            await leagueCreationService.CreatePromotions();
+            await FinishPromotions();
 
             await leagueCreationService.MakePromotionsAndDemotions();
 
@@ -84,8 +84,8 @@ namespace FadingFlameTests
             var leagueCreationService = CreateLeagueService();
 
             await CreateDefaultLeaguesAndPlayers(20);
-            await leagueCreationService.CreateRelegations();
-            await FinishRelegations();
+            await leagueCreationService.CreatePromotions();
+            await FinishPromotions();
 
             await leagueCreationService.MakePromotionsAndDemotions();
 
@@ -114,29 +114,28 @@ namespace FadingFlameTests
             }
         }
 
-        private async Task FinishRelegations()
+        private async Task FinishPromotions()
         {
             var leaguesForSeason = await _leagueRepository.LoadForSeason(0);
             foreach (var league in leaguesForSeason)
             {
-                var leagueRelegationMatches = league.RelegationMatches;
-                foreach (var relegationMatch in leagueRelegationMatches)
+                foreach (var promotionMatch in league.PromotionMatches)
                 {
                     var result = await MatchResult.CreateKoResult(TestUtils.MmrRepositoryMock(), SecondaryObjectiveState.draw, Mmr.Create(),
                         Mmr.Create(), new PlayerResultDto
                         {
-                            Id = relegationMatch.Player1,
+                            Id = promotionMatch.Player1,
                             VictoryPoints = 3500
                         }, new PlayerResultDto
                         {
-                            Id = relegationMatch.Player2,
+                            Id = promotionMatch.Player2,
                             VictoryPoints = 1000
                         }, 
                         GameList.DeffLoss(), 
                         GameList.DeffLoss(), 
                         false);
-                    relegationMatch.RecordResult(result);
-                    await _matchupRepository.UpdateMatch(relegationMatch);
+                    promotionMatch.RecordResult(result);
+                    await _matchupRepository.UpdateMatch(promotionMatch);
                 }
             }
         }

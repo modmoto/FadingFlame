@@ -26,17 +26,18 @@ namespace FadingFlame.Leagues
         public List<GameDay> GameDays { get; set; } = new();
         
         [BsonIgnore]
-        public List<Matchup> RelegationMatches => GameDays.Count == MaxPlayerCount 
+        public List<Matchup> PromotionMatches => GameDays.Count == MaxPlayerCount 
             ? GameDays.Last().Matchups 
             : new List<Matchup>();
 
         [BsonIgnore]
-        public Matchup RelegationMatchOverOneLeague => RelegationMatches.LastOrDefault();
+        public Matchup PromotionMatchOverOneLeague => PromotionMatches.LastOrDefault();
         [BsonIgnore]
-        public Matchup RelegationMatchOverTwoLeagues => RelegationMatches.SkipLast(1).LastOrDefault();
+        public Matchup PromotionMatchOverTwoLeagues => PromotionMatches.SkipLast(1).LastOrDefault();
 
         public DateTime StartDate { get; set; }
-        public DateTime RelegationDeadLine { get; set; }
+        [BsonElement("RelegationDeadLine")]
+        public DateTime PromotionDeadLine { get; set; }
 
         public void RemoveFromLeague(ObjectId playerId)
         {
@@ -88,7 +89,7 @@ namespace FadingFlame.Leagues
             var result = await MatchResult.Create(mmrRepository, matchResultDto.SecondaryObjective, player1Mmr, player2Mmr, player1Result, player2Result, player1List, player2List, matchResultDto.WasDefLoss);
             match.RecordResult(result);
 
-            if (!match.IsRelegation)
+            if (!match.IsPromotion)
             {
                 var player1 = Players.Single(p => p.Id == player1Result.Id);
                 var player2 = Players.Single(p => p.Id == player2Result.Id);
@@ -192,7 +193,7 @@ namespace FadingFlame.Leagues
         {
             var match = GetMatchup(matchId);
 
-            if (!match.IsRelegation)
+            if (!match.IsPromotion)
             {
                 var player1 = Players.First(p => p.Id == match.Player1);
                 var player2 = Players.First(p => p.Id == match.Player2);
@@ -230,7 +231,7 @@ namespace FadingFlame.Leagues
             var match = GetMatchup(matchId);
             match.SetZeroToZero();
 
-            if (!match.IsRelegation)
+            if (!match.IsPromotion)
             {
                 var player1 = Players.First(p => p.Id == match.Player1);
                 var player2 = Players.First(p => p.Id == match.Player2);
@@ -242,23 +243,23 @@ namespace FadingFlame.Leagues
             }
         }
 
-        public void CreateRelegations(League oneLeagueBelow, League twoLeagueBelow, bool isUneven)
+        public void CreatePromotions(League oneLeagueBelow, League twoLeagueBelow, bool isUneven)
         {
             GameDays = GameDays.Take(MaxPlayerCount - 1).ToList();
             
-            var relegationMatches = new List<Matchup>();
+            var promotionMatches = new List<Matchup>();
                 
             if (twoLeagueBelow != null && !DivisionId.StartsWith("1"))
             {
-                relegationMatches.Add(Matchup.CreateRelegationGame(Players[3].Id, twoLeagueBelow.Players[0].Id));
+                promotionMatches.Add(Matchup.CreatePromotionGame(Players[3].Id, twoLeagueBelow.Players[0].Id));
             }
                 
             if (oneLeagueBelow != null)
             {
-                relegationMatches.Add(Matchup.CreateRelegationGame(Players[4].Id, oneLeagueBelow.Players[1].Id));
+                promotionMatches.Add(Matchup.CreatePromotionGame(Players[4].Id, oneLeagueBelow.Players[1].Id));
             }
 
-            GameDays.Add(GameDay.Create(GameDays.Last().StartDate.AddDays(14), relegationMatches));
+            GameDays.Add(GameDay.Create(GameDays.Last().StartDate.AddDays(14), promotionMatches));
         }
 
         public void ResetZeroToZero(ObjectId matchId)

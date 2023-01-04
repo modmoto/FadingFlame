@@ -58,7 +58,8 @@ namespace FadingFlame.Matchups
         [BsonIgnore]
         public bool IsChallengeOrPlayoff => IsChallenge || IsPlayoff;
         public bool IsChallenge { get; set; }
-        public bool IsRelegation { get; set; }
+        [BsonElement("IsRelegation")]
+        public bool IsPromotion { get; set; }
         public bool IsPlayoff { get; set; }
         public bool IsFinished => Result != null;
         [JsonIgnore]
@@ -92,14 +93,14 @@ namespace FadingFlame.Matchups
             };
         }
 
-        public static Matchup CreateRelegationGame(ObjectId challenger, ObjectId playerThatGetsChallenged)
+        public static Matchup CreatePromotionGame(ObjectId challenger, ObjectId playerThatGetsChallenged)
         {
             return new()
             {
                 Player1 = challenger,
                 Player2 = playerThatGetsChallenged,
                 Id = ObjectId.GenerateNewId(),
-                IsRelegation = true
+                IsPromotion = true
             };
         }
         
