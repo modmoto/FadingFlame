@@ -168,6 +168,15 @@
                         }
                     </div>
                     <div class="m-2 col">
+                        <button disabled="@_loadingCreateEmptyLeagueInCurrentSeason" type="button" class="btn btn-primary" @onclick="CreateEmptyLeagueInCurrentSeason">
+                            @if (_loadingCreateEmptyLeagueInCurrentSeason)
+                            {
+                                <span class="spinner-border spinner-border-sm mr-1"></span>
+                            }
+                            Create new empty league in current season
+                        </button>
+                    </div>
+                    <div class="m-2 col">
                         <button disabled="@_loadingDiscordTags" type="button" class="btn btn-primary" @onclick="MakeDiscordTags">
                             @if (_loadingDiscordTags)
                             {
@@ -419,6 +428,7 @@
     private bool _promotionMatchesStarted;
     private bool _playoffsStarted;
     private bool _loadingMakingSeasonOfficial;
+    private bool _loadingCreateEmptyLeagueInCurrentSeason;
     private List<PlayerAndLeagueError> _playersNotFound = new();
 
     protected override void OnInitialized()
@@ -476,6 +486,13 @@
         await _leagueCreationService.MakeSeasonOfficial();
         await OnInitializedAsync();
         _loadingMakingSeasonOfficial = false;
+    }
+    
+    private async Task CreateEmptyLeagueInCurrentSeason()
+    {
+        _loadingCreateEmptyLeagueInCurrentSeason = true;
+        await _leagueCreationService.CreateEmptyLeagueInCurrentSeason();
+        _loadingCreateEmptyLeagueInCurrentSeason = false;
     }
 
     private async Task CreatePlayoffs()

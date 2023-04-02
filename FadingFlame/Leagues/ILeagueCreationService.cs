@@ -14,6 +14,7 @@ namespace FadingFlame.Leagues
         Task MakePromotionsAndDemotions();
         Task CreatePromotions();
         Task MakeSeasonOfficial();
+        Task CreateEmptyLeagueInCurrentSeason();
     }
 
     public class LeagueCreationService : ILeagueCreationService
@@ -252,6 +253,33 @@ namespace FadingFlame.Leagues
             }
 
             await _playerRepository.Update(enrolledPlayers);
+        }
+
+        public async Task CreateEmptyLeagueInCurrentSeason()
+        {
+            var seasons = await _seasonRepository.LoadSeasons();
+            var currentSeason = seasons[1];
+            var currentLeagues = await _leagueRepository.LoadForSeason(currentSeason.SeasonId);
+            var lowestLeague = currentLeagues.Last();
+            var nameIndex = LeagueConstants.Names.IndexOf(lowestLeague.Name);
+            var nextLeagueName = LeagueConstants.Names[nameIndex + 1];
+            var idIndex = LeagueConstants.Ids.IndexOf(lowestLeague.DivisionId);
+            var nextLeagueId = LeagueConstants.Ids[idIndex + 1];
+            var league = League.Create(currentSeason.SeasonId, lowestLeague.StartDate, nextLeagueName, nextLeagueId);
+            for (int i = 0; i < lowestLeague.Players.Count; i++)
+            {
+                var player = Player.Create($"DummyPlayer_{i}", $"DummyMail_{i}");
+                player.Id = ObjectId.GenerateNewId();
+                league.AddPlayer(player);
+            }
+            league.CreateGameDays();
+            for (var i = 0; i < league.GameDays.Count; i++)
+            {
+                league.GameDays[i].Deployment = lowestLeague.GameDays[i].Deployment;
+                league.GameDays[i].SecondaryObjective = lowestLeague.GameDays[i].SecondaryObjective;
+            }
+            
+            await _leagueRepository.Insert(new List<League> { league });
         }
 
         private void MoveFirstPlayerOfOneDownUp(List<Player> newPlayerRanks, List<Player> playersEnrolled, League oneLeagueDownA, League oneLeagueDownB)
