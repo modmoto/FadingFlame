@@ -259,7 +259,7 @@ namespace FadingFlame.Leagues
             var nextLeagueName = LeagueConstants.Names[nameIndex + 1];
             var idIndex = LeagueConstants.Ids.IndexOf(lowestLeague.DivisionId);
             var nextLeagueId = LeagueConstants.Ids[idIndex + 1];
-            var league = League.Create(currentSeason.SeasonId, lowestLeague.StartDate, nextLeagueName, nextLeagueId);
+            var league = League.Create(currentSeason.SeasonId, lowestLeague.StartDate, nextLeagueId, nextLeagueName);
             for (int i = 0; i < lowestLeague.Players.Count; i++)
             {
                 var player = Player.Create($"DummyPlayer_{i}", $"DummyMail_{i}");
