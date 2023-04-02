@@ -159,24 +159,18 @@ namespace FadingFlame.Leagues
                             var newPlayersThatShouldGoToThisLeague = returningPlayersOrderedBySkill.Take(playersToTakeFromNewPlayers);
                             returningPlayersOrderedBySkill = returningPlayersOrderedBySkill.Skip(playersToTakeFromNewPlayers).ToList();
                             playersForThisDivision.AddRange(newPlayersThatShouldGoToThisLeague);
-                            if (division == 5)
-                            {
-                                var newPlayersThatShouldGoToThisLeague2 = returningPlayersOrderedBySkill.Take(2);
-                                returningPlayersOrderedBySkill = returningPlayersOrderedBySkill.Skip(2).ToList();
-                                playersForThisDivision.AddRange(newPlayersThatShouldGoToThisLeague2);
-                            }
                             
-                            // one day, mazbe
-                            // var newPlayerCountMissingFromDivision = playerCountPerDivision - playersForThisDivision.Count;
-                            // var remainingPlayers = divisionsTemp.Skip(division).Sum(d => d.Count);
-                            // while (newPlayerCountMissingFromDivision > 0 
-                            //        && remainingPlayers >= 0 
-                            //        && newPlayerCountMissingFromDivision < remainingPlayers)
-                            // {
-                            //     MovePlayersUp(division, divisionsTemp, newPlayerCountMissingFromDivision);
-                            //     newPlayerCountMissingFromDivision = playerCountPerDivision - playersForThisDivision.Count;
-                            //     remainingPlayers = divisionsTemp.Skip(division).Sum(d => d.Count);
-                            // }
+                            // one day, this should be fixed, somehow messes with the fact if there is no more people in the lower leagues
+                            var newPlayerCountMissingFromDivision = playerCountPerDivision - playersForThisDivision.Count;
+                            var remainingPlayers = divisionsTemp.Skip(division).Sum(d => d.Count);
+                            while (newPlayerCountMissingFromDivision > 0 
+                                   && remainingPlayers >= 0 
+                                   && newPlayerCountMissingFromDivision < remainingPlayers)
+                            {
+                                MovePlayersUp(division, divisionsTemp, newPlayerCountMissingFromDivision);
+                                newPlayerCountMissingFromDivision = playerCountPerDivision - playersForThisDivision.Count;
+                                remainingPlayers = divisionsTemp.Skip(division).Sum(d => d.Count);
+                            }
                         }
                     }
                 }

@@ -28,6 +28,18 @@ namespace FadingFlame.Leagues
             "Tsanas",
             "Phateb",
             "Shamut",
+            // those are old Fantasy names
+            "Archaon",
+            "Ariel",
+            "Araloth",
+            "Imrik",
+            "Tzarina Katarin",
+            "Tzar Boris",
+            "Settra",
+            "The Red Duke",
+            "Abhorash",
+            "Greasus Goldtooth",
+            "Mazdamundi"
         };
 
         public static List<string> Ids => new()
@@ -50,7 +62,24 @@ namespace FadingFlame.Leagues
             "8B",
             "9A",
             "9B",
-            "10A"
+            "10A",
+            "10B",
+            "11A",
+            "11B",
+            "12A",
+            "12B",
+            "13A",
+            "13B",
+            "14A",
+            "14B",
+            "15A",
+            "15B",
+            "16A",
+            "16B",
+            "17A",
+            "17B",
+            "18A",
+            "18B"
         };
 
         public static List<DiscordColor> DiscordColors => new()
