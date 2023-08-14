@@ -83,7 +83,7 @@
 
     protected override void OnInitialized()
     {
-        _seasonState.SeasonsChanged += (_, _) => LoadStuff();
+        _seasonState.SeasonsChanged += async (_, _) => await LoadStuff();
     }
 
     protected override async Task OnInitializedAsync()
