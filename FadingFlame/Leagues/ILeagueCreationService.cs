@@ -288,8 +288,16 @@ namespace FadingFlame.Leagues
             League currentLeagueA,
             League currentLeagueB)
         {
-            AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueA.PromotionMatchOverOneLeague.Result.Winner);
-            AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueA.PromotionMatchOverOneLeague.Result.Looser);
+            if (currentLeagueA.PromotionMatchOverOneLeague.Result.IsDraw)
+            {
+                AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueA.PromotionMatchOverOneLeague.Player1);
+                AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueA.PromotionMatchOverOneLeague.Player2);    
+            }
+            else
+            {
+                AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueA.PromotionMatchOverOneLeague.Result.Winner);
+                AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueA.PromotionMatchOverOneLeague.Result.Looser);    
+            }
 
             if (currentLeagueB != null)
             {
@@ -300,8 +308,16 @@ namespace FadingFlame.Leagues
                 }
                 else
                 {
-                    AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.PromotionMatchOverOneLeague.Result.Winner);
-                    AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.PromotionMatchOverOneLeague.Result.Looser);   
+                    if (currentLeagueB.PromotionMatchOverOneLeague.Result.IsDraw)
+                    {
+                        AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.PromotionMatchOverOneLeague.Player1);
+                        AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.PromotionMatchOverOneLeague.Player2);    
+                    }
+                    else
+                    {
+                        AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.PromotionMatchOverOneLeague.Result.Winner);
+                        AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.PromotionMatchOverOneLeague.Result.Looser);    
+                    }
                 } 
             }
         }
@@ -315,8 +331,16 @@ namespace FadingFlame.Leagues
         {
             if (currentLeagueA != null)
             {
-                AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueA.PromotionMatchOverTwoLeagues?.Result.Winner ?? ObjectId.Empty);
-                AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueA.PromotionMatchOverTwoLeagues?.Result.Looser ?? ObjectId.Empty);    
+                if (currentLeagueA.PromotionMatchOverTwoLeagues?.Result.IsDraw == true)
+                {
+                    AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueA.PromotionMatchOverTwoLeagues?.Player1 ?? ObjectId.Empty);
+                    AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueA.PromotionMatchOverTwoLeagues?.Player2 ?? ObjectId.Empty); 
+                }
+                else
+                {
+                    AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueA.PromotionMatchOverTwoLeagues?.Result.Winner ?? ObjectId.Empty);
+                    AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueA.PromotionMatchOverTwoLeagues?.Result.Looser ?? ObjectId.Empty);    
+                }
             }
 
             if (currentLeagueB != null)
@@ -327,8 +351,16 @@ namespace FadingFlame.Leagues
                 }
                 else
                 {
-                    AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.PromotionMatchOverTwoLeagues.Result.Winner);
-                    AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.PromotionMatchOverTwoLeagues.Result.Looser);    
+                    if (currentLeagueB.PromotionMatchOverTwoLeagues.Result.IsDraw)
+                    {
+                        AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.PromotionMatchOverTwoLeagues.Player1);
+                        AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.PromotionMatchOverTwoLeagues.Player2);    
+                    }
+                    else
+                    {
+                        AddIfEnrolled(newPlayerRanks, playersEnrolled, currentLeagueB.PromotionMatchOverTwoLeagues.Result.Winner);
+                        AddIfEnrolled(newPlayerRanksOneLeaguDown, playersEnrolled, currentLeagueB.PromotionMatchOverTwoLeagues.Result.Looser);    
+                    }
                 }
             }
         }
