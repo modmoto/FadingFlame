@@ -124,13 +124,13 @@ namespace FadingFlame.Leagues
 
             var playerIdsFromLastSeason = divisionsTemp.SelectMany(p => p).Select(p => p.Id).ToList();
 
-            var returningPlayersOrderedBySkill = enrolledPlayers
+            var returningAndNewPlayersOrderedBySkill = enrolledPlayers
                 .Where(p => !playerIdsFromLastSeason.Contains(p.Id))
                 .OrderByDescending(RatePlayer).ToList();
 
             var playerCountPerDivision = League.MaxPlayerCount * 2;
             var newDivisionCountExceptFirstAndSecond = (int) Math.Ceiling((double) enrolledPlayers.Count / League.MaxPlayerCount / 2.0 - 2.0);
-            var amountOfFreshPlayersEachDivision = (int) Math.Ceiling((decimal) returningPlayersOrderedBySkill.Count / newDivisionCountExceptFirstAndSecond);
+            var amountOfFreshPlayersEachDivision = (int) Math.Ceiling((decimal) returningAndNewPlayersOrderedBySkill.Count / newDivisionCountExceptFirstAndSecond);
             
             for (int division = 0; division < divisionsTemp.Count; division++)
             {
@@ -147,7 +147,7 @@ namespace FadingFlame.Leagues
                         var isLowestDivision = division == divisionsTemp.Count - 1;
                         if (isLowestDivision)
                         {
-                            playersForThisDivision = returningPlayersOrderedBySkill;
+                            playersForThisDivision.AddRange(returningAndNewPlayersOrderedBySkill);
                             divisionsTemp[division] = playersForThisDivision;
                         }
                         else
@@ -156,8 +156,8 @@ namespace FadingFlame.Leagues
                                 ? playerCountPerDivision - playersForThisDivision.Count
                                 : amountOfFreshPlayersEachDivision;
                         
-                            var newPlayersThatShouldGoToThisLeague = returningPlayersOrderedBySkill.Take(playersToTakeFromNewPlayers);
-                            returningPlayersOrderedBySkill = returningPlayersOrderedBySkill.Skip(playersToTakeFromNewPlayers).ToList();
+                            var newPlayersThatShouldGoToThisLeague = returningAndNewPlayersOrderedBySkill.Take(playersToTakeFromNewPlayers);
+                            returningAndNewPlayersOrderedBySkill = returningAndNewPlayersOrderedBySkill.Skip(playersToTakeFromNewPlayers).ToList();
                             playersForThisDivision.AddRange(newPlayersThatShouldGoToThisLeague);
                             
                             // one day, this should be fixed, somehow messes with the fact if there is no more people in the lower leagues
