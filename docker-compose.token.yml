@@ -21,7 +21,7 @@ services:
     restart: unless-stopped
 
   mongo-db:
-    image: mongo
+    image: mongo:6
     container_name: mongo-db-fading-flame-${CONTAINER_SUFFIX}
     restart: unless-stopped
     ports:
