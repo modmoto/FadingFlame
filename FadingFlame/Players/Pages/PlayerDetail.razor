@@ -596,13 +596,7 @@
   {
     _loading = true;
     _messageStoreUser.Clear();
-    var regex = new Regex("^.{3,32}#[0-9]{4}$");
     var isValid = true;
-    if (!string.IsNullOrWhiteSpace(_editUserModel.DiscordTag) && !regex.Match(_editUserModel.DiscordTag).Success)
-    {
-      _messageStoreUser.Add(() => _editUserModel.DiscordTag, "Discord tag has to of the form example#1234");
-      isValid = false;
-    }
 
     if (_editUserModel.DisplayName.Length < 3 || _editUserModel.DisplayName.Length > 30)
     {
