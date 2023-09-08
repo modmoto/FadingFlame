@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus;
+using DSharpPlus.Entities;
 using FadingFlame.Leagues;
 using FadingFlame.Players;
 
@@ -60,7 +61,7 @@ namespace FadingFlame.Discord
                 
                 foreach (var player in players)
                 {
-                    var member = guild.Members.FirstOrDefault(member => member.Value.Username?.ToLower() + "#" + member.Value.Discriminator == player.DiscordTag?.ToLower()).Value;
+                    var member = guild.Members.FirstOrDefault(member => FindUser(player.DiscordTag, member.Value)).Value;
                     var leagueOfPlayer = leagues.Single(l => l.Players.Select(p => p.Id).Contains(player.Id));
                     if (member == null)
                     {
@@ -100,8 +101,8 @@ namespace FadingFlame.Discord
                 foreach (var guild in _client.Guilds)
                 {
                     var members = await guild.Value.GetAllMembersAsync();
-                    var lower = discordTag.ToLower();
-                    var discordMember = members.FirstOrDefault(c => $"{c.Username.ToLower()}#{c.Discriminator}" == lower);
+                    
+                    var discordMember = members.FirstOrDefault(c => FindUser(discordTag, c));
                     if (discordMember is not null)
                     {
                         var resul = wasAccepterd ? "accepted, see you on the battlefield =)" : "rejected, reach out to the orga team if you do not approve";
@@ -113,6 +114,14 @@ namespace FadingFlame.Discord
             {
                 // ignored, dont care
             }
+        }
+
+        private bool FindUser(string discordTag, DiscordMember discordMember)
+        {
+            var lower = discordTag.ToLower();
+            return discordMember.Username.ToLower() == lower
+                   || discordMember.DisplayName.ToLower() == lower
+                   || $"{discordMember.Username.ToLower()}#{discordMember.Discriminator}" == lower;
         }
     }
 
