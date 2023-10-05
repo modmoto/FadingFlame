@@ -1,6 +1,5 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using FadingFlame.Admin;
 using FadingFlame.Discord;
 using FadingFlame.GlobalLadder;
@@ -119,7 +118,8 @@ namespace FadingFlame
             services.AddScoped<LoggedInUserState>();
             services.AddScoped<SeasonState>();
             services.AddHttpContextAccessor();
-            services.AddReadModelService<PlayerRankingModelReadHandler>();
+            services.AddReadModelService<SetMissingMatchesToDrawHandler>();
+            // services.AddReadModelService<PlayerRankingModelReadHandler>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

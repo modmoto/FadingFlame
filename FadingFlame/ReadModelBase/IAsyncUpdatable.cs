@@ -5,5 +5,6 @@ namespace FadingFlame.ReadModelBase
     public interface IAsyncUpdatable
     {
         Task<HandlerVersion> Update(HandlerVersion currentVersion);
+        int WaitTimeInMs { get; }
     }
 }

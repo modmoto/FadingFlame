@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using FadingFlame.Leagues;
 using FadingFlame.Matchups;
 using FadingFlame.Players;
 using FadingFlame.ReadModelBase;
@@ -55,5 +54,7 @@ namespace FadingFlame.GlobalLadder
 
             return HandlerVersion.CreateFrom<PlayerRankingModelReadHandler>(lastVersion);
         }
+
+        public int WaitTimeInMs => 5000;
     }
 }

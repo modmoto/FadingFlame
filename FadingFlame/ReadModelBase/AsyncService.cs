@@ -45,6 +45,7 @@ namespace FadingFlame.ReadModelBase
                             var version = await versionRepository.GetLastVersion<THandler>();
                             var newVersion = await service.Update(version);
                             await versionRepository.SaveLastVersion<THandler>(newVersion);
+                            await Task.Delay(service.WaitTimeInMs, stoppingToken);
                         }
                     }
                     
@@ -52,9 +53,8 @@ namespace FadingFlame.ReadModelBase
                     {
                         var logger = scope.ServiceProvider.GetService<ILogger<THandler>>();
                         logger.LogError(e, "Some Readmodelhandler is dying");
+                        await Task.Delay(5000, stoppingToken);
                     }
-
-                    await Task.Delay(5000, stoppingToken);
                 }
             }
             while (!stoppingToken.IsCancellationRequested);
