@@ -119,7 +119,7 @@ namespace FadingFlame
             services.AddScoped<SeasonState>();
             services.AddHttpContextAccessor();
             services.AddReadModelService<SetMissingMatchesToDrawHandler>();
-            // services.AddReadModelService<PlayerRankingModelReadHandler>();
+            services.AddReadModelService<PlayerRankingModelReadHandler>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
