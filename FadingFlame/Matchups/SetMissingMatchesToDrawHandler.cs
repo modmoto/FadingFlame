@@ -51,6 +51,6 @@ namespace FadingFlame.Matchups
             return DateTime.UtcNow.ToString("O");
         }
 
-        public int WaitTimeInMs => 6000;
+        public int WaitTimeInMs => 60000;
     }
 }
