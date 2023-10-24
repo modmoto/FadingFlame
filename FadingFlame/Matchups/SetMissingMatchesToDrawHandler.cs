@@ -25,7 +25,7 @@ namespace FadingFlame.Matchups
         {
             var lastRun = DateTime.Parse(currentVersion.Version ?? CreateNowString());
             var season = await _seasonRepository.LoadSeasons();
-            var currentSeason = season.Last(s => s.IsPubliclyVisible);
+            var currentSeason = season.First(s => s.IsPubliclyVisible);
             var leagues = await _leagueRepository.LoadForSeason(currentSeason.SeasonId);
             foreach (var league in leagues)
             {
