@@ -118,7 +118,7 @@ namespace FadingFlame.Discord
 
         private bool FindUser(string discordTag, DiscordMember discordMember)
         {
-            var lower = discordTag.ToLower();
+            var lower = discordTag?.ToLower();
             return discordMember.Username.ToLower() == lower
                    || discordMember.DisplayName.ToLower() == lower
                    || $"{discordMember.Username.ToLower()}#{discordMember.Discriminator}" == lower;
