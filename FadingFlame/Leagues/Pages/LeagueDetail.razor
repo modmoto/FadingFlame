@@ -64,22 +64,22 @@ else
                             }
                             else
                             {
-                                <EditForm OnSubmit="() => OnSubmitPenalty(_penalties[item.index])" Model="@_penalties[item.index]">
-                                    <DataAnnotationsValidator/>
-                                    <div style="display: flex; flex-direction: row;">
-                                        <div class="form-group" style="max-width: 5rem; margin-bottom: 0!important;">
-                                            <InputNumber @bind-Value="_penalties[item.index].PenaltyPoints" class="form-control"/>
-                                            <ValidationMessage For="@(() => _penalties[item.index].PenaltyPoints)"/>
-                                        </div>
-                                        <button @onclick:stopPropagation="false" disabled="@_loadingAdmin" class="btn btn-danger ms-1">
-                                            @if (_loadingAdmin)
-                                            {
-                                                <span class="spinner-border spinner-border-sm mr-1"></span>
-                                            }
-                                            <span class="oi oi-shield me-2" aria-hidden="true"></span>Save
-                                        </button>
-                                    </div>
-                                </EditForm>
+                                @* <EditForm Model="@_penalties[item.index]"> *@
+                                @*     <DataAnnotationsValidator/> *@
+                                @*     <div style="display: flex; flex-direction: row;"> *@
+                                @*         <div class="form-group" style="max-width: 5rem; margin-bottom: 0!important;"> *@
+                                @*             <InputNumber @bind-Value="_penalties[item.index].PenaltyPoints" class="form-control"/> *@
+                                @*             <ValidationMessage For="@(() => _penalties[item.index].PenaltyPoints)"/> *@
+                                @*         </div> *@
+                                @*         <button @onclick:stopPropagation="false" disabled="@_loadingAdmin" class="btn btn-danger ms-1"> *@
+                                @*             @if (_loadingAdmin) *@
+                                @*             { *@
+                                @*                 <span class="spinner-border spinner-border-sm mr-1"></span> *@
+                                @*             } *@
+                                @*             <span class="oi oi-shield me-2" aria-hidden="true"></span>Save *@
+                                @*         </button> *@
+                                @*     </div> *@
+                                @* </EditForm> *@
                                 <button @onclick="() => RemoveFromLeague(item.value.Id)" disabled="@_loadingAdmin" class="btn btn-danger ms-1">
                                     @if (_loadingAdmin)
                                     {
