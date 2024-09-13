@@ -88,7 +88,7 @@ namespace FadingFlameTests
                     Rating = 1400
                 }
             });
-            var matchResult = await MatchResult.Create(TestUtils.MmrRepositoryMock(), SecondaryObjectiveState.player1, player1.Mmr, player2.Mmr, player1ResultDto, player2ResultDto, player1List, player2List, false);
+            var matchResult = await MatchResult.Create(TestUtils.MmrRepositoryMock(), SecondaryObjectiveState.player1, SecondaryObjectiveState.player1, player1.Mmr, player2.Mmr, player1ResultDto, player2ResultDto, player1List, player2List, false);
             challengeGame.RecordResult(matchResult);
             await matchupRepository.UpdateMatch(challengeGame);
             await playerRepository.Update(player1);

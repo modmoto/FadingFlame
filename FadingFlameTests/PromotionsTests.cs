@@ -121,7 +121,7 @@ namespace FadingFlameTests
             {
                 foreach (var promotionMatch in league.PromotionMatches)
                 {
-                    var result = await MatchResult.CreateKoResult(TestUtils.MmrRepositoryMock(), SecondaryObjectiveState.draw, Mmr.Create(),
+                    var result = await MatchResult.CreateKoResult(TestUtils.MmrRepositoryMock(), SecondaryObjectiveState.draw, SecondaryObjectiveState.draw, Mmr.Create(),
                         Mmr.Create(), new PlayerResultDto
                         {
                             Id = promotionMatch.Player1,

@@ -114,7 +114,13 @@ else
                         <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control my-3" @onfocusout="RecreateTempMatchResult"/>
                         <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
                         <div class="form-check">
-                            <input type="checkbox" class="form-check-input" @onclick="() => Select2ndObjective(1)" checked="@_secondaryObjectivePlayer1">
+                            <input type="checkbox" class="form-check-input" @onclick="() => SelectPrimaryObjective(1)" checked="@_primaryObjectivePlayer1">
+                            <label class="form-check-label">
+                                Won primary objective
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" @onclick="() => SelectSecondaryObjective(1)" checked="@_secondaryObjectivePlayer1">
                             <label class="form-check-label">
                                 Won secondary objective
                             </label>
@@ -126,7 +132,13 @@ else
                         <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control my-3" @onfocusout="RecreateTempMatchResult"/>
                         <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
                         <div class="form-check">
-                            <input type="checkbox" class="form-check-input" @onclick="() => Select2ndObjective(2)" checked="@_secondaryObjectivePlayer2">
+                            <input type="checkbox" class="form-check-input" @onclick="() => SelectPrimaryObjective(2)" checked="@_primaryObjectivePlayer2">
+                            <label class="form-check-label">
+                                Won primary objective
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" @onclick="() => SelectSecondaryObjective(2)" checked="@_secondaryObjectivePlayer2">
                             <label class="form-check-label">
                                 Won secondary objective
                             </label>
@@ -203,7 +215,13 @@ else
                             <InputNumber @bind-Value="_model.Player1.VictoryPoints" class="form-control my-3" @onfocusout="RecreateTempMatchResult"/>
                             <ValidationMessage For="@(() => _model.Player1.VictoryPoints)"/>
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" @onclick="() => Select2ndObjective(1)" checked="@_secondaryObjectivePlayer1">
+                                <input type="checkbox" class="form-check-input" @onclick="() => SelectPrimaryObjective(1)" checked="@_primaryObjectivePlayer1">
+                                <label class="form-check-label">
+                                    Won primary objective
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" @onclick="() => SelectSecondaryObjective(1)" checked="@_secondaryObjectivePlayer1">
                                 <label class="form-check-label">
                                     Won secondary objective
                                 </label>
@@ -215,7 +233,13 @@ else
                             <InputNumber @bind-Value="_model.Player2.VictoryPoints" class="form-control my-3" @onfocusout="RecreateTempMatchResult"/>
                             <ValidationMessage For="@(() => _model.Player2.VictoryPoints)"/>
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" @onclick="() => Select2ndObjective(2)" checked="@_secondaryObjectivePlayer2">
+                                <input type="checkbox" class="form-check-input" @onclick="() => SelectPrimaryObjective(2)" checked="@_primaryObjectivePlayer2">
+                                <label class="form-check-label">
+                                    Won primary objective
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" @onclick="() => SelectSecondaryObjective(2)" checked="@_secondaryObjectivePlayer2">
                                 <label class="form-check-label">
                                     Won secondary objective
                                 </label>
@@ -459,6 +483,8 @@ else
     private int _selectedList;
     private bool _loading = true;
     private bool _errorSaving;
+    private bool _primaryObjectivePlayer1;
+    private bool _primaryObjectivePlayer2;
     private bool _secondaryObjectivePlayer1;
     private bool _secondaryObjectivePlayer2;
     private bool _settingDefWin;
@@ -599,8 +625,8 @@ else
         _model.Player1.VictoryPoints = match.Result?.Player1.VictoryPoints ?? 0;
         _model.Player2.Id = match.Player2;
         _model.Player2.VictoryPoints = match.Result?.Player2.VictoryPoints ?? 0;
-        _secondaryObjectivePlayer1 = match.Result?.SecondaryObjective == SecondaryObjectiveState.player1;
-        _secondaryObjectivePlayer2 = match.Result?.SecondaryObjective == SecondaryObjectiveState.player2;
+        _primaryObjectivePlayer1 = match.Result?.SecondaryObjective == SecondaryObjectiveState.player1;
+        _primaryObjectivePlayer2 = match.Result?.SecondaryObjective == SecondaryObjectiveState.player2;
         _model.MatchId = match.Id;
 
 
@@ -664,13 +690,14 @@ else
     {
         MatchResult result;
 
-        model.SecondaryObjective = ConvertToEnum();
+        model.SecondaryObjective = ConvertPrimaryToEnum();
+        model._3_0_SecondaryObjective = ConvertSecondaryToEnum();
 
         if (_matchup.IsChallenge)
         {
             var gameList1 = GameList.Create(_listEditModelPlayer1.Name, _listEditModelPlayer1.List, _listEditModelPlayer1.Faction);
             var gameList2 = GameList.Create(_listEditModelPlayer2.Name, _listEditModelPlayer2.List, _listEditModelPlayer2.Faction);
-            result = await MatchResult.Create(_mmrRepository, model.SecondaryObjective, _player1.Mmr, _player2.Mmr, model.Player1, model.Player2, gameList1, gameList2, false);
+            result = await MatchResult.Create(_mmrRepository, model.SecondaryObjective, model._3_0_SecondaryObjective, _player1.Mmr, _player2.Mmr, model.Player1, model.Player2, gameList1, gameList2, false);
             _matchup.RecordResult(result);
             var resultOfSaving = await _matchupRepository.UpdateMatch(_matchup);
             if (!resultOfSaving)
@@ -711,7 +738,17 @@ else
         await _playerRepository.Update(_player2);
     }
 
-    private SecondaryObjectiveState ConvertToEnum()
+    private SecondaryObjectiveState ConvertPrimaryToEnum()
+    {
+        if (!_primaryObjectivePlayer1 && !_primaryObjectivePlayer2)
+        {
+            return SecondaryObjectiveState.draw;
+        }
+
+        return _primaryObjectivePlayer1 ? SecondaryObjectiveState.player1 : SecondaryObjectiveState.player2;
+    }
+    
+    private SecondaryObjectiveState ConvertSecondaryToEnum()
     {
         if (!_secondaryObjectivePlayer1 && !_secondaryObjectivePlayer2)
         {
@@ -720,6 +757,7 @@ else
 
         return _secondaryObjectivePlayer1 ? SecondaryObjectiveState.player1 : SecondaryObjectiveState.player2;
     }
+
 
     private async Task SelectListForMatch()
     {
@@ -775,7 +813,24 @@ else
         }
     }
 
-    private void Select2ndObjective(int player)
+    private void SelectPrimaryObjective(int player)
+    {
+        if (player == 1)
+        {
+            _primaryObjectivePlayer1 = !_primaryObjectivePlayer1;
+            _primaryObjectivePlayer2 = false;
+        }
+
+        if (player == 2)
+        {
+            _primaryObjectivePlayer2 = !_primaryObjectivePlayer2;
+            _primaryObjectivePlayer1 = false;
+        }
+
+        RecreateTempMatchResult();
+    }
+    
+    private void SelectSecondaryObjective(int player)
     {
         if (player == 1)
         {
@@ -794,7 +849,7 @@ else
 
     private void RecreateTempMatchResult()
     {
-        _preResult = MatchResult.CreateWithoutMmr(ConvertToEnum(), _model.Player1.VictoryPoints, _model.Player2.VictoryPoints);
+        _preResult = MatchResult.CreateWithoutMmr(ConvertPrimaryToEnum(), ConvertSecondaryToEnum(), _model.Player1.VictoryPoints, _model.Player2.VictoryPoints);
     }
 
     private void GoToPlayer(Player player)
@@ -832,8 +887,8 @@ else
                 VictoryPoints = 0
             }
         };
-        _secondaryObjectivePlayer1 = _player2.Id == playerId;
-        _secondaryObjectivePlayer2 = _player1.Id == playerId;
+        _primaryObjectivePlayer1 = _player2.Id == playerId;
+        _primaryObjectivePlayer2 = _player1.Id == playerId;
         _model.WasDefLoss = true;
         await UpdateMatchWithResult(_model);
         _settingDefWin = false;

@@ -161,6 +161,7 @@ namespace FadingFlame.Playoffs
             var result = await MatchResult.CreateKoResult(
                 mmrRepository,
                 matchResultDto.SecondaryObjective, 
+                matchResultDto._3_0_SecondaryObjective, 
                 player1Mmr,
                 player2Mmr,
                 matchResultDto.Player1, 
