@@ -53,7 +53,8 @@ namespace FadingFlameTests
         }
         
         [TestCase(1, 0, 10, 10)]
-        [TestCase(225, 0, 10, 10)]
+        [TestCase(200, 0, 10, 10)]
+        [TestCase(199, 0, 10, 10)]
         public void ShouldCalculateResult_Draw(
             int player1Points,
             int player2Points,
@@ -96,22 +97,24 @@ namespace FadingFlameTests
             league.Players[0].BattlePoints.Should().Be(expectedPoints2);
         }
 
-        [TestCase(226, 0, 11, 9)]
-        [TestCase(450, 0, 11, 9)]
-        [TestCase(451, 0, 12, 8)]
-        [TestCase(900, 0, 12, 8)]
-        [TestCase(901, 0, 13, 7)]
-        [TestCase(1350, 0, 13, 7)]
-        [TestCase(1351, 0, 14, 6)]
-        [TestCase(1800, 0, 14, 6)]
-        [TestCase(1801, 0, 15, 5)]
-        [TestCase(2250, 0, 15, 5)]
-        [TestCase(2251, 0, 16, 4)]
+        [TestCase(201, 0, 11, 9)]
+        [TestCase(399, 0, 11, 9)]
+        [TestCase(400, 0, 11, 9)]
+        [TestCase(401, 0, 12, 8)]
+        [TestCase(799, 0, 12, 8)]
+        [TestCase(800, 0, 12, 8)]
+        [TestCase(801, 0, 13, 7)]
+        [TestCase(1199, 0, 13, 7)]
+        [TestCase(1200, 0, 13, 7)]
+        [TestCase(1201, 0, 14, 6)]
+        [TestCase(1599, 0, 14, 6)]
+        [TestCase(1600, 0, 14, 6)]
+        [TestCase(1601, 0, 15, 5)]
+        [TestCase(1999, 0, 15, 5)]
+        [TestCase(2000, 0, 15, 5)]
+        [TestCase(2001, 0, 16, 4)]
         [TestCase(3150, 0, 16, 4)]
-        [TestCase(3151, 0, 17, 3)]
-        [TestCase(5100, 0, 17, 3)]
-        [TestCase(5101, 0, 17, 3)]
-        public void ShouldCalculateResult_DrawInSecondObjectiveOneWins(
+        public async Task ShouldCalculateResult_DrawInSecondObjectiveOneWins(
             int player1Points,
             int player2Points,
             int exectedoints1,
@@ -144,7 +147,7 @@ namespace FadingFlameTests
                 }
             };
 
-            league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
+            await league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
 
             league.Players[0].Id.Should().Be(player1.Id);
             league.Players[1].Id.Should().Be(player2.Id);
@@ -154,24 +157,23 @@ namespace FadingFlameTests
         }
 
 
-        [TestCase(0, 0, 10, 10)]
-        [TestCase(0, 1, 10, 10)]
-        [TestCase(0, 225, 10, 10)]
-        [TestCase(0, 226, 9, 11)]
-        [TestCase(0, 450, 9, 11)]
-        [TestCase(0, 451, 8, 12)]
-        [TestCase(0, 900, 8, 12)]
-        [TestCase(0, 901, 7, 13)]
-        [TestCase(0, 1350, 7, 13)]
-        [TestCase(0, 1351, 6, 14)]
-        [TestCase(0, 1800, 6, 14)]
-        [TestCase(0, 1801, 5, 15)]
-        [TestCase(0, 2250, 5, 15)]
-        [TestCase(0, 2251, 4, 16)]
+        [TestCase(0, 201, 9, 11)]
+        [TestCase(0, 399, 9, 11)]
+        [TestCase(0, 400, 9, 11)]
+        [TestCase(0, 401, 8, 12)]
+        [TestCase(0, 799, 8, 12)]
+        [TestCase(0, 800, 8, 12)]
+        [TestCase(0, 801, 7, 13)]
+        [TestCase(0, 1199, 7, 13)]
+        [TestCase(0, 1200, 7, 13)]
+        [TestCase(0, 1201, 6, 14)]
+        [TestCase(0, 1599, 6, 14)]
+        [TestCase(0, 1600, 6, 14)]
+        [TestCase(0, 1601, 5, 15)]
+        [TestCase(0, 1999, 5, 15)]
+        [TestCase(0, 2000, 5, 15)]
+        [TestCase(0, 2001, 4, 16)]
         [TestCase(0, 3150, 4, 16)]
-        [TestCase(0, 3151, 3, 17)]
-        [TestCase(0, 5100, 3, 17)]
-        [TestCase(0, 5101, 3, 17)]
         public void ShouldCalculateResult_DrawInSecondObjectiveTwoWins(
             int player1Points,
             int player2Points,
@@ -215,19 +217,19 @@ namespace FadingFlameTests
         }
 
         [TestCase(1000, 1000, 13, 7)]
-        [TestCase(1225, 1000, 13, 7)]
-        [TestCase(1226, 1000, 14, 6)]
+        [TestCase(1200, 1000, 13, 7)]
+        [TestCase(1201, 1000, 14, 6)]
         [TestCase(1251, 1251, 13, 7)]
-        [TestCase(2501, 2276, 13, 7)]
-        [TestCase(2501, 2275, 14, 6)]
+        [TestCase(2501, 2301, 13, 7)]
+        [TestCase(2501, 2300, 14, 6)]
         [TestCase(451, 0, 15, 5)]
         [TestCase(901, 0, 16, 4)]
         [TestCase(1351, 0, 17, 3)]
         [TestCase(1801, 0, 18, 2)]
         [TestCase(2251, 0, 19, 1)]
         [TestCase(2252, 0, 19, 1)]
-        [TestCase(3150, 0, 19, 1)]
-        [TestCase(3151, 0, 20, 0)]
+        [TestCase(2000, 0, 18, 2)]
+        [TestCase(2001, 0, 19, 1)]
         public void ShouldCalculateResult_player1wins(
             int player1Points,
             int player2Points,
@@ -271,19 +273,19 @@ namespace FadingFlameTests
         }
 
         [TestCase(1000, 1000, 13, 7)]
-        [TestCase(1225, 1000, 13, 7)]
-        [TestCase(1226, 1000, 14, 6)]
+        [TestCase(1200, 1000, 13, 7)]
+        [TestCase(1201, 1000, 14, 6)]
         [TestCase(1251, 1251, 13, 7)]
-        [TestCase(2501, 2276, 13, 7)]
-        [TestCase(2501, 2275, 14, 6)]
+        [TestCase(2501, 2301, 13, 7)]
+        [TestCase(2501, 2300, 14, 6)]
         [TestCase(451, 0, 15, 5)]
         [TestCase(901, 0, 16, 4)]
         [TestCase(1351, 0, 17, 3)]
         [TestCase(1801, 0, 18, 2)]
         [TestCase(2251, 0, 19, 1)]
         [TestCase(2252, 0, 19, 1)]
-        [TestCase(3150, 0, 19, 1)]
-        [TestCase(3151, 0, 20, 0)]
+        [TestCase(2000, 0, 18, 2)]
+        [TestCase(2001, 0, 19, 1)]
         public void ShouldCalculateResult_player2wins(
             int player2Points,
             int player1Points,
@@ -324,6 +326,56 @@ namespace FadingFlameTests
 
             league.Players[0].BattlePoints.Should().Be(expectedPoints2);
             league.Players[1].BattlePoints.Should().Be(exectedoints1);
+        }
+        
+        [TestCase(SecondaryObjectiveState.draw, SecondaryObjectiveState.draw, 10, 10)]
+        [TestCase(SecondaryObjectiveState.player1, SecondaryObjectiveState.draw, 13, 7)]
+        [TestCase(SecondaryObjectiveState.draw, SecondaryObjectiveState.player1, 11, 9)]
+        [TestCase(SecondaryObjectiveState.player2, SecondaryObjectiveState.draw, 7, 13)]
+        [TestCase(SecondaryObjectiveState.draw, SecondaryObjectiveState.player2, 9, 11)]
+        [TestCase(SecondaryObjectiveState.player1, SecondaryObjectiveState.player1, 14, 6)]
+        [TestCase(SecondaryObjectiveState.player1, SecondaryObjectiveState.player2, 12, 8)]
+        [TestCase(SecondaryObjectiveState.player2, SecondaryObjectiveState.player2, 6, 14)]
+        [TestCase(SecondaryObjectiveState.player1, SecondaryObjectiveState.player2, 12, 8)]
+        [TestCase(SecondaryObjectiveState.player2, SecondaryObjectiveState.player1, 8, 12)]
+        public async Task SecondariesAndPrimaries(
+            SecondaryObjectiveState primaryWinner,
+            SecondaryObjectiveState secondaryWinner,
+            int expectedPointsPlayer1,
+            int expectedPointsPlayer2)
+        {
+            var league = new League();
+
+            var player1 = Player.Create("peter", "213");
+            player1.Id = ObjectId.GenerateNewId();
+            var player2 = Player.Create("wolf", "213");
+            player2.Id = ObjectId.GenerateNewId();
+
+            league.AddPlayer(player2);
+            league.AddPlayer(player1);
+            league.CreateGameDays();
+
+            var result = new MatchResultDto
+            {
+                MatchId = league.GameDays.First().Matchups.First().Id,
+                SecondaryObjective = primaryWinner,
+                _3_0_SecondaryObjective = secondaryWinner,
+                Player1 = new PlayerResultDto
+                {
+                    Id = player1.Id,
+                    VictoryPoints = 1000
+                },
+                Player2 = new PlayerResultDto
+                {
+                    Id = player2.Id,
+                    VictoryPoints = 1000
+                }
+            };
+
+            var matchResult = await league.ReportGame(TestUtils.MmrRepositoryMock(), result, player1.Mmr, player2.Mmr, null, null);
+
+            matchResult.Player1.BattlePoints.Should().Be(expectedPointsPlayer1);
+            matchResult.Player2.BattlePoints.Should().Be(expectedPointsPlayer2);
         }
 
         [Test]
@@ -444,7 +496,7 @@ namespace FadingFlameTests
         }
 
         [Test]
-        public void ListComparerDirectComComparison()
+        public async Task ListComparerDirectComComparison()
         {
             var league = CreateLeagueToOrder();
 
@@ -457,6 +509,7 @@ namespace FadingFlameTests
             {
                 MatchId = league.GameDays[2].Matchups[0].Id,
                 SecondaryObjective = SecondaryObjectiveState.player2,
+                _3_0_SecondaryObjective = SecondaryObjectiveState.player2,
                 Player1 = new PlayerResultDto
                 {
                     Id = id1,
@@ -469,7 +522,7 @@ namespace FadingFlameTests
                 }
             };
 
-            league.ReportGame(TestUtils.MmrRepositoryMock(), result, Mmr.Create(), Mmr.Create(), null, null);
+            await league.ReportGame(TestUtils.MmrRepositoryMock(), result, Mmr.Create(), Mmr.Create(), null, null);
 
             Assert.AreEqual(20, league.Players[0].BattlePoints);
             Assert.AreEqual(20, league.Players[1].BattlePoints);

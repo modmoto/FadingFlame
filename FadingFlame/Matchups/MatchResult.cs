@@ -18,6 +18,7 @@ namespace FadingFlame.Matchups
         public PlayerResult Player2 { get; set; }
         public bool WasDefLoss { get; set; }
         public SecondaryObjectiveState SecondaryObjective { get; set; }
+        public SecondaryObjectiveState _3_0_SecondaryObjective { get; set; }
         public int VictoryPointsDifference => Math.Abs((Player1?.VictoryPoints ?? 0) - (Player2?.VictoryPoints ?? 0));
         public DateTime RecordedAt { get; set; }
         public ObjectId Winner { get; set; }
@@ -29,6 +30,7 @@ namespace FadingFlame.Matchups
 
         public static async Task<MatchResult> Create(
             IMmrRepository mmrRepository,
+            SecondaryObjectiveState primaryObjective,
             SecondaryObjectiveState secondaryObjective,
             Mmr player1Mmr,
             Mmr player2Mmr,
@@ -40,7 +42,8 @@ namespace FadingFlame.Matchups
         {
             var points = CalculateWinPoints(player1Result.VictoryPoints, player2Result.VictoryPoints);
 
-            var pointsAfteObjective = CalculateSecondaryObjective(
+            var pointsAfteObjective = CalculateObjective(
+                primaryObjective,
                 secondaryObjective,
                 points.Player1,
                 points.Player2);
@@ -56,7 +59,8 @@ namespace FadingFlame.Matchups
             return new MatchResult
             {
                 RecordedAt = DateTime.UtcNow,
-                SecondaryObjective = secondaryObjective,
+                SecondaryObjective = primaryObjective,
+                _3_0_SecondaryObjective = secondaryObjective,
                 Winner = winner,
                 WasDefLoss = wasDefLoss,
                 Player1 = PlayerResult.Create(player1Result.Id, player1Result.VictoryPoints, pointsAfteObjective.Player1, player1Mmr, newMmrs.Item1),
@@ -96,15 +100,13 @@ namespace FadingFlame.Matchups
         {
             var pointTuples = new Dictionary<int, PointTuple>
             {
-                { 225, new PointTuple(10, 10)},
-                { 450, new PointTuple(11, 9)},
-                { 900, new PointTuple(12, 8)},
-                { 1350, new PointTuple(13, 7)},
-                { 1800, new PointTuple(14, 6)},
-                { 2250, new PointTuple(15, 5)},
-                { 3150, new PointTuple(16, 4)},
-                { 3151, new PointTuple(17, 3)},
-                { Int32.MaxValue, new PointTuple(17, 3)}
+                { 200, new PointTuple(10, 10)},
+                { 400, new PointTuple(11, 9)},
+                { 800, new PointTuple(12, 8)},
+                { 1200, new PointTuple(13, 7)},
+                { 1600, new PointTuple(14, 6)},
+                { 2000, new PointTuple(15, 5)},
+                { Int32.MaxValue, new PointTuple(16, 4)}
             };
 
             var pair = pointTuples.First(p => Math.Abs(player1 - player2) <= p.Key);
@@ -114,22 +116,40 @@ namespace FadingFlame.Matchups
                 : new PointTuple(pair.Value.Player2, pair.Value.Player1);
         }
 
-        private static PointTuple CalculateSecondaryObjective(
+        private static PointTuple CalculateObjective(
+            SecondaryObjectiveState primaryObjective,
             SecondaryObjectiveState secondaryObjective,
             int points1,
             int points2)
         {
+            var objectivePointsPlayer1 = points1;
+            var objectivePointsPlayer2 = points2;
+
+            if (primaryObjective == SecondaryObjectiveState.player1)
+            {
+                objectivePointsPlayer1 += 3;
+                objectivePointsPlayer2 -= 3;
+            }
+            
+            if (primaryObjective == SecondaryObjectiveState.player2)
+            {
+                objectivePointsPlayer1 -= 3;
+                objectivePointsPlayer2 += 3;
+            }
+            
             if (secondaryObjective == SecondaryObjectiveState.player1)
             {
-                return new PointTuple(points1 + 3, points2 - 3);
+                objectivePointsPlayer1 += 1;
+                objectivePointsPlayer2 -= 1;
             }
-
+            
             if (secondaryObjective == SecondaryObjectiveState.player2)
             {
-                return new PointTuple(points1 - 3, points2 + 3);
+                objectivePointsPlayer1 -= 1;
+                objectivePointsPlayer2 += 1;
             }
 
-            return new PointTuple(points1, points2);
+            return new PointTuple(objectivePointsPlayer1, objectivePointsPlayer2);
         }
 
         public static MatchResult ZeroToZero(ObjectId player1Id, ObjectId player2Id)
@@ -142,6 +162,7 @@ namespace FadingFlame.Matchups
                 Player2 = PlayerResult.ZeroToZero(player2Id),
                 Winner = ObjectId.Empty,
                 SecondaryObjective = SecondaryObjectiveState.draw,
+                _3_0_SecondaryObjective = SecondaryObjectiveState.draw,
                 Player1List = GameList.DeffLoss(),
                 Player2List = GameList.DeffLoss()
             };
@@ -149,6 +170,7 @@ namespace FadingFlame.Matchups
 
         public static async Task<MatchResult> CreateKoResult(
             IMmrRepository mmrRepository,
+            SecondaryObjectiveState primaryObjective,
             SecondaryObjectiveState secondaryObjective,
             Mmr player1Mmr,
             Mmr player2Mmr,
@@ -160,7 +182,8 @@ namespace FadingFlame.Matchups
         {
             var points = CalculateWinPoints(player1Result.VictoryPoints, player2Result.VictoryPoints);
 
-            var pointsAfteObjective = CalculateSecondaryObjective(
+            var pointsAfteObjective = CalculateObjective(
+                primaryObjective,
                 secondaryObjective,
                 points.Player1,
                 points.Player2);
@@ -178,7 +201,8 @@ namespace FadingFlame.Matchups
             return new MatchResult
             {
                 RecordedAt = DateTime.UtcNow,
-                SecondaryObjective = secondaryObjective,
+                SecondaryObjective = primaryObjective,
+                _3_0_SecondaryObjective = secondaryObjective,
                 Winner = winner,
                 Player1 = PlayerResult.Create(player1Result.Id, player1Result.VictoryPoints, pointsAfteObjective.Player1, player1Mmr, newMmrs.Item1),
                 Player2 = PlayerResult.Create(player2Result.Id, player2Result.VictoryPoints, pointsAfteObjective.Player2, player2Mmr, newMmrs.Item2),
@@ -197,13 +221,15 @@ namespace FadingFlame.Matchups
         }
 
         public static MatchResult CreateWithoutMmr(
+            SecondaryObjectiveState primaryObjective,
             SecondaryObjectiveState secondaryObjective,
             int player1VictoryPoints,
             int player2VictoryPoints)
         {
             var points = CalculateWinPoints(player1VictoryPoints, player2VictoryPoints);
 
-            var pointsAfteObjective = CalculateSecondaryObjective(
+            var pointsAfteObjective = CalculateObjective(
+                primaryObjective,
                 secondaryObjective,
                 points.Player1,
                 points.Player2);
