@@ -8,6 +8,9 @@ namespace FadingFlame.Admin
         SpoilsOfWar = 3,
         KingOfTheHill = 4, 
         CaptureTheFlags = 5,
-        SecureTarget = 6
+        SecureTarget = 6,
+        HoldTheCentre = 7,
+        ForageAndPlunder = 8,
+        HiddenAgendas = 9,
     }
 }

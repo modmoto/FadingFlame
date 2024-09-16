@@ -8,6 +8,10 @@ namespace FadingFlame.Admin
         Counterthrust = 3,
         Encircle = 4, 
         RefusedFlank = 5,
-        MarchingColumns = 6
+        MarchingColumns = 6,
+        Bottleneck = 7,
+        Spearhead = 8,
+        MutualEncroachment = 9,
+        Cornerstone = 10,
     }
 }
