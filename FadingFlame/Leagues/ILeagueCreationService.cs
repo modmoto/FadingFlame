@@ -15,6 +15,7 @@ namespace FadingFlame.Leagues
         Task CreatePromotions();
         Task MakeSeasonOfficial();
         Task CreateEmptyLeagueInCurrentSeason();
+        Task SetSecondariesAndDeploymentsForNextSeason(Season season);
     }
 
     public class LeagueCreationService : ILeagueCreationService
@@ -209,7 +210,7 @@ namespace FadingFlame.Leagues
             }
 
             await _leagueRepository.Insert(newLeagues);
-            await SetDeploymentsForNextSeason();
+            await SetSecondariesAndDeploymentsForNextSeason(seasons[0]);
         }
 
         private int RatePlayer(Player player)
@@ -402,12 +403,9 @@ namespace FadingFlame.Leagues
             }
         }
 
-        private async Task SetDeploymentsForNextSeason()
+        public async Task SetSecondariesAndDeploymentsForNextSeason(Season season)
         {
-            var seasons = await _seasonRepository.LoadSeasons();
-            var currentSeason = seasons[0];
-
-            var currentLeagues = await _leagueRepository.LoadForSeason(currentSeason.SeasonId);
+            var currentLeagues = await _leagueRepository.LoadForSeason(season.SeasonId);
 
             var secondaryObjectives = new List<SecondaryObjective> {SecondaryObjective.SpoilsOfWar, SecondaryObjective.Breakthrough, SecondaryObjective.SecureTarget, SecondaryObjective.ForageAndPlunder, SecondaryObjective.HoldTheCentre, SecondaryObjective.HiddenAgendas };
             var deployments = new List<Deployment> {Deployment.FrontlineClash, Deployment.Bottleneck, Deployment.Spearhead, Deployment.MutualEncroachment, Deployment.RefusedFlank, Deployment.Cornerstone };
