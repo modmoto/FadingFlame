@@ -40,10 +40,13 @@ namespace FadingFlame.Playoffs
 
             var lowerLeagues = leagues.Skip(4).ToList();
             var weekerPlayers = lowerLeagues.Select(l => l.Players.First()).ToList();
-            if (weekerPlayers.Count < 16)
+            var skips = 1;
+            while (weekerPlayers.Count != 16)
             {
-                var remainingSeconds = lowerLeagues.Select(l => l.Players.Skip(1).First()).Take(16 - weekerPlayers.Count);
+                var remainingSeconds = lowerLeagues.Select(l => l.Players.Skip(skips).First()).Take(16 - weekerPlayers.Count).ToList();
                 weekerPlayers.AddRange(remainingSeconds);
+                weekerPlayers = weekerPlayers.Take(16).ToList();
+                skips++;
             }
             weekerPlayers.Shuffle();
 
