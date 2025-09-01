@@ -52,7 +52,7 @@ namespace FadingFlame.Discord
                 foreach (var discordMember in guild.Members)
                 {
                     var member = discordMember.Value;
-                    var oldLeagueRoles = member.Roles.Where(r => LeagueConstants.Ids.Contains(r.Name)).ToList();
+                    var oldLeagueRoles = member.Roles.Where(r => LeagueConstants.Ids.Contains(r.Name.ToUpper())).ToList();
                     foreach (var oldLeagueRole in oldLeagueRoles)
                     {
                         await member.RevokeRoleAsync(oldLeagueRole);
@@ -69,7 +69,7 @@ namespace FadingFlame.Discord
                     }
                     else
                     {
-                        var leagueRole = guild.Roles.FirstOrDefault(r => r.Value.Name == leagueOfPlayer.DivisionId).Value;
+                        var leagueRole = guild.Roles.FirstOrDefault(r => r.Value.Name.ToUpper() == leagueOfPlayer.DivisionId).Value;
                         await member.GrantRoleAsync(leagueRole);
                     }
                 }
