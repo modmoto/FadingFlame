@@ -49,9 +49,9 @@ namespace FadingFlame.Discord
             {
                 var guild = clientGuild.Value;
 
-                foreach (var discordMember in guild.Members)
+                var allMembers = await guild.GetAllMembersAsync();
+                foreach (var member in allMembers)
                 {
-                    var member = discordMember.Value;
                     var oldLeagueRoles = member.Roles.Where(r => LeagueConstants.Ids.Contains(r.Name.ToUpper())).ToList();
                     foreach (var oldLeagueRole in oldLeagueRoles)
                     {
@@ -61,7 +61,7 @@ namespace FadingFlame.Discord
                 
                 foreach (var player in players)
                 {
-                    var member = guild.Members.FirstOrDefault(member => FindUser(player.DiscordTag, member.Value)).Value;
+                    var member = allMembers.FirstOrDefault(member => FindUser(player.DiscordTag, member));
                     var leagueOfPlayer = leagues.Single(l => l.Players.Select(p => p.Id).Contains(player.Id));
                     if (member == null)
                     {
