@@ -1,62 +1,77 @@
 name: $(Build.BuildID)
 
-pool:
-  vmImage: "ubuntu-24.04"
+jobs:
+  - job: build_and_test
+    pool:
+      vmImage: "ubuntu-24.04"
+    
+    services:
+      mongo:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+        options: >-
+          --restart=always
+    
+    steps:
+      - task: qetza.replacetokens.replacetokens-task.replacetokens@3
+        displayName: 'Replace tokens'
+        inputs:
+          targetFiles: |
+            **/*.token.yml => *.yml
 
-steps:
-  - task: qetza.replacetokens.replacetokens-task.replacetokens@3
-    displayName: 'Replace tokens'
-    inputs:
-      targetFiles: |
-        **/*.token.yml => *.yml
+      - task: UseDotNet@2
+        inputs:
+          packageType: 'sdk'
+          version: '8.0.x'
 
-  - task: UseDotNet@2
-    inputs:
-      packageType: 'sdk'
-      version: '8.0.x'
+      - task: DotNetCoreCLI@2
+        displayName: 'restore'
+        inputs:
+          command: 'restore'
+          feedsToUse: 'select'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'build'
+        inputs:
+          command: 'build'
       
-  - task: DotNetCoreCLI@2
-    displayName: 'restore'
-    inputs:
-      command: 'restore'
-      feedsToUse: 'select'
-      
-  - task: DotNetCoreCLI@2
-    displayName: 'build'
-    inputs:
-      command: 'build'
-      
-  - task: CmdLine@2
-    displayName: 'start mongo daemon'
-    inputs:
-      script: 'sudo systemctl start mongod'
+      - script: |
+          echo "Waiting for MongoDB on 127.0.0.1:27017 ..."
+          for i in {1..60}; do
+            (echo > /dev/tcp/127.0.0.1/27017) >/dev/null 2>&1 && { echo "MongoDB is up."; exit 0; }
+            sleep 1
+          done
+          echo "MongoDB did not become ready in time." >&2
+          exit 1
+        displayName: 'Wait for MongoDB'
 
-  - task: DotNetCoreCLI@2
-    displayName: 'unit tests'
-    env:
-      TESTING_MONGO_CONNECTION_STRING: 'mongodb://127.0.0.1:27017'
-    inputs:
-      command: 'test'
-      projects: '**/*Tests.csproj'
+      - task: DotNetCoreCLI@2
+        displayName: 'unit tests'
+        env:
+          TESTING_MONGO_CONNECTION_STRING: 'mongodb://127.0.0.1:27017'
+        inputs:
+          command: 'test'
+          projects: '**/*Tests.csproj'
 
-  - task: Docker@2
-    condition: eq(variables['Build.Reason'], 'IndividualCI')
-    inputs:
-      containerRegistry: 'official-docker-modmoto'
-      repository: 'modmoto/fading-flame'
-      command: 'buildAndPush'
-      Dockerfile: '**/Dockerfile'
-      buildContext: '.'
-      tags: |
-        $(Build.BuildID),
-        latest
+      - task: Docker@2
+        condition: eq(variables['Build.Reason'], 'IndividualCI')
+        inputs:
+          containerRegistry: 'official-docker-modmoto'
+          repository: 'modmoto/fading-flame'
+          command: 'buildAndPush'
+          Dockerfile: '**/Dockerfile'
+          buildContext: '.'
+          tags: |
+            $(Build.BuildID),
+            latest
 
-  - task: CopyFiles@2
-    displayName: publish docker-compose files
-    inputs:
-      contents: '**/*docker-compose.yml'
-      targetFolder: $(Build.ArtifactStagingDirectory)
+      - task: CopyFiles@2
+        displayName: publish docker-compose files
+        inputs:
+          contents: '**/*docker-compose.yml'
+          targetFolder: $(Build.ArtifactStagingDirectory)
 
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathToPublish: $(Build.ArtifactStagingDirectory)
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathToPublish: $(Build.ArtifactStagingDirectory)
