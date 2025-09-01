@@ -1,7 +1,7 @@
 name: $(Build.BuildID)
 
 pool:
-  vmImage: "ubuntu-20.04"
+  vmImage: "ubuntu-24.04"
 
 steps:
   - task: qetza.replacetokens.replacetokens-task.replacetokens@3
