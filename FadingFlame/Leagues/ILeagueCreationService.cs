@@ -48,14 +48,13 @@ namespace FadingFlame.Leagues
             var currentLeagues = await _leagueRepository.LoadForSeason(currentSeason.SeasonId);
 
             var divisionsTemp = new List<List<Player>>();
-            var oldDivisionCount = (currentLeagues.Count + 1) / 2;
-            var newDivisionCount = Math.Ceiling((float) enrolledPlayers.Count / (float) (League.MaxPlayerCount * (float) 2));
-            for (int i = 0; i < newDivisionCount; i++)
+            var divisionCount = (currentLeagues.Count + 1) / 2;
+            for (int i = 0; i < divisionCount; i++)
             {
                 divisionsTemp.Add(new List<Player>());
             }
 
-            for (int division = 0; division < oldDivisionCount; division ++)
+            for (int division = 0; division < divisionCount; division ++)
             {
                 var newPlayerRanks = divisionsTemp[division];
                 var leagueIndex = division * 2;
@@ -132,6 +131,7 @@ namespace FadingFlame.Leagues
 
             var playerCountPerDivision = League.MaxPlayerCount * 2;
             var newDivisionCountExceptFirstAndSecond = (int) Math.Ceiling((double) enrolledPlayers.Count / League.MaxPlayerCount / 2.0 - 2.0);
+            var amountOfFreshPlayersEachDivision = (int) Math.Ceiling((decimal) returningAndNewPlayersOrderedBySkill.Count / newDivisionCountExceptFirstAndSecond);
             
             for (int division = 0; division < divisionsTemp.Count; division++)
             {
@@ -145,11 +145,34 @@ namespace FadingFlame.Leagues
                     }
                     else
                     {
-                        var playersToTakeFromNewPlayers = playerCountPerDivision - playersForThisDivision.Count;
+                        var isLowestDivision = division == divisionsTemp.Count - 1;
+                        if (isLowestDivision)
+                        {
+                            playersForThisDivision.AddRange(returningAndNewPlayersOrderedBySkill);
+                            divisionsTemp[division] = playersForThisDivision;
+                        }
+                        else
+                        {
+                            var playersToTakeFromNewPlayers = amountOfFreshPlayersEachDivision > playerCountPerDivision - playersForThisDivision.Count
+                                ? playerCountPerDivision - playersForThisDivision.Count
+                                : amountOfFreshPlayersEachDivision;
                         
-                        var newPlayersThatShouldGoToThisLeague = returningAndNewPlayersOrderedBySkill.Take(playersToTakeFromNewPlayers);
-                        returningAndNewPlayersOrderedBySkill = returningAndNewPlayersOrderedBySkill.Skip(playersToTakeFromNewPlayers).ToList();
-                        playersForThisDivision.AddRange(newPlayersThatShouldGoToThisLeague);
+                            var newPlayersThatShouldGoToThisLeague = returningAndNewPlayersOrderedBySkill.Take(playersToTakeFromNewPlayers);
+                            returningAndNewPlayersOrderedBySkill = returningAndNewPlayersOrderedBySkill.Skip(playersToTakeFromNewPlayers).ToList();
+                            playersForThisDivision.AddRange(newPlayersThatShouldGoToThisLeague);
+                            
+                            // one day, this should be fixed, somehow messes with the fact if there is no more people in the lower leagues
+                            var newPlayerCountMissingFromDivision = playerCountPerDivision - playersForThisDivision.Count;
+                            var remainingPlayers = divisionsTemp.Skip(division).Sum(d => d.Count);
+                            while (newPlayerCountMissingFromDivision > 0 
+                                   && remainingPlayers >= 0 
+                                   && newPlayerCountMissingFromDivision < remainingPlayers)
+                            {
+                                MovePlayersUp(division, divisionsTemp, newPlayerCountMissingFromDivision);
+                                newPlayerCountMissingFromDivision = playerCountPerDivision - playersForThisDivision.Count;
+                                remainingPlayers = divisionsTemp.Skip(division).Sum(d => d.Count);
+                            }
+                        }
                     }
                 }
 
