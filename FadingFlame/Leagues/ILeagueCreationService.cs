@@ -407,8 +407,24 @@ namespace FadingFlame.Leagues
         {
             var currentLeagues = await _leagueRepository.LoadForSeason(season.SeasonId);
 
-            var secondaryObjectives = new List<SecondaryObjective> {SecondaryObjective.SpoilsOfWar, SecondaryObjective.Breakthrough, SecondaryObjective.SecureTarget, SecondaryObjective.ForageAndPlunder, SecondaryObjective.HoldTheCentre, SecondaryObjective.HiddenAgendas };
-            var deployments = new List<Deployment> {Deployment.FrontlineClash, Deployment.Bottleneck, Deployment.Spearhead, Deployment.MutualEncroachment, Deployment.RefusedFlank, Deployment.Cornerstone };
+            var secondaryObjectives = new List<SecondaryObjective>
+            {
+                SecondaryObjective.TrophiesOfWar, 
+                SecondaryObjective.DivideAndConquer, 
+                SecondaryObjective.Breakthrough, 
+                SecondaryObjective.SecureTarget, 
+                SecondaryObjective.HoldTheCentre, 
+                SecondaryObjective.SkullOfHaraldRedstub
+            };
+            var deployments = new List<Deployment>
+            {
+                Deployment.FrontlineClash, 
+                Deployment.Bottleneck, 
+                Deployment.Spearhead, 
+                Deployment.Encircle, 
+                Deployment.RefusedFlank, 
+                Deployment.AssaultAtFirstLight
+            };
             
             secondaryObjectives.Shuffle();
             deployments.Shuffle();

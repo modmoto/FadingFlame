@@ -13,5 +13,6 @@ namespace FadingFlame.Admin
         Spearhead = 8,
         MutualEncroachment = 9,
         Cornerstone = 10,
+        AssaultAtFirstLight = 11,
     }
 }

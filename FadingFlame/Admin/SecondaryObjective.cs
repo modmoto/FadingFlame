@@ -12,5 +12,8 @@ namespace FadingFlame.Admin
         HoldTheCentre = 7,
         ForageAndPlunder = 8,
         HiddenAgendas = 9,
+        TrophiesOfWar = 10,
+        DivideAndConquer = 11,
+        SkullOfHaraldRedstub = 12,
     }
 }
