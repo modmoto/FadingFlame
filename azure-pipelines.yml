@@ -3,7 +3,7 @@ name: $(Build.BuildID)
 jobs:
   - job: build_and_test
     pool:
-      vmImage: "ubuntu-24.04"
+      vmImage: "ubuntu-22.04"
     
     services:
       mongo:
